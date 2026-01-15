@@ -59,6 +59,10 @@ export function useKeyboardShortcuts({
           break;
 
         case "KeyR":
+          // Allow CMD+R / Ctrl+R for browser reload
+          if (event.metaKey || event.ctrlKey) {
+            return;
+          }
           event.preventDefault();
           onReset();
           break;
@@ -74,6 +78,10 @@ export function useKeyboardShortcuts({
           break;
 
         case "KeyM":
+          // Allow CMD+M / Ctrl+M for browser/OS shortcuts
+          if (event.metaKey || event.ctrlKey) {
+            return;
+          }
           event.preventDefault();
           setMetronomeEnabled(!metronome.enabled);
           break;
