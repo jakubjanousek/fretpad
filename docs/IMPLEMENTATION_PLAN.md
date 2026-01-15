@@ -16,10 +16,10 @@
 - [x] `lib/theory/progression.ts` - parseProgression (with multi-chord bars)
 
 ### Milestone 3 – Fretboard Visualization
-- [ ] `lib/fretboard.ts` - getFretNotesForChord
-- [ ] `components/fretboard/Fretboard.tsx` - grid rendering
-- [ ] `components/fretboard/FretMarker.tsx` - note circles with colors
-- [ ] Hover tooltips working
+- [x] `lib/fretboard.ts` - getFretNotesForChord
+- [x] `components/fretboard/Fretboard.tsx` - grid rendering
+- [x] `components/fretboard/FretMarker.tsx` - note circles with colors
+- [x] Hover tooltips working
 
 ### Milestone 4 – Progression Editor & State
 - [ ] `state/useAppStore.ts` - Zustand store with default preset

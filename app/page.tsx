@@ -1,6 +1,18 @@
+"use client";
+
+import { useState } from "react";
+import { Fretboard } from "@/components/fretboard/Fretboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getFretNotesForChord } from "@/lib/fretboard";
+import { parseChordSymbol } from "@/lib/theory/chords";
+
+const DEFAULT_PROGRESSION = ["Dm7", "G7", "Cmaj7", "Cmaj7"];
 
 export default function Page() {
+  const [selectedChordIndex, setSelectedChordIndex] = useState(0);
+  const selectedChordSymbol = DEFAULT_PROGRESSION[selectedChordIndex];
+  const currentChord = parseChordSymbol(selectedChordSymbol);
+  const fretNotes = currentChord ? getFretNotesForChord(currentChord) : [];
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
@@ -21,20 +33,24 @@ export default function Page() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <span className="px-3 py-2 border rounded-md bg-muted/50">
-                  Dm7
+              <div className="flex items-center gap-2 text-sm">
+                {DEFAULT_PROGRESSION.map((chord, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setSelectedChordIndex(index)}
+                    className={`px-3 py-2 border rounded-md transition-colors ${
+                      index === selectedChordIndex
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {chord}
+                  </button>
+                ))}
+                <span className="ml-2 text-xs text-muted-foreground">
+                  (ii-V-I in C)
                 </span>
-                <span className="px-3 py-2 border rounded-md bg-muted/50">
-                  G7
-                </span>
-                <span className="px-3 py-2 border rounded-md bg-muted/50">
-                  Cmaj7
-                </span>
-                <span className="px-3 py-2 border rounded-md bg-muted/50">
-                  Cmaj7
-                </span>
-                <span className="ml-2 text-xs">(ii-V-I in C)</span>
               </div>
             </CardContent>
           </Card>
@@ -47,11 +63,7 @@ export default function Page() {
               <CardTitle className="text-base font-medium">Fretboard</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-48 flex items-center justify-center border-2 border-dashed border-muted rounded-lg">
-                <p className="text-muted-foreground text-sm">
-                  Fretboard visualization will appear here
-                </p>
-              </div>
+              <Fretboard fretNotes={fretNotes} />
             </CardContent>
           </Card>
         </section>
@@ -98,23 +110,41 @@ export default function Page() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-1 text-sm">
-                  <p>
-                    <span className="text-muted-foreground">Current:</span>{" "}
-                    <span className="font-medium">Dm7</span>
+                {currentChord ? (
+                  <div className="space-y-1 text-sm">
+                    <p>
+                      <span className="text-muted-foreground">Current:</span>{" "}
+                      <span className="font-medium">{currentChord.symbol}</span>
+                    </p>
+                    <p>
+                      <span className="text-muted-foreground">Notes:</span>{" "}
+                      <span className="font-mono">
+                        {currentChord.notes.join(" ")}
+                      </span>
+                    </p>
+                    <p>
+                      <span className="text-muted-foreground">
+                        Guide tones:
+                      </span>{" "}
+                      <span className="font-mono">
+                        {currentChord.guideTones.join(" ")}
+                      </span>
+                      <span className="text-xs text-muted-foreground ml-1">
+                        (3rd, 7th)
+                      </span>
+                    </p>
+                    <p>
+                      <span className="text-muted-foreground">Scale:</span>{" "}
+                      <span className="font-mono">
+                        {currentChord.suggestedScales[0]}
+                      </span>
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Select a chord
                   </p>
-                  <p>
-                    <span className="text-muted-foreground">Notes:</span>{" "}
-                    <span className="font-mono">D F A C</span>
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">Guide tones:</span>{" "}
-                    <span className="font-mono">F C</span>
-                    <span className="text-xs text-muted-foreground ml-1">
-                      (3rd, 7th)
-                    </span>
-                  </p>
-                </div>
+                )}
               </CardContent>
             </Card>
           </div>
