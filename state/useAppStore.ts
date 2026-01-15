@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { DEFAULT_STYLE_ID } from "@/lib/audio/styles";
 import type { ErrorInfo } from "@/lib/errors";
 import { toErrorInfo } from "@/lib/errors";
@@ -84,252 +85,273 @@ function getChordAtPosition(
 const defaultProgression = PRESET_PROGRESSIONS["ii-V-I in C"];
 const defaultChord = getChordAtPosition(defaultProgression, 0, 0);
 
-export const useAppStore = create<AppState>((set, get) => ({
-  // Initial state
-  progression: defaultProgression,
-  currentBarIndex: 0,
-  currentChordIndex: 0,
-  currentChord: defaultChord,
-  tempo: 120,
-  isPlaying: false,
-  selectedStyle: DEFAULT_STYLE_ID,
-  metronome: {
-    enabled: false,
-    volume: -6,
-    accentDownbeat: true,
-    countIn: 0,
-  },
-  showScaleTones: false,
-  error: null,
-
-  // Error actions
-  setError: (error) => {
-    set({ error: toErrorInfo(error) });
-  },
-
-  clearError: () => {
-    set({ error: null });
-  },
-
-  // Actions
-  setProgression: (progression) => {
-    const chord = getChordAtPosition(progression, 0, 0);
-    set({
-      progression,
+export const useAppStore = create<AppState>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      progression: defaultProgression,
       currentBarIndex: 0,
       currentChordIndex: 0,
-      currentChord: chord,
-    });
-  },
+      currentChord: defaultChord,
+      tempo: 120,
+      isPlaying: false,
+      selectedStyle: DEFAULT_STYLE_ID,
+      metronome: {
+        enabled: false,
+        volume: -6,
+        accentDownbeat: true,
+        countIn: 0,
+      },
+      showScaleTones: false,
+      error: null,
 
-  loadPreset: (presetName) => {
-    const progression = PRESET_PROGRESSIONS[presetName];
-    const chord = getChordAtPosition(progression, 0, 0);
-    set({
-      progression,
-      currentBarIndex: 0,
-      currentChordIndex: 0,
-      currentChord: chord,
-    });
-  },
+      // Error actions
+      setError: (error) => {
+        set({ error: toErrorInfo(error) });
+      },
 
-  setCurrentPosition: (barIndex, chordIndex) => {
-    const { progression } = get();
-    const chord = getChordAtPosition(progression, barIndex, chordIndex);
-    set({
-      currentBarIndex: barIndex,
-      currentChordIndex: chordIndex,
-      currentChord: chord,
-    });
-  },
+      clearError: () => {
+        set({ error: null });
+      },
 
-  setTempo: (tempo) => {
-    // Clamp tempo between 40 and 200 BPM
-    const clampedTempo = Math.max(40, Math.min(200, tempo));
-    set({ tempo: clampedTempo });
-  },
+      // Actions
+      setProgression: (progression) => {
+        const chord = getChordAtPosition(progression, 0, 0);
+        set({
+          progression,
+          currentBarIndex: 0,
+          currentChordIndex: 0,
+          currentChord: chord,
+        });
+      },
 
-  setIsPlaying: (isPlaying) => {
-    set({ isPlaying });
-  },
+      loadPreset: (presetName) => {
+        const progression = PRESET_PROGRESSIONS[presetName];
+        const chord = getChordAtPosition(progression, 0, 0);
+        set({
+          progression,
+          currentBarIndex: 0,
+          currentChordIndex: 0,
+          currentChord: chord,
+        });
+      },
 
-  setSelectedStyle: (style) => {
-    set({ selectedStyle: style });
-  },
+      setCurrentPosition: (barIndex, chordIndex) => {
+        const { progression } = get();
+        const chord = getChordAtPosition(progression, barIndex, chordIndex);
+        set({
+          currentBarIndex: barIndex,
+          currentChordIndex: chordIndex,
+          currentChord: chord,
+        });
+      },
 
-  // Metronome actions
-  setMetronomeEnabled: (enabled) => {
-    set((state) => ({
-      metronome: { ...state.metronome, enabled },
-    }));
-  },
+      setTempo: (tempo) => {
+        // Clamp tempo between 40 and 200 BPM
+        const clampedTempo = Math.max(40, Math.min(200, tempo));
+        set({ tempo: clampedTempo });
+      },
 
-  setMetronomeVolume: (volume) => {
-    // Clamp volume between -20 and 0 dB
-    const clampedVolume = Math.max(-20, Math.min(0, volume));
-    set((state) => ({
-      metronome: { ...state.metronome, volume: clampedVolume },
-    }));
-  },
+      setIsPlaying: (isPlaying) => {
+        set({ isPlaying });
+      },
 
-  setMetronomeCountIn: (countIn) => {
-    set((state) => ({
-      metronome: { ...state.metronome, countIn },
-    }));
-  },
+      setSelectedStyle: (style) => {
+        set({ selectedStyle: style });
+      },
 
-  setShowScaleTones: (show) => {
-    set({ showScaleTones: show });
-  },
+      // Metronome actions
+      setMetronomeEnabled: (enabled) => {
+        set((state) => ({
+          metronome: { ...state.metronome, enabled },
+        }));
+      },
 
-  updateBar: (barIndex, barString) => {
-    const { progression } = get();
-    const newBar = parseBar(barString, progression.timeSignature.numerator);
+      setMetronomeVolume: (volume) => {
+        // Clamp volume between -20 and 0 dB
+        const clampedVolume = Math.max(-20, Math.min(0, volume));
+        set((state) => ({
+          metronome: { ...state.metronome, volume: clampedVolume },
+        }));
+      },
 
-    if (!newBar) {
-      // Invalid chord input
-      return false;
-    }
+      setMetronomeCountIn: (countIn) => {
+        set((state) => ({
+          metronome: { ...state.metronome, countIn },
+        }));
+      },
 
-    // Preserve the bar's ID
-    const existingBar = progression.bars[barIndex];
-    if (existingBar) {
-      newBar.id = existingBar.id;
-    }
+      setShowScaleTones: (show) => {
+        set({ showScaleTones: show });
+      },
 
-    const newBars = [...progression.bars];
-    newBars[barIndex] = newBar;
+      updateBar: (barIndex, barString) => {
+        const { progression } = get();
+        const newBar = parseBar(barString, progression.timeSignature.numerator);
 
-    const newProgression: Progression = {
-      ...progression,
-      bars: newBars,
-    };
+        if (!newBar) {
+          // Invalid chord input
+          return false;
+        }
 
-    // Update current chord if we're editing the current bar
-    const { currentBarIndex, currentChordIndex } = get();
-    let newCurrentChord = get().currentChord;
-    let newChordIndex = currentChordIndex;
+        // Preserve the bar's ID
+        const existingBar = progression.bars[barIndex];
+        if (existingBar) {
+          newBar.id = existingBar.id;
+        }
 
-    if (barIndex === currentBarIndex) {
-      // Adjust chord index if it's now out of bounds
-      if (currentChordIndex >= newBar.chords.length) {
-        newChordIndex = newBar.chords.length - 1;
-      }
-      newCurrentChord = getChordAtPosition(
-        newProgression,
-        barIndex,
-        newChordIndex,
-      );
-    }
+        const newBars = [...progression.bars];
+        newBars[barIndex] = newBar;
 
-    set({
-      progression: newProgression,
-      currentChordIndex: newChordIndex,
-      currentChord: newCurrentChord,
-    });
+        const newProgression: Progression = {
+          ...progression,
+          bars: newBars,
+        };
 
-    return true;
-  },
+        // Update current chord if we're editing the current bar
+        const { currentBarIndex, currentChordIndex } = get();
+        let newCurrentChord = get().currentChord;
+        let newChordIndex = currentChordIndex;
 
-  addBar: () => {
-    const { progression } = get();
+        if (barIndex === currentBarIndex) {
+          // Adjust chord index if it's now out of bounds
+          if (currentChordIndex >= newBar.chords.length) {
+            newChordIndex = newBar.chords.length - 1;
+          }
+          newCurrentChord = getChordAtPosition(
+            newProgression,
+            barIndex,
+            newChordIndex,
+          );
+        }
 
-    // Create a new empty bar with a default chord
-    const newBar: ProgressionBar = {
-      id: generateId(),
-      totalBeats: progression.timeSignature.numerator,
-      chords: [{ chord: "C", beats: progression.timeSignature.numerator }],
-    };
+        set({
+          progression: newProgression,
+          currentChordIndex: newChordIndex,
+          currentChord: newCurrentChord,
+        });
 
-    const newProgression: Progression = {
-      ...progression,
-      bars: [...progression.bars, newBar],
-    };
+        return true;
+      },
 
-    set({ progression: newProgression });
-  },
+      addBar: () => {
+        const { progression } = get();
 
-  removeBar: (barIndex) => {
-    const { progression, currentBarIndex, currentChordIndex } = get();
+        // Create a new empty bar with a default chord
+        const newBar: ProgressionBar = {
+          id: generateId(),
+          totalBeats: progression.timeSignature.numerator,
+          chords: [{ chord: "C", beats: progression.timeSignature.numerator }],
+        };
 
-    // Don't remove if only one bar left
-    if (progression.bars.length <= 1) return;
+        const newProgression: Progression = {
+          ...progression,
+          bars: [...progression.bars, newBar],
+        };
 
-    const newBars = progression.bars.filter((_, idx) => idx !== barIndex);
-    const newProgression: Progression = {
-      ...progression,
-      bars: newBars,
-    };
+        set({ progression: newProgression });
+      },
 
-    // Adjust current position if needed
-    let newBarIndex = currentBarIndex;
-    let newChordIndex = currentChordIndex;
+      removeBar: (barIndex) => {
+        const { progression, currentBarIndex, currentChordIndex } = get();
 
-    if (barIndex < currentBarIndex) {
-      // Removed bar is before current, shift index down
-      newBarIndex = currentBarIndex - 1;
-    } else if (barIndex === currentBarIndex) {
-      // Removed the current bar, select previous or first
-      newBarIndex = Math.max(0, currentBarIndex - 1);
-      newChordIndex = 0;
-    }
+        // Don't remove if only one bar left
+        if (progression.bars.length <= 1) return;
 
-    // Ensure index is valid
-    newBarIndex = Math.min(newBarIndex, newBars.length - 1);
+        const newBars = progression.bars.filter((_, idx) => idx !== barIndex);
+        const newProgression: Progression = {
+          ...progression,
+          bars: newBars,
+        };
 
-    const newCurrentChord = getChordAtPosition(
-      newProgression,
-      newBarIndex,
-      newChordIndex,
-    );
+        // Adjust current position if needed
+        let newBarIndex = currentBarIndex;
+        let newChordIndex = currentChordIndex;
 
-    set({
-      progression: newProgression,
-      currentBarIndex: newBarIndex,
-      currentChordIndex: newChordIndex,
-      currentChord: newCurrentChord,
-    });
-  },
+        if (barIndex < currentBarIndex) {
+          // Removed bar is before current, shift index down
+          newBarIndex = currentBarIndex - 1;
+        } else if (barIndex === currentBarIndex) {
+          // Removed the current bar, select previous or first
+          newBarIndex = Math.max(0, currentBarIndex - 1);
+          newChordIndex = 0;
+        }
 
-  advanceToNextChord: () => {
-    const { progression, currentBarIndex, currentChordIndex } = get();
-    const currentBar = progression.bars[currentBarIndex];
+        // Ensure index is valid
+        newBarIndex = Math.min(newBarIndex, newBars.length - 1);
 
-    if (!currentBar) return;
+        const newCurrentChord = getChordAtPosition(
+          newProgression,
+          newBarIndex,
+          newChordIndex,
+        );
 
-    // Try to advance within the current bar
-    if (currentChordIndex < currentBar.chords.length - 1) {
-      const newChordIndex = currentChordIndex + 1;
-      const chord = getChordAtPosition(
-        progression,
-        currentBarIndex,
-        newChordIndex,
-      );
-      set({
-        currentChordIndex: newChordIndex,
-        currentChord: chord,
-      });
-      return;
-    }
+        set({
+          progression: newProgression,
+          currentBarIndex: newBarIndex,
+          currentChordIndex: newChordIndex,
+          currentChord: newCurrentChord,
+        });
+      },
 
-    // Move to next bar
-    if (currentBarIndex < progression.bars.length - 1) {
-      const newBarIndex = currentBarIndex + 1;
-      const chord = getChordAtPosition(progression, newBarIndex, 0);
-      set({
-        currentBarIndex: newBarIndex,
-        currentChordIndex: 0,
-        currentChord: chord,
-      });
-      return;
-    }
+      advanceToNextChord: () => {
+        const { progression, currentBarIndex, currentChordIndex } = get();
+        const currentBar = progression.bars[currentBarIndex];
 
-    // Loop back to beginning
-    const chord = getChordAtPosition(progression, 0, 0);
-    set({
-      currentBarIndex: 0,
-      currentChordIndex: 0,
-      currentChord: chord,
-    });
-  },
-}));
+        if (!currentBar) return;
+
+        // Try to advance within the current bar
+        if (currentChordIndex < currentBar.chords.length - 1) {
+          const newChordIndex = currentChordIndex + 1;
+          const chord = getChordAtPosition(
+            progression,
+            currentBarIndex,
+            newChordIndex,
+          );
+          set({
+            currentChordIndex: newChordIndex,
+            currentChord: chord,
+          });
+          return;
+        }
+
+        // Move to next bar
+        if (currentBarIndex < progression.bars.length - 1) {
+          const newBarIndex = currentBarIndex + 1;
+          const chord = getChordAtPosition(progression, newBarIndex, 0);
+          set({
+            currentBarIndex: newBarIndex,
+            currentChordIndex: 0,
+            currentChord: chord,
+          });
+          return;
+        }
+
+        // Loop back to beginning
+        const chord = getChordAtPosition(progression, 0, 0);
+        set({
+          currentBarIndex: 0,
+          currentChordIndex: 0,
+          currentChord: chord,
+        });
+      },
+    }),
+    {
+      name: "fretflow-state",
+      partialize: (state) => ({
+        progression: state.progression,
+        tempo: state.tempo,
+        selectedStyle: state.selectedStyle,
+        metronome: state.metronome,
+        showScaleTones: state.showScaleTones,
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Recalculate currentChord after rehydration
+        if (state) {
+          const chord = getChordAtPosition(state.progression, 0, 0);
+          state.currentChord = chord;
+        }
+      },
+    },
+  ),
+);

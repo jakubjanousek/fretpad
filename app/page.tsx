@@ -3,6 +3,7 @@
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ProgressionPresets } from "@/components/progression/ProgressionPresets";
+import { ShareExport } from "@/components/progression/ShareExport";
 import { ChordInfoPanel } from "@/components/theory/ChordInfoPanel";
 import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportControls } from "@/components/transport/TransportControls";
@@ -10,9 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import { cn } from "@/lib/utils";
+import { useUrlState } from "@/hooks/useUrlState";
 import { useAppStore } from "@/state/useAppStore";
 
 export default function Page() {
+  // Load state from URL if present
+  useUrlState();
+
   const currentChord = useAppStore((state) => state.currentChord);
   const showScaleTones = useAppStore((state) => state.showScaleTones);
   const setShowScaleTones = useAppStore((state) => state.setShowScaleTones);
@@ -38,10 +43,11 @@ export default function Page() {
         {/* Progression Editor Section */}
         <section>
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-base font-medium">
                 Chord Progression
               </CardTitle>
+              <ShareExport />
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4">
