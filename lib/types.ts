@@ -167,3 +167,9 @@ export interface StyleDefinition {
     chord: ChordPattern;
   };
 }
+
+// ============================================
+// Fretboard Display Types
+// ============================================
+
+export type NoteLabelMode = "notes" | "intervals" | "none";

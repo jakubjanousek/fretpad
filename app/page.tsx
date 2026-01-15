@@ -35,6 +35,8 @@ export default function Page() {
   const setShowScaleTones = useAppStore((state) => state.setShowScaleTones);
   const showVoiceLeading = useAppStore((state) => state.showVoiceLeading);
   const setShowVoiceLeading = useAppStore((state) => state.setShowVoiceLeading);
+  const noteLabelMode = useAppStore((state) => state.noteLabelMode);
+  const setNoteLabelMode = useAppStore((state) => state.setNoteLabelMode);
 
   // Panel states
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -145,10 +147,12 @@ export default function Page() {
                 voiceLeadingPaths={voiceLeadingPaths}
                 showVoiceLeading={showVoiceLeading}
                 showScaleTones={showScaleTones}
+                noteLabelMode={noteLabelMode}
                 onToggleVoiceLeading={() =>
                   setShowVoiceLeading(!showVoiceLeading)
                 }
                 onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
+                onNoteLabelModeChange={setNoteLabelMode}
               />
             </CardContent>
           </Card>

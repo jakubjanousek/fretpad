@@ -2,15 +2,27 @@
 
 import { NoteInfoTooltip } from "@/components/theory/NoteInfoTooltip";
 import { getFretNoteColor, getFretNoteTextColor } from "@/lib/fretboard";
-import type { FretNote } from "@/lib/types";
+import type { FretNote, NoteLabelMode } from "@/lib/types";
 
 interface FretMarkerProps {
   note: FretNote;
+  labelMode?: NoteLabelMode;
 }
 
-export function FretMarker({ note }: FretMarkerProps) {
+export function FretMarker({ note, labelMode = "notes" }: FretMarkerProps) {
   const bgColor = getFretNoteColor(note);
   const textColor = getFretNoteTextColor(note);
+
+  const getLabel = (): string => {
+    switch (labelMode) {
+      case "intervals":
+        return note.interval;
+      case "none":
+        return "";
+      default:
+        return note.note;
+    }
+  };
 
   return (
     <NoteInfoTooltip note={note}>
@@ -23,7 +35,7 @@ export function FretMarker({ note }: FretMarkerProps) {
           ${bgColor} ${textColor}
         `}
       >
-        {note.note}
+        {getLabel()}
       </div>
     </NoteInfoTooltip>
   );

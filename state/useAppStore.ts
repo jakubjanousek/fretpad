@@ -10,6 +10,7 @@ import type {
   BackingTrackConfig,
   Chord,
   MetronomeConfig,
+  NoteLabelMode,
   Progression,
   ProgressionBar,
   StyleId,
@@ -36,6 +37,7 @@ interface AppState {
   // Fretboard display state
   showScaleTones: boolean;
   showVoiceLeading: boolean;
+  noteLabelMode: NoteLabelMode;
 
   // Error state
   error: ErrorInfo | null;
@@ -69,6 +71,7 @@ interface AppState {
   // Fretboard display actions
   setShowScaleTones: (show: boolean) => void;
   setShowVoiceLeading: (show: boolean) => void;
+  setNoteLabelMode: (mode: NoteLabelMode) => void;
 
   // Helper to advance to next chord (for playback)
   advanceToNextChord: () => void;
@@ -120,6 +123,7 @@ export const useAppStore = create<AppState>()(
       },
       showScaleTones: false,
       showVoiceLeading: false,
+      noteLabelMode: "notes",
       error: null,
 
       // Error actions
@@ -225,6 +229,10 @@ export const useAppStore = create<AppState>()(
 
       setShowVoiceLeading: (show) => {
         set({ showVoiceLeading: show });
+      },
+
+      setNoteLabelMode: (mode) => {
+        set({ noteLabelMode: mode });
       },
 
       updateBar: (barIndex, barString) => {
@@ -388,6 +396,7 @@ export const useAppStore = create<AppState>()(
         backingTrack: state.backingTrack,
         showScaleTones: state.showScaleTones,
         showVoiceLeading: state.showVoiceLeading,
+        noteLabelMode: state.noteLabelMode,
       }),
       onRehydrateStorage: () => (state) => {
         // Recalculate currentChord after rehydration

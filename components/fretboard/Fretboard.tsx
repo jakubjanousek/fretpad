@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
-import type { FretNote, NoteName } from "@/lib/types";
+import type { FretNote, NoteLabelMode, NoteName } from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -17,8 +17,10 @@ interface FretboardProps {
   voiceLeadingPaths?: VoiceLeadingPath[];
   showVoiceLeading?: boolean;
   showScaleTones?: boolean;
+  noteLabelMode?: NoteLabelMode;
   onToggleVoiceLeading?: () => void;
   onToggleScaleTones?: () => void;
+  onNoteLabelModeChange?: (mode: NoteLabelMode) => void;
 }
 
 // Fret markers positions (standard dots)
@@ -60,8 +62,10 @@ export function Fretboard({
   voiceLeadingPaths = [],
   showVoiceLeading = false,
   showScaleTones = false,
+  noteLabelMode = "notes",
   onToggleVoiceLeading,
   onToggleScaleTones,
+  onNoteLabelModeChange,
 }: FretboardProps) {
   const responsiveFretCount = useResponsiveFrets(numFrets);
 
@@ -152,7 +156,7 @@ export function Fretboard({
                   {(() => {
                     const nutNote = noteMap.get(`${stringNum}-0`);
                     return nutNote ? (
-                      <FretMarker note={nutNote} />
+                      <FretMarker note={nutNote} labelMode={noteLabelMode} />
                     ) : (
                       <div className="w-8 h-8 sm:w-7 sm:h-7" />
                     );
@@ -179,7 +183,7 @@ export function Fretboard({
                       {/* Note marker */}
                       {note ? (
                         <div className="relative z-10">
-                          <FretMarker note={note} />
+                          <FretMarker note={note} labelMode={noteLabelMode} />
                         </div>
                       ) : (
                         <div className="w-8 h-8 sm:w-7 sm:h-7" />
@@ -217,41 +221,91 @@ export function Fretboard({
             </div>
           </div>
 
-          {/* Toggle buttons */}
-          {(onToggleVoiceLeading || onToggleScaleTones) && (
-            <div className="flex gap-1.5 sm:gap-2">
-              {onToggleVoiceLeading && (
-                <Button
-                  variant="toggle"
-                  size="sm"
-                  data-state={showVoiceLeading ? "on" : "off"}
-                  onClick={onToggleVoiceLeading}
-                  className={cn(
-                    "h-7 text-xs",
-                    showVoiceLeading &&
-                      "bg-blue-600 border-blue-600 hover:bg-blue-700 text-white shadow-sm",
-                  )}
-                >
-                  Voice Leading
-                </Button>
-              )}
-              {onToggleScaleTones && (
-                <Button
-                  variant="toggle"
-                  size="sm"
-                  data-state={showScaleTones ? "on" : "off"}
-                  onClick={onToggleScaleTones}
-                  className={cn(
-                    "h-7 text-xs",
-                    showScaleTones &&
-                      "bg-slate-600 border-slate-600 hover:bg-slate-700 text-white shadow-sm",
-                  )}
-                >
-                  Scale Tones
-                </Button>
-              )}
-            </div>
-          )}
+          {/* Controls */}
+          <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
+            {/* Note label mode selector */}
+            {onNoteLabelModeChange && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-muted-foreground hidden sm:inline">
+                  Labels:
+                </span>
+                <div className="flex rounded-md border border-input bg-background">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onNoteLabelModeChange("notes")}
+                    className={cn(
+                      "h-7 px-2 text-xs rounded-r-none border-r",
+                      noteLabelMode === "notes" &&
+                        "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+                    )}
+                  >
+                    Notes
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onNoteLabelModeChange("intervals")}
+                    className={cn(
+                      "h-7 px-2 text-xs rounded-none border-r",
+                      noteLabelMode === "intervals" &&
+                        "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+                    )}
+                  >
+                    Intervals
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onNoteLabelModeChange("none")}
+                    className={cn(
+                      "h-7 px-2 text-xs rounded-l-none",
+                      noteLabelMode === "none" &&
+                        "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+                    )}
+                  >
+                    None
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Toggle buttons */}
+            {(onToggleVoiceLeading || onToggleScaleTones) && (
+              <div className="flex gap-1.5 sm:gap-2">
+                {onToggleVoiceLeading && (
+                  <Button
+                    variant="toggle"
+                    size="sm"
+                    data-state={showVoiceLeading ? "on" : "off"}
+                    onClick={onToggleVoiceLeading}
+                    className={cn(
+                      "h-7 text-xs",
+                      showVoiceLeading &&
+                        "bg-blue-600 border-blue-600 hover:bg-blue-700 text-white shadow-sm",
+                    )}
+                  >
+                    Voice Leading
+                  </Button>
+                )}
+                {onToggleScaleTones && (
+                  <Button
+                    variant="toggle"
+                    size="sm"
+                    data-state={showScaleTones ? "on" : "off"}
+                    onClick={onToggleScaleTones}
+                    className={cn(
+                      "h-7 text-xs",
+                      showScaleTones &&
+                        "bg-slate-600 border-slate-600 hover:bg-slate-700 text-white shadow-sm",
+                    )}
+                  >
+                    Scale Tones
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

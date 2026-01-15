@@ -317,14 +317,23 @@ Mirror the fretboard for left-handed players.
 - [ ] Mirror fretboard rendering (flip strings)
 - [ ] Store preference in state/localStorage
 
-### 3.8 Note Label Options (P2)
+### 3.8 Note Label Options (P2) ✅ COMPLETE
 
 Let users choose what's displayed on fret markers.
 
-**Tasks:**
-- [ ] Add display mode selector: Note Names | Intervals | None
-- [ ] Update `FretMarker` component to respect setting
-- [ ] Store preference in state
+**Completed:**
+- [x] Add display mode selector: Note Names | Intervals | None
+- [x] Update `FretMarker` component to respect setting
+- [x] Store preference in state (persisted to localStorage)
+
+**Files created/modified:**
+```
+lib/types.ts                         # Added NoteLabelMode type
+state/useAppStore.ts                 # Added noteLabelMode state and setNoteLabelMode action
+components/fretboard/FretMarker.tsx  # Accept labelMode prop, display based on mode
+components/fretboard/Fretboard.tsx   # Added label mode selector UI, pass mode to FretMarker
+app/page.tsx                         # Wire up noteLabelMode from store to Fretboard
+```
 
 ### 3.9 Voice Leading Visualization (P3) ✅ COMPLETE
 
@@ -465,7 +474,7 @@ For maximum impact, implement in this order:
 ### Phase 4 – Polish
 13. Alternate Tunings (3.6)
 14. Left-Handed Mode (3.7)
-15. Note Label Options (3.8)
+15. ~~Note Label Options (3.8)~~ ✅ Complete
 16. Mobile Experience (2.4)
 
 ### Phase 5 – Advanced
