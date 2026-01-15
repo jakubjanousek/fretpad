@@ -273,17 +273,26 @@ Scale tones are implemented but not exposed in UI.
 - [ ] Update fretboard to show scale tones in gray when enabled
 - [ ] Store preference in Zustand
 
-### 3.5 More Presets (P2)
+### 3.5 More Presets (P2) ✅ COMPLETE
 
-Expand the preset library for common progressions.
+Expanded the preset library with 16 presets organized by category.
 
-**Tasks:**
-- [ ] Add jazz standards: Autumn Leaves changes, Rhythm changes (A section)
-- [ ] Add pop progressions: vi-IV-I-V, I-vi-IV-V
-- [ ] Add blues variations: minor blues, jazz blues
-- [ ] Add modal vamps: Dm7 vamp (Dorian), etc.
-- [ ] Organize presets by category in UI
-- [ ] Allow users to save custom presets
+**Completed:**
+- [x] Add jazz standards: Autumn Leaves changes, Rhythm changes (A section), All The Things You Are
+- [x] Add pop progressions: vi-IV-I-V, I-vi-IV-V, I-IV-V-IV
+- [x] Add blues variations: minor blues, jazz blues, 8-bar blues
+- [x] Add modal vamps: Dorian (Dm7), Mixolydian (G7), Phrygian (Em), Lydian (Fmaj7)
+- [x] Organize presets by category in UI (collapsible sections)
+- [x] Allow users to save custom presets (up to 10, stored in localStorage)
+
+**Files created/modified:**
+```
+lib/theory/progression.ts          # 16 presets with metadata, categories, getPresetsByCategory()
+lib/persistence.ts                 # CustomPreset type, save/load functions
+hooks/useCustomPresets.ts          # Hook for managing custom presets (NEW)
+components/progression/ProgressionPresets.tsx  # Categorized UI with save/delete
+components/ui/collapsible.tsx      # shadcn collapsible component (NEW)
+```
 
 ### 3.6 Alternate Tunings (P2)
 
@@ -438,7 +447,7 @@ For maximum impact, implement in this order:
 
 ### Phase 3 – Rich Features
 9. ~~Richer Backing Track (3.2)~~ ✅ Core complete, enhancements remain
-10. More Presets (3.5)
+10. ~~More Presets (3.5)~~ ✅ Complete
 11. Improved Chord Editing UX (2.3)
 12. ~~Optimize Audio Engine (1.4)~~ ✅ Partially complete
 

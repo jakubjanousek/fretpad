@@ -22,7 +22,7 @@ const PRESET_KEYS = Object.keys(PRESET_PROGRESSIONS) as Array<
  * - R: Reset to beginning
  * - ↑/↓: Adjust tempo by 5 BPM
  * - M: Toggle metronome
- * - 1-3: Load preset
+ * - 1-3: Quick load first 3 presets (ii-V-I, Autumn Leaves, Rhythm Changes)
  */
 export function useKeyboardShortcuts({
   onPlay,

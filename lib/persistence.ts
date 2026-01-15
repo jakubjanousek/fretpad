@@ -211,3 +211,59 @@ function isValidMetronomeConfig(value: unknown): value is MetronomeConfig {
     (obj.countIn === 0 || obj.countIn === 1 || obj.countIn === 2)
   );
 }
+
+// Custom presets storage
+const CUSTOM_PRESETS_KEY = "fretflow-custom-presets";
+
+export interface CustomPreset {
+  id: string;
+  name: string;
+  progression: Progression;
+  createdAt: number;
+}
+
+/**
+ * Save custom presets to localStorage
+ */
+export function saveCustomPresets(presets: CustomPreset[]): void {
+  try {
+    localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(presets));
+  } catch (error) {
+    console.warn("Failed to save custom presets:", error);
+  }
+}
+
+/**
+ * Load custom presets from localStorage
+ */
+export function loadCustomPresets(): CustomPreset[] {
+  try {
+    const stored = localStorage.getItem(CUSTOM_PRESETS_KEY);
+    if (!stored) return [];
+
+    const parsed = JSON.parse(stored) as unknown;
+    if (!Array.isArray(parsed)) return [];
+
+    // Validate each preset
+    return parsed.filter(isValidCustomPreset);
+  } catch (error) {
+    console.warn("Failed to load custom presets:", error);
+    return [];
+  }
+}
+
+/**
+ * Type guard for CustomPreset
+ */
+function isValidCustomPreset(value: unknown): value is CustomPreset {
+  if (typeof value !== "object" || value === null) return false;
+
+  const obj = value as Record<string, unknown>;
+
+  return (
+    typeof obj.id === "string" &&
+    typeof obj.name === "string" &&
+    isValidProgression(obj.progression) &&
+    typeof obj.createdAt === "number"
+  );
+}
