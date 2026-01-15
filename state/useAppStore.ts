@@ -7,6 +7,7 @@ import { generateId } from "@/lib/id";
 import { parseChordSymbol } from "@/lib/theory/chords";
 import { PRESET_PROGRESSIONS, parseBar } from "@/lib/theory/progression";
 import type {
+  BackingTrackConfig,
   Chord,
   MetronomeConfig,
   Progression,
@@ -28,6 +29,9 @@ interface AppState {
 
   // Metronome state
   metronome: MetronomeConfig;
+
+  // Backing track state
+  backingTrack: BackingTrackConfig;
 
   // Fretboard display state
   showScaleTones: boolean;
@@ -56,6 +60,10 @@ interface AppState {
   setMetronomeEnabled: (enabled: boolean) => void;
   setMetronomeVolume: (volume: number) => void;
   setMetronomeCountIn: (countIn: 0 | 1 | 2) => void;
+
+  // Backing track actions
+  setBackingTrackVolume: (type: "bass" | "chord", volume: number) => void;
+  setBackingTrackMuted: (type: "bass" | "chord", muted: boolean) => void;
 
   // Fretboard display actions
   setShowScaleTones: (show: boolean) => void;
@@ -101,6 +109,12 @@ export const useAppStore = create<AppState>()(
         volume: -6,
         accentDownbeat: true,
         countIn: 0,
+      },
+      backingTrack: {
+        bassVolume: -6,
+        chordVolume: -14,
+        bassMuted: false,
+        chordMuted: false,
       },
       showScaleTones: false,
       error: null,
@@ -178,6 +192,27 @@ export const useAppStore = create<AppState>()(
       setMetronomeCountIn: (countIn) => {
         set((state) => ({
           metronome: { ...state.metronome, countIn },
+        }));
+      },
+
+      // Backing track actions
+      setBackingTrackVolume: (type, volume) => {
+        // Clamp volume between -30 and 0 dB
+        const clampedVolume = Math.max(-30, Math.min(0, volume));
+        set((state) => ({
+          backingTrack: {
+            ...state.backingTrack,
+            [type === "bass" ? "bassVolume" : "chordVolume"]: clampedVolume,
+          },
+        }));
+      },
+
+      setBackingTrackMuted: (type, muted) => {
+        set((state) => ({
+          backingTrack: {
+            ...state.backingTrack,
+            [type === "bass" ? "bassMuted" : "chordMuted"]: muted,
+          },
         }));
       },
 
@@ -343,6 +378,7 @@ export const useAppStore = create<AppState>()(
         tempo: state.tempo,
         selectedStyle: state.selectedStyle,
         metronome: state.metronome,
+        backingTrack: state.backingTrack,
         showScaleTones: state.showScaleTones,
       }),
       onRehydrateStorage: () => (state) => {

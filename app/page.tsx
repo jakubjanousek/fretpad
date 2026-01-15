@@ -9,9 +9,9 @@ import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportControls } from "@/components/transport/TransportControls";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import { cn } from "@/lib/utils";
-import { useUrlState } from "@/hooks/useUrlState";
 import { useAppStore } from "@/state/useAppStore";
 
 export default function Page() {

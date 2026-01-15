@@ -192,7 +192,7 @@ state/useAppStore.ts                  # Metronome state and actions
 components/transport/TransportControls.tsx  # Metronome toggle, volume slider, count-in selector
 ```
 
-### 3.2 Richer Backing Track (P1) ✅ PARTIALLY COMPLETE
+### 3.2 Richer Backing Track (P1) ✅ COMPLETE
 
 iReal-style backing track system with selectable styles.
 
@@ -204,9 +204,9 @@ iReal-style backing track system with selectable styles.
 - [x] Swing feel per style (via Tone.js Transport)
 
 **Remaining Tasks:**
-- [ ] Add volume controls (separate sliders for bass and chords)
-- [ ] Add mute toggles (mute bass or chords independently)
-- [ ] Add count-in option (1-2 bar count before loop starts)
+- [x] Add volume controls (separate sliders for bass and chords)
+- [x] Add mute toggles (mute bass or chords independently)
+- [x] Add count-in option (1-2 bar count before loop starts) - Implemented via metronome count-in
 
 **Additional Styles (Phase 2):**
 - [ ] Add Bossa Nova style (syncopated bass + fingerpicked guitar)
@@ -222,7 +222,7 @@ iReal-style backing track system with selectable styles.
 - [ ] Add pattern variation (randomize velocity/timing slightly for human feel)
 - [ ] Better jazz voicings (rootless voicings, drop-2)
 
-**Files created:**
+**Files created/modified:**
 ```
 lib/audio/
   styles/
@@ -235,8 +235,12 @@ lib/audio/
     chordInstrument.ts # Chord polySynth factory
   scheduler.ts         # Pattern-based scheduling
   voicings.ts          # Chord voicing generator
+lib/types.ts           # Added BackingTrackConfig type
+state/useAppStore.ts   # Added backingTrack state and actions
+hooks/useAudioEngine.ts # Added dynamic volume/mute control
 components/transport/
   StyleSelector.tsx    # Style dropdown UI
+  TransportControls.tsx # Added bass/chord volume sliders and mute toggles
 ```
 
 ### 3.3 Persistence (P1) ✅ COMPLETE

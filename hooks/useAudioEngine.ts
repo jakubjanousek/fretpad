@@ -14,6 +14,7 @@ import {
   scheduleProgression,
 } from "@/lib/audio/scheduler";
 import type {
+  BackingTrackConfig,
   MetronomeConfig,
   Progression,
   StyleDefinition,
@@ -26,6 +27,7 @@ interface UseAudioEngineOptions {
   tempo: number;
   style: StyleDefinition;
   metronome: MetronomeConfig;
+  backingTrack: BackingTrackConfig;
   onChordChange: (barIndex: number, chordIndex: number) => void;
   onStop: () => void;
 }
@@ -46,6 +48,7 @@ export function useAudioEngine({
   tempo,
   style,
   metronome,
+  backingTrack,
   onChordChange,
   onStop,
 }: UseAudioEngineOptions): AudioEngineReturn {
@@ -57,6 +60,8 @@ export function useAudioEngine({
   const isPlayingRef = useRef(false);
   const [audioContextState, setAudioContextState] =
     useState<AudioContextState>("suspended");
+  // Counter that increments when instruments are recreated, triggering volume effect
+  const [instrumentVersion, setInstrumentVersion] = useState(0);
 
   // Track audio context state
   useEffect(() => {
@@ -90,6 +95,8 @@ export function useAudioEngine({
     metronomeRef.current = createMetronomeInstrument(metronome.volume);
 
     isReadyRef.current = true;
+    // Increment version to trigger volume effect after instrument recreation
+    setInstrumentVersion((v) => v + 1);
 
     return () => {
       // Cleanup on unmount or style change
@@ -154,6 +161,28 @@ export function useAudioEngine({
     transport.swing = style.swing;
     transport.swingSubdivision = "8n";
   }, [style.swing]);
+
+  // Update backing track volume and mute state dynamically
+  // Also runs when instrumentVersion changes (after instrument recreation)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: instrumentVersion is intentionally included to trigger re-run after instrument recreation
+  useEffect(() => {
+    if (bassRef.current) {
+      bassRef.current.volume.value = backingTrack.bassMuted
+        ? -Infinity
+        : backingTrack.bassVolume;
+    }
+    if (chordRef.current) {
+      chordRef.current.volume.value = backingTrack.chordMuted
+        ? -Infinity
+        : backingTrack.chordVolume;
+    }
+  }, [
+    instrumentVersion,
+    backingTrack.bassVolume,
+    backingTrack.chordVolume,
+    backingTrack.bassMuted,
+    backingTrack.chordMuted,
+  ]);
 
   const start = useCallback(async () => {
     if (!bassRef.current || !chordRef.current) return;

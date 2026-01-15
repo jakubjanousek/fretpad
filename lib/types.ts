@@ -146,6 +146,13 @@ export interface MetronomeConfig {
   countIn: 0 | 1 | 2; // 0 = no count-in, 1 = 1 bar, 2 = 2 bars
 }
 
+export interface BackingTrackConfig {
+  bassVolume: number; // dB, -30 to 0
+  chordVolume: number; // dB, -30 to 0
+  bassMuted: boolean;
+  chordMuted: boolean;
+}
+
 export interface StyleDefinition {
   id: StyleId;
   name: string;
