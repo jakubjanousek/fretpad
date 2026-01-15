@@ -22,10 +22,10 @@
 - [x] Hover tooltips working
 
 ### Milestone 4 – Progression Editor & State
-- [ ] `state/useAppStore.ts` - Zustand store with default preset
-- [ ] `components/progression/ProgressionEditor.tsx` - bar inputs
-- [ ] `components/progression/ProgressionPresets.tsx` - preset buttons
-- [ ] Fretboard updates when chord selection changes
+- [x] `state/useAppStore.ts` - Zustand store with default preset
+- [x] `components/progression/ProgressionEditor.tsx` - bar inputs
+- [x] `components/progression/ProgressionPresets.tsx` - preset buttons
+- [x] Fretboard updates when chord selection changes
 
 ### Milestone 5 – Playback Engine
 - [ ] `hooks/useAudioEngine.ts` - Tone.js transport
