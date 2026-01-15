@@ -83,3 +83,73 @@ export interface FretNote extends FretPosition {
 
 // Standard tuning - can be extended later for alternate tunings
 export const STANDARD_TUNING: NoteName[] = ["E", "B", "G", "D", "A", "E"]; // high to low (string 1-6)
+
+// ============================================
+// Backing Track Types
+// ============================================
+
+export type StyleId = "jazzSwing" | "popRock";
+
+export interface PatternEvent {
+  time: string; // Tone.js time format: "0:0", "0:1", "0:2:2"
+  duration: string; // Note duration: "4n", "8n", "2n"
+  velocity?: number; // 0-1, defaults to 0.8
+  degree?: number; // Scale degree for bass (1, 3, 5, 7)
+  type?: "root" | "fifth" | "chord" | "approach";
+}
+
+export interface ChordPatternEvent {
+  time: string;
+  duration: string;
+  velocity?: number;
+  voicingType: "shell" | "full" | "triad";
+}
+
+export interface BassPattern {
+  name: string;
+  events: PatternEvent[];
+}
+
+export interface ChordPattern {
+  name: string;
+  events: ChordPatternEvent[];
+}
+
+export interface BassInstrumentConfig {
+  octave: number;
+  volume: number; // dB
+  oscillatorType: "triangle" | "sine" | "square";
+  envelope: {
+    attack: number;
+    decay: number;
+    sustain: number;
+    release: number;
+  };
+}
+
+export interface ChordInstrumentConfig {
+  octave: number;
+  volume: number;
+  oscillatorType: "triangle" | "sine";
+  envelope: {
+    attack: number;
+    decay: number;
+    sustain: number;
+    release: number;
+  };
+}
+
+export interface StyleDefinition {
+  id: StyleId;
+  name: string;
+  description: string;
+  swing: number; // 0-1, 0 = straight, 1 = full triplet swing
+  instruments: {
+    bass: BassInstrumentConfig;
+    chord: ChordInstrumentConfig;
+  };
+  patterns: {
+    bass: BassPattern;
+    chord: ChordPattern;
+  };
+}

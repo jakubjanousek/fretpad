@@ -2,11 +2,18 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import * as Tone from "tone";
-import type { Progression } from "@/lib/types";
+import { createBassInstrument } from "@/lib/audio/instruments/bassInstrument";
+import { createChordInstrument } from "@/lib/audio/instruments/chordInstrument";
+import {
+  clearScheduledEvents,
+  scheduleProgression,
+} from "@/lib/audio/scheduler";
+import type { Progression, StyleDefinition } from "@/lib/types";
 
 interface UseAudioEngineOptions {
   progression: Progression;
   tempo: number;
+  style: StyleDefinition;
   onChordChange: (barIndex: number, chordIndex: number) => void;
   onStop: () => void;
 }
@@ -19,101 +26,59 @@ interface AudioEngineReturn {
 
 /**
  * Audio engine hook using Tone.js for playback control.
- * Schedules chord changes based on the progression and tempo.
+ * Schedules backing track patterns based on the progression, style, and tempo.
  */
 export function useAudioEngine({
   progression,
   tempo,
+  style,
   onChordChange,
   onStop,
 }: UseAudioEngineOptions): AudioEngineReturn {
-  const synthRef = useRef<Tone.Synth | null>(null);
+  const bassRef = useRef<Tone.Synth | null>(null);
+  const chordRef = useRef<Tone.PolySynth | null>(null);
   const scheduledEventsRef = useRef<number[]>([]);
   const isReadyRef = useRef(false);
 
-  // Initialize synth on mount
+  // Initialize instruments based on style
   useEffect(() => {
-    synthRef.current = new Tone.Synth({
-      oscillator: { type: "triangle" },
-      envelope: {
-        attack: 0.01,
-        decay: 0.1,
-        sustain: 0.3,
-        release: 0.3,
-      },
-    }).toDestination();
+    // Dispose previous instruments if they exist
+    bassRef.current?.dispose();
+    chordRef.current?.dispose();
 
-    synthRef.current.volume.value = -12; // Quieter for background
+    // Create new instruments based on style configuration
+    bassRef.current = createBassInstrument(style.instruments.bass);
+    chordRef.current = createChordInstrument(style.instruments.chord);
 
     isReadyRef.current = true;
 
     return () => {
-      // Cleanup on unmount
+      // Cleanup on unmount or style change
       Tone.getTransport().stop();
       Tone.getTransport().cancel();
-      synthRef.current?.dispose();
-      synthRef.current = null;
+      bassRef.current?.dispose();
+      chordRef.current?.dispose();
+      bassRef.current = null;
+      chordRef.current = null;
       isReadyRef.current = false;
     };
-  }, []);
+  }, [style]);
 
   // Update tempo when it changes
   useEffect(() => {
     Tone.getTransport().bpm.value = tempo;
   }, [tempo]);
 
-  /**
-   * Schedules all chord change events for the progression.
-   * Returns the total duration in bars.
-   */
-  const scheduleProgression = useCallback(() => {
+  // Update swing setting when style changes
+  useEffect(() => {
     const transport = Tone.getTransport();
-
-    // Clear any previously scheduled events
-    for (const eventId of scheduledEventsRef.current) {
-      transport.clear(eventId);
-    }
-    scheduledEventsRef.current = [];
-
-    const beatsPerBar = progression.timeSignature.numerator;
-    let currentBeat = 0;
-
-    // Schedule each chord in the progression
-    for (let barIndex = 0; barIndex < progression.bars.length; barIndex++) {
-      const bar = progression.bars[barIndex];
-
-      for (let chordIndex = 0; chordIndex < bar.chords.length; chordIndex++) {
-        const barChord = bar.chords[chordIndex];
-        const timeInBars = `0:${currentBeat}`;
-
-        // Schedule chord change callback
-        const eventId = transport.schedule((time) => {
-          onChordChange(barIndex, chordIndex);
-
-          // Play root note as audio cue
-          if (synthRef.current) {
-            // Get root note from chord symbol (first character(s))
-            const rootMatch = barChord.chord.match(/^[A-G][#b]?/);
-            if (rootMatch) {
-              const rootNote = `${rootMatch[0]}3`; // Play in octave 3
-              synthRef.current.triggerAttackRelease(rootNote, "8n", time);
-            }
-          }
-        }, timeInBars);
-
-        scheduledEventsRef.current.push(eventId);
-        currentBeat += barChord.beats;
-      }
-    }
-
-    // Calculate total bars for loop
-    const totalBeats = currentBeat;
-    const totalBars = Math.ceil(totalBeats / beatsPerBar);
-
-    return totalBars;
-  }, [progression, onChordChange]);
+    transport.swing = style.swing;
+    transport.swingSubdivision = "8n";
+  }, [style.swing]);
 
   const start = useCallback(async () => {
+    if (!bassRef.current || !chordRef.current) return;
+
     // Ensure audio context is started (required for browser autoplay policy)
     await Tone.start();
 
@@ -124,8 +89,22 @@ export function useAudioEngine({
     transport.cancel();
     transport.position = 0;
 
-    // Schedule the progression
-    const totalBars = scheduleProgression();
+    // Clear previously scheduled events
+    clearScheduledEvents(scheduledEventsRef.current);
+    scheduledEventsRef.current = [];
+
+    // Schedule the progression with backing track patterns
+    const { eventIds, totalBars } = scheduleProgression(
+      progression,
+      style,
+      {
+        bass: bassRef.current,
+        chord: chordRef.current,
+      },
+      onChordChange,
+    );
+
+    scheduledEventsRef.current = eventIds;
 
     // Set up looping
     transport.loop = true;
@@ -137,7 +116,7 @@ export function useAudioEngine({
 
     // Start playback
     transport.start();
-  }, [scheduleProgression, onChordChange]);
+  }, [progression, style, onChordChange]);
 
   const stop = useCallback(() => {
     const transport = Tone.getTransport();
@@ -146,9 +125,7 @@ export function useAudioEngine({
     transport.position = 0;
 
     // Clear scheduled events
-    for (const eventId of scheduledEventsRef.current) {
-      transport.clear(eventId);
-    }
+    clearScheduledEvents(scheduledEventsRef.current);
     scheduledEventsRef.current = [];
 
     // Reset to first chord

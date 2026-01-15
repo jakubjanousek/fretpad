@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useAudioEngine } from "@/hooks/useAudioEngine";
+import { getStyle } from "@/lib/audio/styles";
 import { useAppStore } from "@/state/useAppStore";
+import { StyleSelector } from "./StyleSelector";
 
 /**
  * Transport controls for playback: play/stop buttons and tempo slider.
@@ -16,9 +18,12 @@ export function TransportControls() {
   const progression = useAppStore((state) => state.progression);
   const tempo = useAppStore((state) => state.tempo);
   const isPlaying = useAppStore((state) => state.isPlaying);
+  const selectedStyle = useAppStore((state) => state.selectedStyle);
   const setTempo = useAppStore((state) => state.setTempo);
   const setIsPlaying = useAppStore((state) => state.setIsPlaying);
   const setCurrentPosition = useAppStore((state) => state.setCurrentPosition);
+
+  const style = getStyle(selectedStyle);
 
   const handleChordChange = useCallback(
     (barIndex: number, chordIndex: number) => {
@@ -35,6 +40,7 @@ export function TransportControls() {
   const { start, stop } = useAudioEngine({
     progression,
     tempo,
+    style,
     onChordChange: handleChordChange,
     onStop: handleStop,
   });
@@ -117,6 +123,9 @@ export function TransportControls() {
           aria-label="Tempo"
         />
       </div>
+
+      {/* Style Selector */}
+      <StyleSelector />
     </div>
   );
 }

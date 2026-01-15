@@ -1,7 +1,8 @@
 import { create } from "zustand";
+import { DEFAULT_STYLE_ID } from "@/lib/audio/styles";
 import { parseChordSymbol } from "@/lib/theory/chords";
 import { PRESET_PROGRESSIONS, parseBar } from "@/lib/theory/progression";
-import type { Chord, Progression, ProgressionBar } from "@/lib/types";
+import type { Chord, Progression, ProgressionBar, StyleId } from "@/lib/types";
 
 interface AppState {
   // Progression state
@@ -13,6 +14,7 @@ interface AppState {
   // Playback state
   tempo: number;
   isPlaying: boolean;
+  selectedStyle: StyleId;
 
   // Actions
   setProgression: (progression: Progression) => void;
@@ -20,6 +22,7 @@ interface AppState {
   setCurrentPosition: (barIndex: number, chordIndex: number) => void;
   setTempo: (tempo: number) => void;
   setIsPlaying: (isPlaying: boolean) => void;
+  setSelectedStyle: (style: StyleId) => void;
 
   // Bar manipulation
   updateBar: (barIndex: number, barString: string) => boolean;
@@ -66,6 +69,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   currentChord: defaultChord,
   tempo: 120,
   isPlaying: false,
+  selectedStyle: DEFAULT_STYLE_ID,
 
   // Actions
   setProgression: (progression) => {
@@ -107,6 +111,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setIsPlaying: (isPlaying) => {
     set({ isPlaying });
+  },
+
+  setSelectedStyle: (style) => {
+    set({ selectedStyle: style });
   },
 
   updateBar: (barIndex, barString) => {
