@@ -5,10 +5,19 @@ import * as Tone from "tone";
 import { createBassInstrument } from "@/lib/audio/instruments/bassInstrument";
 import { createChordInstrument } from "@/lib/audio/instruments/chordInstrument";
 import {
+  createMetronomeInstrument,
+  type MetronomeInstrument,
+} from "@/lib/audio/instruments/metronomeInstrument";
+import {
   clearScheduledEvents,
+  scheduleCountIn,
   scheduleProgression,
 } from "@/lib/audio/scheduler";
-import type { Progression, StyleDefinition } from "@/lib/types";
+import type {
+  MetronomeConfig,
+  Progression,
+  StyleDefinition,
+} from "@/lib/types";
 
 type AudioContextState = "suspended" | "running" | "closed";
 
@@ -16,6 +25,7 @@ interface UseAudioEngineOptions {
   progression: Progression;
   tempo: number;
   style: StyleDefinition;
+  metronome: MetronomeConfig;
   onChordChange: (barIndex: number, chordIndex: number) => void;
   onStop: () => void;
 }
@@ -35,11 +45,13 @@ export function useAudioEngine({
   progression,
   tempo,
   style,
+  metronome,
   onChordChange,
   onStop,
 }: UseAudioEngineOptions): AudioEngineReturn {
   const bassRef = useRef<Tone.Synth | null>(null);
   const chordRef = useRef<Tone.PolySynth | null>(null);
+  const metronomeRef = useRef<MetronomeInstrument | null>(null);
   const scheduledEventsRef = useRef<number[]>([]);
   const isReadyRef = useRef(false);
   const isPlayingRef = useRef(false);
@@ -70,10 +82,12 @@ export function useAudioEngine({
     // Dispose previous instruments if they exist
     bassRef.current?.dispose();
     chordRef.current?.dispose();
+    metronomeRef.current?.dispose();
 
     // Create new instruments based on style configuration
     bassRef.current = createBassInstrument(style.instruments.bass);
     chordRef.current = createChordInstrument(style.instruments.chord);
+    metronomeRef.current = createMetronomeInstrument(metronome.volume);
 
     isReadyRef.current = true;
 
@@ -83,13 +97,15 @@ export function useAudioEngine({
       Tone.getTransport().cancel();
       bassRef.current?.dispose();
       chordRef.current?.dispose();
+      metronomeRef.current?.dispose();
       bassRef.current = null;
       chordRef.current = null;
+      metronomeRef.current = null;
       isReadyRef.current = false;
     };
-  }, [style]);
+  }, [style, metronome.volume]);
 
-  // Handle style change during playback - reschedule events
+  // Handle style/metronome change during playback - reschedule events
   useEffect(() => {
     if (!isPlayingRef.current || !bassRef.current || !chordRef.current) return;
 
@@ -112,8 +128,10 @@ export function useAudioEngine({
       {
         bass: bassRef.current,
         chord: chordRef.current,
+        metronome: metronomeRef.current ?? undefined,
       },
       onChordChange,
+      { metronomeConfig: metronome },
     );
 
     scheduledEventsRef.current = eventIds;
@@ -123,7 +141,7 @@ export function useAudioEngine({
 
     // Restore position
     transport.position = currentPosition;
-  }, [style, progression, onChordChange]);
+  }, [style, progression, onChordChange, metronome]);
 
   // Update tempo when it changes (no reschedule needed - Tone.js handles this)
   useEffect(() => {
@@ -154,33 +172,61 @@ export function useAudioEngine({
     clearScheduledEvents(scheduledEventsRef.current);
     scheduledEventsRef.current = [];
 
+    const beatsPerBar = progression.timeSignature.numerator;
+    const countInBars = metronome.countIn;
+
+    // Schedule count-in if enabled and metronome exists
+    if (countInBars > 0 && metronomeRef.current) {
+      const countInEventIds = scheduleCountIn(
+        transport,
+        countInBars,
+        beatsPerBar,
+        metronomeRef.current,
+        metronome.accentDownbeat,
+      );
+      scheduledEventsRef.current.push(...countInEventIds);
+    }
+
     // Schedule the progression with backing track patterns
+    // Offset by count-in duration
     const { eventIds, totalBars } = scheduleProgression(
       progression,
       style,
       {
         bass: bassRef.current,
         chord: chordRef.current,
+        metronome: metronomeRef.current ?? undefined,
       },
       onChordChange,
+      {
+        metronomeConfig: metronome,
+        countInBars,
+      },
     );
 
-    scheduledEventsRef.current = eventIds;
+    scheduledEventsRef.current.push(...eventIds);
 
-    // Set up looping
+    // Set up looping - loop only covers the progression, not count-in
     transport.loop = true;
-    transport.loopStart = 0;
-    transport.loopEnd = `${totalBars}:0:0`;
+    transport.loopStart = `${countInBars}:0:0`;
+    transport.loopEnd = `${countInBars + totalBars}:0:0`;
 
-    // Trigger first chord immediately
-    onChordChange(0, 0);
+    // Trigger first chord immediately (or after count-in delay)
+    if (countInBars === 0) {
+      onChordChange(0, 0);
+    } else {
+      // Schedule first chord change after count-in
+      transport.schedule(() => {
+        onChordChange(0, 0);
+      }, `${countInBars}:0:0`);
+    }
 
     // Mark as playing
     isPlayingRef.current = true;
 
     // Start playback
     transport.start();
-  }, [progression, style, onChordChange]);
+  }, [progression, style, onChordChange, metronome]);
 
   const stop = useCallback(() => {
     const transport = Tone.getTransport();

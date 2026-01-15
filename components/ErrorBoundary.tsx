@@ -58,7 +58,9 @@ export class ErrorBoundary extends Component<
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">{errorInfo.message}</p>
             {errorInfo.action && (
-              <p className="text-sm text-muted-foreground">{errorInfo.action}</p>
+              <p className="text-sm text-muted-foreground">
+                {errorInfo.action}
+              </p>
             )}
             {errorInfo.recoverable && (
               <Button

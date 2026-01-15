@@ -13,11 +13,17 @@ interface PlaybackPosition {
   barProgress: number;
   /** Whether playback is currently active */
   isActive: boolean;
+  /** Whether currently in count-in phase */
+  isCountingIn: boolean;
+  /** Progress through count-in (0-1), only valid when isCountingIn is true */
+  countInProgress: number;
 }
 
 interface UsePlaybackPositionOptions {
   progression: Progression;
   isPlaying: boolean;
+  /** Number of count-in bars (0, 1, or 2) */
+  countInBars?: number;
 }
 
 /**
@@ -27,16 +33,20 @@ interface UsePlaybackPositionOptions {
 export function usePlaybackPosition({
   progression,
   isPlaying,
+  countInBars = 0,
 }: UsePlaybackPositionOptions): PlaybackPosition {
   const [position, setPosition] = useState<PlaybackPosition>({
     barIndex: 0,
     chordIndex: 0,
     barProgress: 0,
     isActive: false,
+    isCountingIn: false,
+    countInProgress: 0,
   });
 
   const animationFrameRef = useRef<number | null>(null);
   const beatsPerBar = progression.timeSignature.numerator;
+  const countInBeats = countInBars * beatsPerBar;
 
   // Build a lookup table for beat -> bar/chord mapping
   const beatMapRef = useRef<
@@ -141,20 +151,46 @@ export function usePlaybackPosition({
     if (transport.state === "started") {
       const positionStr = transport.position as string;
       const beat = parsePositionToBeats(positionStr);
-      const { barIndex, chordIndex, barProgress } = findPositionAtBeat(beat);
 
-      setPosition({
-        barIndex,
-        chordIndex,
-        barProgress,
-        isActive: true,
-      });
+      // Check if we're in the count-in phase
+      if (countInBeats > 0 && beat < countInBeats) {
+        // During count-in, don't update progression position
+        const countInProgress = beat / countInBeats;
+        setPosition({
+          barIndex: 0,
+          chordIndex: 0,
+          barProgress: 0,
+          isActive: true,
+          isCountingIn: true,
+          countInProgress,
+        });
+      } else {
+        // After count-in (or no count-in), track progression normally
+        // Offset by count-in beats to get the actual progression beat
+        const progressionBeat = beat - countInBeats;
+        const { barIndex, chordIndex, barProgress } =
+          findPositionAtBeat(progressionBeat);
+
+        setPosition({
+          barIndex,
+          chordIndex,
+          barProgress,
+          isActive: true,
+          isCountingIn: false,
+          countInProgress: 0,
+        });
+      }
 
       animationFrameRef.current = requestAnimationFrame(updatePosition);
     } else {
-      setPosition((prev) => ({ ...prev, isActive: false }));
+      setPosition((prev) => ({
+        ...prev,
+        isActive: false,
+        isCountingIn: false,
+        countInProgress: 0,
+      }));
     }
-  }, [parsePositionToBeats, findPositionAtBeat]);
+  }, [parsePositionToBeats, findPositionAtBeat, countInBeats]);
 
   // Start/stop polling based on isPlaying
   useEffect(() => {
@@ -172,6 +208,8 @@ export function usePlaybackPosition({
         chordIndex: 0,
         barProgress: 0,
         isActive: false,
+        isCountingIn: false,
+        countInProgress: 0,
       });
     }
 

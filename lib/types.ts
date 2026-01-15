@@ -139,6 +139,13 @@ export interface ChordInstrumentConfig {
   };
 }
 
+export interface MetronomeConfig {
+  enabled: boolean;
+  volume: number; // dB, -20 to 0
+  accentDownbeat: boolean; // Accent beat 1
+  countIn: 0 | 1 | 2; // 0 = no count-in, 1 = 1 bar, 2 = 2 bars
+}
+
 export interface StyleDefinition {
   id: StyleId;
   name: string;

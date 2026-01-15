@@ -1,8 +1,14 @@
 import * as Tone from "tone";
+import {
+  METRONOME_ACCENT_NOTE,
+  METRONOME_CLICK_NOTE,
+  type MetronomeInstrument,
+} from "@/lib/audio/instruments/metronomeInstrument";
 import { parseChordSymbol } from "@/lib/theory/chords";
 import type {
   Chord,
   ChordPatternEvent,
+  MetronomeConfig,
   PatternEvent,
   Progression,
   StyleDefinition,
@@ -12,11 +18,17 @@ import { getApproachNote, getBassNote, getVoicing } from "./voicings";
 interface SchedulerInstruments {
   bass: Tone.Synth;
   chord: Tone.PolySynth;
+  metronome?: MetronomeInstrument;
 }
 
 interface ScheduleResult {
   eventIds: number[];
   totalBars: number;
+}
+
+interface ScheduleOptions {
+  metronomeConfig?: MetronomeConfig;
+  countInBars?: number;
 }
 
 /**
@@ -158,6 +170,71 @@ function scheduleChordPattern(
 }
 
 /**
+ * Schedules metronome clicks for the entire progression
+ */
+function scheduleMetronome(
+  transport: typeof Tone.Transport,
+  totalBeats: number,
+  beatsPerBar: number,
+  metronomeInstrument: MetronomeInstrument,
+  accentDownbeat: boolean,
+  startBeat = 0,
+): number[] {
+  const eventIds: number[] = [];
+
+  for (let beat = 0; beat < totalBeats; beat++) {
+    const absoluteBeat = startBeat + beat;
+    const time = beatsToTime(absoluteBeat);
+    const isDownbeat = beat % beatsPerBar === 0;
+
+    const eventId = transport.schedule((audioTime) => {
+      if (isDownbeat && accentDownbeat) {
+        // Accented downbeat
+        metronomeInstrument.accent.triggerAttackRelease(
+          METRONOME_ACCENT_NOTE,
+          "32n",
+          audioTime,
+          0.9,
+        );
+      } else {
+        // Regular click
+        metronomeInstrument.click.triggerAttackRelease(
+          METRONOME_CLICK_NOTE,
+          "32n",
+          audioTime,
+          0.7,
+        );
+      }
+    }, time);
+
+    eventIds.push(eventId);
+  }
+
+  return eventIds;
+}
+
+/**
+ * Schedules a count-in before the progression starts
+ */
+export function scheduleCountIn(
+  transport: typeof Tone.Transport,
+  countInBars: number,
+  beatsPerBar: number,
+  metronomeInstrument: MetronomeInstrument,
+  accentDownbeat: boolean,
+): number[] {
+  const totalBeats = countInBars * beatsPerBar;
+  return scheduleMetronome(
+    transport,
+    totalBeats,
+    beatsPerBar,
+    metronomeInstrument,
+    accentDownbeat,
+    0,
+  );
+}
+
+/**
  * Main scheduling function that schedules the entire progression
  */
 export function scheduleProgression(
@@ -165,12 +242,16 @@ export function scheduleProgression(
   style: StyleDefinition,
   instruments: SchedulerInstruments,
   onChordChange: (barIndex: number, chordIndex: number) => void,
+  options?: ScheduleOptions,
 ): ScheduleResult {
   const transport = Tone.getTransport();
   const eventIds: number[] = [];
   const beatsPerBar = progression.timeSignature.numerator;
 
-  let currentBeat = 0;
+  // Offset all events by count-in bars if specified
+  const countInOffset = (options?.countInBars ?? 0) * beatsPerBar;
+
+  let currentBeat = countInOffset;
 
   // Iterate through each bar
   for (let barIndex = 0; barIndex < progression.bars.length; barIndex++) {
@@ -226,7 +307,22 @@ export function scheduleProgression(
     }
   }
 
-  const totalBars = Math.ceil(currentBeat / beatsPerBar);
+  // Calculate total bars (excluding count-in offset)
+  const progressionBeats = currentBeat - countInOffset;
+  const totalBars = Math.ceil(progressionBeats / beatsPerBar);
+
+  // Schedule metronome if enabled
+  if (options?.metronomeConfig?.enabled && instruments.metronome) {
+    const metronomeEventIds = scheduleMetronome(
+      transport,
+      progressionBeats,
+      beatsPerBar,
+      instruments.metronome,
+      options.metronomeConfig.accentDownbeat,
+      countInOffset,
+    );
+    eventIds.push(...metronomeEventIds);
+  }
 
   return { eventIds, totalBars };
 }

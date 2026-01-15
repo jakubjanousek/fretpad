@@ -1,12 +1,13 @@
 "use client";
 
-import { Play, RotateCcw, Square } from "lucide-react";
+import { Play, RotateCcw, Square, Timer } from "lucide-react";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useAudioEngine } from "@/hooks/useAudioEngine";
 import { getStyle } from "@/lib/audio/styles";
+import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 import { StyleSelector } from "./StyleSelector";
 
@@ -19,9 +20,13 @@ export function TransportControls() {
   const tempo = useAppStore((state) => state.tempo);
   const isPlaying = useAppStore((state) => state.isPlaying);
   const selectedStyle = useAppStore((state) => state.selectedStyle);
+  const metronome = useAppStore((state) => state.metronome);
   const setTempo = useAppStore((state) => state.setTempo);
   const setIsPlaying = useAppStore((state) => state.setIsPlaying);
   const setCurrentPosition = useAppStore((state) => state.setCurrentPosition);
+  const setMetronomeEnabled = useAppStore((state) => state.setMetronomeEnabled);
+  const setMetronomeVolume = useAppStore((state) => state.setMetronomeVolume);
+  const setMetronomeCountIn = useAppStore((state) => state.setMetronomeCountIn);
 
   const style = getStyle(selectedStyle);
 
@@ -41,6 +46,7 @@ export function TransportControls() {
     progression,
     tempo,
     style,
+    metronome,
     onChordChange: handleChordChange,
     onStop: handleStop,
   });
@@ -69,6 +75,20 @@ export function TransportControls() {
       }
     },
     [setTempo],
+  );
+
+  const handleMetronomeToggle = useCallback(() => {
+    setMetronomeEnabled(!metronome.enabled);
+  }, [metronome.enabled, setMetronomeEnabled]);
+
+  const handleMetronomeVolumeChange = useCallback(
+    (value: number[]) => {
+      const newVolume = value[0];
+      if (newVolume !== undefined) {
+        setMetronomeVolume(newVolume);
+      }
+    },
+    [setMetronomeVolume],
   );
 
   return (
@@ -102,6 +122,19 @@ export function TransportControls() {
         >
           <RotateCcw className="h-4 w-4" />
         </Button>
+        <Button
+          variant={metronome.enabled ? "default" : "outline"}
+          size="icon"
+          onClick={handleMetronomeToggle}
+          aria-label={
+            metronome.enabled ? "Disable metronome" : "Enable metronome"
+          }
+          className={cn(
+            metronome.enabled && "bg-orange-500 hover:bg-orange-600",
+          )}
+        >
+          <Timer className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Tempo Control */}
@@ -126,6 +159,58 @@ export function TransportControls() {
           aria-label="Tempo"
         />
       </div>
+
+      {/* Metronome Controls (shown when metronome is enabled) */}
+      {metronome.enabled && (
+        <div className="flex flex-col gap-3">
+          {/* Metronome Volume */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <Label
+                htmlFor="metronome-volume-slider"
+                className="text-sm text-muted-foreground"
+              >
+                Metronome Volume
+              </Label>
+              <span className="text-sm font-mono tabular-nums">
+                {metronome.volume} dB
+              </span>
+            </div>
+            <Slider
+              id="metronome-volume-slider"
+              min={-20}
+              max={0}
+              step={1}
+              value={[metronome.volume]}
+              onValueChange={handleMetronomeVolumeChange}
+              className="w-full"
+              aria-label="Metronome volume"
+            />
+          </div>
+
+          {/* Count-In Selector */}
+          <div className="flex items-center justify-between">
+            <Label className="text-sm text-muted-foreground">Count-In</Label>
+            <div className="flex gap-1">
+              {([0, 1, 2] as const).map((bars) => (
+                <Button
+                  key={bars}
+                  variant={metronome.countIn === bars ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMetronomeCountIn(bars)}
+                  className={cn(
+                    "h-7 w-12 text-xs",
+                    metronome.countIn === bars &&
+                      "bg-orange-500 hover:bg-orange-600",
+                  )}
+                >
+                  {bars === 0 ? "Off" : `${bars} bar${bars > 1 ? "s" : ""}`}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Style Selector */}
       <StyleSelector />

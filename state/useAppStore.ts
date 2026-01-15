@@ -5,7 +5,13 @@ import { toErrorInfo } from "@/lib/errors";
 import { generateId } from "@/lib/id";
 import { parseChordSymbol } from "@/lib/theory/chords";
 import { PRESET_PROGRESSIONS, parseBar } from "@/lib/theory/progression";
-import type { Chord, Progression, ProgressionBar, StyleId } from "@/lib/types";
+import type {
+  Chord,
+  MetronomeConfig,
+  Progression,
+  ProgressionBar,
+  StyleId,
+} from "@/lib/types";
 
 interface AppState {
   // Progression state
@@ -18,6 +24,9 @@ interface AppState {
   tempo: number;
   isPlaying: boolean;
   selectedStyle: StyleId;
+
+  // Metronome state
+  metronome: MetronomeConfig;
 
   // Error state
   error: ErrorInfo | null;
@@ -38,6 +47,11 @@ interface AppState {
   updateBar: (barIndex: number, barString: string) => boolean;
   addBar: () => void;
   removeBar: (barIndex: number) => void;
+
+  // Metronome actions
+  setMetronomeEnabled: (enabled: boolean) => void;
+  setMetronomeVolume: (volume: number) => void;
+  setMetronomeCountIn: (countIn: 0 | 1 | 2) => void;
 
   // Helper to advance to next chord (for playback)
   advanceToNextChord: () => void;
@@ -73,6 +87,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   tempo: 120,
   isPlaying: false,
   selectedStyle: DEFAULT_STYLE_ID,
+  metronome: {
+    enabled: false,
+    volume: -6,
+    accentDownbeat: true,
+    countIn: 0,
+  },
   error: null,
 
   // Error actions
@@ -128,6 +148,27 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setSelectedStyle: (style) => {
     set({ selectedStyle: style });
+  },
+
+  // Metronome actions
+  setMetronomeEnabled: (enabled) => {
+    set((state) => ({
+      metronome: { ...state.metronome, enabled },
+    }));
+  },
+
+  setMetronomeVolume: (volume) => {
+    // Clamp volume between -20 and 0 dB
+    const clampedVolume = Math.max(-20, Math.min(0, volume));
+    set((state) => ({
+      metronome: { ...state.metronome, volume: clampedVolume },
+    }));
+  },
+
+  setMetronomeCountIn: (countIn) => {
+    set((state) => ({
+      metronome: { ...state.metronome, countIn },
+    }));
   },
 
   updateBar: (barIndex, barString) => {

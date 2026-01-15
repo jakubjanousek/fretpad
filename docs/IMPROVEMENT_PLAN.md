@@ -161,16 +161,27 @@ Enhance accessibility beyond what shadcn/ui provides.
 
 ## 3. Feature Additions
 
-### 3.1 Metronome (P0)
+### 3.1 Metronome (P0) ✅ COMPLETE
 
 Add optional metronome click during playback.
 
-**Tasks:**
-- [ ] Add metronome toggle in `TransportControls`
-- [ ] Implement metronome sound in `useAudioEngine` (use Tone.js `MetalSynth` or sample)
-- [ ] Add volume control for metronome
-- [ ] Add count-in option (1-2 bar count before loop starts)
-- [ ] Store metronome preference in state
+**Completed:**
+- [x] Add metronome toggle in `TransportControls`
+- [x] Implement metronome sound in `useAudioEngine` (sine wave clicks with accented downbeat)
+- [x] Add volume control for metronome (-20 to 0 dB)
+- [x] Add count-in option (0, 1, or 2 bars before loop starts)
+- [x] Store metronome preference in Zustand state
+
+**Files created/modified:**
+```
+lib/types.ts                          # MetronomeConfig type
+lib/audio/instruments/metronomeInstrument.ts  # Metronome synth factory
+lib/audio/instruments/index.ts        # Export metronome instrument
+lib/audio/scheduler.ts                # scheduleMetronome, scheduleCountIn functions
+hooks/useAudioEngine.ts               # Metronome integration with count-in support
+state/useAppStore.ts                  # Metronome state and actions
+components/transport/TransportControls.tsx  # Metronome toggle, volume slider, count-in selector
+```
 
 ### 3.2 Richer Backing Track (P1) ✅ PARTIALLY COMPLETE
 
@@ -393,7 +404,7 @@ For maximum impact, implement in this order:
 
 ### Phase 1 – Production Ready
 1. ~~Visual Playhead Indicator (2.1)~~ ✅ Complete
-2. Metronome (3.1)
+2. ~~Metronome (3.1)~~ ✅ Complete
 3. Add Test Suite (1.1)
 4. Improve Error Handling (1.2)
 

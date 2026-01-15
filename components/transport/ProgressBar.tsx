@@ -7,22 +7,34 @@ import { useAppStore } from "@/state/useAppStore";
 export function ProgressBar() {
   const progression = useAppStore((state) => state.progression);
   const isPlaying = useAppStore((state) => state.isPlaying);
+  const metronome = useAppStore((state) => state.metronome);
 
-  const playbackPosition = usePlaybackPosition({ progression, isPlaying });
+  const playbackPosition = usePlaybackPosition({
+    progression,
+    isPlaying,
+    countInBars: metronome.countIn,
+  });
 
   // Calculate overall progress across the entire progression
   const totalBars = progression.bars.length;
-  const overallProgress = playbackPosition.isActive
-    ? (playbackPosition.barIndex + playbackPosition.barProgress) / totalBars
-    : 0;
+  // During count-in, don't show progress
+  const overallProgress =
+    playbackPosition.isActive && !playbackPosition.isCountingIn
+      ? (playbackPosition.barIndex + playbackPosition.barProgress) / totalBars
+      : 0;
 
   // Build bar segments for the progress bar
   const barSegments = progression.bars.map((bar, index) => {
     const chordNames = bar.chords.map((bc) => bc.chord).join(" ");
+    // Don't highlight bars during count-in
     const isCurrentBar =
-      playbackPosition.isActive && playbackPosition.barIndex === index;
+      playbackPosition.isActive &&
+      !playbackPosition.isCountingIn &&
+      playbackPosition.barIndex === index;
     const isPastBar =
-      playbackPosition.isActive && playbackPosition.barIndex > index;
+      playbackPosition.isActive &&
+      !playbackPosition.isCountingIn &&
+      playbackPosition.barIndex > index;
 
     return {
       id: bar.id,
@@ -91,8 +103,15 @@ export function ProgressBar() {
       {/* Beat/bar counter */}
       <div className="flex justify-between mt-1 text-xs text-muted-foreground">
         <span>
-          Bar {playbackPosition.isActive ? playbackPosition.barIndex + 1 : 1} of{" "}
-          {totalBars}
+          {playbackPosition.isCountingIn ? (
+            <span className="text-orange-500 font-medium">Count-in...</span>
+          ) : (
+            <>
+              Bar{" "}
+              {playbackPosition.isActive ? playbackPosition.barIndex + 1 : 1} of{" "}
+              {totalBars}
+            </>
+          )}
         </span>
         <span>
           {progression.timeSignature.numerator}/

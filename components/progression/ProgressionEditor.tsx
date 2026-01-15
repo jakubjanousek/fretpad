@@ -173,12 +173,17 @@ export function ProgressionEditor() {
   const currentBarIndex = useAppStore((state) => state.currentBarIndex);
   const currentChordIndex = useAppStore((state) => state.currentChordIndex);
   const isPlaying = useAppStore((state) => state.isPlaying);
+  const metronome = useAppStore((state) => state.metronome);
   const setCurrentPosition = useAppStore((state) => state.setCurrentPosition);
   const updateBar = useAppStore((state) => state.updateBar);
   const addBar = useAppStore((state) => state.addBar);
   const removeBar = useAppStore((state) => state.removeBar);
 
-  const playbackPosition = usePlaybackPosition({ progression, isPlaying });
+  const playbackPosition = usePlaybackPosition({
+    progression,
+    isPlaying,
+    countInBars: metronome.countIn,
+  });
 
   const handleSelect = (barIndex: number, chordIndex: number) => {
     setCurrentPosition(barIndex, chordIndex);
@@ -214,9 +219,11 @@ export function ProgressionEditor() {
               canRemove={progression.bars.length > 1}
               isPlaying={
                 playbackPosition.isActive &&
+                !playbackPosition.isCountingIn &&
                 playbackPosition.barIndex === barIndex
               }
               playheadProgress={
+                !playbackPosition.isCountingIn &&
                 playbackPosition.barIndex === barIndex
                   ? playbackPosition.barProgress
                   : 0

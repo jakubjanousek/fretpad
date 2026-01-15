@@ -23,10 +23,7 @@ export class ChordParseError extends FretFlowError {
     public readonly symbol: string,
     message?: string,
   ) {
-    super(
-      message || `Invalid chord symbol: "${symbol}"`,
-      "CHORD_PARSE_ERROR",
-    );
+    super(message || `Invalid chord symbol: "${symbol}"`, "CHORD_PARSE_ERROR");
     this.name = "ChordParseError";
   }
 }
@@ -66,7 +63,8 @@ export class AudioPlaybackError extends FretFlowError {
 export class AudioContextError extends FretFlowError {
   constructor(message?: string) {
     super(
-      message || "Failed to start audio context. Please interact with the page first.",
+      message ||
+        "Failed to start audio context. Please interact with the page first.",
       "AUDIO_CONTEXT_ERROR",
     );
     this.name = "AudioContextError";
