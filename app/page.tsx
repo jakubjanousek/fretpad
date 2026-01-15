@@ -3,13 +3,13 @@
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ProgressionPresets } from "@/components/progression/ProgressionPresets";
+import { TransportControls } from "@/components/transport/TransportControls";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import { useAppStore } from "@/state/useAppStore";
 
 export default function Page() {
   const currentChord = useAppStore((state) => state.currentChord);
-  const tempo = useAppStore((state) => state.tempo);
   const fretNotes = currentChord ? getFretNotesForChord(currentChord) : [];
 
   return (
@@ -63,26 +63,7 @@ export default function Page() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
-                    >
-                      <PlayIcon className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
-                    >
-                      <StopIcon className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-muted-foreground">Tempo:</span>
-                    <span className="font-mono">{tempo} BPM</span>
-                  </div>
-                </div>
+                <TransportControls />
               </CardContent>
             </Card>
 
@@ -135,35 +116,5 @@ export default function Page() {
         </section>
       </main>
     </div>
-  );
-}
-
-function PlayIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-label="Play"
-      role="img"
-    >
-      <path d="M8 5v14l11-7z" />
-    </svg>
-  );
-}
-
-function StopIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-label="Stop"
-      role="img"
-    >
-      <rect x="6" y="6" width="12" height="12" />
-    </svg>
   );
 }

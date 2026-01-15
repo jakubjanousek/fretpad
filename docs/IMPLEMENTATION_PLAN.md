@@ -28,10 +28,10 @@
 - [x] Fretboard updates when chord selection changes
 
 ### Milestone 5 – Playback Engine
-- [ ] `hooks/useAudioEngine.ts` - Tone.js transport
-- [ ] `components/transport/TransportControls.tsx` - play/stop/tempo
-- [ ] Playback advances through chords and updates fretboard
-- [ ] Loop functionality
+- [x] `hooks/useAudioEngine.ts` - Tone.js transport
+- [x] `components/transport/TransportControls.tsx` - play/stop/tempo
+- [x] Playback advances through chords and updates fretboard
+- [x] Loop functionality
 
 ### Milestone 6 – Theory UI
 - [ ] `components/theory/ChordInfoPanel.tsx` - chord details
