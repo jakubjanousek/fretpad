@@ -55,7 +55,7 @@ export function VoiceLeadingOverlay({
     updateDimensions();
     window.addEventListener("resize", updateDimensions);
     return () => window.removeEventListener("resize", updateDimensions);
-  }, [paths]); // Re-measure when paths change
+  }, []);
 
   if (paths.length === 0) return null;
 
@@ -102,6 +102,8 @@ export function VoiceLeadingOverlay({
           height: "100%",
         }}
         viewBox={`0 0 ${containerWidth} ${containerHeight}`}
+        role="img"
+        aria-label="Voice leading paths between chord tones"
       >
         <defs>
           {/* Arrow marker for guide tone paths */}

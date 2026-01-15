@@ -36,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Required for theme flash prevention */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body

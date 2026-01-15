@@ -1,7 +1,7 @@
 import { Note } from "tonal";
+import { getFretNotesForChord } from "@/lib/fretboard";
 import type { Chord, FretNote, NoteName, Progression } from "@/lib/types";
 import { parseChordSymbol } from "./chords";
-import { getFretNotesForChord } from "@/lib/fretboard";
 
 /**
  * Represents a voice leading connection between two fret positions

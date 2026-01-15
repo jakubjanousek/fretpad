@@ -212,7 +212,10 @@ describe("PRESET_PROGRESSIONS", () => {
 describe("getAllChordsFromProgression", () => {
   it("returns all chord symbols flattened", () => {
     const prog = parseProgression("| Dm7 G7 | Cmaj7 |");
-    const chords = getAllChordsFromProgression(prog!);
+    expect(prog).not.toBeNull();
+    const chords = getAllChordsFromProgression(
+      prog as NonNullable<typeof prog>,
+    );
     expect(chords).toEqual(["Dm7", "G7", "Cmaj7"]);
   });
 
@@ -226,7 +229,10 @@ describe("getAllChordsFromProgression", () => {
 describe("getProgressionTotalBeats", () => {
   it("calculates total beats correctly", () => {
     const prog = parseProgression("| C | G | Am | F |");
-    const totalBeats = getProgressionTotalBeats(prog!);
+    expect(prog).not.toBeNull();
+    const totalBeats = getProgressionTotalBeats(
+      prog as NonNullable<typeof prog>,
+    );
     expect(totalBeats).toBe(16); // 4 bars * 4 beats
   });
 
@@ -234,7 +240,10 @@ describe("getProgressionTotalBeats", () => {
     const prog = parseProgression("| C | G |", {
       timeSignature: { numerator: 3, denominator: 4 },
     });
-    const totalBeats = getProgressionTotalBeats(prog!);
+    expect(prog).not.toBeNull();
+    const totalBeats = getProgressionTotalBeats(
+      prog as NonNullable<typeof prog>,
+    );
     expect(totalBeats).toBe(6); // 2 bars * 3 beats
   });
 
