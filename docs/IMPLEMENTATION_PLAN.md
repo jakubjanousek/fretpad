@@ -1,5 +1,45 @@
 # FretFlow – Implementation Plan (for Claude Code)
 
+## Progress Tracker
+
+### Milestone 1 – Project Setup
+- [x] Next.js + TypeScript initialized
+- [x] Tailwind CSS configured
+- [x] shadcn/ui components installed
+- [x] Dependencies installed (tone, tonal, zustand)
+- [ ] Basic app layout with header and three regions
+- [ ] `lib/types.ts` with all type definitions
+
+### Milestone 2 – Theory Layer
+- [ ] `lib/theory/chords.ts` - parseChordSymbol, getGuideTones
+- [ ] `lib/theory/scales.ts` - getSuggestedScalesForChord
+- [ ] `lib/theory/progression.ts` - parseProgression (with multi-chord bars)
+
+### Milestone 3 – Fretboard Visualization
+- [ ] `lib/fretboard.ts` - getFretNotesForChord
+- [ ] `components/fretboard/Fretboard.tsx` - grid rendering
+- [ ] `components/fretboard/FretMarker.tsx` - note circles with colors
+- [ ] Hover tooltips working
+
+### Milestone 4 – Progression Editor & State
+- [ ] `state/useAppStore.ts` - Zustand store with default preset
+- [ ] `components/progression/ProgressionEditor.tsx` - bar inputs
+- [ ] `components/progression/ProgressionPresets.tsx` - preset buttons
+- [ ] Fretboard updates when chord selection changes
+
+### Milestone 5 – Playback Engine
+- [ ] `hooks/useAudioEngine.ts` - Tone.js transport
+- [ ] `components/transport/TransportControls.tsx` - play/stop/tempo
+- [ ] Playback advances through chords and updates fretboard
+- [ ] Loop functionality
+
+### Milestone 6 – Theory UI
+- [ ] `components/theory/ChordInfoPanel.tsx` - chord details
+- [ ] `components/theory/NoteInfoTooltip.tsx` - interval display
+- [ ] Hover/click interactions wired up
+
+---
+
 ## 1. Project Overview
 
 **Goal:**
@@ -23,18 +63,19 @@ Build a browser-based practice tool that helps guitarists improvise over chord p
 
 **Frontend:**
 
-- Framework: React (Vite or Next.js – your choice)
+- Framework: Next.js (App Router)
 - Language: TypeScript
 - Styling: Tailwind CSS
+- UI Components: shadcn/ui (Radix-based)
 - Audio: Tone.js
-- Music theory: tonal (or similar theory lib)
-- State management: Zustand (lightweight) or React Context
+- Music theory: tonal
+- State management: Zustand
 
 **Build Tools:**
 
-- Package manager: pnpm or npm
-- Lint/format: ESLint + Prettier
-- Testing: Vitest / Jest (optional in MVP)
+- Package manager: npm
+- Lint/format: Biome
+- Testing: Vitest (optional in MVP)
 
 ---
 
@@ -91,44 +132,43 @@ Build a browser-based practice tool that helps guitarists improvise over chord p
 
 ```txt
 fretflow/
-  ├─ src/
-  │   ├─ components/
-  │   │   ├─ layout/
-  │   │   │   └─ AppLayout.tsx
-  │   │   ├─ fretboard/
-  │   │   │   ├─ Fretboard.tsx
-  │   │   │   ├─ FretMarker.tsx
-  │   │   │   └─ FretboardLegend.tsx
-  │   │   ├─ progression/
-  │   │   │   ├─ ProgressionEditor.tsx
-  │   │   │   └─ ProgressionPresets.tsx
-  │   │   ├─ transport/
-  │   │   │   └─ TransportControls.tsx
-  │   │   ├─ theory/
-  │   │   │   ├─ ChordInfoPanel.tsx
-  │   │   │   └─ NoteInfoTooltip.tsx
-  │   │   └─ common/
-  │   │       └─ Button.tsx
-  │   ├─ hooks/
-  │   │   ├─ useAudioEngine.ts
-  │   │   └─ useFretboardMapping.ts
-  │   ├─ lib/
-  │   │   ├─ theory/
-  │   │   │   ├─ chords.ts
-  │   │   │   ├─ scales.ts
-  │   │   │   └─ progression.ts
-  │   │   ├─ fretboard.ts
-  │   │   └─ types.ts
-  │   ├─ state/
-  │   │   └─ useAppStore.ts
-  │   ├─ pages/ (or routes/)
-  │   │   └─ App.tsx / index.tsx
-  │   └─ main.tsx
+  ├─ app/
+  │   ├─ layout.tsx
+  │   ├─ page.tsx
+  │   └─ globals.css
+  ├─ components/
+  │   ├─ ui/                    # shadcn components (already exists)
+  │   │   ├─ button.tsx
+  │   │   └─ ...
+  │   ├─ fretboard/
+  │   │   ├─ Fretboard.tsx
+  │   │   ├─ FretMarker.tsx
+  │   │   └─ FretboardLegend.tsx
+  │   ├─ progression/
+  │   │   ├─ ProgressionEditor.tsx
+  │   │   └─ ProgressionPresets.tsx
+  │   ├─ transport/
+  │   │   └─ TransportControls.tsx
+  │   └─ theory/
+  │       ├─ ChordInfoPanel.tsx
+  │       └─ NoteInfoTooltip.tsx
+  ├─ hooks/
+  │   ├─ useAudioEngine.ts
+  │   └─ useFretboardMapping.ts
+  ├─ lib/
+  │   ├─ theory/
+  │   │   ├─ chords.ts
+  │   │   ├─ scales.ts
+  │   │   └─ progression.ts
+  │   ├─ fretboard.ts
+  │   ├─ types.ts
+  │   └─ utils.ts               # already exists
+  ├─ state/
+  │   └─ useAppStore.ts
   ├─ public/
   ├─ package.json
   ├─ tsconfig.json
-  ├─ vite.config.ts / next.config.mjs
-  ├─ tailwind.config.js
+  ├─ next.config.ts
   └─ docs/
       └─ IMPLEMENTATION_PLAN.md  (this file)
 ```
@@ -137,7 +177,7 @@ fretflow/
 
 ## 5. Data Model & Types
 
-Put these in `src/lib/types.ts` (Claude can extend/refine as needed):
+Put these in `lib/types.ts` (Claude can extend/refine as needed):
 
 ```ts
 export type NoteName =
@@ -161,39 +201,102 @@ export type NoteName =
 
 export type ChordSymbol = string; // e.g. "Cmaj7", "Dm7", "G7"
 
+// Common chord qualities - use tonal for parsing, this is for display/logic
+export type ChordQuality =
+  | "maj"      // C, Cmaj
+  | "min"      // Cm, Cmin
+  | "maj7"     // Cmaj7
+  | "min7"     // Cm7, Cmin7
+  | "7"        // C7 (dominant)
+  | "min7b5"   // Cm7b5, Cø
+  | "dim"      // Cdim
+  | "dim7"     // Cdim7
+  | "aug"      // Caug, C+
+  | "sus2"     // Csus2
+  | "sus4"     // Csus4
+  | "6"        // C6
+  | "min6"     // Cm6
+  | "9"        // C9
+  | "maj9"     // Cmaj9
+  | "min9"     // Cm9
+  | "add9"     // Cadd9
+  | "other";   // fallback for complex chords
+
 export interface Chord {
   symbol: ChordSymbol;
   root: NoteName;
-  quality: "maj7" | "m7" | "7" | "m7b5" | "dim" | "other";
+  quality: ChordQuality;
   notes: NoteName[];
-  guideTones: NoteName[]; // usually 3rd & 7th
+  guideTones: NoteName[]; // usually 3rd & 7th (or 3rd & 6th for 6 chords)
   suggestedScales: string[]; // ["C Ionian"], etc.
+}
+
+export interface BarChord {
+  chord: ChordSymbol;
+  beats: number; // how many beats this chord occupies in the bar
 }
 
 export interface ProgressionBar {
   id: string;
-  beats: number; // e.g. 4
-  chords: ChordSymbol[]; // simple for MVP: 1 chord per bar
+  totalBeats: number; // e.g. 4 for 4/4 time
+  chords: BarChord[]; // 1-2 chords per bar, beats should sum to totalBeats
 }
 
 export interface Progression {
   id: string;
   name: string;
+  timeSignature: { numerator: number; denominator: number }; // e.g. { 4, 4 }
   bars: ProgressionBar[];
 }
 
 export interface FretPosition {
-  string: number; // 1 = high E, 6 = low E
+  string: number; // 1 = high E, 6 = low E (standard guitar convention)
   fret: number; // 0 = open
 }
 
 export interface FretNote extends FretPosition {
   note: NoteName;
+  interval: string; // e.g. "1", "b3", "5", "b7"
+  isRoot: boolean;
   isChordTone: boolean;
   isGuideTone: boolean;
   isScaleTone: boolean;
 }
+
+// Standard tuning - can be extended later for alternate tunings
+export const STANDARD_TUNING: NoteName[] = ["E", "B", "G", "D", "A", "E"]; // high to low (string 1-6)
 ```
+
+---
+
+## 5b. Visual Design Tokens
+
+Use these color conventions for fretboard note visualization:
+
+| Note Type | Color | Tailwind Class |
+|-----------|-------|----------------|
+| Root | Red/Orange | `bg-orange-500` |
+| Guide Tone (3rd, 7th) | Blue | `bg-blue-500` |
+| Other Chord Tone | Green | `bg-emerald-500` |
+| Scale Tone (non-chord) | Gray | `bg-slate-400` |
+| Inactive/Muted | Light Gray | `bg-slate-200` |
+
+Note labels should be white text on colored backgrounds for contrast.
+
+---
+
+## 5c. Default State & Error Handling
+
+**Initial State (on app load):**
+- Load a default preset: **ii-V-I in C** (`| Dm7 | G7 | Cmaj7 | Cmaj7 |`)
+- Tempo: 120 BPM
+- Current chord: First chord of progression (Dm7)
+- Fretboard shows chord tones for current chord
+
+**Error Handling for Chord Input:**
+- If chord cannot be parsed by tonal, show inline error below input
+- Keep previous valid chord until new valid input is entered
+- Provide hint: "Try: Cmaj7, Dm7, G7, Am"
 
 ---
 
@@ -207,11 +310,11 @@ export interface FretNote extends FretPosition {
 
 Tasks:
 
-1. Initialize project:
-
-   - `npm create vite@latest` (React + TS) OR `npx create-next-app@latest`
-   - Add Tailwind CSS
-   - Install deps: `tone`, `@tonaljs/tonal`, `zustand`
+1. Project already initialized with:
+   - Next.js + TypeScript ✓
+   - Tailwind CSS ✓
+   - shadcn/ui components ✓
+   - Dependencies: `tone`, `tonal`, `zustand` ✓
 
 2. Create basic layout:
 
@@ -221,13 +324,11 @@ Tasks:
 **Prompt example for Claude:**
 
 ```txt
-Create a new React + TypeScript + Vite project (if not existing yet).
-Set up Tailwind CSS, install tone, @tonaljs/tonal, and zustand.
-Implement an AppLayout component that has a header and three main regions:
-- left/top: chord progression editor placeholder
+Implement the main app layout in app/page.tsx that has a header and three main regions:
+- top: chord progression editor placeholder
 - center: fretboard visualization placeholder
-- bottom: transport controls placeholder.
-Use a minimal, clean design.
+- bottom: transport controls and theory panel placeholder.
+Use shadcn/ui components where appropriate. Use a minimal, clean design.
 ```
 
 ---
@@ -236,34 +337,37 @@ Use a minimal, clean design.
 
 Tasks:
 
-1. Implement chord parsing + info helpers in `src/lib/theory/chords.ts`:
+1. Implement chord parsing + info helpers in `lib/theory/chords.ts`:
 
    - Input: `"Cmaj7"`, `"Dm7"`, `"G7"`
-   - Output: `Chord` object (notes, guide tones)
+   - Output: `Chord` object (notes, guide tones, interval info)
 
-2. Implement scale suggestions in `src/lib/theory/scales.ts`:
+2. Implement scale suggestions in `lib/theory/scales.ts`:
 
    - For basic jazz/pop use:
 
-     - maj7 → Ionian
-     - m7 → Dorian
+     - maj/maj7 → Ionian
+     - min/min7 → Dorian
      - 7 → Mixolydian
+     - min7b5 → Locrian
+     - dim7 → Diminished (whole-half)
 
    - Keep this simple for MVP.
 
-3. Implement progression parsing in `src/lib/theory/progression.ts`:
+3. Implement progression parsing in `lib/theory/progression.ts`:
 
-   - Convert simple text or array into `Progression`.
+   - Convert simple text or array into `Progression`
+   - Support multiple chords per bar: `| Dm7 G7 |` = two chords, 2 beats each
 
 **Prompt example for Claude:**
 
 ```txt
-In src/lib/theory/chords.ts and src/lib/theory/scales.ts, use @tonaljs/tonal to implement helpers:
-- parseChordSymbol(symbol: string): Chord
+In lib/theory/chords.ts and lib/theory/scales.ts, use tonal to implement helpers:
+- parseChordSymbol(symbol: string): Chord | null
 - getSuggestedScalesForChord(chord: Chord): string[]
-Support at least: maj7, m7, 7, m7b5, dim.
-Use NoteName and Chord interfaces from src/lib/types.ts.
-Write a couple of basic unit tests demonstrating usage, but keep it minimal.
+- getIntervalName(root: NoteName, note: NoteName): string
+Support all ChordQuality types from lib/types.ts.
+Return null for invalid chord input (for error handling).
 ```
 
 ---
@@ -272,11 +376,11 @@ Write a couple of basic unit tests demonstrating usage, but keep it minimal.
 
 Tasks:
 
-1. Implement `src/lib/fretboard.ts`:
+1. Implement `lib/fretboard.ts`:
 
    - Generate fretboard layout (e.g. frets 0–12)
-   - Map tuning to notes (standard EADGBE)
-   - Given a `Chord` and optional scale, produce array of `FretNote`.
+   - Map tuning to notes (standard EADGBE using STANDARD_TUNING constant)
+   - Given a `Chord` and optional scale, produce array of `FretNote`
 
 2. Implement `<Fretboard />`:
 
@@ -285,38 +389,34 @@ Tasks:
      - `fretNotes: FretNote[]`
      - `numFrets` (default 12)
 
-   - Render grid (strings x frets) using divs/SVG.
-   - Visual style:
+   - Render grid (strings x frets) using divs or SVG
+   - Visual style using design tokens from section 5b:
 
-     - Minimal, clear
-     - Different visual treatment for:
-
-       - root
-       - other chord tones
-       - guide tones
-       - optionally scale tones
+     - Root: orange
+     - Guide tones: blue
+     - Other chord tones: green
+     - Scale tones: gray
 
 3. Implement hover/click behavior:
 
    - On hover: show tooltip (use `NoteInfoTooltip`) with:
 
      - Note name
-     - Interval
+     - Interval (e.g., "b3", "5", "b7")
 
 **Prompt example for Claude:**
 
 ```txt
-Implement a fretboard mapping utility in src/lib/fretboard.ts that:
-- Assumes standard tuning EADGBE.
-- Maps frets 0–12 to NoteName for each string.
-- Exposes a function getFretNotesForChord(chord: Chord, options?: { includeScale?: boolean, scaleName?: string }) that returns FretNote[].
+Implement a fretboard mapping utility in lib/fretboard.ts that:
+- Uses STANDARD_TUNING from lib/types.ts
+- Maps frets 0–12 to NoteName for each string
+- Exposes getFretNotesForChord(chord: Chord, options?: { includeScale?: boolean, scaleName?: string }): FretNote[]
 
-Then implement a Fretboard React component in src/components/fretboard/Fretboard.tsx that:
-- Renders a simple grid (6 strings x N frets).
-- Displays notes as circles with minimal styling.
-- Highlights root, other chord tones, and guide tones differently.
-- Supports hover to show a tooltip (NoteInfoTooltip) with note name and interval.
-Use Tailwind for styling, keep the visuals clean.
+Then implement a Fretboard React component in components/fretboard/Fretboard.tsx that:
+- Renders a grid (6 strings x N frets)
+- Uses color tokens: root=orange-500, guide=blue-500, chord=emerald-500, scale=slate-400
+- Supports hover to show NoteInfoTooltip with note name and interval
+Use Tailwind for styling. Keep the visuals clean and minimal.
 ```
 
 ---
@@ -325,42 +425,45 @@ Use Tailwind for styling, keep the visuals clean.
 
 Tasks:
 
-1. Implement global store in `src/state/useAppStore.ts` (Zustand):
+1. Implement global store in `state/useAppStore.ts` (Zustand):
 
-   - Current progression
-   - Selected bar/chord index
+   - Current progression (initialized with ii-V-I preset per section 5c)
+   - Selected bar index and chord index within bar
    - Current chord for visualization
-   - Tempo, isPlaying, etc.
+   - Tempo (default 120), isPlaying, etc.
 
 2. Implement `<ProgressionEditor />`:
 
-   - For MVP: simple list of bars, each with a single chord input.
+   - Bar-based view, each bar can have 1-2 chords
+   - Support splitting a bar: entering two chords like "Dm7 G7" creates two BarChords
    - A few buttons:
 
-     - “Add bar”
-     - “Use preset: ii–V–I in C”
+     - "Add bar"
+     - Preset buttons: "ii–V–I in C", "12-bar blues", "I–V–vi–IV"
 
-   - Clicking on a bar sets the “current chord” in the store.
+   - Clicking on a chord sets the "current chord" in the store
+   - Show inline error for invalid chord input (per section 5c)
 
 3. Connect `ProgressionEditor` ⇄ `Fretboard`:
 
-   - When current chord changes, recompute fretNotes and update Fretboard.
+   - When current chord changes, recompute fretNotes and update Fretboard
 
 **Prompt example:**
 
 ```txt
-Implement a Zustand store in src/state/useAppStore.ts to hold:
-- progression: Progression
+Implement a Zustand store in state/useAppStore.ts to hold:
+- progression: Progression (default: ii-V-I in C)
 - currentBarIndex: number
+- currentChordIndex: number (for multiple chords per bar)
 - currentChord: Chord | null
-- tempo: number
+- tempo: number (default 120)
 - isPlaying: boolean
 
 Then implement ProgressionEditor that:
-- Renders bars with a simple text input for chord symbol.
-- Parses chord symbols using parseChordSymbol.
-- When a bar is clicked, sets currentChord in the store.
-Finally, wire Fretboard to read currentChord from the store and display its fret notes.
+- Renders bars with inputs for chord symbols (support 1-2 chords per bar)
+- Parses chord symbols using parseChordSymbol, shows error for invalid input
+- When a chord is clicked, sets currentChord in the store
+Wire Fretboard to read currentChord from the store and display its fret notes.
 ```
 
 ---
@@ -369,7 +472,7 @@ Finally, wire Fretboard to read currentChord from the store and display its fret
 
 Tasks:
 
-1. Implement `useAudioEngine` hook in `src/hooks/useAudioEngine.ts`:
+1. Implement `useAudioEngine` hook in `hooks/useAudioEngine.ts`:
 
    - Uses Tone.js
    - Exposes functions:
@@ -378,35 +481,43 @@ Tasks:
      - `stop()`
      - `setTempo(bpm)`
 
-   - For MVP:
+   - For MVP backing track options (in order of complexity):
 
-     - Play a simple click or root note of each chord on downbeats.
+     - Option A: Metronome click only
+     - Option B: Root note of each chord (bass sound)
+     - Option C: Simple piano/synth chord voicing
+
+   - Start with Option A or B, can enhance later
 
 2. Implement `<TransportControls />`:
 
    - Play/stop buttons
-   - Tempo slider/input
-   - Hook into global store and `useAudioEngine`.
+   - Tempo slider/input (range: 40-200 BPM)
+   - Hook into global store and `useAudioEngine`
 
 3. Integrate with progression:
 
-   - On play: step through progression bars in time.
-   - For now, even a simple “one chord per bar at given BPM, 4 beats” is enough.
+   - On play: step through progression bars and chords in time
+   - Respect multiple chords per bar (e.g., 2 chords = each gets half the beats)
+   - Update `currentChord` in store as playback progresses
+   - Loop back to start when progression ends
 
 **Prompt example:**
 
 ```txt
-Implement useAudioEngine in src/hooks/useAudioEngine.ts using Tone.js.
+Implement useAudioEngine in hooks/useAudioEngine.ts using Tone.js.
 It should:
-- create a Transport
-- have functions start, stop, setTempo
-- on each bar, trigger a simple sound (e.g., a synth or click) aligned with the progression's current chord.
+- Create a Transport and schedule events for each chord in the progression
+- Have functions start, stop, setTempo
+- On each chord change, trigger a click or root note sound
+- Update the store's currentBarIndex and currentChordIndex as playback progresses
+- Handle multiple chords per bar (divide beats accordingly)
 
 Then implement TransportControls that:
-- Controls play/stop and tempo.
-- Uses the global store for tempo and isPlaying.
-- Wires play/stop to useAudioEngine.
-Keep the UI minimal and clean.
+- Has play/stop buttons and tempo slider (40-200 BPM)
+- Uses the global store for tempo and isPlaying
+- Wires play/stop to useAudioEngine
+Keep the UI minimal and clean. Use shadcn/ui components.
 ```
 
 ---
@@ -438,21 +549,20 @@ Tasks:
 **Prompt example:**
 
 ```txt
-Implement ChordInfoPanel which displays information about the currently selected chord:
-- symbol
-- root
-- notes
-- guide tones
+Implement ChordInfoPanel in components/theory/ChordInfoPanel.tsx which displays:
+- symbol, root, quality
+- notes (all chord tones)
+- guide tones (highlighted)
 - suggestedScales
 
-Implement NoteInfoTooltip as a small tooltip component that shows:
+Implement NoteInfoTooltip in components/theory/NoteInfoTooltip.tsx as a small tooltip:
 - note name
-- interval relative to the chord root and quality (e.g., 3, b3, 5, b7).
+- interval relative to the chord root (e.g., "1", "b3", "5", "b7")
 
-Integrate these with Fretboard and AppLayout so that:
-- The ChordInfoPanel is always visible in a side/bottom panel.
-- NoteInfoTooltip appears on hover over fret markers.
-Keep visual noise low.
+Integrate these with Fretboard and the main layout so that:
+- ChordInfoPanel is always visible in the bottom panel
+- NoteInfoTooltip appears on hover over fret markers
+Use shadcn/ui Tooltip component. Keep visual noise low.
 ```
 
 ---
@@ -473,7 +583,12 @@ Explicitly **do not** implement (so Claude doesn’t wander):
 
 Once MVP is stable, possible next steps:
 
-- Support multiple chords per bar
 - Voice-leading arrows between chord tones
-- Scale degree paths (e.g., “follow 3rds and 7ths through progression”)
-- More musical backing tracks vs. simple click
+- Scale degree paths (e.g., "follow 3rds and 7ths through progression")
+- More musical backing tracks (piano comp, guitar strums)
+- Alternate tunings support (Drop D, DADGAD, etc.)
+- Left-handed fretboard view toggle
+- Note label display options (note names, intervals, or none)
+- Save/load progressions (localStorage or URL sharing)
+- More time signatures (3/4, 6/8)
+- Swing/shuffle feel option
