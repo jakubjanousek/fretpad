@@ -1,7 +1,14 @@
 "use client";
 
+import { Check, Link, Share2, Type } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { exportProgressionToText, generateShareUrl } from "@/lib/persistence";
 import { useAppStore } from "@/state/useAppStore";
 
@@ -33,23 +40,30 @@ export function ShareExport() {
   };
 
   return (
-    <div className="flex gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleCopyUrl}
-        className="h-8 text-xs"
-      >
-        {copied === "url" ? "Copied!" : "Copy Link"}
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleCopyText}
-        className="h-8 text-xs"
-      >
-        {copied === "text" ? "Copied!" : "Copy Text"}
-      </Button>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon-sm" className="h-8 w-8">
+          <Share2 className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={handleCopyUrl} className="text-xs gap-2">
+          {copied === "url" ? (
+            <Check className="h-3.5 w-3.5" />
+          ) : (
+            <Link className="h-3.5 w-3.5" />
+          )}
+          {copied === "url" ? "Copied!" : "Copy Link"}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleCopyText} className="text-xs gap-2">
+          {copied === "text" ? (
+            <Check className="h-3.5 w-3.5" />
+          ) : (
+            <Type className="h-3.5 w-3.5" />
+          )}
+          {copied === "text" ? "Copied!" : "Copy as Text"}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

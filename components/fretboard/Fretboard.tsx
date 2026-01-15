@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
 import type { FretNote, NoteName } from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 import { FretMarker } from "./FretMarker";
 import { VoiceLeadingOverlay } from "./VoiceLeadingOverlay";
@@ -12,18 +15,56 @@ interface FretboardProps {
   numFrets?: number;
   tuning?: NoteName[];
   voiceLeadingPaths?: VoiceLeadingPath[];
+  showVoiceLeading?: boolean;
+  showScaleTones?: boolean;
+  onToggleVoiceLeading?: () => void;
+  onToggleScaleTones?: () => void;
 }
 
 // Fret markers positions (standard dots)
 const FRET_MARKERS = [3, 5, 7, 9, 12];
 const DOUBLE_MARKER_FRETS = [12];
 
+// Responsive fret counts
+const MOBILE_FRETS = 8;
+const TABLET_FRETS = 10;
+const DESKTOP_FRETS = 12;
+
+function useResponsiveFrets(maxFrets: number): number {
+  const [fretCount, setFretCount] = useState(maxFrets);
+
+  useEffect(() => {
+    const updateFretCount = () => {
+      const width = window.innerWidth;
+      if (width < 480) {
+        setFretCount(Math.min(MOBILE_FRETS, maxFrets));
+      } else if (width < 768) {
+        setFretCount(Math.min(TABLET_FRETS, maxFrets));
+      } else {
+        setFretCount(maxFrets);
+      }
+    };
+
+    updateFretCount();
+    window.addEventListener("resize", updateFretCount);
+    return () => window.removeEventListener("resize", updateFretCount);
+  }, [maxFrets]);
+
+  return fretCount;
+}
+
 export function Fretboard({
   fretNotes,
-  numFrets = 12,
+  numFrets = DESKTOP_FRETS,
   tuning = STANDARD_TUNING,
   voiceLeadingPaths = [],
+  showVoiceLeading = false,
+  showScaleTones = false,
+  onToggleVoiceLeading,
+  onToggleScaleTones,
 }: FretboardProps) {
+  const responsiveFretCount = useResponsiveFrets(numFrets);
+
   // Create a map for quick lookup of notes at positions
   const noteMap = new Map<string, FretNote>();
   for (const note of fretNotes) {
@@ -31,12 +72,12 @@ export function Fretboard({
     noteMap.set(key, note);
   }
 
-  // Generate fret numbers for header
-  const frets = Array.from({ length: numFrets + 1 }, (_, i) => i);
+  // Generate fret numbers for header (use responsive count)
+  const frets = Array.from({ length: responsiveFretCount + 1 }, (_, i) => i);
 
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="min-w-[700px]">
+    <div className="w-full overflow-x-auto scrollbar-hide sm:scrollbar-thin sm:scrollbar-thumb-muted sm:scrollbar-track-transparent">
+      <div className="min-w-125 sm:min-w-150 md:min-w-175">
         {/* Fret numbers header */}
         <div className="flex mb-1">
           {/* String label placeholder */}
@@ -62,7 +103,7 @@ export function Fretboard({
           {voiceLeadingPaths.length > 0 && (
             <VoiceLeadingOverlay
               paths={voiceLeadingPaths}
-              numFrets={numFrets}
+              numFrets={responsiveFretCount}
               numStrings={tuning.length}
             />
           )}
@@ -107,13 +148,13 @@ export function Fretboard({
                 </div>
 
                 {/* Nut position (fret 0) */}
-                <div className="w-10 shrink-0 flex items-center justify-center border-r-4 border-slate-400 dark:border-slate-500 py-3">
+                <div className="w-10 shrink-0 flex items-center justify-center border-r-4 border-slate-400 dark:border-slate-500 py-2.5 sm:py-3">
                   {(() => {
                     const nutNote = noteMap.get(`${stringNum}-0`);
                     return nutNote ? (
                       <FretMarker note={nutNote} />
                     ) : (
-                      <div className="w-7 h-7" />
+                      <div className="w-8 h-8 sm:w-7 sm:h-7" />
                     );
                   })()}
                 </div>
@@ -126,7 +167,7 @@ export function Fretboard({
                   return (
                     <div
                       key={fret}
-                      className="flex-1 min-w-12 flex items-center justify-center border-r border-slate-400/60 dark:border-slate-500/60 py-3 relative"
+                      className="flex-1 min-w-10 sm:min-w-12 flex items-center justify-center border-r border-slate-400/60 dark:border-slate-500/60 py-2.5 sm:py-3 relative"
                     >
                       {/* String wire */}
                       <div
@@ -141,7 +182,7 @@ export function Fretboard({
                           <FretMarker note={note} />
                         </div>
                       ) : (
-                        <div className="w-7 h-7" />
+                        <div className="w-8 h-8 sm:w-7 sm:h-7" />
                       )}
                     </div>
                   );
@@ -151,24 +192,66 @@ export function Fretboard({
           })}
         </div>
 
-        {/* Legend */}
-        <div className="mt-4 flex flex-wrap gap-4 text-xs">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-orange-500" />
-            <span className="text-muted-foreground">Root</span>
+        {/* Legend and controls */}
+        <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          {/* Legend */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-4 gap-y-1.5 sm:gap-4 text-xs">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-orange-500 shrink-0" />
+              <span className="text-muted-foreground">Root</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-blue-500 shrink-0" />
+              <span className="text-muted-foreground">
+                <span className="sm:hidden">Guide</span>
+                <span className="hidden sm:inline">Guide tone (3rd/7th)</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500 shrink-0" />
+              <span className="text-muted-foreground">Chord tone</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-slate-400 shrink-0" />
+              <span className="text-muted-foreground">Scale tone</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-blue-500" />
-            <span className="text-muted-foreground">Guide tone (3rd/7th)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-emerald-500" />
-            <span className="text-muted-foreground">Chord tone</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-slate-400" />
-            <span className="text-muted-foreground">Scale tone</span>
-          </div>
+
+          {/* Toggle buttons */}
+          {(onToggleVoiceLeading || onToggleScaleTones) && (
+            <div className="flex gap-1.5 sm:gap-2">
+              {onToggleVoiceLeading && (
+                <Button
+                  variant="toggle"
+                  size="sm"
+                  data-state={showVoiceLeading ? "on" : "off"}
+                  onClick={onToggleVoiceLeading}
+                  className={cn(
+                    "h-7 text-xs",
+                    showVoiceLeading &&
+                      "bg-blue-600 border-blue-600 hover:bg-blue-700 text-white shadow-sm",
+                  )}
+                >
+                  Voice Leading
+                </Button>
+              )}
+              {onToggleScaleTones && (
+                <Button
+                  variant="toggle"
+                  size="sm"
+                  data-state={showScaleTones ? "on" : "off"}
+                  onClick={onToggleScaleTones}
+                  className={cn(
+                    "h-7 text-xs",
+                    showScaleTones &&
+                      "bg-slate-600 border-slate-600 hover:bg-slate-700 text-white shadow-sm",
+                  )}
+                >
+                  Scale Tones
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -8,11 +8,11 @@ import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ShareExport } from "@/components/progression/ShareExport";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChordInfoSheet } from "@/components/theory/ChordInfoSheet";
+import { KeyboardShortcutsHelp } from "@/components/transport/KeyboardShortcutsHelp";
 import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import {
@@ -20,7 +20,6 @@ import {
   filterBestPaths,
   getNextChord,
 } from "@/lib/theory/voiceLeading";
-import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
 export default function Page() {
@@ -40,19 +39,24 @@ export default function Page() {
   // Panel states
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [chordInfoOpen, setChordInfoOpen] = useState(false);
+  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
 
-  // Keyboard shortcut for chord info panel (I key)
+  // Keyboard shortcuts for panels (I and ? keys)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key.toLowerCase() === "i" &&
-        !e.metaKey &&
-        !e.ctrlKey &&
-        !e.altKey &&
-        document.activeElement?.tagName !== "INPUT"
-      ) {
+      const isInputFocused = document.activeElement?.tagName === "INPUT";
+      const hasModifier = e.metaKey || e.ctrlKey || e.altKey;
+
+      // Toggle chord info panel (I key)
+      if (e.key.toLowerCase() === "i" && !hasModifier && !isInputFocused) {
         e.preventDefault();
         setChordInfoOpen((prev) => !prev);
+      }
+
+      // Toggle shortcuts help (? key)
+      if (e.key === "?" && !hasModifier && !isInputFocused) {
+        e.preventDefault();
+        setShortcutsHelpOpen((prev) => !prev);
       }
     };
 
@@ -95,27 +99,25 @@ export default function Page() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-semibold tracking-tight">FretFlow</h1>
-          <ThemeToggle />
+      <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-30">
+        <div className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+          <h1 className="text-lg sm:text-xl font-semibold tracking-tight shrink-0">
+            FretFlow
+          </h1>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <PresetDropdown />
+            <ShareExport />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
       {/* Main Content - add bottom padding for fixed transport bar */}
-      <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-6 pb-20">
+      <main className="flex-1 container mx-auto px-3 sm:px-4 py-4 sm:py-6 flex flex-col gap-4 sm:gap-6 pb-20">
         {/* Progression Editor Section */}
         <section>
           <Card>
-            <CardHeader className="pb-3">
-              <div className="flex flex-row items-center justify-between gap-2">
-                <div className="flex items-center gap-3">
-                  <PresetDropdown />
-                  <ShareExport />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="py-3 sm:py-4 px-3 sm:px-6">
               <ProgressionEditor />
             </CardContent>
           </Card>
@@ -124,35 +126,7 @@ export default function Page() {
         {/* Fretboard Visualization Section */}
         <section className="flex-1">
           <Card className="h-full">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              {/* Toggle buttons moved to right side */}
-              <div className="flex-1" />
-              <div className="flex gap-2">
-                <Button
-                  variant={showVoiceLeading ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setShowVoiceLeading(!showVoiceLeading)}
-                  className={cn(
-                    "h-7 text-xs",
-                    showVoiceLeading && "bg-blue-500 hover:bg-blue-600",
-                  )}
-                >
-                  Voice Leading
-                </Button>
-                <Button
-                  variant={showScaleTones ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setShowScaleTones(!showScaleTones)}
-                  className={cn(
-                    "h-7 text-xs",
-                    showScaleTones && "bg-slate-500 hover:bg-slate-600",
-                  )}
-                >
-                  Scale Tones
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
+            <CardContent className="flex flex-col gap-2 py-4 px-3 sm:px-6">
               {/* Prominent chord header */}
               <div className="flex justify-center">
                 <FretboardHeader
@@ -169,6 +143,12 @@ export default function Page() {
               <Fretboard
                 fretNotes={fretNotes}
                 voiceLeadingPaths={voiceLeadingPaths}
+                showVoiceLeading={showVoiceLeading}
+                showScaleTones={showScaleTones}
+                onToggleVoiceLeading={() =>
+                  setShowVoiceLeading(!showVoiceLeading)
+                }
+                onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
               />
             </CardContent>
           </Card>
@@ -179,6 +159,7 @@ export default function Page() {
       <TransportBar
         onSettingsClick={() => setSettingsOpen(true)}
         onInfoClick={() => setChordInfoOpen(true)}
+        onHelpClick={() => setShortcutsHelpOpen(true)}
       />
 
       {/* Settings Drawer */}
@@ -189,6 +170,12 @@ export default function Page() {
         chord={currentChord}
         open={chordInfoOpen}
         onOpenChange={setChordInfoOpen}
+      />
+
+      {/* Keyboard Shortcuts Help */}
+      <KeyboardShortcutsHelp
+        open={shortcutsHelpOpen}
+        onOpenChange={setShortcutsHelpOpen}
       />
     </div>
   );

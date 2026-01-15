@@ -89,10 +89,11 @@ function BarInput({
             role="button"
             tabIndex={0}
             className={cn(
-              "relative flex items-center border rounded-md px-1.5 py-1 cursor-pointer hover:border-primary/50 transition-colors overflow-hidden",
-              isSelected && "border-primary ring-1 ring-primary/30",
+              "relative flex flex-wrap items-center gap-y-0.5 border rounded-md px-1.5 py-1 cursor-pointer hover:border-primary/50 transition-all overflow-hidden",
+              isSelected &&
+                "border-primary ring-1 ring-primary/30 border-l-4 border-l-primary bg-primary/5",
               isPlaying &&
-                "border-orange-400 bg-orange-500/10 ring-1 ring-orange-400/50",
+                "border-orange-400 bg-orange-500/10 ring-1 ring-orange-400/50 border-l-4 border-l-orange-500",
             )}
             onClick={() => setIsEditing(true)}
             onKeyDown={(e) => {
@@ -139,7 +140,7 @@ function BarInput({
                   e.stopPropagation();
                   onRemove(barIndex);
                 }}
-                className="ml-1 opacity-0 group-hover/bar:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                className="ml-3 opacity-0 group-hover/bar:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
                 aria-label="Remove bar"
               >
                 <X className="h-3.5 w-3.5" />
@@ -178,9 +179,9 @@ export function ProgressionEditor() {
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Horizontal scrolling progression bar */}
+      {/* Progression bars - wrap on mobile, scroll on larger screens */}
       <div className="relative">
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
           {progression.bars.map((bar, barIndex) => {
             // Convert bar chords to string for editing
             const chordString = bar.chords.map((bc) => bc.chord).join(" ");

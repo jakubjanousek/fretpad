@@ -59,40 +59,42 @@ export function FretboardHeader({
   }
 
   return (
-    <button
-      type="button"
-      onClick={onChordClick}
-      className={cn(
-        "flex flex-col items-center gap-1 py-4 px-6 rounded-lg transition-all",
-        "hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-        isPlaying && "animate-pulse-subtle",
-      )}
-    >
-      <div className="flex items-baseline gap-3">
-        <span
-          className={cn(
-            "text-4xl font-bold tracking-tight transition-colors",
-            isPlaying && "text-orange-500",
-          )}
-        >
-          {chord.symbol}
-        </span>
-        <Badge
-          variant="secondary"
-          className={cn(
-            "text-sm font-medium",
-            isPlaying &&
-              "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-          )}
-        >
-          {formatQuality(chord.quality)}
-        </Badge>
-      </div>
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span>Root: {chord.root}</span>
-        <span className="text-border">|</span>
-        <span className="italic">Click for details</span>
-      </div>
-    </button>
+    <div key={chord.symbol} className="animate-chord-change">
+      <button
+        type="button"
+        onClick={onChordClick}
+        className={cn(
+          "flex flex-col items-center gap-0.5 sm:gap-1 py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all",
+          "hover:bg-muted/50 focus-ring",
+          isPlaying && "animate-pulse-subtle",
+        )}
+      >
+        <div className="flex items-baseline gap-2 sm:gap-3">
+          <span
+            className={cn(
+              "hero-text transition-colors",
+              isPlaying && "text-orange-500",
+            )}
+          >
+            {chord.symbol}
+          </span>
+          <Badge
+            variant="secondary"
+            className={cn(
+              "text-xs sm:text-sm font-medium transition-colors",
+              isPlaying &&
+                "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+            )}
+          >
+            {formatQuality(chord.quality)}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-2 text-[10px] sm:text-xs text-muted-foreground">
+          <span>Root: {chord.root}</span>
+          <span className="text-border hidden sm:inline">|</span>
+          <span className="italic hidden sm:inline">Click for details</span>
+        </div>
+      </button>
+    </div>
   );
 }
