@@ -58,7 +58,8 @@ function getPitchClass(note: string): number {
 export function getNoteAtFret(openString: NoteName, fret: number): NoteName {
   const openPitchClass = getPitchClass(openString);
   const newPitchClass = (openPitchClass + fret) % 12;
-  return CHROMATIC_NOTES[newPitchClass];
+  // newPitchClass is always 0-11 due to modulo, so index is always valid
+  return CHROMATIC_NOTES[newPitchClass] ?? "C";
 }
 
 /**
@@ -72,9 +73,11 @@ export function generateFretboardLayout(
   const layout: NoteName[][] = [];
 
   for (let stringNum = 0; stringNum < tuning.length; stringNum++) {
+    const openString = tuning[stringNum];
+    if (!openString) continue;
     const stringNotes: NoteName[] = [];
     for (let fret = 0; fret <= numFrets; fret++) {
-      stringNotes.push(getNoteAtFret(tuning[stringNum], fret));
+      stringNotes.push(getNoteAtFret(openString, fret));
     }
     layout.push(stringNotes);
   }
@@ -133,8 +136,11 @@ export function getFretNotesForChord(
 
   // Iterate through each position on the fretboard
   for (let stringNum = 0; stringNum < tuning.length; stringNum++) {
+    const stringNotes = layout[stringNum];
+    if (!stringNotes) continue;
     for (let fret = 0; fret <= numFrets; fret++) {
-      const note = layout[stringNum][fret];
+      const note = stringNotes[fret];
+      if (!note) continue;
 
       const noteIsRoot = isRoot(chord, note);
       const noteIsChordTone = isChordTone(chord, note);

@@ -26,10 +26,15 @@ function parseTimeToBeats(time: string): number {
   const parts = time.split(":").map(Number);
   if (parts.length === 2) {
     // "bars:beats" format
-    return parts[0] * 4 + parts[1];
+    const bars = parts[0] ?? 0;
+    const beats = parts[1] ?? 0;
+    return bars * 4 + beats;
   } else if (parts.length === 3) {
     // "bars:beats:sixteenths" format
-    return parts[0] * 4 + parts[1] + parts[2] / 4;
+    const bars = parts[0] ?? 0;
+    const beats = parts[1] ?? 0;
+    const sixteenths = parts[2] ?? 0;
+    return bars * 4 + beats + sixteenths / 4;
   }
   return 0;
 }
@@ -170,10 +175,12 @@ export function scheduleProgression(
   // Iterate through each bar
   for (let barIndex = 0; barIndex < progression.bars.length; barIndex++) {
     const bar = progression.bars[barIndex];
+    if (!bar) continue;
 
     // Iterate through each chord in the bar
     for (let chordIndex = 0; chordIndex < bar.chords.length; chordIndex++) {
       const barChord = bar.chords[chordIndex];
+      if (!barChord) continue;
       const chord = parseChordSymbol(barChord.chord);
 
       if (!chord) continue;
@@ -233,19 +240,22 @@ function getNextChord(
   currentChordIndex: number,
 ): { chord: string } | null {
   const currentBar = progression.bars[currentBarIndex];
+  if (!currentBar) return null;
 
   // Check if there's another chord in the same bar
   if (currentChordIndex < currentBar.chords.length - 1) {
-    return currentBar.chords[currentChordIndex + 1];
+    return currentBar.chords[currentChordIndex + 1] ?? null;
   }
 
   // Check if there's another bar
   if (currentBarIndex < progression.bars.length - 1) {
-    return progression.bars[currentBarIndex + 1].chords[0];
+    const nextBar = progression.bars[currentBarIndex + 1];
+    return nextBar?.chords[0] ?? null;
   }
 
   // Wrap around to the first chord
-  return progression.bars[0].chords[0];
+  const firstBar = progression.bars[0];
+  return firstBar?.chords[0] ?? null;
 }
 
 /**

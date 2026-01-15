@@ -1,5 +1,8 @@
 import { create } from "zustand";
 import { DEFAULT_STYLE_ID } from "@/lib/audio/styles";
+import type { ErrorInfo } from "@/lib/errors";
+import { toErrorInfo } from "@/lib/errors";
+import { generateId } from "@/lib/id";
 import { parseChordSymbol } from "@/lib/theory/chords";
 import { PRESET_PROGRESSIONS, parseBar } from "@/lib/theory/progression";
 import type { Chord, Progression, ProgressionBar, StyleId } from "@/lib/types";
@@ -16,6 +19,9 @@ interface AppState {
   isPlaying: boolean;
   selectedStyle: StyleId;
 
+  // Error state
+  error: ErrorInfo | null;
+
   // Actions
   setProgression: (progression: Progression) => void;
   loadPreset: (presetName: keyof typeof PRESET_PROGRESSIONS) => void;
@@ -24,6 +30,10 @@ interface AppState {
   setIsPlaying: (isPlaying: boolean) => void;
   setSelectedStyle: (style: StyleId) => void;
 
+  // Error actions
+  setError: (error: unknown) => void;
+  clearError: () => void;
+
   // Bar manipulation
   updateBar: (barIndex: number, barString: string) => boolean;
   addBar: () => void;
@@ -31,13 +41,6 @@ interface AppState {
 
   // Helper to advance to next chord (for playback)
   advanceToNextChord: () => void;
-}
-
-/**
- * Generates a unique ID for bars
- */
-function generateId(): string {
-  return Math.random().toString(36).substring(2, 9);
 }
 
 /**
@@ -70,6 +73,16 @@ export const useAppStore = create<AppState>((set, get) => ({
   tempo: 120,
   isPlaying: false,
   selectedStyle: DEFAULT_STYLE_ID,
+  error: null,
+
+  // Error actions
+  setError: (error) => {
+    set({ error: toErrorInfo(error) });
+  },
+
+  clearError: () => {
+    set({ error: null });
+  },
 
   // Actions
   setProgression: (progression) => {

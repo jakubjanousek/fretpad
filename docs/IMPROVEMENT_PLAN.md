@@ -15,21 +15,23 @@ This document outlines improvements that can be implemented to enhance FretFlow 
 
 ## 1. Code Quality & Technical Debt
 
-### 1.1 Add Test Suite (P0)
+### 1.1 Add Test Suite (P0) ✅ PARTIALLY COMPLETE
 
-The codebase has no tests. Add Vitest for unit and integration testing.
+Vitest and testing utilities have been set up with comprehensive unit tests.
 
-**Tasks:**
-- [ ] Install Vitest and testing utilities (`@testing-library/react`)
-- [ ] Add unit tests for `lib/theory/chords.ts` (chord parsing, guide tones)
-- [ ] Add unit tests for `lib/theory/scales.ts` (scale suggestions)
-- [ ] Add unit tests for `lib/theory/progression.ts` (progression parsing)
-- [ ] Add unit tests for `lib/fretboard.ts` (note mapping, fret calculations)
+**Completed:**
+- [x] Install Vitest and testing utilities (`@testing-library/react`)
+- [x] Add unit tests for `lib/theory/chords.ts` (chord parsing, guide tones) - 46 tests
+- [x] Add unit tests for `lib/theory/scales.ts` (scale suggestions) - 19 tests
+- [x] Add unit tests for `lib/theory/progression.ts` (progression parsing) - 33 tests
+- [x] Add unit tests for `lib/fretboard.ts` (note mapping, fret calculations) - 31 tests
+
+**Remaining Tasks:**
 - [ ] Add component tests for `Fretboard`, `ProgressionEditor`, `TransportControls`
 - [ ] Add integration test for full user flow (load preset → play → stop)
 - [ ] Configure CI to run tests on PR
 
-**Files to create:**
+**Files created:**
 ```
 __tests__/
   lib/
@@ -38,55 +40,53 @@ __tests__/
       scales.test.ts
       progression.test.ts
     fretboard.test.ts
-  components/
-    Fretboard.test.tsx
-    ProgressionEditor.test.tsx
-  integration/
-    playback-flow.test.tsx
+  setup.ts
 vitest.config.ts
 ```
 
-### 1.2 Improve Error Handling (P0)
+### 1.2 Improve Error Handling (P0) ✅ PARTIALLY COMPLETE
 
-Currently, chord parsing returns `null` silently. Add proper error boundaries and user feedback.
+Custom error types and Error Boundary have been added.
 
-**Tasks:**
-- [ ] Create custom error types in `lib/errors.ts` (e.g., `ChordParseError`, `ProgressionParseError`)
-- [ ] Add React Error Boundary component wrapping main sections
+**Completed:**
+- [x] Create custom error types in `lib/errors.ts` (e.g., `ChordParseError`, `ProgressionParseError`)
+- [x] Add React Error Boundary component wrapping main sections
+- [x] Add error states to Zustand store
+
+**Remaining Tasks:**
 - [ ] Show toast notifications for recoverable errors
-- [ ] Add error states to Zustand store
 - [ ] Improve inline validation messages in `ProgressionEditor`
 
-### 1.3 Improve ID Generation (P1)
+### 1.3 Improve ID Generation (P1) ✅ COMPLETE
 
-Replace `Math.random().toString(36).substring(2, 9)` with robust IDs.
+Replaced `Math.random().toString(36).substring(2, 9)` with `crypto.randomUUID()`.
 
-**Tasks:**
-- [ ] Install `nanoid` or use `crypto.randomUUID()`
-- [ ] Update `lib/theory/progression.ts` to use new ID generator
-- [ ] Update `state/useAppStore.ts` `addBar` function
+**Completed:**
+- [x] Created `lib/id.ts` with `generateId()` using `crypto.randomUUID()`
+- [x] Update `lib/theory/progression.ts` to use new ID generator
+- [x] Update `state/useAppStore.ts` `addBar` function
 
-### 1.4 Optimize Audio Engine (P1) ✅ PARTIALLY COMPLETE
+### 1.4 Optimize Audio Engine (P1) ✅ COMPLETE
 
-The `useAudioEngine` hook has been refactored for backing track support.
+The `useAudioEngine` hook has been fully optimized.
 
 **Completed:**
 - [x] Move synth creation to a `useRef` to prevent recreation on each render
 - [x] Add proper cleanup for scheduled events on progression change
 - [x] Proper instrument disposal on style change
+- [x] Memoize event scheduling to prevent duplicate schedules
+- [x] Add audio context state management (suspended/running)
+- [x] Handle edge case: style change during playback gracefully
+
+### 1.5 Add TypeScript Strict Checks (P2) ✅ PARTIALLY COMPLETE
+
+Enabled stricter TypeScript checks for better type safety.
+
+**Completed:**
+- [x] Enable `noUncheckedIndexedAccess` in tsconfig
+- [x] Fix any resulting type errors
 
 **Remaining Tasks:**
-- [ ] Memoize event scheduling to prevent duplicate schedules
-- [ ] Add audio context state management (suspended/running)
-- [ ] Handle edge case: style change during playback gracefully
-
-### 1.5 Add TypeScript Strict Checks (P2)
-
-Enable stricter TypeScript checks for better type safety.
-
-**Tasks:**
-- [ ] Enable `noUncheckedIndexedAccess` in tsconfig
-- [ ] Fix any resulting type errors
 - [ ] Add explicit return types to all exported functions
 
 ---

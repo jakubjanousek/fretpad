@@ -63,7 +63,10 @@ export function TransportControls() {
 
   const handleTempoChange = useCallback(
     (value: number[]) => {
-      setTempo(value[0]);
+      const newTempo = value[0];
+      if (newTempo !== undefined) {
+        setTempo(newTempo);
+      }
     },
     [setTempo],
   );

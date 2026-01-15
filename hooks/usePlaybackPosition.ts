@@ -54,9 +54,12 @@ export function usePlaybackPosition({
 
     for (let barIndex = 0; barIndex < progression.bars.length; barIndex++) {
       const bar = progression.bars[barIndex];
+      if (!bar) continue;
       for (let chordIndex = 0; chordIndex < bar.chords.length; chordIndex++) {
+        const chord = bar.chords[chordIndex];
+        if (!chord) continue;
         map.push({ barIndex, chordIndex, startBeat: currentBeat });
-        currentBeat += bar.chords[chordIndex].beats;
+        currentBeat += chord.beats;
       }
     }
 
@@ -73,9 +76,9 @@ export function usePlaybackPosition({
     (positionStr: string): number => {
       const parts = positionStr.split(":").map(Number);
       if (parts.length >= 2) {
-        const bars = parts[0];
-        const beats = parts[1];
-        const sixteenths = parts.length > 2 ? parts[2] : 0;
+        const bars = parts[0] ?? 0;
+        const beats = parts[1] ?? 0;
+        const sixteenths = parts[2] ?? 0;
         return bars * beatsPerBar + beats + sixteenths / 4;
       }
       return 0;
@@ -99,6 +102,7 @@ export function usePlaybackPosition({
       // Find which chord we're in
       for (let i = 0; i < map.length; i++) {
         const entry = map[i];
+        if (!entry) continue;
         const nextEntry = map[i + 1];
         const entryEndBeat = nextEntry ? nextEntry.startBeat : totalBeats;
 
@@ -114,11 +118,12 @@ export function usePlaybackPosition({
 
       // Calculate bar progress
       const bar = progression.bars[currentBarIndex];
+      const barTotalBeats = bar?.totalBeats ?? beatsPerBar;
       const barStartBeat = progression.bars
         .slice(0, currentBarIndex)
         .reduce((sum, b) => sum + b.totalBeats, 0);
       const beatInBar = normalizedBeat - barStartBeat;
-      const barProgress = Math.min(1, Math.max(0, beatInBar / bar.totalBeats));
+      const barProgress = Math.min(1, Math.max(0, beatInBar / barTotalBeats));
 
       return {
         barIndex: currentBarIndex,
@@ -126,7 +131,7 @@ export function usePlaybackPosition({
         barProgress,
       };
     },
-    [progression, getTotalBeats],
+    [progression, getTotalBeats, beatsPerBar],
   );
 
   // Animation frame callback for polling position

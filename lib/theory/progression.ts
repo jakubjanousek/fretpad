@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id";
 import type {
   BarChord,
   ChordSymbol,
@@ -5,13 +6,6 @@ import type {
   ProgressionBar,
 } from "@/lib/types";
 import { parseChordSymbol } from "./chords";
-
-/**
- * Generates a unique ID for bars
- */
-function generateId(): string {
-  return Math.random().toString(36).substring(2, 9);
-}
 
 /**
  * Parses a bar string into a ProgressionBar
