@@ -103,133 +103,138 @@ export function VoiceLeadingOverlay({
         }}
         viewBox={`0 0 ${containerWidth} ${containerHeight}`}
       >
-      <defs>
-        {/* Arrow marker for guide tone paths */}
-        <marker
-          id="arrow-blue"
-          markerWidth="8"
-          markerHeight="8"
-          refX="6"
-          refY="3"
-          orient="auto"
-          markerUnits="strokeWidth"
-        >
-          <path d="M0,0 L0,6 L8,3 z" className="fill-blue-500" />
-        </marker>
-        <marker
-          id="arrow-orange"
-          markerWidth="8"
-          markerHeight="8"
-          refX="6"
-          refY="3"
-          orient="auto"
-          markerUnits="strokeWidth"
-        >
-          <path d="M0,0 L0,6 L8,3 z" className="fill-orange-500" />
-        </marker>
-        <marker
-          id="arrow-emerald"
-          markerWidth="8"
-          markerHeight="8"
-          refX="6"
-          refY="3"
-          orient="auto"
-          markerUnits="strokeWidth"
-        >
-          <path d="M0,0 L0,6 L8,3 z" className="fill-emerald-500" />
-        </marker>
-      </defs>
+        <defs>
+          {/* Arrow marker for guide tone paths */}
+          <marker
+            id="arrow-blue"
+            markerWidth="8"
+            markerHeight="8"
+            refX="6"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <path d="M0,0 L0,6 L8,3 z" className="fill-blue-500" />
+          </marker>
+          <marker
+            id="arrow-orange"
+            markerWidth="8"
+            markerHeight="8"
+            refX="6"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <path d="M0,0 L0,6 L8,3 z" className="fill-orange-500" />
+          </marker>
+          <marker
+            id="arrow-emerald"
+            markerWidth="8"
+            markerHeight="8"
+            refX="6"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <path d="M0,0 L0,6 L8,3 z" className="fill-emerald-500" />
+          </marker>
+        </defs>
 
-      {paths.map((path, index) => {
-        const fromX = getFretX(path.from.fret);
-        const fromY = getStringY(path.from.string);
-        const toX = getFretX(path.to.fret);
-        const toY = getStringY(path.to.string);
+        {paths.map((path, index) => {
+          // If arrow starts from fret 0 and we have at least 12 frets visible,
+          // draw it from fret 12 instead (same note, octave equivalent) for better visuals
+          const visualFromFret =
+            path.from.fret === 0 && numFrets >= 12 ? 12 : path.from.fret;
 
-        const color = getPathColor(path.type);
-        const opacity = getPathOpacity(path);
+          const fromX = getFretX(visualFromFret);
+          const fromY = getStringY(path.from.string);
+          const toX = getFretX(path.to.fret);
+          const toY = getStringY(path.to.string);
 
-        // For common tones, draw a circle highlight instead of an arrow
-        if (path.type === "common-tone") {
-          return (
-            <g key={index}>
-              {/* Pulsing ring around common tone */}
-              <circle
-                cx={fromX}
-                cy={fromY}
-                r="18"
-                fill="none"
-                stroke={color}
-                strokeWidth="2"
-                opacity={opacity}
-                strokeDasharray="4 2"
-              />
-              {/* Small connector if positions differ */}
-              {(fromX !== toX || fromY !== toY) && (
-                <line
-                  x1={fromX}
-                  y1={fromY}
-                  x2={toX}
-                  y2={toY}
+          const color = getPathColor(path.type);
+          const opacity = getPathOpacity(path);
+
+          // For common tones, draw a circle highlight instead of an arrow
+          if (path.type === "common-tone") {
+            return (
+              <g key={index}>
+                {/* Pulsing ring around common tone */}
+                <circle
+                  cx={fromX}
+                  cy={fromY}
+                  r="18"
+                  fill="none"
                   stroke={color}
                   strokeWidth="2"
-                  opacity={opacity * 0.5}
-                  strokeDasharray="2 2"
+                  opacity={opacity}
+                  strokeDasharray="4 2"
                 />
-              )}
-            </g>
+                {/* Small connector if positions differ */}
+                {(fromX !== toX || fromY !== toY) && (
+                  <line
+                    x1={fromX}
+                    y1={fromY}
+                    x2={toX}
+                    y2={toY}
+                    stroke={color}
+                    strokeWidth="2"
+                    opacity={opacity * 0.5}
+                    strokeDasharray="2 2"
+                  />
+                )}
+              </g>
+            );
+          }
+
+          // Determine arrow marker based on type
+          // Note: common-tone is handled separately above, so only resolution or guide-tone here
+          const markerEnd =
+            path.type === "resolution"
+              ? "url(#arrow-orange)"
+              : "url(#arrow-blue)";
+
+          // Calculate a curved path for better visibility
+          // Use a quadratic bezier for smooth curves
+          const midX = (fromX + toX) / 2;
+          const midY = (fromY + toY) / 2;
+
+          // Offset the control point perpendicular to the line
+          const dx = toX - fromX;
+          const dy = toY - fromY;
+          const length = Math.sqrt(dx * dx + dy * dy);
+
+          // Only curve if there's significant distance
+          const curveOffset = length > 50 ? 15 : 0;
+          const perpX = length > 0 ? (-dy / length) * curveOffset : 0;
+          const perpY = length > 0 ? (dx / length) * curveOffset : 0;
+
+          const controlX = midX + perpX;
+          const controlY = midY + perpY;
+
+          // Shorten the line slightly to account for the note marker
+          const shortenBy = 16;
+          const adjustedFromX = fromX + (dx / length) * shortenBy || fromX;
+          const adjustedFromY = fromY + (dy / length) * shortenBy || fromY;
+          const adjustedToX = toX - (dx / length) * shortenBy || toX;
+          const adjustedToY = toY - (dy / length) * shortenBy || toY;
+
+          return (
+            <path
+              key={index}
+              d={
+                curveOffset > 0
+                  ? `M ${adjustedFromX} ${adjustedFromY} Q ${controlX} ${controlY} ${adjustedToX} ${adjustedToY}`
+                  : `M ${adjustedFromX} ${adjustedFromY} L ${adjustedToX} ${adjustedToY}`
+              }
+              fill="none"
+              stroke={color}
+              strokeWidth="2.5"
+              opacity={opacity}
+              markerEnd={markerEnd}
+              strokeLinecap="round"
+            />
           );
-        }
-
-        // Determine arrow marker based on type
-        // Note: common-tone is handled separately above, so only resolution or guide-tone here
-        const markerEnd =
-          path.type === "resolution"
-            ? "url(#arrow-orange)"
-            : "url(#arrow-blue)";
-
-        // Calculate a curved path for better visibility
-        // Use a quadratic bezier for smooth curves
-        const midX = (fromX + toX) / 2;
-        const midY = (fromY + toY) / 2;
-
-        // Offset the control point perpendicular to the line
-        const dx = toX - fromX;
-        const dy = toY - fromY;
-        const length = Math.sqrt(dx * dx + dy * dy);
-
-        // Only curve if there's significant distance
-        const curveOffset = length > 50 ? 15 : 0;
-        const perpX = length > 0 ? (-dy / length) * curveOffset : 0;
-        const perpY = length > 0 ? (dx / length) * curveOffset : 0;
-
-        const controlX = midX + perpX;
-        const controlY = midY + perpY;
-
-        // Shorten the line slightly to account for the note marker
-        const shortenBy = 16;
-        const adjustedFromX = fromX + (dx / length) * shortenBy || fromX;
-        const adjustedFromY = fromY + (dy / length) * shortenBy || fromY;
-        const adjustedToX = toX - (dx / length) * shortenBy || toX;
-        const adjustedToY = toY - (dy / length) * shortenBy || toY;
-
-        return (
-          <path
-            key={index}
-            d={
-              curveOffset > 0
-                ? `M ${adjustedFromX} ${adjustedFromY} Q ${controlX} ${controlY} ${adjustedToX} ${adjustedToY}`
-                : `M ${adjustedFromX} ${adjustedFromY} L ${adjustedToX} ${adjustedToY}`
-            }
-            fill="none"
-            stroke={color}
-            strokeWidth="2.5"
-            opacity={opacity}
-            markerEnd={markerEnd}
-            strokeLinecap="round"
-          />
-        );
-      })}
+        })}
       </svg>
     </div>
   );
