@@ -1,7 +1,7 @@
 "use client";
 
+import { useLayoutEffect, useRef, useState } from "react";
 import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
-import { cn } from "@/lib/utils";
 
 interface VoiceLeadingOverlayProps {
   paths: VoiceLeadingPath[];
@@ -12,37 +12,6 @@ interface VoiceLeadingOverlayProps {
 // Layout constants matching the Fretboard component
 const STRING_LABEL_WIDTH = 32; // w-8
 const NUT_WIDTH = 40; // w-10
-const MIN_FRET_WIDTH = 48; // min-w-12
-const STRING_HEIGHT = 52; // Approximate height per string row (including padding)
-
-/**
- * Calculates the X position for a fret on the fretboard
- */
-function getFretX(
-  fret: number,
-  containerWidth: number,
-  numFrets: number,
-): number {
-  if (fret === 0) {
-    // Open string (nut position)
-    return STRING_LABEL_WIDTH + NUT_WIDTH / 2;
-  }
-
-  // Calculate fret width dynamically
-  const availableWidth = containerWidth - STRING_LABEL_WIDTH - NUT_WIDTH;
-  const fretWidth = Math.max(MIN_FRET_WIDTH, availableWidth / numFrets);
-
-  // Position at center of fret
-  return STRING_LABEL_WIDTH + NUT_WIDTH + (fret - 0.5) * fretWidth;
-}
-
-/**
- * Calculates the Y position for a string on the fretboard
- */
-function getStringY(stringNum: number): number {
-  // stringNum is 1-indexed (1 = high E, 6 = low E)
-  return (stringNum - 0.5) * STRING_HEIGHT;
-}
 
 /**
  * Gets the stroke color for a voice leading path based on its type
@@ -50,22 +19,20 @@ function getStringY(stringNum: number): number {
 function getPathColor(type: VoiceLeadingPath["type"]): string {
   switch (type) {
     case "common-tone":
-      return "stroke-emerald-500"; // Green for common tones (staying in place)
+      return "#10b981"; // emerald-500
     case "resolution":
-      return "stroke-orange-500"; // Orange for resolutions (musically significant)
+      return "#f97316"; // orange-500
     default:
-      return "stroke-blue-500"; // Blue for general guide tone motion
+      return "#3b82f6"; // blue-500
   }
 }
 
 /**
  * Gets opacity for a path based on semitone distance
- * Closer movements are more prominent
  */
 function getPathOpacity(path: VoiceLeadingPath): number {
   if (path.type === "common-tone") return 0.9;
   if (path.type === "resolution") return 0.85;
-  // Fade out larger intervals slightly
   return Math.max(0.5, 0.8 - path.semitoneDistance * 0.05);
 }
 
@@ -74,23 +41,68 @@ export function VoiceLeadingOverlay({
   numFrets,
   numStrings,
 }: VoiceLeadingOverlayProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useLayoutEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setDimensions({ width: rect.width, height: rect.height });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
+  }, [paths]); // Re-measure when paths change
+
   if (paths.length === 0) return null;
 
-  // Calculate container dimensions
-  const containerWidth =
-    STRING_LABEL_WIDTH + NUT_WIDTH + numFrets * MIN_FRET_WIDTH;
-  const containerHeight = numStrings * STRING_HEIGHT;
+  const { width: containerWidth, height: containerHeight } = dimensions;
+
+  // Calculate actual fret area dimensions
+  const fretAreaStart = STRING_LABEL_WIDTH + NUT_WIDTH;
+  const fretAreaWidth = Math.max(0, containerWidth - fretAreaStart);
+
+  // Helper to convert fret position to actual X coordinate
+  const getFretX = (fret: number): number => {
+    if (fret === 0) {
+      return STRING_LABEL_WIDTH + NUT_WIDTH / 2;
+    }
+    const fretWidth = fretAreaWidth / numFrets;
+    return fretAreaStart + (fret - 0.5) * fretWidth;
+  };
+
+  // Helper to convert string position to actual Y coordinate
+  const getStringY = (stringNum: number): number => {
+    const stringHeight = containerHeight / numStrings;
+    return (stringNum - 0.5) * stringHeight;
+  };
+
+  // Don't render until we have valid dimensions
+  if (containerWidth === 0 || containerHeight === 0) {
+    return (
+      <div
+        ref={containerRef}
+        className="absolute inset-0 pointer-events-none"
+      />
+    );
+  }
 
   return (
-    <svg
+    <div
+      ref={containerRef}
       className="absolute inset-0 pointer-events-none overflow-visible"
-      style={{
-        width: "100%",
-        height: "100%",
-      }}
-      viewBox={`0 0 ${containerWidth} ${containerHeight}`}
-      preserveAspectRatio="none"
     >
+      <svg
+        className="absolute inset-0 overflow-visible"
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
+        viewBox={`0 0 ${containerWidth} ${containerHeight}`}
+      >
       <defs>
         {/* Arrow marker for guide tone paths */}
         <marker
@@ -129,12 +141,12 @@ export function VoiceLeadingOverlay({
       </defs>
 
       {paths.map((path, index) => {
-        const fromX = getFretX(path.from.fret, containerWidth, numFrets);
+        const fromX = getFretX(path.from.fret);
         const fromY = getStringY(path.from.string);
-        const toX = getFretX(path.to.fret, containerWidth, numFrets);
+        const toX = getFretX(path.to.fret);
         const toY = getStringY(path.to.string);
 
-        const colorClass = getPathColor(path.type);
+        const color = getPathColor(path.type);
         const opacity = getPathOpacity(path);
 
         // For common tones, draw a circle highlight instead of an arrow
@@ -146,7 +158,8 @@ export function VoiceLeadingOverlay({
                 cx={fromX}
                 cy={fromY}
                 r="18"
-                className={cn(colorClass, "fill-none")}
+                fill="none"
+                stroke={color}
                 strokeWidth="2"
                 opacity={opacity}
                 strokeDasharray="4 2"
@@ -158,7 +171,7 @@ export function VoiceLeadingOverlay({
                   y1={fromY}
                   x2={toX}
                   y2={toY}
-                  className={colorClass}
+                  stroke={color}
                   strokeWidth="2"
                   opacity={opacity * 0.5}
                   strokeDasharray="2 2"
@@ -208,7 +221,8 @@ export function VoiceLeadingOverlay({
                 ? `M ${adjustedFromX} ${adjustedFromY} Q ${controlX} ${controlY} ${adjustedToX} ${adjustedToY}`
                 : `M ${adjustedFromX} ${adjustedFromY} L ${adjustedToX} ${adjustedToY}`
             }
-            className={cn(colorClass, "fill-none")}
+            fill="none"
+            stroke={color}
             strokeWidth="2.5"
             opacity={opacity}
             markerEnd={markerEnd}
@@ -216,6 +230,7 @@ export function VoiceLeadingOverlay({
           />
         );
       })}
-    </svg>
+      </svg>
+    </div>
   );
 }

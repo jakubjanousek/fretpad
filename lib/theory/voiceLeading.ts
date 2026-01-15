@@ -231,11 +231,12 @@ function isTypicalResolution(
 
 /**
  * Filters voice leading paths to show only the most relevant ones
- * per string region to avoid visual clutter
+ * per string region to avoid visual clutter.
+ * Ensures at least one of each path type (common-tone, resolution) is included.
  */
 export function filterBestPaths(
   paths: VoiceLeadingPath[],
-  maxPathsPerRegion: number = 2,
+  maxPathsPerRegion: number = 3,
 ): VoiceLeadingPath[] {
   // Group paths by string region (high strings 1-2, middle 3-4, low 5-6)
   const regions: Map<string, VoiceLeadingPath[]> = new Map();
@@ -249,27 +250,65 @@ export function filterBestPaths(
     regions.get(region)?.push(path);
   }
 
-  // Sort paths within each region by priority:
-  // 1. Common tones (stay in place)
-  // 2. Resolutions (musically significant)
-  // 3. Guide tones (smallest movement first)
   const filteredPaths: VoiceLeadingPath[] = [];
 
   for (const [, regionPaths] of regions) {
-    const sorted = [...regionPaths].sort((a, b) => {
-      // Common tones first
-      if (a.type === "common-tone" && b.type !== "common-tone") return -1;
-      if (b.type === "common-tone" && a.type !== "common-tone") return 1;
+    const selected: VoiceLeadingPath[] = [];
+    const used = new Set<number>();
 
-      // Resolutions second
-      if (a.type === "resolution" && b.type !== "resolution") return -1;
-      if (b.type === "resolution" && a.type !== "resolution") return 1;
+    // First, select one of each type to ensure variety
+    const types: VoiceLeadingPath["type"][] = [
+      "common-tone",
+      "resolution",
+      "guide-tone",
+    ];
 
-      // Then by smallest semitone distance
-      return a.semitoneDistance - b.semitoneDistance;
-    });
+    for (const type of types) {
+      // Find best path of this type (smallest semitone distance)
+      let bestIndex = -1;
+      let bestDistance = Infinity;
 
-    filteredPaths.push(...sorted.slice(0, maxPathsPerRegion));
+      for (let i = 0; i < regionPaths.length; i++) {
+        const path = regionPaths[i];
+        if (
+          !used.has(i) &&
+          path &&
+          path.type === type &&
+          path.semitoneDistance < bestDistance
+        ) {
+          bestDistance = path.semitoneDistance;
+          bestIndex = i;
+        }
+      }
+
+      if (bestIndex !== -1) {
+        const path = regionPaths[bestIndex];
+        if (path) {
+          selected.push(path);
+          used.add(bestIndex);
+        }
+      }
+    }
+
+    // Fill remaining slots with best remaining paths
+    const remaining = regionPaths
+      .map((path, idx) => ({ path, idx }))
+      .filter(({ idx }) => !used.has(idx))
+      .sort((a, b) => {
+        // Prioritize by type then by distance
+        const typeOrder = { "common-tone": 0, resolution: 1, "guide-tone": 2 };
+        const aOrder = typeOrder[a.path.type];
+        const bOrder = typeOrder[b.path.type];
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        return a.path.semitoneDistance - b.path.semitoneDistance;
+      });
+
+    for (const { path } of remaining) {
+      if (selected.length >= maxPathsPerRegion) break;
+      selected.push(path);
+    }
+
+    filteredPaths.push(...selected);
   }
 
   return filteredPaths;
