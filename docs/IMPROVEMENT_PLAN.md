@@ -66,15 +66,19 @@ Replace `Math.random().toString(36).substring(2, 9)` with robust IDs.
 - [ ] Update `lib/theory/progression.ts` to use new ID generator
 - [ ] Update `state/useAppStore.ts` `addBar` function
 
-### 1.4 Optimize Audio Engine (P1)
+### 1.4 Optimize Audio Engine (P1) ✅ PARTIALLY COMPLETE
 
-The `useAudioEngine` hook has potential memory leaks and inefficiencies.
+The `useAudioEngine` hook has been refactored for backing track support.
 
-**Tasks:**
-- [ ] Move synth creation to a `useRef` to prevent recreation on each render
-- [ ] Add proper cleanup for scheduled events on progression change
+**Completed:**
+- [x] Move synth creation to a `useRef` to prevent recreation on each render
+- [x] Add proper cleanup for scheduled events on progression change
+- [x] Proper instrument disposal on style change
+
+**Remaining Tasks:**
 - [ ] Memoize event scheduling to prevent duplicate schedules
 - [ ] Add audio context state management (suspended/running)
+- [ ] Handle edge case: style change during playback gracefully
 
 ### 1.5 Add TypeScript Strict Checks (P2)
 
@@ -160,16 +164,52 @@ Add optional metronome click during playback.
 - [ ] Add count-in option (1-2 bar count before loop starts)
 - [ ] Store metronome preference in state
 
-### 3.2 Richer Backing Track (P1)
+### 3.2 Richer Backing Track (P1) ✅ PARTIALLY COMPLETE
 
-Currently only root notes play. Add chord voicings.
+iReal-style backing track system with selectable styles.
 
-**Tasks:**
-- [ ] Implement chord voicing playback (piano/synth triads or 7th chords)
-- [ ] Add instrument selection (piano, guitar, synth)
-- [ ] Add backing track volume control
-- [ ] Consider adding bass line (roots on beats 1 and 3)
-- [ ] Add "mute backing" option to practice in silence
+**Completed:**
+- [x] Implement chord voicing playback (shell voicings, triads)
+- [x] Add walking bass line with approach notes
+- [x] Add style selector (Jazz Swing, Pop/Rock)
+- [x] Pattern-based scheduling system
+- [x] Swing feel per style (via Tone.js Transport)
+
+**Remaining Tasks:**
+- [ ] Add volume controls (separate sliders for bass and chords)
+- [ ] Add mute toggles (mute bass or chords independently)
+- [ ] Add count-in option (1-2 bar count before loop starts)
+
+**Additional Styles (Phase 2):**
+- [ ] Add Bossa Nova style (syncopated bass + fingerpicked guitar)
+- [ ] Add Ballad style (slow arpeggiated chords + sustained bass)
+
+**Sound Quality Improvements:**
+- [ ] Use Tone.js Sampler with real instrument samples for more realistic sound
+- [ ] Add subtle reverb/effects on chords for depth
+
+**Advanced Features:**
+- [ ] Add metronome/drum pattern option
+- [ ] Add swing control slider (let users adjust swing 0-100%)
+- [ ] Add pattern variation (randomize velocity/timing slightly for human feel)
+- [ ] Better jazz voicings (rootless voicings, drop-2)
+
+**Files created:**
+```
+lib/audio/
+  styles/
+    index.ts           # Style registry
+    jazzSwing.ts       # Jazz Swing style
+    popRock.ts         # Pop/Rock style
+  instruments/
+    index.ts
+    bassInstrument.ts  # Bass synth factory
+    chordInstrument.ts # Chord polySynth factory
+  scheduler.ts         # Pattern-based scheduling
+  voicings.ts          # Chord voicing generator
+components/transport/
+  StyleSelector.tsx    # Style dropdown UI
+```
 
 ### 3.3 Persistence (P1)
 
@@ -254,14 +294,18 @@ Support time signatures beyond 4/4.
 - [ ] Update bar visualization to reflect different beat counts
 - [ ] Adjust metronome accent patterns
 
-### 3.11 Swing/Shuffle Feel (P3)
+### 3.11 Swing/Shuffle Feel (P3) ✅ PARTIALLY COMPLETE
 
 Add rhythmic feel options.
 
-**Tasks:**
-- [ ] Add feel selector: Straight | Light Swing | Heavy Swing
-- [ ] Implement swing using Tone.js Transport swing settings
-- [ ] Adjust backing track rhythm to match feel
+**Completed:**
+- [x] Implement swing using Tone.js Transport swing settings (per style)
+- [x] Jazz Swing style has swing=0.5, Pop/Rock has swing=0
+
+**Remaining Tasks:**
+- [ ] Add user-adjustable swing slider (override style default)
+- [ ] Add more feel options: Light Swing, Heavy Swing, Shuffle
+- [ ] Consider adding Latin feel options (straight 8ths with accents)
 
 ---
 
@@ -352,10 +396,10 @@ For maximum impact, implement in this order:
 8. CI/CD Pipeline (6.1)
 
 ### Phase 3 – Rich Features
-9. Richer Backing Track (3.2)
+9. ~~Richer Backing Track (3.2)~~ ✅ Core complete, enhancements remain
 10. More Presets (3.5)
 11. Improved Chord Editing UX (2.3)
-12. Optimize Audio Engine (1.4)
+12. ~~Optimize Audio Engine (1.4)~~ ✅ Partially complete
 
 ### Phase 4 – Polish
 13. Alternate Tunings (3.6)
@@ -366,7 +410,7 @@ For maximum impact, implement in this order:
 ### Phase 5 – Advanced
 17. Voice Leading Visualization (3.9)
 18. Time Signature Support (3.10)
-19. Swing/Shuffle Feel (3.11)
+19. ~~Swing/Shuffle Feel (3.11)~~ ✅ Basic swing per style, user control remains
 20. Component Memoization (4.1)
 
 ---
