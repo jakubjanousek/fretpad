@@ -35,11 +35,11 @@ Make the Play button visually dominant as the primary action.
 **Target:** Larger, more prominent Play button that draws attention
 
 **Tasks:**
-- [ ] Increase Play button size (48px vs 36px for others)
-- [ ] Add filled background color (cyan accent) to Play button
-- [ ] Add subtle glow/shadow effect on hover
-- [ ] Animate play/pause icon transition
-- [ ] Add ripple effect on click
+- [x] Increase Play button size (48px vs 36px for others)
+- [x] Add filled background color (cyan accent) to Play button
+- [x] Add subtle glow/shadow effect on hover
+- [x] Animate play/pause icon transition
+- [x] Add ripple effect on click
 
 **Files to modify:**
 ```
@@ -65,11 +65,11 @@ Group related controls with visual containers for better organization.
 ```
 
 **Tasks:**
-- [ ] Create visual grouping with subtle background containers
-- [ ] Add group labels below icons ("Playback", "Tempo")
-- [ ] Combine Help, Shortcuts, Settings into "More" dropdown menu
-- [ ] Keep chord Info button separate (frequently used)
-- [ ] Add separator lines between groups
+- [x] Create visual grouping with subtle background containers
+- [x] Add group labels below icons ("Playback", "Tempo")
+- [x] Combine Help, Shortcuts, Settings into "More" dropdown menu
+- [x] Keep chord Info button separate (frequently used)
+- [x] Add separator lines between groups
 
 **Files to modify:**
 ```
@@ -105,11 +105,11 @@ Improve visual feedback for toggle states (Voice Leading, Scale Tones, Notes/Int
 **Target:** Clear visual distinction between active/inactive states
 
 **Tasks:**
-- [ ] Use filled style for active, outline for inactive
-- [ ] Add color accent to active toggles (cyan border or background)
-- [ ] Animate transition between states (scale + color)
-- [ ] Add checkmark or indicator icon to active state
-- [ ] Increase contrast between states
+- [x] Use filled style for active, outline for inactive
+- [x] Add color accent to active toggles (cyan border or background)
+- [x] Animate transition between states (scale + color)
+- [x] Add checkmark or indicator icon to active state
+- [x] Increase contrast between states
 
 **Files to modify:**
 ```
@@ -117,7 +117,7 @@ components/ui/button.tsx                 # Toggle variant styling
 components/fretboard/Fretboard.tsx       # Apply to legend toggles
 ```
 
-### 2.2 Segmented Control Style (P1)
+### 2.2 Segmented Control Style (P1) ✅ COMPLETE
 
 Convert Notes/Intervals/None to proper segmented control.
 
@@ -126,10 +126,10 @@ Convert Notes/Intervals/None to proper segmented control.
 **Target:** Connected pill-style segmented control
 
 **Tasks:**
-- [ ] Create `SegmentedControl` component
-- [ ] Connect buttons visually (shared background, no gaps)
-- [ ] Add sliding indicator that moves between options
-- [ ] Animate indicator movement smoothly
+- [x] Create `SegmentedControl` component (inline in Fretboard)
+- [x] Connect buttons visually (shared background, no gaps)
+- [x] Add sliding indicator that moves between options
+- [x] Animate indicator movement smoothly
 
 **Files to modify:**
 ```
@@ -351,10 +351,10 @@ components/share/ShareButton.tsx          # New component (create)
 
 ## Implementation Order
 
-### Phase 1 – Transport & Controls (P0)
-1. Hero Play Button (1.1)
-2. Transport Control Grouping (1.2)
-3. Enhanced Toggle Buttons (2.1)
+### Phase 1 – Transport & Controls (P0) ✅ COMPLETE
+1. ~~Hero Play Button (1.1)~~ ✅
+2. ~~Transport Control Grouping (1.2)~~ ✅
+3. ~~Enhanced Toggle Buttons (2.1)~~ ✅
 
 ### Phase 2 – Visual Feedback (P1)
 4. Icon Labels (1.3)

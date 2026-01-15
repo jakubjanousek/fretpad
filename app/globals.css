@@ -268,3 +268,101 @@
 .animate-chord-change {
   animation: chord-change 0.2s ease-out;
 }
+
+/* ============================
+   Hero Play Button
+   ============================ */
+
+.hero-button {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ripple effect on click */
+.hero-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 70%
+  );
+  transform: scale(0);
+  opacity: 0;
+  transition:
+    transform 0.4s ease-out,
+    opacity 0.4s ease-out;
+}
+
+.hero-button:active::after {
+  transform: scale(2);
+  opacity: 1;
+  transition:
+    transform 0s,
+    opacity 0s;
+}
+
+/* Glow effect for play button */
+.hero-play {
+  animation: hero-glow 2s ease-in-out infinite;
+}
+
+@keyframes hero-glow {
+  0%,
+  100% {
+    box-shadow: 0 10px 25px -5px oklch(0.78 0.15 194 / 30%);
+  }
+  50% {
+    box-shadow: 0 10px 30px -3px oklch(0.78 0.15 194 / 50%);
+  }
+}
+
+/* Play/Pause icon transition */
+@keyframes icon-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.hero-button svg {
+  animation: icon-pop 0.2s ease-out;
+}
+
+/* ============================
+   Enhanced Toggle Buttons
+   ============================ */
+
+/* Toggle button active state with cyan accent */
+.toggle-enhanced[data-state="on"] {
+  background-color: oklch(0.78 0.15 194 / 15%);
+  border-color: oklch(0.78 0.15 194);
+  color: oklch(0.65 0.15 194);
+}
+
+.toggle-enhanced[data-state="on"]:hover {
+  background-color: oklch(0.78 0.15 194 / 25%);
+}
+
+.dark .toggle-enhanced[data-state="on"] {
+  background-color: oklch(0.78 0.15 194 / 20%);
+  border-color: oklch(0.78 0.15 194);
+  color: oklch(0.85 0.12 194);
+}
+
+/* Toggle transition animation */
+.toggle-enhanced {
+  transition: all 0.15s ease-out;
+}
+
+.toggle-enhanced:active {
+  transform: scale(0.97);
+}

@@ -223,83 +223,113 @@ export function Fretboard({
 
           {/* Controls */}
           <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
-            {/* Note label mode selector */}
+            {/* Note label mode selector - segmented control style */}
             {onNoteLabelModeChange && (
               <div className="flex items-center gap-1.5">
                 <span className="text-xs text-muted-foreground hidden sm:inline">
                   Labels:
                 </span>
-                <div className="flex rounded-md border border-input bg-background">
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                <div className="relative flex rounded-lg bg-muted/60 p-0.5">
+                  {/* Sliding indicator */}
+                  <div
+                    className={cn(
+                      "absolute top-0.5 bottom-0.5 rounded-md bg-background shadow-sm transition-all duration-200 ease-out",
+                      noteLabelMode === "notes" &&
+                        "left-0.5 w-[calc(33.33%-2px)]",
+                      noteLabelMode === "intervals" &&
+                        "left-[33.33%] w-[calc(33.33%-2px)]",
+                      noteLabelMode === "none" &&
+                        "left-[66.66%] w-[calc(33.33%-2px)]"
+                    )}
+                  />
+                  <button
+                    type="button"
                     onClick={() => onNoteLabelModeChange("notes")}
                     className={cn(
-                      "h-7 px-2 text-xs rounded-r-none border-r",
-                      noteLabelMode === "notes" &&
-                        "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+                      "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                      noteLabelMode === "notes"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     Notes
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => onNoteLabelModeChange("intervals")}
                     className={cn(
-                      "h-7 px-2 text-xs rounded-none border-r",
-                      noteLabelMode === "intervals" &&
-                        "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+                      "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                      noteLabelMode === "intervals"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     Intervals
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => onNoteLabelModeChange("none")}
                     className={cn(
-                      "h-7 px-2 text-xs rounded-l-none",
-                      noteLabelMode === "none" &&
-                        "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+                      "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                      noteLabelMode === "none"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     None
-                  </Button>
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* Toggle buttons */}
+            {/* Toggle buttons with enhanced states */}
             {(onToggleVoiceLeading || onToggleScaleTones) && (
               <div className="flex gap-1.5 sm:gap-2">
                 {onToggleVoiceLeading && (
                   <Button
-                    variant="toggle"
+                    variant="outline"
                     size="sm"
                     data-state={showVoiceLeading ? "on" : "off"}
                     onClick={onToggleVoiceLeading}
                     className={cn(
-                      "h-7 text-xs",
-                      showVoiceLeading &&
-                        "bg-blue-600 border-blue-600 hover:bg-blue-700 text-white shadow-sm",
+                      "h-7 text-xs transition-all duration-150 active:scale-95",
+                      showVoiceLeading
+                        ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
+                        : "hover:border-blue-500/50"
                     )}
                   >
+                    <span
+                      className={cn(
+                        "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
+                        showVoiceLeading
+                          ? "bg-blue-500"
+                          : "bg-muted-foreground/30"
+                      )}
+                    />
                     Voice Leading
                   </Button>
                 )}
                 {onToggleScaleTones && (
                   <Button
-                    variant="toggle"
+                    variant="outline"
                     size="sm"
                     data-state={showScaleTones ? "on" : "off"}
                     onClick={onToggleScaleTones}
                     className={cn(
-                      "h-7 text-xs",
-                      showScaleTones &&
-                        "bg-slate-600 border-slate-600 hover:bg-slate-700 text-white shadow-sm",
+                      "h-7 text-xs transition-all duration-150 active:scale-95",
+                      showScaleTones
+                        ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
+                        : "hover:border-slate-500/50"
                     )}
                   >
+                    <span
+                      className={cn(
+                        "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
+                        showScaleTones
+                          ? "bg-slate-500"
+                          : "bg-muted-foreground/30"
+                      )}
+                    />
                     Scale Tones
                   </Button>
                 )}
