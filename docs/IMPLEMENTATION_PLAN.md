@@ -34,9 +34,9 @@
 - [x] Loop functionality
 
 ### Milestone 6 – Theory UI
-- [ ] `components/theory/ChordInfoPanel.tsx` - chord details
-- [ ] `components/theory/NoteInfoTooltip.tsx` - interval display
-- [ ] Hover/click interactions wired up
+- [x] `components/theory/ChordInfoPanel.tsx` - chord details
+- [x] `components/theory/NoteInfoTooltip.tsx` - interval display
+- [x] Hover/click interactions wired up
 
 ---
 

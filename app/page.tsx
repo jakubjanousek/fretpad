@@ -3,6 +3,7 @@
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ProgressionPresets } from "@/components/progression/ProgressionPresets";
+import { ChordInfoPanel } from "@/components/theory/ChordInfoPanel";
 import { TransportControls } from "@/components/transport/TransportControls";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getFretNotesForChord } from "@/lib/fretboard";
@@ -75,41 +76,7 @@ export default function Page() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {currentChord ? (
-                  <div className="space-y-1 text-sm">
-                    <p>
-                      <span className="text-muted-foreground">Current:</span>{" "}
-                      <span className="font-medium">{currentChord.symbol}</span>
-                    </p>
-                    <p>
-                      <span className="text-muted-foreground">Notes:</span>{" "}
-                      <span className="font-mono">
-                        {currentChord.notes.join(" ")}
-                      </span>
-                    </p>
-                    <p>
-                      <span className="text-muted-foreground">
-                        Guide tones:
-                      </span>{" "}
-                      <span className="font-mono">
-                        {currentChord.guideTones.join(" ")}
-                      </span>
-                      <span className="text-xs text-muted-foreground ml-1">
-                        (3rd, 7th)
-                      </span>
-                    </p>
-                    <p>
-                      <span className="text-muted-foreground">Scale:</span>{" "}
-                      <span className="font-mono">
-                        {currentChord.suggestedScales[0]}
-                      </span>
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Select a chord
-                  </p>
-                )}
+                <ChordInfoPanel chord={currentChord} />
               </CardContent>
             </Card>
           </div>
