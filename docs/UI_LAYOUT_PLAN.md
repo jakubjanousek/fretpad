@@ -76,7 +76,7 @@ components/progression/BarInput.tsx            # Compact redesign
 components/progression/ProgressionEditor.tsx   # Horizontal scroll container
 ```
 
-### 1.3 Fixed Transport Bar (P1)
+### 1.3 Fixed Transport Bar (P1) ✅
 
 Convert transport controls to a fixed bottom bar like a media player.
 
@@ -85,11 +85,11 @@ Convert transport controls to a fixed bottom bar like a media player.
 **Target:** Sticky bottom bar always visible, containing essential controls
 
 **Tasks:**
-- [ ] Create `TransportBar` component as fixed-position element
-- [ ] Include: Play/Stop, Reset, Tempo slider, Metronome toggle
-- [ ] Move style selector and volume controls to expandable drawer
-- [ ] Add keyboard shortcut hints on hover
-- [ ] Ensure transport bar doesn't overlap content (add bottom padding)
+- [x] Create `TransportBar` component as fixed-position element
+- [x] Include: Play/Stop, Reset, Tempo slider, Metronome toggle
+- [x] Move style selector and volume controls to expandable drawer
+- [x] Add keyboard shortcut hints on hover
+- [x] Ensure transport bar doesn't overlap content (add bottom padding)
 - [ ] Mobile: Make transport bar touch-friendly with larger targets
 
 **Files to create/modify:**
@@ -99,7 +99,7 @@ components/transport/TransportDrawer.tsx       # Expandable settings drawer
 app/page.tsx                                   # Layout restructure
 ```
 
-### 1.4 Chord Info Slide-Out Panel (P1)
+### 1.4 Chord Info Slide-Out Panel (P1) ✅
 
 Convert Chord Info from always-visible card to on-demand panel.
 
@@ -108,30 +108,30 @@ Convert Chord Info from always-visible card to on-demand panel.
 **Target:** Slide-out panel triggered by clicking chord or info button
 
 **Tasks:**
-- [ ] Create `ChordInfoPanel` as slide-out drawer (right side)
-- [ ] Trigger panel when clicking chord name on fretboard
-- [ ] Add info button (ℹ) in transport bar to toggle panel
-- [ ] Keep panel open during playback, updating with current chord
-- [ ] Add smooth slide animation
+- [x] Create `ChordInfoSheet` as slide-out drawer (right side)
+- [x] Trigger panel when clicking chord name on fretboard
+- [x] Add info button (ℹ) in transport bar to toggle panel
+- [x] Keep panel open during playback, updating with current chord
+- [x] Add smooth slide animation
 - [ ] Mobile: Use bottom sheet instead of side panel
 
 **Files to create/modify:**
 ```
-components/theory/ChordInfoPanel.tsx           # Slide-out panel wrapper
+components/theory/ChordInfoSheet.tsx           # Slide-out panel wrapper
 components/ui/sheet.tsx                        # shadcn sheet component (new)
 app/page.tsx                                   # Panel integration
 ```
 
-### 1.5 Fretboard as Hero (P1)
+### 1.5 Fretboard as Hero (P1) ✅
 
 Maximize fretboard prominence and visual weight.
 
 **Tasks:**
-- [ ] Increase fretboard vertical space (remove wasted whitespace)
-- [ ] Add larger current chord display above fretboard
-- [ ] Improve playhead visibility (thicker line, glow effect)
+- [x] Increase fretboard vertical space (remove wasted whitespace)
+- [x] Add larger current chord display above fretboard
+- [x] Improve playhead visibility (thicker line, glow effect) - done in Phase 1
 - [ ] Move legend inline or to a collapsible footer
-- [ ] Add subtle animation when chord changes
+- [x] Add subtle animation when chord changes
 
 **Files to modify:**
 ```
@@ -309,15 +309,15 @@ app/page.tsx                                   # Breakpoint adjustments
 
 ## Implementation Order
 
-### Phase 1 – Core Layout (Priority)
-1. Collapsible Presets Panel (1.1)
-2. Compact Progression Bar (1.2)
-3. Improved Playhead (3.1)
+### Phase 1 – Core Layout (Priority) ✅
+1. Collapsible Presets Panel (1.1) ✅
+2. Compact Progression Bar (1.2) ✅
+3. Improved Playhead (3.1) ✅
 
-### Phase 2 – Transport & Info Redesign
-4. Fixed Transport Bar (1.3)
-5. Chord Info Slide-Out Panel (1.4)
-6. Fretboard as Hero (1.5)
+### Phase 2 – Transport & Info Redesign ✅
+4. Fixed Transport Bar (1.3) ✅
+5. Chord Info Slide-Out Panel (1.4) ✅
+6. Fretboard as Hero (1.5) ✅
 
 ### Phase 3 – Visual Polish
 7. Consistent Button Styles (2.1)

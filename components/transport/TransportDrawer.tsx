@@ -1,0 +1,330 @@
+"use client";
+
+import { Keyboard, Music, Volume2, VolumeOff } from "lucide-react";
+import { useCallback, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Slider } from "@/components/ui/slider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import { useAppStore } from "@/state/useAppStore";
+import { StyleSelector } from "./StyleSelector";
+
+interface TransportDrawerProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+/**
+ * Expandable settings drawer containing volume controls, style selector,
+ * metronome settings, and keyboard shortcuts.
+ */
+export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
+  const metronome = useAppStore((state) => state.metronome);
+  const backingTrack = useAppStore((state) => state.backingTrack);
+  const setMetronomeVolume = useAppStore((state) => state.setMetronomeVolume);
+  const setMetronomeCountIn = useAppStore((state) => state.setMetronomeCountIn);
+  const setBackingTrackVolume = useAppStore(
+    (state) => state.setBackingTrackVolume,
+  );
+  const setBackingTrackMuted = useAppStore(
+    (state) => state.setBackingTrackMuted,
+  );
+
+  const [showShortcuts, setShowShortcuts] = useState(false);
+
+  const handleMetronomeVolumeChange = useCallback(
+    (value: number[]) => {
+      const newVolume = value[0];
+      if (newVolume !== undefined) {
+        setMetronomeVolume(newVolume);
+      }
+    },
+    [setMetronomeVolume],
+  );
+
+  const handleBassVolumeChange = useCallback(
+    (value: number[]) => {
+      const newVolume = value[0];
+      if (newVolume !== undefined) {
+        setBackingTrackVolume("bass", newVolume);
+      }
+    },
+    [setBackingTrackVolume],
+  );
+
+  const handleChordVolumeChange = useCallback(
+    (value: number[]) => {
+      const newVolume = value[0];
+      if (newVolume !== undefined) {
+        setBackingTrackVolume("chord", newVolume);
+      }
+    },
+    [setBackingTrackVolume],
+  );
+
+  const handleBassMuteToggle = useCallback(() => {
+    setBackingTrackMuted("bass", !backingTrack.bassMuted);
+  }, [backingTrack.bassMuted, setBackingTrackMuted]);
+
+  const handleChordMuteToggle = useCallback(() => {
+    setBackingTrackMuted("chord", !backingTrack.chordMuted);
+  }, [backingTrack.chordMuted, setBackingTrackMuted]);
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Settings</SheetTitle>
+          <SheetDescription>
+            Adjust audio settings and backing track options.
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className="flex flex-col gap-6 p-4">
+          {/* Style Selector */}
+          <StyleSelector />
+
+          {/* Metronome Settings */}
+          {metronome.enabled && (
+            <div className="flex flex-col gap-3 pt-2 border-t">
+              <h3 className="text-sm font-medium">Metronome</h3>
+
+              {/* Metronome Volume */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="metronome-volume-slider"
+                    className="text-sm text-muted-foreground"
+                  >
+                    Volume
+                  </Label>
+                  <span className="text-sm font-mono tabular-nums">
+                    {metronome.volume} dB
+                  </span>
+                </div>
+                <Slider
+                  id="metronome-volume-slider"
+                  min={-20}
+                  max={0}
+                  step={1}
+                  value={[metronome.volume]}
+                  onValueChange={handleMetronomeVolumeChange}
+                  className="w-full"
+                  aria-label="Metronome volume"
+                />
+              </div>
+
+              {/* Count-In Selector */}
+              <div className="flex items-center justify-between">
+                <Label className="text-sm text-muted-foreground">
+                  Count-In
+                </Label>
+                <div className="flex gap-1">
+                  {([0, 1, 2] as const).map((bars) => (
+                    <Button
+                      key={bars}
+                      variant={
+                        metronome.countIn === bars ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() => setMetronomeCountIn(bars)}
+                      className={cn(
+                        "h-7 w-12 text-xs",
+                        metronome.countIn === bars &&
+                          "bg-orange-500 hover:bg-orange-600",
+                      )}
+                    >
+                      {bars === 0 ? "Off" : `${bars} bar${bars > 1 ? "s" : ""}`}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Backing Track Volume Controls */}
+          <div className="flex flex-col gap-3 pt-2 border-t">
+            <div className="flex items-center gap-2">
+              <Music className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Backing Track</span>
+            </div>
+
+            {/* Bass Volume */}
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleBassMuteToggle}
+                    aria-label={
+                      backingTrack.bassMuted ? "Unmute bass" : "Mute bass"
+                    }
+                    className="h-7 w-7 shrink-0"
+                  >
+                    {backingTrack.bassMuted ? (
+                      <VolumeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                    ) : (
+                      <Volume2 className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                  {backingTrack.bassMuted ? "Unmute bass" : "Mute bass"}
+                </TooltipContent>
+              </Tooltip>
+              <div className="flex-1 flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="bass-volume-slider"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Bass
+                  </Label>
+                  <span className="text-xs font-mono tabular-nums text-muted-foreground">
+                    {backingTrack.bassMuted
+                      ? "Muted"
+                      : `${backingTrack.bassVolume} dB`}
+                  </span>
+                </div>
+                <Slider
+                  id="bass-volume-slider"
+                  min={-30}
+                  max={0}
+                  step={1}
+                  value={[backingTrack.bassVolume]}
+                  onValueChange={handleBassVolumeChange}
+                  disabled={backingTrack.bassMuted}
+                  className={cn(
+                    "w-full",
+                    backingTrack.bassMuted && "opacity-50",
+                  )}
+                  aria-label="Bass volume"
+                />
+              </div>
+            </div>
+
+            {/* Chord Volume */}
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleChordMuteToggle}
+                    aria-label={
+                      backingTrack.chordMuted ? "Unmute chords" : "Mute chords"
+                    }
+                    className="h-7 w-7 shrink-0"
+                  >
+                    {backingTrack.chordMuted ? (
+                      <VolumeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                    ) : (
+                      <Volume2 className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                  {backingTrack.chordMuted ? "Unmute chords" : "Mute chords"}
+                </TooltipContent>
+              </Tooltip>
+              <div className="flex-1 flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="chord-volume-slider"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Chords
+                  </Label>
+                  <span className="text-xs font-mono tabular-nums text-muted-foreground">
+                    {backingTrack.chordMuted
+                      ? "Muted"
+                      : `${backingTrack.chordVolume} dB`}
+                  </span>
+                </div>
+                <Slider
+                  id="chord-volume-slider"
+                  min={-30}
+                  max={0}
+                  step={1}
+                  value={[backingTrack.chordVolume]}
+                  onValueChange={handleChordVolumeChange}
+                  disabled={backingTrack.chordMuted}
+                  className={cn(
+                    "w-full",
+                    backingTrack.chordMuted && "opacity-50",
+                  )}
+                  aria-label="Chord volume"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Keyboard Shortcuts */}
+          <div className="pt-2 border-t">
+            <button
+              type="button"
+              onClick={() => setShowShortcuts(!showShortcuts)}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Keyboard className="h-4 w-4" />
+              <span>Keyboard shortcuts</span>
+            </button>
+            {showShortcuts && (
+              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-muted-foreground">
+                <div>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
+                    Space
+                  </kbd>{" "}
+                  Play/Stop
+                </div>
+                <div>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
+                    R
+                  </kbd>{" "}
+                  Reset
+                </div>
+                <div>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
+                    M
+                  </kbd>{" "}
+                  Metronome
+                </div>
+                <div>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
+                    I
+                  </kbd>{" "}
+                  Chord Info
+                </div>
+                <div>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
+                    Up/Down
+                  </kbd>{" "}
+                  Tempo
+                </div>
+                <div>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
+                    1-3
+                  </kbd>{" "}
+                  Presets
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

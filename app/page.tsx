@@ -1,16 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Fretboard } from "@/components/fretboard/Fretboard";
+import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
+import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
-import { ProgressionPresets } from "@/components/progression/ProgressionPresets";
 import { ShareExport } from "@/components/progression/ShareExport";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ChordInfoPanel } from "@/components/theory/ChordInfoPanel";
+import { ChordInfoSheet } from "@/components/theory/ChordInfoSheet";
 import { ProgressBar } from "@/components/transport/ProgressBar";
-import { TransportControls } from "@/components/transport/TransportControls";
+import { TransportBar } from "@/components/transport/TransportBar";
+import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import {
@@ -29,10 +31,38 @@ export default function Page() {
   const progression = useAppStore((state) => state.progression);
   const currentBarIndex = useAppStore((state) => state.currentBarIndex);
   const currentChordIndex = useAppStore((state) => state.currentChordIndex);
+  const isPlaying = useAppStore((state) => state.isPlaying);
   const showScaleTones = useAppStore((state) => state.showScaleTones);
   const setShowScaleTones = useAppStore((state) => state.setShowScaleTones);
   const showVoiceLeading = useAppStore((state) => state.showVoiceLeading);
   const setShowVoiceLeading = useAppStore((state) => state.setShowVoiceLeading);
+
+  // Panel states
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [chordInfoOpen, setChordInfoOpen] = useState(false);
+
+  // Keyboard shortcut for chord info panel (I key)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key.toLowerCase() === "i" &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.altKey &&
+        document.activeElement?.tagName !== "INPUT"
+      ) {
+        e.preventDefault();
+        setChordInfoOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleChordHeaderClick = useCallback(() => {
+    setChordInfoOpen(true);
+  }, []);
 
   const fretNotes = currentChord
     ? getFretNotesForChord(currentChord, {
@@ -72,31 +102,31 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-6">
+      {/* Main Content - add bottom padding for fixed transport bar */}
+      <main className="flex-1 container mx-auto px-4 py-6 flex flex-col gap-6 pb-20">
         {/* Progression Editor Section */}
         <section>
           <Card>
-            <CardHeader className="pb-3 flex flex-row items-center justify-between">
-              <CardTitle className="text-base font-medium">
-                Chord Progression
-              </CardTitle>
-              <ShareExport />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-4">
-                <ProgressionPresets />
-                <ProgressionEditor />
+            <CardHeader className="pb-3">
+              <div className="flex flex-row items-center justify-between gap-2">
+                <div className="flex items-center gap-3">
+                  <PresetDropdown />
+                  <ShareExport />
+                </div>
               </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <ProgressionEditor />
             </CardContent>
           </Card>
         </section>
 
         {/* Fretboard Visualization Section */}
         <section className="flex-1">
-          <Card className="h-full min-h-75">
-            <CardHeader className="pb-3 flex flex-row items-center justify-between">
-              <CardTitle className="text-base font-medium">Fretboard</CardTitle>
+          <Card className="h-full">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+              {/* Toggle buttons moved to right side */}
+              <div className="flex-1" />
               <div className="flex gap-2">
                 <Button
                   variant={showVoiceLeading ? "default" : "outline"}
@@ -122,8 +152,20 @@ export default function Page() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4">
+            <CardContent className="flex flex-col gap-2">
+              {/* Prominent chord header */}
+              <div className="flex justify-center">
+                <FretboardHeader
+                  chord={currentChord}
+                  isPlaying={isPlaying}
+                  onChordClick={handleChordHeaderClick}
+                />
+              </div>
+
+              {/* Progress bar */}
               <ProgressBar />
+
+              {/* Fretboard */}
               <Fretboard
                 fretNotes={fretNotes}
                 voiceLeadingPaths={voiceLeadingPaths}
@@ -131,36 +173,23 @@ export default function Page() {
             </CardContent>
           </Card>
         </section>
-
-        {/* Transport Controls & Theory Panel Section */}
-        <section>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Transport Controls */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium">
-                  Transport
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TransportControls />
-              </CardContent>
-            </Card>
-
-            {/* Theory Panel */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium">
-                  Chord Info
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ChordInfoPanel chord={currentChord} />
-              </CardContent>
-            </Card>
-          </div>
-        </section>
       </main>
+
+      {/* Fixed Transport Bar */}
+      <TransportBar
+        onSettingsClick={() => setSettingsOpen(true)}
+        onInfoClick={() => setChordInfoOpen(true)}
+      />
+
+      {/* Settings Drawer */}
+      <TransportDrawer open={settingsOpen} onOpenChange={setSettingsOpen} />
+
+      {/* Chord Info Sheet */}
+      <ChordInfoSheet
+        chord={currentChord}
+        open={chordInfoOpen}
+        onOpenChange={setChordInfoOpen}
+      />
     </div>
   );
 }

@@ -17,6 +17,7 @@ export function ProgressBar() {
 
   // Calculate overall progress across the entire progression
   const totalBars = progression.bars.length;
+  const beatsPerBar = progression.timeSignature.numerator;
   // During count-in, don't show progress
   const overallProgress =
     playbackPosition.isActive && !playbackPosition.isCountingIn
@@ -45,6 +46,21 @@ export function ProgressBar() {
     };
   });
 
+  // Generate beat markers for each bar
+  const beatMarkers = barSegments.flatMap((segment, barIndex) => {
+    const markers = [];
+    for (let beat = 0; beat < beatsPerBar; beat++) {
+      const position =
+        barIndex * segment.width + (beat / beatsPerBar) * segment.width;
+      markers.push({
+        id: `${segment.id}-beat-${beat}`,
+        position,
+        isDownbeat: beat === 0,
+      });
+    }
+    return markers;
+  });
+
   return (
     <div className="w-full">
       {/* Bar labels */}
@@ -69,7 +85,21 @@ export function ProgressBar() {
       </div>
 
       {/* Progress bar track */}
-      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+      <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+        {/* Beat markers */}
+        {beatMarkers.map((marker) => (
+          <div
+            key={marker.id}
+            className={cn(
+              "absolute top-1/2 -translate-y-1/2 rounded-full z-5",
+              marker.isDownbeat
+                ? "w-1.5 h-1.5 bg-border"
+                : "w-1 h-1 bg-border/60",
+            )}
+            style={{ left: `${marker.position}%` }}
+          />
+        ))}
+
         {/* Bar segment dividers */}
         {barSegments.slice(0, -1).map((segment, index) => (
           <div
@@ -82,34 +112,47 @@ export function ProgressBar() {
         {/* Progress fill */}
         <div
           className={cn(
-            "absolute top-0 bottom-0 left-0 bg-orange-500 transition-none",
+            "absolute top-0 bottom-0 left-0 bg-orange-500/80 transition-none",
             !playbackPosition.isActive && "bg-muted",
           )}
           style={{ width: `${overallProgress * 100}%` }}
         />
 
-        {/* Playhead indicator */}
-        {playbackPosition.isActive && (
+        {/* Playhead indicator - enhanced with glow */}
+        {playbackPosition.isActive && !playbackPosition.isCountingIn && (
           <div
-            className="absolute top-0 bottom-0 w-1 bg-orange-600 rounded-full shadow-sm transition-none"
+            className="absolute top-0 bottom-0 w-0.75 bg-orange-500 rounded-full transition-none shadow-[0_0_8px_2px_rgba(249,115,22,0.5)]"
             style={{
               left: `${overallProgress * 100}%`,
               transform: "translateX(-50%)",
             }}
           />
         )}
+
+        {/* Count-in pulse indicator */}
+        {playbackPosition.isCountingIn && (
+          <div className="absolute inset-0 bg-orange-500/20 animate-pulse" />
+        )}
       </div>
 
       {/* Beat/bar counter */}
-      <div className="flex justify-between mt-1 text-xs text-muted-foreground">
+      <div className="flex justify-between mt-1.5 text-xs text-muted-foreground">
         <span>
           {playbackPosition.isCountingIn ? (
-            <span className="text-orange-500 font-medium">Count-in...</span>
+            <span className="text-orange-500 font-medium animate-pulse">
+              Count-in...
+            </span>
           ) : (
             <>
               Bar{" "}
-              {playbackPosition.isActive ? playbackPosition.barIndex + 1 : 1} of{" "}
-              {totalBars}
+              <span
+                className={
+                  playbackPosition.isActive ? "font-medium text-foreground" : ""
+                }
+              >
+                {playbackPosition.isActive ? playbackPosition.barIndex + 1 : 1}
+              </span>{" "}
+              of {totalBars}
             </>
           )}
         </span>

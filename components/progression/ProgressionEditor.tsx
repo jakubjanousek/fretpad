@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,13 +67,8 @@ function BarInput({
   };
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-1">
-        {/* Bar number */}
-        <span className="text-xs text-muted-foreground w-4 text-right">
-          {barIndex + 1}
-        </span>
-
+    <div className="flex flex-col gap-1 shrink-0 group/bar">
+      <div className="flex items-center">
         {isEditing ? (
           <Input
             value={inputValue}
@@ -83,7 +79,7 @@ function BarInput({
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             className={cn(
-              "w-32 h-8 text-sm font-mono",
+              "w-28 h-8 text-sm font-mono",
               error && "border-red-500 focus-visible:ring-red-500",
             )}
             autoFocus
@@ -93,10 +89,10 @@ function BarInput({
             role="button"
             tabIndex={0}
             className={cn(
-              "relative flex items-center gap-0.5 border rounded-md px-1 py-0.5 min-w-32 cursor-pointer hover:border-primary/50 transition-colors overflow-hidden",
+              "relative flex items-center border rounded-md px-1.5 py-1 cursor-pointer hover:border-primary/50 transition-colors overflow-hidden",
               isSelected && "border-primary ring-1 ring-primary/30",
               isPlaying &&
-                "border-orange-400 bg-orange-50 dark:bg-orange-950/20",
+                "border-orange-400 bg-orange-500/10 ring-1 ring-orange-400/50",
             )}
             onClick={() => setIsEditing(true)}
             onKeyDown={(e) => {
@@ -109,10 +105,14 @@ function BarInput({
             {/* Playhead indicator */}
             {isPlaying && (
               <div
-                className="absolute top-0 bottom-0 w-0.5 bg-orange-500 z-10 transition-none"
+                className="absolute top-0 bottom-0 w-0.5 bg-orange-500 z-10 transition-none shadow-[0_0_8px_rgba(249,115,22,0.6)]"
                 style={{ left: `${playheadProgress * 100}%` }}
               />
             )}
+            {/* Bar number */}
+            <span className="text-[10px] text-muted-foreground mr-1.5 font-medium">
+              {barIndex + 1}.
+            </span>
             {chords.map((chord, chordIdx) => (
               <button
                 key={chordIdx}
@@ -122,7 +122,7 @@ function BarInput({
                   handleChordClick(chordIdx);
                 }}
                 className={cn(
-                  "px-2 py-1 text-sm font-mono rounded transition-colors relative z-0",
+                  "px-1.5 py-0.5 text-sm font-mono rounded transition-colors relative z-0",
                   isSelected && selectedChordIndex === chordIdx
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-muted",
@@ -131,39 +131,26 @@ function BarInput({
                 {chord}
               </button>
             ))}
+            {/* Remove button - hover only */}
+            {canRemove && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove(barIndex);
+                }}
+                className="ml-1 opacity-0 group-hover/bar:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                aria-label="Remove bar"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
-        )}
-
-        {/* Remove button */}
-        {canRemove && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-            onClick={() => onRemove(barIndex)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-label="Remove bar"
-              role="img"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </Button>
         )}
       </div>
 
       {/* Error message */}
-      {error && <span className="text-xs text-red-500 ml-5">{error}</span>}
+      {error && <span className="text-xs text-red-500">{error}</span>}
     </div>
   );
 }
@@ -190,79 +177,61 @@ export function ProgressionEditor() {
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-muted-foreground">
-          Progression
-        </h3>
-        <span className="text-xs text-muted-foreground">
-          {progression.timeSignature.numerator}/
-          {progression.timeSignature.denominator} time
-        </span>
-      </div>
+    <div className="flex flex-col gap-2">
+      {/* Horizontal scrolling progression bar */}
+      <div className="relative">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+          {progression.bars.map((bar, barIndex) => {
+            // Convert bar chords to string for editing
+            const chordString = bar.chords.map((bc) => bc.chord).join(" ");
 
-      <div className="flex flex-wrap items-start gap-2">
-        {progression.bars.map((bar, barIndex) => {
-          // Convert bar chords to string for editing
-          const chordString = bar.chords.map((bc) => bc.chord).join(" ");
+            return (
+              <BarInput
+                key={bar.id}
+                barIndex={barIndex}
+                chordString={chordString}
+                isSelected={barIndex === currentBarIndex}
+                selectedChordIndex={currentChordIndex}
+                onSelect={handleSelect}
+                onUpdate={updateBar}
+                onRemove={removeBar}
+                canRemove={progression.bars.length > 1}
+                isPlaying={
+                  playbackPosition.isActive &&
+                  !playbackPosition.isCountingIn &&
+                  playbackPosition.barIndex === barIndex
+                }
+                playheadProgress={
+                  !playbackPosition.isCountingIn &&
+                  playbackPosition.barIndex === barIndex
+                    ? playbackPosition.barProgress
+                    : 0
+                }
+              />
+            );
+          })}
 
-          return (
-            <BarInput
-              key={bar.id}
-              barIndex={barIndex}
-              chordString={chordString}
-              isSelected={barIndex === currentBarIndex}
-              selectedChordIndex={currentChordIndex}
-              onSelect={handleSelect}
-              onUpdate={updateBar}
-              onRemove={removeBar}
-              canRemove={progression.bars.length > 1}
-              isPlaying={
-                playbackPosition.isActive &&
-                !playbackPosition.isCountingIn &&
-                playbackPosition.barIndex === barIndex
-              }
-              playheadProgress={
-                !playbackPosition.isCountingIn &&
-                playbackPosition.barIndex === barIndex
-                  ? playbackPosition.barProgress
-                  : 0
-              }
-            />
-          );
-        })}
-
-        {/* Add bar button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={addBar}
-          className="h-8 text-xs"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-1"
-            aria-label="Add"
-            role="img"
+          {/* Add bar button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={addBar}
+            className="h-8 px-2 shrink-0"
           >
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          Add Bar
-        </Button>
+            <Plus className="h-4 w-4" />
+          </Button>
+
+          {/* Time signature display */}
+          <span className="text-xs text-muted-foreground shrink-0 ml-auto pl-2">
+            {progression.timeSignature.numerator}/
+            {progression.timeSignature.denominator}
+          </span>
+        </div>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Click a chord to select it. Click a bar to edit. Use spaces for multiple
-        chords per bar (e.g., "Dm7 G7").
+      <p className="text-[11px] text-muted-foreground">
+        Click chord to select, click bar to edit. Use spaces for multiple chords
+        (e.g., "Dm7 G7").
       </p>
     </div>
   );
