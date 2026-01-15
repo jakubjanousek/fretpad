@@ -1,0 +1,193 @@
+import { Chord as TonalChord, Interval, Note } from "tonal";
+import type { Chord, ChordQuality, ChordSymbol, NoteName } from "@/lib/types";
+
+/**
+ * Scale suggestions based on chord quality
+ */
+const SCALE_SUGGESTIONS: Record<ChordQuality, string[]> = {
+  maj: ["Major", "Lydian"],
+  min: ["Dorian", "Aeolian"],
+  maj7: ["Major", "Lydian"],
+  min7: ["Dorian", "Aeolian"],
+  "7": ["Mixolydian", "Lydian Dominant"],
+  min7b5: ["Locrian", "Locrian 6"],
+  dim: ["Diminished", "Whole Tone"],
+  dim7: ["Diminished"],
+  aug: ["Whole Tone", "Lydian Augmented"],
+  sus2: ["Major", "Mixolydian"],
+  sus4: ["Mixolydian", "Dorian"],
+  "6": ["Major", "Lydian"],
+  min6: ["Dorian", "Melodic Minor"],
+  "9": ["Mixolydian", "Lydian Dominant"],
+  maj9: ["Major", "Lydian"],
+  min9: ["Dorian", "Aeolian"],
+  add9: ["Major", "Lydian"],
+  other: ["Major"],
+};
+
+/**
+ * Maps tonal chord type strings to our ChordQuality type
+ * Uses the 'type' field from tonal (e.g., "dominant seventh", "minor seventh")
+ */
+function mapChordType(tonalType: string): ChordQuality {
+  const typeMap: Record<string, ChordQuality> = {
+    major: "maj",
+    "": "maj",
+    minor: "min",
+    "major seventh": "maj7",
+    "minor seventh": "min7",
+    "dominant seventh": "7",
+    "half-diminished seventh": "min7b5",
+    "half-diminished": "min7b5",
+    diminished: "dim",
+    "diminished seventh": "dim7",
+    augmented: "aug",
+    "suspended second": "sus2",
+    "suspended fourth": "sus4",
+    "suspended fourth seventh": "7",
+    "major sixth": "6",
+    sixth: "6",
+    "minor sixth": "min6",
+    "dominant ninth": "9",
+    "major ninth": "maj9",
+    "minor ninth": "min9",
+    "added ninth": "add9",
+  };
+
+  return typeMap[tonalType.toLowerCase()] || "other";
+}
+
+/**
+ * Normalizes a note name to our NoteName type (handles enharmonics)
+ */
+function normalizeNoteName(note: string): NoteName {
+  // tonal returns notes like "C", "C#", "Db", etc.
+  // We need to ensure it matches our NoteName type
+  const pc = Note.pitchClass(note);
+  if (!pc) return "C"; // fallback
+
+  // Keep the original spelling from tonal
+  return pc as NoteName;
+}
+
+/**
+ * Gets the guide tones (3rd and 7th) from a chord
+ * For 6 chords, uses 3rd and 6th instead
+ */
+export function getGuideTones(
+  notes: string[],
+  intervals: string[],
+  quality: ChordQuality
+): NoteName[] {
+  const guideTones: NoteName[] = [];
+
+  // Find the 3rd (or sus2/sus4 equivalent)
+  const thirdIndex = intervals.findIndex(
+    (i) => i === "3M" || i === "3m" || i === "2M" || i === "4P"
+  );
+  if (thirdIndex !== -1 && notes[thirdIndex]) {
+    guideTones.push(normalizeNoteName(notes[thirdIndex]));
+  }
+
+  // Find the 7th (or 6th for 6 chords)
+  if (quality === "6" || quality === "min6") {
+    const sixthIndex = intervals.findIndex((i) => i === "6M" || i === "6m");
+    if (sixthIndex !== -1 && notes[sixthIndex]) {
+      guideTones.push(normalizeNoteName(notes[sixthIndex]));
+    }
+  } else {
+    const seventhIndex = intervals.findIndex(
+      (i) => i === "7M" || i === "7m" || i === "7d"
+    );
+    if (seventhIndex !== -1 && notes[seventhIndex]) {
+      guideTones.push(normalizeNoteName(notes[seventhIndex]));
+    }
+  }
+
+  return guideTones;
+}
+
+/**
+ * Parses a chord symbol string into a Chord object
+ * Returns null if the chord cannot be parsed
+ */
+export function parseChordSymbol(symbol: ChordSymbol): Chord | null {
+  const parsed = TonalChord.get(symbol);
+
+  // Check if parsing was successful
+  if (!parsed.tonic || parsed.notes.length === 0) {
+    return null;
+  }
+
+  const root = normalizeNoteName(parsed.tonic);
+  const quality = mapChordType(parsed.type);
+  const notes = parsed.notes.map(normalizeNoteName);
+  const guideTones = getGuideTones(parsed.notes, parsed.intervals, quality);
+
+  // Get suggested scales based on chord quality
+  const scaleNames = SCALE_SUGGESTIONS[quality] || ["Major"];
+  const suggestedScales = scaleNames.map((scaleName: string) => `${root} ${scaleName}`);
+
+  return {
+    symbol,
+    root,
+    quality,
+    notes,
+    guideTones,
+    suggestedScales,
+  };
+}
+
+/**
+ * Gets the interval name between a root note and another note
+ * Returns a display-friendly interval name (e.g., "1", "b3", "5", "b7")
+ */
+export function getIntervalName(root: NoteName, note: NoteName): string {
+  const interval = Interval.distance(root, note);
+  if (!interval) return "?";
+
+  // Convert tonal interval notation to display format
+  const intervalMap: Record<string, string> = {
+    "1P": "1",
+    "2m": "b2",
+    "2M": "2",
+    "3m": "b3",
+    "3M": "3",
+    "4P": "4",
+    "4A": "#4",
+    "5d": "b5",
+    "5P": "5",
+    "5A": "#5",
+    "6m": "b6",
+    "6M": "6",
+    "7m": "b7",
+    "7M": "7",
+  };
+
+  return intervalMap[interval] || interval;
+}
+
+/**
+ * Checks if a note is a chord tone for the given chord
+ */
+export function isChordTone(chord: Chord, note: NoteName): boolean {
+  return chord.notes.some(
+    (chordNote) => Note.pitchClass(chordNote) === Note.pitchClass(note)
+  );
+}
+
+/**
+ * Checks if a note is a guide tone (3rd or 7th) for the given chord
+ */
+export function isGuideTone(chord: Chord, note: NoteName): boolean {
+  return chord.guideTones.some(
+    (guideTone) => Note.pitchClass(guideTone) === Note.pitchClass(note)
+  );
+}
+
+/**
+ * Checks if a note is the root of the chord
+ */
+export function isRoot(chord: Chord, note: NoteName): boolean {
+  return Note.pitchClass(chord.root) === Note.pitchClass(note);
+}

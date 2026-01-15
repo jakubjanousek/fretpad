@@ -11,9 +11,9 @@
 - [x] `lib/types.ts` with all type definitions
 
 ### Milestone 2 – Theory Layer
-- [ ] `lib/theory/chords.ts` - parseChordSymbol, getGuideTones
-- [ ] `lib/theory/scales.ts` - getSuggestedScalesForChord
-- [ ] `lib/theory/progression.ts` - parseProgression (with multi-chord bars)
+- [x] `lib/theory/chords.ts` - parseChordSymbol, getGuideTones
+- [x] `lib/theory/scales.ts` - getSuggestedScalesForChord
+- [x] `lib/theory/progression.ts` - parseProgression (with multi-chord bars)
 
 ### Milestone 3 – Fretboard Visualization
 - [ ] `lib/fretboard.ts` - getFretNotesForChord
