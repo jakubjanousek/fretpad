@@ -1,13 +1,17 @@
 "use client";
 
+import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
 import type { FretNote, NoteName } from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
+
 import { FretMarker } from "./FretMarker";
+import { VoiceLeadingOverlay } from "./VoiceLeadingOverlay";
 
 interface FretboardProps {
   fretNotes: FretNote[];
   numFrets?: number;
   tuning?: NoteName[];
+  voiceLeadingPaths?: VoiceLeadingPath[];
 }
 
 // Fret markers positions (standard dots)
@@ -18,6 +22,7 @@ export function Fretboard({
   fretNotes,
   numFrets = 12,
   tuning = STANDARD_TUNING,
+  voiceLeadingPaths = [],
 }: FretboardProps) {
   // Create a map for quick lookup of notes at positions
   const noteMap = new Map<string, FretNote>();
@@ -52,7 +57,16 @@ export function Fretboard({
         </div>
 
         {/* Fretboard grid */}
-        <div className="relative border rounded-lg bg-gradient-to-b from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30">
+        <div className="relative border rounded-lg bg-linear-to-b from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30">
+          {/* Voice leading overlay */}
+          {voiceLeadingPaths.length > 0 && (
+            <VoiceLeadingOverlay
+              paths={voiceLeadingPaths}
+              numFrets={numFrets}
+              numStrings={tuning.length}
+            />
+          )}
+
           {/* Fret marker dots (behind the grid) */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="flex h-full">

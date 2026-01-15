@@ -35,6 +35,7 @@ interface AppState {
 
   // Fretboard display state
   showScaleTones: boolean;
+  showVoiceLeading: boolean;
 
   // Error state
   error: ErrorInfo | null;
@@ -67,6 +68,7 @@ interface AppState {
 
   // Fretboard display actions
   setShowScaleTones: (show: boolean) => void;
+  setShowVoiceLeading: (show: boolean) => void;
 
   // Helper to advance to next chord (for playback)
   advanceToNextChord: () => void;
@@ -117,6 +119,7 @@ export const useAppStore = create<AppState>()(
         chordMuted: false,
       },
       showScaleTones: false,
+      showVoiceLeading: false,
       error: null,
 
       // Error actions
@@ -218,6 +221,10 @@ export const useAppStore = create<AppState>()(
 
       setShowScaleTones: (show) => {
         set({ showScaleTones: show });
+      },
+
+      setShowVoiceLeading: (show) => {
+        set({ showVoiceLeading: show });
       },
 
       updateBar: (barIndex, barString) => {
@@ -380,6 +387,7 @@ export const useAppStore = create<AppState>()(
         metronome: state.metronome,
         backingTrack: state.backingTrack,
         showScaleTones: state.showScaleTones,
+        showVoiceLeading: state.showVoiceLeading,
       }),
       onRehydrateStorage: () => (state) => {
         // Recalculate currentChord after rehydration

@@ -324,15 +324,24 @@ Let users choose what's displayed on fret markers.
 - [ ] Update `FretMarker` component to respect setting
 - [ ] Store preference in state
 
-### 3.9 Voice Leading Visualization (P3)
+### 3.9 Voice Leading Visualization (P3) ✅ COMPLETE
 
 Help users see smooth voice leading between chords.
 
-**Tasks:**
-- [ ] Add "Voice Leading" toggle/mode
-- [ ] Draw arrows/lines connecting guide tones between consecutive chords
-- [ ] Highlight common tones between chords
-- [ ] Show resolution paths (e.g., 7th resolving down to 3rd)
+**Completed:**
+- [x] Add "Voice Leading" toggle/mode
+- [x] Draw arrows/lines connecting guide tones between consecutive chords
+- [x] Highlight common tones between chords (green dashed circles)
+- [x] Show resolution paths (e.g., 7th resolving down to 3rd) with orange arrows
+
+**Files created/modified:**
+```
+lib/theory/voiceLeading.ts              # Voice leading calculation utilities
+components/fretboard/VoiceLeadingOverlay.tsx  # SVG overlay for voice leading paths
+components/fretboard/Fretboard.tsx      # Integrated overlay support
+state/useAppStore.ts                    # Added showVoiceLeading state
+app/page.tsx                            # Added Voice Leading toggle button
+```
 
 ### 3.10 Time Signature Support (P3)
 
@@ -458,7 +467,7 @@ For maximum impact, implement in this order:
 16. Mobile Experience (2.4)
 
 ### Phase 5 – Advanced
-17. Voice Leading Visualization (3.9)
+17. ~~Voice Leading Visualization (3.9)~~ ✅ Complete
 18. Time Signature Support (3.10)
 19. ~~Swing/Shuffle Feel (3.11)~~ ✅ Basic swing per style, user control remains
 20. Component Memoization (4.1)

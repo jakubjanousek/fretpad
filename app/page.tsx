@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ProgressionPresets } from "@/components/progression/ProgressionPresets";
@@ -11,6 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
+import {
+  calculateVoiceLeadingPaths,
+  filterBestPaths,
+  getNextChord,
+} from "@/lib/theory/voiceLeading";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
@@ -19,8 +25,13 @@ export default function Page() {
   useUrlState();
 
   const currentChord = useAppStore((state) => state.currentChord);
+  const progression = useAppStore((state) => state.progression);
+  const currentBarIndex = useAppStore((state) => state.currentBarIndex);
+  const currentChordIndex = useAppStore((state) => state.currentChordIndex);
   const showScaleTones = useAppStore((state) => state.showScaleTones);
   const setShowScaleTones = useAppStore((state) => state.setShowScaleTones);
+  const showVoiceLeading = useAppStore((state) => state.showVoiceLeading);
+  const setShowVoiceLeading = useAppStore((state) => state.setShowVoiceLeading);
 
   const fretNotes = currentChord
     ? getFretNotesForChord(currentChord, {
@@ -28,6 +39,27 @@ export default function Page() {
         scaleName: showScaleTones ? currentChord.suggestedScales[0] : undefined,
       })
     : [];
+
+  // Calculate voice leading paths to next chord
+  const voiceLeadingPaths = useMemo(() => {
+    if (!showVoiceLeading || !currentChord) return [];
+
+    const nextChord = getNextChord(
+      progression,
+      currentBarIndex,
+      currentChordIndex,
+    );
+    if (!nextChord) return [];
+
+    const allPaths = calculateVoiceLeadingPaths(currentChord, nextChord);
+    return filterBestPaths(allPaths);
+  }, [
+    showVoiceLeading,
+    currentChord,
+    progression,
+    currentBarIndex,
+    currentChordIndex,
+  ]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -63,21 +95,37 @@ export default function Page() {
           <Card className="h-full min-h-75">
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-base font-medium">Fretboard</CardTitle>
-              <Button
-                variant={showScaleTones ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowScaleTones(!showScaleTones)}
-                className={cn(
-                  "h-7 text-xs",
-                  showScaleTones && "bg-slate-500 hover:bg-slate-600",
-                )}
-              >
-                Scale Tones
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant={showVoiceLeading ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowVoiceLeading(!showVoiceLeading)}
+                  className={cn(
+                    "h-7 text-xs",
+                    showVoiceLeading && "bg-blue-500 hover:bg-blue-600",
+                  )}
+                >
+                  Voice Leading
+                </Button>
+                <Button
+                  variant={showScaleTones ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowScaleTones(!showScaleTones)}
+                  className={cn(
+                    "h-7 text-xs",
+                    showScaleTones && "bg-slate-500 hover:bg-slate-600",
+                  )}
+                >
+                  Scale Tones
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <ProgressBar />
-              <Fretboard fretNotes={fretNotes} />
+              <Fretboard
+                fretNotes={fretNotes}
+                voiceLeadingPaths={voiceLeadingPaths}
+              />
             </CardContent>
           </Card>
         </section>
