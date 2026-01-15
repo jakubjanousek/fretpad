@@ -2,12 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   generateFretboardLayout,
   getFretNoteColor,
-  getFretNoteTextColor,
   getFretNotesForChord,
+  getFretNoteTextColor,
   getNoteAtFret,
 } from "@/lib/fretboard";
-import type { Chord, FretNote } from "@/lib/types";
-import { STANDARD_TUNING } from "@/lib/types";
+import type { Chord, FretNote, STANDARD_TUNING } from "@/lib/types";
 
 describe("getNoteAtFret", () => {
   it("returns open string note at fret 0", () => {

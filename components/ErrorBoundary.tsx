@@ -1,10 +1,10 @@
 "use client";
 
+import { AlertTriangle, RefreshCw } from "lucide-react";
+import { Component, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toErrorInfo } from "@/lib/errors";
-import { AlertTriangle, RefreshCw } from "lucide-react";
-import { Component, type ReactNode } from "react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;

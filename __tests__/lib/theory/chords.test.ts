@@ -7,7 +7,7 @@ import {
   isRoot,
   parseChordSymbol,
 } from "@/lib/theory/chords";
-import type { Chord, NoteName } from "@/lib/types";
+import type { Chord } from "@/lib/types";
 
 describe("parseChordSymbol", () => {
   describe("major chords", () => {

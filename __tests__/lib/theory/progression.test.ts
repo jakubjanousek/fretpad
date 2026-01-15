@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  PRESET_PROGRESSIONS,
   createProgression,
   getAllChordsFromProgression,
   getProgressionTotalBeats,
+  PRESET_PROGRESSIONS,
   parseBar,
   parseProgression,
 } from "@/lib/theory/progression";
