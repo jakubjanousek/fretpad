@@ -239,7 +239,7 @@ export function Fretboard({
                       noteLabelMode === "intervals" &&
                         "left-[33.33%] w-[calc(33.33%-2px)]",
                       noteLabelMode === "none" &&
-                        "left-[66.66%] w-[calc(33.33%-2px)]"
+                        "left-[66.66%] w-[calc(33.33%-2px)]",
                     )}
                   />
                   <button
@@ -249,7 +249,7 @@ export function Fretboard({
                       "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
                       noteLabelMode === "notes"
                         ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     Notes
@@ -261,7 +261,7 @@ export function Fretboard({
                       "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
                       noteLabelMode === "intervals"
                         ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     Intervals
@@ -273,7 +273,7 @@ export function Fretboard({
                       "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
                       noteLabelMode === "none"
                         ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     None
@@ -295,7 +295,7 @@ export function Fretboard({
                       "h-7 text-xs transition-all duration-150 active:scale-95",
                       showVoiceLeading
                         ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
-                        : "hover:border-blue-500/50"
+                        : "hover:border-blue-500/50",
                     )}
                   >
                     <span
@@ -303,7 +303,7 @@ export function Fretboard({
                         "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
                         showVoiceLeading
                           ? "bg-blue-500"
-                          : "bg-muted-foreground/30"
+                          : "bg-muted-foreground/30",
                       )}
                     />
                     Voice Leading
@@ -319,7 +319,7 @@ export function Fretboard({
                       "h-7 text-xs transition-all duration-150 active:scale-95",
                       showScaleTones
                         ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
-                        : "hover:border-slate-500/50"
+                        : "hover:border-slate-500/50",
                     )}
                   >
                     <span
@@ -327,7 +327,7 @@ export function Fretboard({
                         "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
                         showScaleTones
                           ? "bg-slate-500"
-                          : "bg-muted-foreground/30"
+                          : "bg-muted-foreground/30",
                       )}
                     />
                     Scale Tones

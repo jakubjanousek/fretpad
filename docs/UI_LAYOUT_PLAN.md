@@ -77,15 +77,15 @@ components/transport/TransportBar.tsx    # Layout restructure
 components/transport/MoreMenu.tsx        # New combined menu (create)
 ```
 
-### 1.3 Icon Labels (P1)
+### 1.3 Icon Labels (P1) ✅ COMPLETE
 
 Add text labels to transport icons for clarity.
 
 **Tasks:**
-- [ ] Add small labels below transport icons on desktop
-- [ ] Hide labels on mobile (icons only with tooltips)
-- [ ] Use short labels: "Play", "Reset", "Click" (metronome)
-- [ ] Animate label appearance on first visit
+- [x] Add small labels below transport icons on desktop
+- [x] Hide labels on mobile (icons only with tooltips)
+- [x] Use short labels: "Play", "Reset", "Click" (metronome)
+- [ ] Animate label appearance on first visit (deferred)
 
 **Files to modify:**
 ```
@@ -223,35 +223,38 @@ lib/persistence.ts                         # Store onboarding state
 
 ## 5. Micro-Interactions & Polish
 
-### 5.1 Chord Change Animation (P1)
+### 5.1 Chord Change Animation (P1) ✅ COMPLETE
 
 Add satisfying feedback when chords change.
 
 **Tasks:**
-- [ ] Add subtle scale animation to chord name on change
-- [ ] Animate fretboard notes (fade out old, fade in new)
-- [ ] Add brief color flash on progress bar at chord boundaries
-- [ ] Play subtle UI sound on chord change (optional, off by default)
+- [x] Add subtle scale animation to chord name on change
+- [x] Animate fretboard notes (fade out old, fade in new)
+- [x] Add brief color flash on progress bar at chord boundaries
+- [ ] Play subtle UI sound on chord change (optional, off by default) (deferred)
 
 **Files to modify:**
 ```
 components/fretboard/Fretboard.tsx        # Animation logic
 components/fretboard/FretMarker.tsx       # Note animations
+components/transport/ProgressBar.tsx      # Chord boundary flash
+app/globals.css                           # Animation keyframes
 ```
 
-### 5.2 Button Press Feedback (P1)
+### 5.2 Button Press Feedback (P1) ✅ COMPLETE
 
 Add tactile feedback to all interactive elements.
 
 **Tasks:**
-- [ ] Add scale-down effect on button press (transform: scale(0.95))
-- [ ] Add ripple effect to primary actions
-- [ ] Ensure all buttons have visible focus states
-- [ ] Add hover lift effect to cards and panels
+- [x] Add scale-down effect on button press (transform: scale(0.95))
+- [x] Add ripple effect to primary actions
+- [x] Ensure all buttons have visible focus states
+- [x] Add hover lift effect to cards and panels
 
 **Files to modify:**
 ```
 components/ui/button.tsx                  # Press animations
+components/ui/card.tsx                    # Card hover effect
 app/globals.css                           # Global interaction styles
 ```
 
@@ -356,11 +359,11 @@ components/share/ShareButton.tsx          # New component (create)
 2. ~~Transport Control Grouping (1.2)~~ ✅
 3. ~~Enhanced Toggle Buttons (2.1)~~ ✅
 
-### Phase 2 – Visual Feedback (P1)
-4. Icon Labels (1.3)
-5. Segmented Control Style (2.2)
-6. Chord Change Animation (5.1)
-7. Button Press Feedback (5.2)
+### Phase 2 – Visual Feedback (P1) ✅ COMPLETE
+4. ~~Icon Labels (1.3)~~ ✅
+5. ~~Segmented Control Style (2.2)~~ ✅
+6. ~~Chord Change Animation (5.1)~~ ✅
+7. ~~Button Press Feedback (5.2)~~ ✅
 
 ### Phase 3 – Discovery & Learning (P1)
 8. Visual Preset Categories (3.1)

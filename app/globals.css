@@ -366,3 +366,103 @@
 .toggle-enhanced:active {
   transform: scale(0.97);
 }
+
+/* ============================
+   Fretboard Note Animations
+   ============================ */
+
+/* Note appear animation - scales up and fades in */
+@keyframes note-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-note-appear {
+  animation: note-appear 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================
+   Chord Boundary Flash
+   ============================ */
+
+@keyframes chord-flash {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-chord-flash {
+  animation: chord-flash 0.4s ease-out forwards;
+}
+
+/* ============================
+   Button Press & Card Hover
+   ============================ */
+
+/* Global button press effect */
+.btn-press {
+  transition: transform 0.1s ease-out;
+}
+
+.btn-press:active {
+  transform: scale(0.95);
+}
+
+/* Card/panel hover lift effect */
+.card-hover {
+  transition:
+    transform 0.2s ease-out,
+    box-shadow 0.2s ease-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 25px -5px rgba(0, 0, 0, 0.1),
+    0 4px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.dark .card-hover:hover {
+  box-shadow:
+    0 8px 25px -5px rgba(0, 0, 0, 0.3),
+    0 4px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Ripple effect base */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, currentColor 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transition:
+    transform 0.3s ease-out,
+    opacity 0.3s ease-out;
+}
+
+.ripple:active::before {
+  opacity: 0.15;
+  transform: scale(2.5);
+  transition:
+    transform 0s,
+    opacity 0s;
+}

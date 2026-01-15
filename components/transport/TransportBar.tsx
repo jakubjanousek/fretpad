@@ -1,6 +1,6 @@
 "use client";
 
-import { Info, Play, RotateCcw, Square, Timer } from "lucide-react";
+import { Play, RotateCcw, Square, Timer } from "lucide-react";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -18,7 +18,6 @@ import { MoreMenu } from "./MoreMenu";
 
 interface TransportBarProps {
   onSettingsClick: () => void;
-  onInfoClick: () => void;
   onHelpClick: () => void;
   onGuideClick: () => void;
 }
@@ -29,7 +28,6 @@ interface TransportBarProps {
  */
 export function TransportBar({
   onSettingsClick,
-  onInfoClick,
   onHelpClick,
   onGuideClick,
 }: TransportBarProps) {
@@ -111,10 +109,10 @@ export function TransportBar({
         <div className="flex items-center justify-between gap-3 sm:gap-4 h-16 sm:h-16">
           {/* Playback Group */}
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="flex items-center gap-1.5 bg-muted/50 rounded-xl px-2 py-1.5">
-              {/* Hero Play/Stop Button */}
-              <Tooltip>
-                <TooltipTrigger asChild>
+            {/* Hero Play/Stop Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center">
                   {isPlaying ? (
                     <Button
                       variant="outline"
@@ -136,14 +134,16 @@ export function TransportBar({
                       <Play className="h-5 w-5 ml-0.5" />
                     </Button>
                   )}
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  {isPlaying ? "Stop" : "Play"} (Space)
-                </TooltipContent>
-              </Tooltip>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="sm:hidden">
+                {isPlaying ? "Stop" : "Play"} (Space)
+              </TooltipContent>
+            </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -153,12 +153,16 @@ export function TransportBar({
                   >
                     <RotateCcw className="h-4 w-4" />
                   </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Reset (R)</TooltipContent>
-              </Tooltip>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="sm:hidden">
+                Reset (R)
+              </TooltipContent>
+            </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex flex-col items-center">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -178,15 +182,12 @@ export function TransportBar({
                   >
                     <Timer className="h-4 w-4" />
                   </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Metronome (M)</TooltipContent>
-              </Tooltip>
-            </div>
-
-            {/* Group label - desktop only */}
-            <span className="hidden lg:block text-[10px] text-muted-foreground uppercase tracking-wider -ml-2">
-              Playback
-            </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="sm:hidden">
+                Metronome (M)
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           {/* Tempo Group - hidden on very small screens */}

@@ -182,7 +182,6 @@ export default function Page() {
       {/* Fixed Transport Bar */}
       <TransportBar
         onSettingsClick={() => setSettingsOpen(true)}
-        onInfoClick={() => setChordInfoOpen(true)}
         onHelpClick={() => setShortcutsHelpOpen(true)}
         onGuideClick={() => setHelpGuideOpen(true)}
       />

@@ -31,7 +31,7 @@ export function FretMarker({ note, labelMode = "notes" }: FretMarkerProps) {
           w-8 h-8 sm:w-7 sm:h-7 rounded-full flex items-center justify-center
           text-xs font-medium cursor-pointer
           transition-transform hover:scale-110 active:scale-95
-          touch-target-sm
+          touch-target-sm animate-note-appear
           ${bgColor} ${textColor}
         `}
       >

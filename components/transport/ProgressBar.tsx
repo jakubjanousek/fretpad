@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { usePlaybackPosition } from "@/hooks/usePlaybackPosition";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
@@ -14,6 +15,35 @@ export function ProgressBar() {
     isPlaying,
     countInBars: metronome.countIn,
   });
+
+  // Track bar changes for flash effect
+  const prevBarIndex = useRef(playbackPosition.barIndex);
+  const [flashPosition, setFlashPosition] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (
+      playbackPosition.isActive &&
+      !playbackPosition.isCountingIn &&
+      playbackPosition.barIndex !== prevBarIndex.current &&
+      playbackPosition.barIndex > 0
+    ) {
+      // Flash at the bar boundary that was just crossed
+      const totalBars = progression.bars.length;
+      const position = (playbackPosition.barIndex / totalBars) * 100;
+      setFlashPosition(position);
+
+      // Clear flash after animation
+      const timeout = setTimeout(() => setFlashPosition(null), 400);
+      prevBarIndex.current = playbackPosition.barIndex;
+      return () => clearTimeout(timeout);
+    }
+    prevBarIndex.current = playbackPosition.barIndex;
+  }, [
+    playbackPosition.barIndex,
+    playbackPosition.isActive,
+    playbackPosition.isCountingIn,
+    progression.bars.length,
+  ]);
 
   // Calculate overall progress across the entire progression
   const totalBars = progression.bars.length;
@@ -125,6 +155,19 @@ export function ProgressBar() {
             style={{
               left: `${overallProgress * 100}%`,
               transform: "translateX(-50%)",
+            }}
+          />
+        )}
+
+        {/* Chord boundary flash effect */}
+        {flashPosition !== null && (
+          <div
+            className="absolute top-0 bottom-0 w-4 animate-chord-flash pointer-events-none z-20"
+            style={{
+              left: `${flashPosition}%`,
+              transform: "translateX(-50%)",
+              background:
+                "radial-gradient(ellipse at center, rgba(249, 115, 22, 0.8) 0%, transparent 70%)",
             }}
           />
         )}
