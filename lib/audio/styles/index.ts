@@ -1,4 +1,6 @@
 import type { StyleDefinition, StyleId } from "@/lib/types";
+import { balladStyle } from "./ballad";
+import { bossaNovaStyle } from "./bossaNova";
 import { jazzSwingStyle } from "./jazzSwing";
 import { popRockStyle } from "./popRock";
 
@@ -8,6 +10,8 @@ import { popRockStyle } from "./popRock";
 export const AVAILABLE_STYLES: StyleDefinition[] = [
   jazzSwingStyle,
   popRockStyle,
+  bossaNovaStyle,
+  balladStyle,
 ];
 
 /**
@@ -16,6 +20,8 @@ export const AVAILABLE_STYLES: StyleDefinition[] = [
 export const STYLES_MAP: Record<StyleId, StyleDefinition> = {
   jazzSwing: jazzSwingStyle,
   popRock: popRockStyle,
+  bossaNova: bossaNovaStyle,
+  ballad: balladStyle,
 };
 
 /**
@@ -30,4 +36,4 @@ export function getStyle(id: StyleId): StyleDefinition {
  */
 export const DEFAULT_STYLE_ID: StyleId = "jazzSwing";
 
-export { jazzSwingStyle, popRockStyle };
+export { jazzSwingStyle, popRockStyle, bossaNovaStyle, balladStyle };

@@ -208,9 +208,9 @@ iReal-style backing track system with selectable styles.
 - [x] Add mute toggles (mute bass or chords independently)
 - [x] Add count-in option (1-2 bar count before loop starts) - Implemented via metronome count-in
 
-**Additional Styles (Phase 2):**
-- [ ] Add Bossa Nova style (syncopated bass + fingerpicked guitar)
-- [ ] Add Ballad style (slow arpeggiated chords + sustained bass)
+**Additional Styles (Phase 2):** ✅ COMPLETE
+- [x] Add Bossa Nova style (syncopated bass + fingerpicked guitar)
+- [x] Add Ballad style (slow arpeggiated chords + sustained bass)
 
 **Sound Quality Improvements:**
 - [ ] Use Tone.js Sampler with real instrument samples for more realistic sound
@@ -229,6 +229,8 @@ lib/audio/
     index.ts           # Style registry
     jazzSwing.ts       # Jazz Swing style
     popRock.ts         # Pop/Rock style
+    bossaNova.ts       # Bossa Nova style
+    ballad.ts          # Ballad style
   instruments/
     index.ts
     bassInstrument.ts  # Bass synth factory
