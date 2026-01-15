@@ -20,6 +20,7 @@ const SHORTCUTS: ShortcutItem[] = [
   { key: "R", description: "Reset to beginning" },
   { key: "M", description: "Toggle metronome" },
   { key: "I", description: "Toggle chord info panel" },
+  { key: "H", description: "Open help guide" },
   { key: "↑", description: "Increase tempo (+5 BPM)" },
   { key: "↓", description: "Decrease tempo (-5 BPM)" },
   { key: "1", description: "Load preset: ii-V-I in C" },

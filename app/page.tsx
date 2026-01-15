@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
+import { HelpGuide } from "@/components/help/HelpGuide";
 import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ShareExport } from "@/components/progression/ShareExport";
@@ -13,6 +14,7 @@ import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { Card, CardContent } from "@/components/ui/card";
+import { useFirstVisit } from "@/hooks/useFirstVisit";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import {
@@ -42,6 +44,18 @@ export default function Page() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [chordInfoOpen, setChordInfoOpen] = useState(false);
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
+  const [helpGuideOpen, setHelpGuideOpen] = useState(false);
+
+  // First-time user detection
+  const { isFirstVisit, markAsVisited } = useFirstVisit();
+
+  // Show help guide on first visit
+  useEffect(() => {
+    if (isFirstVisit) {
+      setHelpGuideOpen(true);
+      markAsVisited();
+    }
+  }, [isFirstVisit, markAsVisited]);
 
   // Keyboard shortcuts for panels (I and ? keys)
   useEffect(() => {
@@ -59,6 +73,12 @@ export default function Page() {
       if (e.key === "?" && !hasModifier && !isInputFocused) {
         e.preventDefault();
         setShortcutsHelpOpen((prev) => !prev);
+      }
+
+      // Toggle help guide (H key)
+      if (e.key.toLowerCase() === "h" && !hasModifier && !isInputFocused) {
+        e.preventDefault();
+        setHelpGuideOpen((prev) => !prev);
       }
     };
 
@@ -164,6 +184,7 @@ export default function Page() {
         onSettingsClick={() => setSettingsOpen(true)}
         onInfoClick={() => setChordInfoOpen(true)}
         onHelpClick={() => setShortcutsHelpOpen(true)}
+        onGuideClick={() => setHelpGuideOpen(true)}
       />
 
       {/* Settings Drawer */}
@@ -181,6 +202,9 @@ export default function Page() {
         open={shortcutsHelpOpen}
         onOpenChange={setShortcutsHelpOpen}
       />
+
+      {/* Help Guide */}
+      <HelpGuide open={helpGuideOpen} onOpenChange={setHelpGuideOpen} />
     </div>
   );
 }

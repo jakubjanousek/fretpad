@@ -414,14 +414,23 @@ Add documentation for complex logic.
 - [ ] Document the fretboard mapping logic
 - [ ] Add README section on architecture
 
-### 5.2 User Documentation (P3)
+### 5.2 User Documentation (P3) ✅ COMPLETE
 
 Help users understand the tool.
 
-**Tasks:**
-- [ ] Add "How to Use" modal/tooltip for first-time users
-- [ ] Document chord symbol format (what's supported)
-- [ ] Add music theory glossary (guide tones, intervals, etc.)
+**Completed:**
+- [x] Add "How to Use" modal/tooltip for first-time users (auto-shows on first visit)
+- [x] Document chord symbol format (what's supported)
+- [x] Add music theory glossary (guide tones, intervals, etc.)
+
+**Files created/modified:**
+```
+components/help/HelpGuide.tsx    # Tabbed help modal with 3 sections
+hooks/useFirstVisit.ts           # First-time user detection via localStorage
+components/transport/TransportBar.tsx  # Added help guide button (BookOpen icon)
+components/transport/KeyboardShortcutsHelp.tsx  # Added H shortcut
+app/page.tsx                     # Integrated HelpGuide with H keyboard shortcut
+```
 
 ---
 

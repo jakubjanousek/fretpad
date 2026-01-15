@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BookOpen,
   CircleHelp,
   Info,
   Play,
@@ -27,6 +28,7 @@ interface TransportBarProps {
   onSettingsClick: () => void;
   onInfoClick: () => void;
   onHelpClick: () => void;
+  onGuideClick: () => void;
 }
 
 /**
@@ -37,6 +39,7 @@ export function TransportBar({
   onSettingsClick,
   onInfoClick,
   onHelpClick,
+  onGuideClick,
 }: TransportBarProps) {
   const progression = useAppStore((state) => state.progression);
   const tempo = useAppStore((state) => state.tempo);
@@ -201,6 +204,21 @@ export function TransportBar({
 
           {/* Right: Help, Settings & Info */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onGuideClick}
+                  aria-label="Help guide"
+                  className="h-10 w-10 sm:h-9 sm:w-9 touch-target hidden sm:flex"
+                >
+                  <BookOpen className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Help Guide (H)</TooltipContent>
+            </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
