@@ -4,6 +4,7 @@ import { Fretboard } from "@/components/fretboard/Fretboard";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ProgressionPresets } from "@/components/progression/ProgressionPresets";
 import { ChordInfoPanel } from "@/components/theory/ChordInfoPanel";
+import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportControls } from "@/components/transport/TransportControls";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getFretNotesForChord } from "@/lib/fretboard";
@@ -47,7 +48,8 @@ export default function Page() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-medium">Fretboard</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col gap-4">
+              <ProgressBar />
               <Fretboard fretNotes={fretNotes} />
             </CardContent>
           </Card>

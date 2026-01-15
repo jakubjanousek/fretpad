@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { usePlaybackPosition } from "@/hooks/usePlaybackPosition";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
@@ -15,6 +16,8 @@ interface BarInputProps {
   onUpdate: (barIndex: number, value: string) => boolean;
   onRemove: (barIndex: number) => void;
   canRemove: boolean;
+  isPlaying: boolean;
+  playheadProgress: number;
 }
 
 function BarInput({
@@ -26,6 +29,8 @@ function BarInput({
   onUpdate,
   onRemove,
   canRemove,
+  isPlaying,
+  playheadProgress,
 }: BarInputProps) {
   const [inputValue, setInputValue] = useState(chordString);
   const [error, setError] = useState<string | null>(null);
@@ -88,8 +93,10 @@ function BarInput({
             role="button"
             tabIndex={0}
             className={cn(
-              "flex items-center gap-0.5 border rounded-md px-1 py-0.5 min-w-[8rem] cursor-pointer hover:border-primary/50 transition-colors",
+              "relative flex items-center gap-0.5 border rounded-md px-1 py-0.5 min-w-32 cursor-pointer hover:border-primary/50 transition-colors overflow-hidden",
               isSelected && "border-primary ring-1 ring-primary/30",
+              isPlaying &&
+                "border-orange-400 bg-orange-50 dark:bg-orange-950/20",
             )}
             onClick={() => setIsEditing(true)}
             onKeyDown={(e) => {
@@ -99,6 +106,13 @@ function BarInput({
               }
             }}
           >
+            {/* Playhead indicator */}
+            {isPlaying && (
+              <div
+                className="absolute top-0 bottom-0 w-0.5 bg-orange-500 z-10 transition-none"
+                style={{ left: `${playheadProgress * 100}%` }}
+              />
+            )}
             {chords.map((chord, chordIdx) => (
               <button
                 key={chordIdx}
@@ -108,7 +122,7 @@ function BarInput({
                   handleChordClick(chordIdx);
                 }}
                 className={cn(
-                  "px-2 py-1 text-sm font-mono rounded transition-colors",
+                  "px-2 py-1 text-sm font-mono rounded transition-colors relative z-0",
                   isSelected && selectedChordIndex === chordIdx
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-muted",
@@ -158,10 +172,13 @@ export function ProgressionEditor() {
   const progression = useAppStore((state) => state.progression);
   const currentBarIndex = useAppStore((state) => state.currentBarIndex);
   const currentChordIndex = useAppStore((state) => state.currentChordIndex);
+  const isPlaying = useAppStore((state) => state.isPlaying);
   const setCurrentPosition = useAppStore((state) => state.setCurrentPosition);
   const updateBar = useAppStore((state) => state.updateBar);
   const addBar = useAppStore((state) => state.addBar);
   const removeBar = useAppStore((state) => state.removeBar);
+
+  const playbackPosition = usePlaybackPosition({ progression, isPlaying });
 
   const handleSelect = (barIndex: number, chordIndex: number) => {
     setCurrentPosition(barIndex, chordIndex);
@@ -195,6 +212,15 @@ export function ProgressionEditor() {
               onUpdate={updateBar}
               onRemove={removeBar}
               canRemove={progression.bars.length > 1}
+              isPlaying={
+                playbackPosition.isActive &&
+                playbackPosition.barIndex === barIndex
+              }
+              playheadProgress={
+                playbackPosition.barIndex === barIndex
+                  ? playbackPosition.barProgress
+                  : 0
+              }
             />
           );
         })}

@@ -93,15 +93,23 @@ Enable stricter TypeScript checks for better type safety.
 
 ## 2. User Experience Improvements
 
-### 2.1 Visual Playhead Indicator (P0)
+### 2.1 Visual Playhead Indicator (P0) ✅ COMPLETE
 
 Users can't see where they are in the progression during playback.
 
 **Tasks:**
-- [ ] Add visual playhead/cursor that moves during playback
-- [ ] Highlight the currently playing bar in `ProgressionEditor`
-- [ ] Add beat indicator within bars (show sub-beat progress)
-- [ ] Consider adding a progress bar above the fretboard
+- [x] Add visual playhead/cursor that moves during playback
+- [x] Highlight the currently playing bar in `ProgressionEditor`
+- [x] Add beat indicator within bars (show sub-beat progress)
+- [x] Consider adding a progress bar above the fretboard
+
+**Files created/modified:**
+```
+hooks/usePlaybackPosition.ts     # Real-time position tracking via requestAnimationFrame
+components/transport/ProgressBar.tsx  # Overall progression progress bar
+components/progression/ProgressionEditor.tsx  # Bar highlighting + playhead
+app/page.tsx  # ProgressBar integration
+```
 
 ### 2.2 Keyboard Shortcuts (P1)
 
@@ -384,7 +392,7 @@ Understand how users use the app.
 For maximum impact, implement in this order:
 
 ### Phase 1 – Production Ready
-1. Visual Playhead Indicator (2.1)
+1. ~~Visual Playhead Indicator (2.1)~~ ✅ Complete
 2. Metronome (3.1)
 3. Add Test Suite (1.1)
 4. Improve Error Handling (1.2)
