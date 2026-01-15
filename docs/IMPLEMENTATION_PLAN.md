@@ -7,8 +7,8 @@
 - [x] Tailwind CSS configured
 - [x] shadcn/ui components installed
 - [x] Dependencies installed (tone, tonal, zustand)
-- [ ] Basic app layout with header and three regions
-- [ ] `lib/types.ts` with all type definitions
+- [x] Basic app layout with header and three regions
+- [x] `lib/types.ts` with all type definitions
 
 ### Milestone 2 – Theory Layer
 - [ ] `lib/theory/chords.ts` - parseChordSymbol, getGuideTones
