@@ -6,13 +6,23 @@ import { ProgressionPresets } from "@/components/progression/ProgressionPresets"
 import { ChordInfoPanel } from "@/components/theory/ChordInfoPanel";
 import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportControls } from "@/components/transport/TransportControls";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getFretNotesForChord } from "@/lib/fretboard";
+import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
 export default function Page() {
   const currentChord = useAppStore((state) => state.currentChord);
-  const fretNotes = currentChord ? getFretNotesForChord(currentChord) : [];
+  const showScaleTones = useAppStore((state) => state.showScaleTones);
+  const setShowScaleTones = useAppStore((state) => state.setShowScaleTones);
+
+  const fretNotes = currentChord
+    ? getFretNotesForChord(currentChord, {
+        includeScale: showScaleTones,
+        scaleName: showScaleTones ? currentChord.suggestedScales[0] : undefined,
+      })
+    : [];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -45,8 +55,19 @@ export default function Page() {
         {/* Fretboard Visualization Section */}
         <section className="flex-1">
           <Card className="h-full min-h-75">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-base font-medium">Fretboard</CardTitle>
+              <Button
+                variant={showScaleTones ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowScaleTones(!showScaleTones)}
+                className={cn(
+                  "h-7 text-xs",
+                  showScaleTones && "bg-slate-500 hover:bg-slate-600",
+                )}
+              >
+                Scale Tones
+              </Button>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <ProgressBar />

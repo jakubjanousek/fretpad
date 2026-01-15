@@ -28,6 +28,9 @@ interface AppState {
   // Metronome state
   metronome: MetronomeConfig;
 
+  // Fretboard display state
+  showScaleTones: boolean;
+
   // Error state
   error: ErrorInfo | null;
 
@@ -52,6 +55,9 @@ interface AppState {
   setMetronomeEnabled: (enabled: boolean) => void;
   setMetronomeVolume: (volume: number) => void;
   setMetronomeCountIn: (countIn: 0 | 1 | 2) => void;
+
+  // Fretboard display actions
+  setShowScaleTones: (show: boolean) => void;
 
   // Helper to advance to next chord (for playback)
   advanceToNextChord: () => void;
@@ -93,6 +99,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     accentDownbeat: true,
     countIn: 0,
   },
+  showScaleTones: false,
   error: null,
 
   // Error actions
@@ -169,6 +176,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((state) => ({
       metronome: { ...state.metronome, countIn },
     }));
+  },
+
+  setShowScaleTones: (show) => {
+    set({ showScaleTones: show });
   },
 
   updateBar: (barIndex, barString) => {
