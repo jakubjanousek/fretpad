@@ -111,18 +111,27 @@ components/progression/ProgressionEditor.tsx  # Bar highlighting + playhead
 app/page.tsx  # ProgressBar integration
 ```
 
-### 2.2 Keyboard Shortcuts (P1)
+### 2.2 Keyboard Shortcuts (P1) ✅ COMPLETE
 
 Add keyboard navigation for common actions.
 
-**Tasks:**
-- [ ] `Space` – Play/Stop toggle
-- [ ] `←` / `→` – Navigate between chords
-- [ ] `↑` / `↓` – Adjust tempo by 5 BPM
-- [ ] `R` – Reset to beginning
-- [ ] `1-9` – Select preset (optional)
-- [ ] Add keyboard shortcut hints in UI (tooltips or footer)
-- [ ] Create `hooks/useKeyboardShortcuts.ts`
+**Completed:**
+- [x] `Space` – Play/Stop toggle
+- [x] `↑` / `↓` – Adjust tempo by 5 BPM
+- [x] `R` – Reset to beginning
+- [x] `M` – Toggle metronome
+- [x] `1-3` – Select preset
+- [x] Add keyboard shortcut hints in UI (tooltips + collapsible section)
+- [x] Create `hooks/useKeyboardShortcuts.ts`
+
+**Remaining Tasks:**
+- [ ] `←` / `→` – Navigate between chords (requires additional state management)
+
+**Files created/modified:**
+```
+hooks/useKeyboardShortcuts.ts           # Keyboard event handling hook
+components/transport/TransportControls.tsx  # Tooltips + shortcuts hint section
+```
 
 ### 2.3 Improved Chord Editing UX (P1)
 
@@ -409,7 +418,7 @@ For maximum impact, implement in this order:
 4. Improve Error Handling (1.2)
 
 ### Phase 2 – Enhanced UX
-5. Keyboard Shortcuts (2.2)
+5. ~~Keyboard Shortcuts (2.2)~~ ✅ Complete
 6. Persistence (3.3)
 7. Scale Tone Toggle (3.4)
 8. CI/CD Pipeline (6.1)

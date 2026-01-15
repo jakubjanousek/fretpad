@@ -1,11 +1,17 @@
 "use client";
 
-import { Play, RotateCcw, Square, Timer } from "lucide-react";
-import { useCallback } from "react";
+import { Keyboard, Play, RotateCcw, Square, Timer } from "lucide-react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useAudioEngine } from "@/hooks/useAudioEngine";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { getStyle } from "@/lib/audio/styles";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
@@ -29,6 +35,7 @@ export function TransportControls() {
   const setMetronomeCountIn = useAppStore((state) => state.setMetronomeCountIn);
 
   const style = getStyle(selectedStyle);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const handleChordChange = useCallback(
     (barIndex: number, chordIndex: number) => {
@@ -67,6 +74,13 @@ export function TransportControls() {
     setIsPlaying(false);
   }, [stop, setCurrentPosition, setIsPlaying]);
 
+  // Enable keyboard shortcuts for transport controls
+  useKeyboardShortcuts({
+    onPlay: handlePlay,
+    onStop: handleStopClick,
+    onReset: handleReset,
+  });
+
   const handleTempoChange = useCallback(
     (value: number[]) => {
       const newTempo = value[0];
@@ -95,46 +109,63 @@ export function TransportControls() {
     <div className="flex flex-col gap-4">
       {/* Playback Controls */}
       <div className="flex items-center gap-2">
-        {isPlaying ? (
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleStopClick}
-            aria-label="Stop"
-          >
-            <Square className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            variant="default"
-            size="icon"
-            onClick={handlePlay}
-            aria-label="Play"
-          >
-            <Play className="h-4 w-4" />
-          </Button>
-        )}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleReset}
-          aria-label="Reset to beginning"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </Button>
-        <Button
-          variant={metronome.enabled ? "default" : "outline"}
-          size="icon"
-          onClick={handleMetronomeToggle}
-          aria-label={
-            metronome.enabled ? "Disable metronome" : "Enable metronome"
-          }
-          className={cn(
-            metronome.enabled && "bg-orange-500 hover:bg-orange-600",
-          )}
-        >
-          <Timer className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {isPlaying ? (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleStopClick}
+                aria-label="Stop"
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="default"
+                size="icon"
+                onClick={handlePlay}
+                aria-label="Play"
+              >
+                <Play className="h-4 w-4" />
+              </Button>
+            )}
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {isPlaying ? "Stop" : "Play"} (Space)
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleReset}
+              aria-label="Reset to beginning"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Reset (R)</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={metronome.enabled ? "default" : "outline"}
+              size="icon"
+              onClick={handleMetronomeToggle}
+              aria-label={
+                metronome.enabled ? "Disable metronome" : "Enable metronome"
+              }
+              className={cn(
+                metronome.enabled && "bg-orange-500 hover:bg-orange-600",
+              )}
+            >
+              <Timer className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Metronome (M)</TooltipContent>
+        </Tooltip>
       </div>
 
       {/* Tempo Control */}
@@ -214,6 +245,48 @@ export function TransportControls() {
 
       {/* Style Selector */}
       <StyleSelector />
+
+      {/* Keyboard Shortcuts Hint */}
+      <div className="pt-2 border-t">
+        <button
+          type="button"
+          onClick={() => setShowShortcuts(!showShortcuts)}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Keyboard className="h-3 w-3" />
+          <span>Keyboard shortcuts</span>
+        </button>
+        {showShortcuts && (
+          <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <div>
+              <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">
+                Space
+              </kbd>{" "}
+              Play/Stop
+            </div>
+            <div>
+              <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">R</kbd>{" "}
+              Reset
+            </div>
+            <div>
+              <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">M</kbd>{" "}
+              Metronome
+            </div>
+            <div>
+              <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">
+                1-3
+              </kbd>{" "}
+              Presets
+            </div>
+            <div>
+              <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">
+                Up/Down
+              </kbd>{" "}
+              Tempo
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
