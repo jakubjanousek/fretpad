@@ -1,6 +1,6 @@
-# FretFlow – UI/Layout Improvement Plan
+# FretFlow – UI/Layout Improvement Plan (v2)
 
-This document outlines UI and layout improvements to enhance the visual hierarchy, usability, and overall user experience of FretFlow.
+This document outlines UI and layout improvements focused on visual hierarchy, engagement, and appeal for younger users.
 
 ---
 
@@ -14,364 +14,412 @@ This document outlines UI and layout improvements to enhance the visual hierarch
 
 ## Current Issues Summary
 
-1. **Fretboard buried below fold** – The main feature is pushed down by Chord Progression panel
-2. **Presets take too much space** – Always expanded, showing 4 categories
-3. **Progression bar clutter** – Individual delete buttons, wrapping to multiple rows
-4. **Split bottom section** – Transport and Chord Info side-by-side creates awkward layout
-5. **Inconsistent button styles** – Mix of icon, text, and outlined buttons
-6. **Weak selection state** – Connection between selected chord and fretboard not obvious
+1. **Transport bar lacks hierarchy** – All icons same size/weight, Play button not prominent
+2. **Icon-only buttons unclear** – Younger users expect instant clarity without hovering
+3. **Control grouping arbitrary** – Playback controls mixed with utility buttons
+4. **Toggle states too subtle** – Selected state hard to distinguish
+5. **Preset dropdown text-only** – Missing visual cues for difficulty/style
+6. **No micro-interactions** – Interface feels static, lacking engagement
+7. **Legend easily missed** – Small inline legend at bottom-left
 
 ---
 
-## 1. Layout Restructure
+## 1. Transport Bar Redesign
 
-### 1.1 Collapsible Presets Panel (P0)
+### 1.1 Hero Play Button (P0)
 
-Move presets from always-visible expanded sections to a more compact format.
+Make the Play button visually dominant as the primary action.
 
-**Current:** 4 collapsible categories always visible, taking ~150px vertical space
+**Current:** Play button same size as other transport icons
 
-**Target:** Single dropdown or modal that opens on demand
+**Target:** Larger, more prominent Play button that draws attention
 
 **Tasks:**
-- [ ] Create `PresetDropdown` component with search/filter
-- [ ] Group presets by category in dropdown menu
-- [ ] Add "Recently Used" section at top (store in localStorage)
-- [ ] Remove collapsible accordion from main view
-- [ ] Add preset name display showing current selection
-- [ ] Keep "Save" button accessible for custom presets
+- [ ] Increase Play button size (48px vs 36px for others)
+- [ ] Add filled background color (cyan accent) to Play button
+- [ ] Add subtle glow/shadow effect on hover
+- [ ] Animate play/pause icon transition
+- [ ] Add ripple effect on click
 
 **Files to modify:**
 ```
-components/progression/ProgressionPresets.tsx  # Refactor to dropdown
-components/ui/command.tsx                       # shadcn command for search (new)
-lib/persistence.ts                              # Add recent presets tracking
+components/transport/TransportBar.tsx    # Play button styling
+app/globals.css                          # Animation keyframes
 ```
 
-### 1.2 Compact Progression Bar (P0)
+### 1.2 Transport Control Grouping (P0)
 
-Simplify the chord bar editor to be more compact and less cluttered.
+Group related controls with visual containers for better organization.
 
-**Current:**
-- Bars wrap to multiple rows
-- Each bar has visible × button
-- Numbers, inputs, and buttons create visual noise
+**Current layout:**
+```
+[Play][Reset][Metronome]  [───slider───]  120 BPM  [Help][?][Settings][Info]
+```
 
-**Target:**
-- Single horizontal row with overflow scroll
-- Delete button appears on hover only
-- Cleaner visual design
+**Target layout:**
+```
+┌─────────────────┐  ┌──────────────────────┐  ┌─────────┐
+│ [▶] [↺] [🎵]   │  │ [───slider───] 120   │  │ [≡ More]│
+│  Playback       │  │     Tempo            │  │         │
+└─────────────────┘  └──────────────────────┘  └─────────┘
+```
 
 **Tasks:**
-- [ ] Redesign `BarInput` to be more compact (remove visible delete button)
-- [ ] Show delete button on hover/focus only
-- [ ] Add horizontal scroll container for progression
-- [ ] Show bar numbers inside the chord chip (e.g., "1. Dm7")
-- [ ] Add visual indicator for bars that overflow viewport
-- [ ] Style currently playing bar more prominently
+- [ ] Create visual grouping with subtle background containers
+- [ ] Add group labels below icons ("Playback", "Tempo")
+- [ ] Combine Help, Shortcuts, Settings into "More" dropdown menu
+- [ ] Keep chord Info button separate (frequently used)
+- [ ] Add separator lines between groups
 
 **Files to modify:**
 ```
-components/progression/BarInput.tsx            # Compact redesign
-components/progression/ProgressionEditor.tsx   # Horizontal scroll container
+components/transport/TransportBar.tsx    # Layout restructure
+components/transport/MoreMenu.tsx        # New combined menu (create)
 ```
 
-### 1.3 Fixed Transport Bar (P1) ✅
+### 1.3 Icon Labels (P1)
 
-Convert transport controls to a fixed bottom bar like a media player.
-
-**Current:** Transport is a card in the grid, scrolls with page
-
-**Target:** Sticky bottom bar always visible, containing essential controls
+Add text labels to transport icons for clarity.
 
 **Tasks:**
-- [x] Create `TransportBar` component as fixed-position element
-- [x] Include: Play/Stop, Reset, Tempo slider, Metronome toggle
-- [x] Move style selector and volume controls to expandable drawer
-- [x] Add keyboard shortcut hints on hover
-- [x] Ensure transport bar doesn't overlap content (add bottom padding)
-- [ ] Mobile: Make transport bar touch-friendly with larger targets
-
-**Files to create/modify:**
-```
-components/transport/TransportBar.tsx          # New fixed bar component
-components/transport/TransportDrawer.tsx       # Expandable settings drawer
-app/page.tsx                                   # Layout restructure
-```
-
-### 1.4 Chord Info Slide-Out Panel (P1) ✅
-
-Convert Chord Info from always-visible card to on-demand panel.
-
-**Current:** Chord Info card always visible next to Transport
-
-**Target:** Slide-out panel triggered by clicking chord or info button
-
-**Tasks:**
-- [x] Create `ChordInfoSheet` as slide-out drawer (right side)
-- [x] Trigger panel when clicking chord name on fretboard
-- [x] Add info button (ℹ) in transport bar to toggle panel
-- [x] Keep panel open during playback, updating with current chord
-- [x] Add smooth slide animation
-- [ ] Mobile: Use bottom sheet instead of side panel
-
-**Files to create/modify:**
-```
-components/theory/ChordInfoSheet.tsx           # Slide-out panel wrapper
-components/ui/sheet.tsx                        # shadcn sheet component (new)
-app/page.tsx                                   # Panel integration
-```
-
-### 1.5 Fretboard as Hero (P1) ✅
-
-Maximize fretboard prominence and visual weight.
-
-**Tasks:**
-- [x] Increase fretboard vertical space (remove wasted whitespace)
-- [x] Add larger current chord display above fretboard
-- [x] Improve playhead visibility (thicker line, glow effect) - done in Phase 1
-- [ ] Move legend inline or to a collapsible footer
-- [x] Add subtle animation when chord changes
+- [ ] Add small labels below transport icons on desktop
+- [ ] Hide labels on mobile (icons only with tooltips)
+- [ ] Use short labels: "Play", "Reset", "Click" (metronome)
+- [ ] Animate label appearance on first visit
 
 **Files to modify:**
 ```
-components/fretboard/Fretboard.tsx             # Layout adjustments
-components/fretboard/FretboardHeader.tsx       # New component for chord display
+components/transport/TransportBar.tsx    # Add label elements
 ```
 
 ---
 
-## 2. Visual Design Improvements
+## 2. Toggle & Button States
 
-### 2.1 Consistent Button Styles (P1) ✅
+### 2.1 Enhanced Toggle Buttons (P0)
 
-Unify button appearance across the app.
+Improve visual feedback for toggle states (Voice Leading, Scale Tones, Notes/Intervals/None).
 
-**Current issues:**
-- "Voice Leading" / "Scale Tones" toggles look different from other buttons
-- Mix of ghost, outline, and solid button variants
-- Inconsistent icon sizes
+**Current:** Subtle background change on selection
+
+**Target:** Clear visual distinction between active/inactive states
 
 **Tasks:**
-- [x] Define button style guide (primary, secondary, ghost, toggle)
-- [x] Update toggle buttons to use consistent style
-- [x] Standardize icon sizes (16px for small, 20px for medium)
-- [x] Add consistent hover/active states
-- [ ] Document button usage in component
+- [ ] Use filled style for active, outline for inactive
+- [ ] Add color accent to active toggles (cyan border or background)
+- [ ] Animate transition between states (scale + color)
+- [ ] Add checkmark or indicator icon to active state
+- [ ] Increase contrast between states
 
 **Files to modify:**
 ```
-components/ui/button.tsx                       # Add toggle variant
-components/fretboard/Fretboard.tsx             # Update toggle buttons
-components/transport/TransportControls.tsx     # Standardize buttons
+components/ui/button.tsx                 # Toggle variant styling
+components/fretboard/Fretboard.tsx       # Apply to legend toggles
 ```
 
-### 2.2 Selection State Enhancement (P1) ✅
+### 2.2 Segmented Control Style (P1)
 
-Strengthen visual connection between selected chord and fretboard.
+Convert Notes/Intervals/None to proper segmented control.
+
+**Current:** Three separate buttons
+
+**Target:** Connected pill-style segmented control
 
 **Tasks:**
-- [ ] Add colored accent bar on fretboard matching selected chord
-- [x] Animate chord name transition when selection changes
-- [x] Highlight chord in progression with colored left border
-- [x] Add subtle pulse animation on chord change during playback
-- [x] Show chord quality badge more prominently
+- [ ] Create `SegmentedControl` component
+- [ ] Connect buttons visually (shared background, no gaps)
+- [ ] Add sliding indicator that moves between options
+- [ ] Animate indicator movement smoothly
 
 **Files to modify:**
 ```
-components/progression/BarInput.tsx            # Selection styling
-components/fretboard/Fretboard.tsx             # Header enhancement
-```
-
-### 2.3 Typography Hierarchy (P2) ✅
-
-Improve text sizing and weight for better scanning.
-
-**Tasks:**
-- [x] Increase section header size ("Fretboard", "Transport")
-- [x] Add subtle color differentiation for headers
-- [x] Improve chord name typography (larger, bolder on fretboard)
-- [x] Use consistent label styling throughout
-
-**Files to modify:**
-```
-app/globals.css                                # Typography tokens
-Multiple component files                       # Apply new styles
-```
-
-### 2.4 Dark Mode Polish (P2) ✅
-
-Refine dark mode color palette.
-
-**Tasks:**
-- [x] Improve card differentiation (subtle border or shadow)
-- [x] Add depth with layered backgrounds
-- [x] Ensure sufficient contrast for all text
-- [x] Polish focus rings for accessibility
-
-**Files to modify:**
-```
-app/globals.css                                # Color refinements
-tailwind.config.ts                             # Theme adjustments
+components/ui/segmented-control.tsx      # New component (create)
+components/fretboard/Fretboard.tsx       # Replace button group
 ```
 
 ---
 
-## 3. Interaction Improvements
+## 3. Preset Dropdown Enhancement
 
-### 3.1 Improved Playhead (P0)
+### 3.1 Visual Preset Categories (P1)
 
-Make the playhead more visible during playback.
+Add visual cues to preset dropdown for better discovery.
+
+**Current:** Text-only list with category headers
+
+**Target:** Rich preset cards with metadata
 
 **Tasks:**
-- [ ] Increase playhead line thickness (2px -> 3px)
-- [ ] Add glow/shadow effect to playhead
-- [ ] Add beat markers on progress bar (4 dots per bar)
-- [ ] Animate playhead smoothly (currently may be choppy)
-- [ ] Show countdown during count-in visually
+- [ ] Add category icons (🎷 Jazz, 🎸 Rock, 🎹 Blues, 🎵 Modal)
+- [ ] Add difficulty badges (Beginner, Intermediate, Advanced)
+- [ ] Add bar count indicator (e.g., "4 bars", "12 bars")
+- [ ] Color-code categories with subtle background tints
+- [ ] Add "Popular" or "Trending" section
 
 **Files to modify:**
 ```
-components/fretboard/Fretboard.tsx             # Playhead styling
-components/fretboard/ProgressBar.tsx           # Beat markers
+components/progression/ProgressionPresets.tsx  # Enhance menu items
+lib/presets.ts                                  # Add metadata to presets
 ```
 
-### 3.2 Keyboard Shortcuts Discoverability (P1) ✅
+### 3.2 Preset Preview (P2)
 
-Make shortcuts more discoverable without cluttering UI.
+Allow users to preview presets before selecting.
 
 **Tasks:**
-- [x] Add floating "?" button that shows shortcuts overlay
-- [x] Show shortcut hints on button hover (tooltips)
-- [ ] Add first-time user hint about Space to play
-- [ ] Consider onboarding tooltip sequence
+- [ ] Add hover preview showing chord sequence
+- [ ] Show mini fretboard preview on hover (optional)
+- [ ] Add "Preview" button that plays first 2 bars
+- [ ] Remember recently used presets (already implemented, enhance UI)
 
 **Files to modify:**
 ```
-components/transport/KeyboardShortcutsHelp.tsx # New overlay component
-components/transport/TransportBar.tsx          # Help button
-```
-
-### 3.3 Touch-Friendly Fretboard (P2) ✅
-
-Improve fretboard interaction on touch devices.
-
-**Tasks:**
-- [x] Increase tap target size for fret markers
-- [x] Add tap-to-select note (shows note info)
-- [ ] Support pinch-to-zoom on fretboard
-- [x] Add horizontal swipe to scroll frets on mobile
-
-**Files to modify:**
-```
-components/fretboard/FretMarker.tsx            # Tap handling
-components/fretboard/Fretboard.tsx             # Touch gestures
+components/progression/ProgressionPresets.tsx  # Preview functionality
+components/progression/PresetPreview.tsx       # New component (create)
 ```
 
 ---
 
-## 4. Responsive Layout
+## 4. Fretboard Legend Improvements
 
-### 4.1 Mobile Layout Optimization (P1) ✅
+### 4.1 Interactive Legend (P1)
 
-Improve experience on narrow viewports.
+Make the legend more discoverable and interactive.
+
+**Current:** Static small legend at bottom-left
+
+**Target:** Interactive legend that highlights notes on hover
 
 **Tasks:**
-- [x] Stack all sections vertically (already done, needs polish)
-- [x] Use bottom sheet for Chord Info on mobile
-- [x] Reduce fretboard to 7-8 frets with scroll
-- [x] Make progression bar horizontally scrollable
-- [x] Increase touch target sizes (min 44px)
-- [ ] Test at 320px, 375px, 414px widths
+- [ ] Increase legend size and spacing
+- [ ] Highlight corresponding notes on fretboard when hovering legend item
+- [ ] Add tooltip explaining each note type on first visit
+- [ ] Consider floating legend position (top-right corner)
+- [ ] Add toggle to show/hide legend
 
 **Files to modify:**
 ```
-app/page.tsx                                   # Responsive layout
-components/fretboard/Fretboard.tsx             # Mobile fret range
-components/progression/ProgressionEditor.tsx   # Horizontal scroll
+components/fretboard/FretboardLegend.tsx  # New component (extract from Fretboard)
+components/fretboard/Fretboard.tsx        # Legend interaction logic
 ```
 
-### 4.2 Tablet Layout (P2) ✅
+### 4.2 First-Time Legend Tooltip (P2)
 
-Optimize for medium-sized screens.
+Help new users understand the color system.
 
 **Tasks:**
-- [x] Consider two-column layout (fretboard + info side-by-side)
-- [x] Larger touch targets than desktop
-- [x] Full fretboard without scroll
+- [ ] Show animated tooltip sequence on first visit
+- [ ] Highlight each legend item one by one
+- [ ] Store "seen" state in localStorage
+- [ ] Add "Show guide" button to replay sequence
 
 **Files to modify:**
 ```
-app/page.tsx                                   # Breakpoint adjustments
+components/fretboard/FretboardLegend.tsx  # Tooltip integration
+lib/persistence.ts                         # Store onboarding state
+```
+
+---
+
+## 5. Micro-Interactions & Polish
+
+### 5.1 Chord Change Animation (P1)
+
+Add satisfying feedback when chords change.
+
+**Tasks:**
+- [ ] Add subtle scale animation to chord name on change
+- [ ] Animate fretboard notes (fade out old, fade in new)
+- [ ] Add brief color flash on progress bar at chord boundaries
+- [ ] Play subtle UI sound on chord change (optional, off by default)
+
+**Files to modify:**
+```
+components/fretboard/Fretboard.tsx        # Animation logic
+components/fretboard/FretMarker.tsx       # Note animations
+```
+
+### 5.2 Button Press Feedback (P1)
+
+Add tactile feedback to all interactive elements.
+
+**Tasks:**
+- [ ] Add scale-down effect on button press (transform: scale(0.95))
+- [ ] Add ripple effect to primary actions
+- [ ] Ensure all buttons have visible focus states
+- [ ] Add hover lift effect to cards and panels
+
+**Files to modify:**
+```
+components/ui/button.tsx                  # Press animations
+app/globals.css                           # Global interaction styles
+```
+
+### 5.3 Loading & State Transitions (P2)
+
+Polish transitions between states.
+
+**Tasks:**
+- [ ] Add skeleton loading for fretboard on initial load
+- [ ] Animate panel open/close with spring physics
+- [ ] Add progress indicator during audio initialization
+- [ ] Smooth scroll-to behavior when selecting chords
+
+**Files to modify:**
+```
+components/fretboard/Fretboard.tsx        # Loading states
+components/ui/sheet.tsx                   # Panel animations
+```
+
+---
+
+## 6. Chord Info Panel Enhancement
+
+### 6.1 Interactive Scale Suggestions (P1)
+
+Make scale suggestions more useful and interactive.
+
+**Current:** Static list of scale names
+
+**Target:** Clickable scales that preview on fretboard
+
+**Tasks:**
+- [ ] Make scale names clickable
+- [ ] Preview scale on fretboard when hovering/clicking
+- [ ] Add "Apply" button to lock in scale view
+- [ ] Show scale degree labels (1, 2, b3, 4, 5, 6, b7)
+
+**Files to modify:**
+```
+components/theory/ChordInfoSheet.tsx      # Scale interaction
+state/ui-store.ts                         # Track previewed scale
+```
+
+### 6.2 Audio Preview (P2)
+
+Add ability to hear chords and scales.
+
+**Tasks:**
+- [ ] Add "Play chord" button in chord info panel
+- [ ] Add "Play scale" button next to each suggested scale
+- [ ] Use existing Tone.js setup for audio
+- [ ] Add arpeggio option (play notes sequentially)
+
+**Files to modify:**
+```
+components/theory/ChordInfoSheet.tsx      # Audio controls
+lib/audio/preview.ts                      # New preview audio module (create)
+```
+
+---
+
+## 7. Engagement Features (Future)
+
+### 7.1 Practice Tracking (P2)
+
+Add basic progress tracking for motivation.
+
+**Tasks:**
+- [ ] Track daily practice time in localStorage
+- [ ] Show "streak" indicator (consecutive days practiced)
+- [ ] Add simple stats view (total time, favorite progressions)
+- [ ] Consider gamification badges (optional)
+
+**Files to modify:**
+```
+lib/persistence.ts                        # Practice tracking
+components/stats/PracticeStats.tsx        # New component (create)
+```
+
+### 7.2 Share Feature (P2)
+
+Allow users to share their practice sessions.
+
+**Tasks:**
+- [ ] Generate shareable URL with progression encoded
+- [ ] Add "Copy link" button
+- [ ] Consider screenshot/image export of progression
+- [ ] Social media share buttons (optional)
+
+**Files to modify:**
+```
+lib/share.ts                              # URL encoding (create)
+components/share/ShareButton.tsx          # New component (create)
 ```
 
 ---
 
 ## Implementation Order
 
-### Phase 1 – Core Layout (Priority) ✅
-1. Collapsible Presets Panel (1.1) ✅
-2. Compact Progression Bar (1.2) ✅
-3. Improved Playhead (3.1) ✅
+### Phase 1 – Transport & Controls (P0)
+1. Hero Play Button (1.1)
+2. Transport Control Grouping (1.2)
+3. Enhanced Toggle Buttons (2.1)
 
-### Phase 2 – Transport & Info Redesign ✅
-4. Fixed Transport Bar (1.3) ✅
-5. Chord Info Slide-Out Panel (1.4) ✅
-6. Fretboard as Hero (1.5) ✅
+### Phase 2 – Visual Feedback (P1)
+4. Icon Labels (1.3)
+5. Segmented Control Style (2.2)
+6. Chord Change Animation (5.1)
+7. Button Press Feedback (5.2)
 
-### Phase 3 – Visual Polish ✅
-7. Consistent Button Styles (2.1) ✅
-8. Selection State Enhancement (2.2) ✅
-9. Keyboard Shortcuts Discoverability (3.2) ✅
+### Phase 3 – Discovery & Learning (P1)
+8. Visual Preset Categories (3.1)
+9. Interactive Legend (4.1)
+10. Interactive Scale Suggestions (6.1)
 
-### Phase 4 – Responsive & Mobile ✅
-10. Mobile Layout Optimization (4.1) ✅
-11. Touch-Friendly Fretboard (3.3) ✅
-12. Tablet Layout (4.2) ✅
-
-### Phase 5 – Final Polish ✅
-13. Typography Hierarchy (2.3) ✅
-14. Dark Mode Polish (2.4) ✅
+### Phase 4 – Polish & Engagement (P2)
+11. Preset Preview (3.2)
+12. First-Time Legend Tooltip (4.2)
+13. Loading & State Transitions (5.3)
+14. Audio Preview (6.2)
+15. Practice Tracking (7.1)
 
 ---
 
-## Target Layout
+## Target Transport Bar Layout
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  FretFlow                    [Presets ▾] [⚙] [🌙]  │  <- Header
-├─────────────────────────────────────────────────────┤
-│  [Dm7] [G7] [Cmaj7] [Cmaj7] [+]           4/4 time │  <- Compact progression
-├─────────────────────────────────────────────────────┤
-│                                                     │
-│              ┌─────────────────┐                    │
-│              │   Dm7 (minor 7) │                    │  <- Prominent chord name
-│              └─────────────────┘                    │
-│  ═══════════════════════════════════  ← playhead   │  <- Progress bar
-│                                                     │
-│    0   1   2   3   4   5   6   7   8   9  10  11   │
-│  ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐ │
-│ E│   │ F │   │   │   │   │   │   │   │ D │   │   │ │
-│ B│   │ C │   │   │   │   │   │ A │   │   │   │   │ │  <- Fretboard (hero)
-│ G│   │   │ A │   │   │   │ D │   │   │ F │   │   │ │
-│ D│   │   │ F │   │   │ A │   │   │ C │   │ D │   │ │
-│ A│   │   │ C │   │ D │   │ F │   │   │   │ A │   │ │
-│ E│   │ F │   │   │   │   │   │   │   │ D │   │   │ │
-│  └───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘ │
-│  ● Root  ● Guide  ● Chord  ○ Scale                 │  <- Inline legend
-│                                                     │
-├─────────────────────────────────────────────────────┤
-│  [▶]  [↺]  [♪]  ════════════  120 BPM    [⚙] [ℹ]  │  <- Fixed transport bar
-└─────────────────────────────────────────────────────┘
-                                              ↓
-                                    [Chord Info Panel]  <- Slide-out on demand
+┌────────────────────────────────────────────────────────────────────────┐
+│                                                                        │
+│  ┌──────────────────┐   ┌─────────────────────────┐   ┌─────────────┐ │
+│  │   ┌────┐         │   │                         │   │             │ │
+│  │   │ ▶  │  ↺  🎵  │   │  ═══════●═══════  120  │   │  ⚙  ℹ      │ │
+│  │   └────┘         │   │                   BPM  │   │             │ │
+│  │   Play   Reset   │   │       Tempo            │   │ More  Info  │ │
+│  └──────────────────┘   └─────────────────────────┘   └─────────────┘ │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
+        ↑                           ↑                         ↑
+   Playback group              Tempo group              Utilities
+   (hero play button)       (slider + value)         (dropdown + info)
 ```
+
+---
+
+## Design Tokens for Younger Audience
+
+### Colors
+- Primary accent: `cyan-500` (energetic, modern)
+- Active state: `cyan-500/20` background with `cyan-500` border
+- Hover state: Slight lift + glow effect
+
+### Motion
+- Duration: 150-200ms for micro-interactions
+- Easing: `cubic-bezier(0.4, 0, 0.2, 1)` (smooth, natural)
+- Scale on press: `0.95`
+- Scale on hover: `1.02` (subtle lift)
+
+### Spacing
+- Touch targets: minimum 44px
+- Button padding: 12px horizontal, 8px vertical
+- Group gaps: 16px between control groups
 
 ---
 
 ## Notes
 
-- Each improvement should be tested on both desktop (1280px+) and mobile (375px)
+- Test all changes on mobile (375px) and desktop (1280px+)
 - Run `pnpm lint` and `pnpm build` before committing
-- Consider A/B testing major layout changes if analytics are available
+- Prioritize accessibility: visible focus states, sufficient contrast
+- Consider A/B testing major interaction changes
 - Get user feedback after Phase 1 before proceeding
