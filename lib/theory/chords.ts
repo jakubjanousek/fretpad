@@ -1,4 +1,4 @@
-import { Chord as TonalChord, Interval, Note } from "tonal";
+import { Interval, Note, Chord as TonalChord } from "tonal";
 import type { Chord, ChordQuality, ChordSymbol, NoteName } from "@/lib/types";
 
 /**
@@ -77,13 +77,13 @@ function normalizeNoteName(note: string): NoteName {
 export function getGuideTones(
   notes: string[],
   intervals: string[],
-  quality: ChordQuality
+  quality: ChordQuality,
 ): NoteName[] {
   const guideTones: NoteName[] = [];
 
   // Find the 3rd (or sus2/sus4 equivalent)
   const thirdIndex = intervals.findIndex(
-    (i) => i === "3M" || i === "3m" || i === "2M" || i === "4P"
+    (i) => i === "3M" || i === "3m" || i === "2M" || i === "4P",
   );
   if (thirdIndex !== -1 && notes[thirdIndex]) {
     guideTones.push(normalizeNoteName(notes[thirdIndex]));
@@ -97,7 +97,7 @@ export function getGuideTones(
     }
   } else {
     const seventhIndex = intervals.findIndex(
-      (i) => i === "7M" || i === "7m" || i === "7d"
+      (i) => i === "7M" || i === "7m" || i === "7d",
     );
     if (seventhIndex !== -1 && notes[seventhIndex]) {
       guideTones.push(normalizeNoteName(notes[seventhIndex]));
@@ -126,7 +126,9 @@ export function parseChordSymbol(symbol: ChordSymbol): Chord | null {
 
   // Get suggested scales based on chord quality
   const scaleNames = SCALE_SUGGESTIONS[quality] || ["Major"];
-  const suggestedScales = scaleNames.map((scaleName: string) => `${root} ${scaleName}`);
+  const suggestedScales = scaleNames.map(
+    (scaleName: string) => `${root} ${scaleName}`,
+  );
 
   return {
     symbol,
@@ -172,7 +174,7 @@ export function getIntervalName(root: NoteName, note: NoteName): string {
  */
 export function isChordTone(chord: Chord, note: NoteName): boolean {
   return chord.notes.some(
-    (chordNote) => Note.pitchClass(chordNote) === Note.pitchClass(note)
+    (chordNote) => Note.pitchClass(chordNote) === Note.pitchClass(note),
   );
 }
 
@@ -181,7 +183,7 @@ export function isChordTone(chord: Chord, note: NoteName): boolean {
  */
 export function isGuideTone(chord: Chord, note: NoteName): boolean {
   return chord.guideTones.some(
-    (guideTone) => Note.pitchClass(guideTone) === Note.pitchClass(note)
+    (guideTone) => Note.pitchClass(guideTone) === Note.pitchClass(note),
   );
 }
 

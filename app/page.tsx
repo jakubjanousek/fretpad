@@ -69,10 +69,16 @@ export default function Page() {
               <CardContent>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <button className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-muted transition-colors">
+                    <button
+                      type="button"
+                      className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
+                    >
                       <PlayIcon className="w-4 h-4" />
                     </button>
-                    <button className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-muted transition-colors">
+                    <button
+                      type="button"
+                      className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-muted transition-colors"
+                    >
                       <StopIcon className="w-4 h-4" />
                     </button>
                   </div>
@@ -125,6 +131,8 @@ function PlayIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
+      aria-label="Play"
+      role="img"
     >
       <path d="M8 5v14l11-7z" />
     </svg>
@@ -138,6 +146,8 @@ function StopIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
+      aria-label="Stop"
+      role="img"
     >
       <rect x="6" y="6" width="12" height="12" />
     </svg>

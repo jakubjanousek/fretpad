@@ -21,7 +21,7 @@ function generateId(): string {
  */
 export function parseBar(
   barString: string,
-  totalBeats: number = 4
+  totalBeats: number = 4,
 ): ProgressionBar | null {
   const trimmed = barString.trim();
   if (!trimmed) return null;
@@ -66,13 +66,15 @@ export function parseProgression(
   options: {
     name?: string;
     timeSignature?: { numerator: number; denominator: number };
-  } = {}
+  } = {},
 ): Progression | null {
-  const { name = "Custom Progression", timeSignature = { numerator: 4, denominator: 4 } } =
-    options;
+  const {
+    name = "Custom Progression",
+    timeSignature = { numerator: 4, denominator: 4 },
+  } = options;
 
   const totalBeats = timeSignature.numerator;
-  let bars: ProgressionBar[] = [];
+  const bars: ProgressionBar[] = [];
 
   // Check if input uses bar notation (pipes)
   if (input.includes("|")) {
@@ -131,7 +133,7 @@ export function createProgression(
   options: {
     name?: string;
     timeSignature?: { numerator: number; denominator: number };
-  } = {}
+  } = {},
 ): Progression | null {
   const {
     name = "Custom Progression",
@@ -162,28 +164,50 @@ export function createProgression(
 }
 
 /**
+ * Helper to assert a progression was created successfully
+ */
+function assertProgression(
+  progression: Progression | null,
+  name: string,
+): Progression {
+  if (!progression) {
+    throw new Error(`Failed to create preset progression: ${name}`);
+  }
+  return progression;
+}
+
+/**
  * Preset progressions
  */
 export const PRESET_PROGRESSIONS = {
-  "ii-V-I in C": createProgression(["Dm7", "G7", "Cmaj7", "Cmaj7"], {
-    name: "ii-V-I in C",
-  })!,
+  "ii-V-I in C": assertProgression(
+    createProgression(["Dm7", "G7", "Cmaj7", "Cmaj7"], {
+      name: "ii-V-I in C",
+    }),
+    "ii-V-I in C",
+  ),
 
-  "I-V-vi-IV in C": createProgression(["C", "G", "Am", "F"], {
-    name: "I-V-vi-IV in C",
-  })!,
+  "I-V-vi-IV in C": assertProgression(
+    createProgression(["C", "G", "Am", "F"], {
+      name: "I-V-vi-IV in C",
+    }),
+    "I-V-vi-IV in C",
+  ),
 
-  "12-bar blues in A": parseProgression(
-    "| A7 | A7 | A7 | A7 | D7 | D7 | A7 | A7 | E7 | D7 | A7 | E7 |",
-    { name: "12-bar blues in A" }
-  )!,
+  "12-bar blues in A": assertProgression(
+    parseProgression(
+      "| A7 | A7 | A7 | A7 | D7 | D7 | A7 | A7 | E7 | D7 | A7 | E7 |",
+      { name: "12-bar blues in A" },
+    ),
+    "12-bar blues in A",
+  ),
 } as const;
 
 /**
  * Gets all chord symbols from a progression (flattened)
  */
 export function getAllChordsFromProgression(
-  progression: Progression
+  progression: Progression,
 ): ChordSymbol[] {
   return progression.bars.flatMap((bar) => bar.chords.map((bc) => bc.chord));
 }

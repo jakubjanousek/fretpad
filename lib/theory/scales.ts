@@ -27,7 +27,7 @@ export function getScaleNotes(root: NoteName, scaleName: string): NoteName[] {
 export function isInScale(
   note: NoteName,
   root: NoteName,
-  scaleName: string
+  scaleName: string,
 ): boolean {
   const scaleNotes = getScaleNotes(root, scaleName);
   // Compare pitch classes to handle enharmonics
