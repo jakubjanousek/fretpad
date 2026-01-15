@@ -5,6 +5,7 @@ import { Fretboard } from "@/components/fretboard/Fretboard";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ProgressionPresets } from "@/components/progression/ProgressionPresets";
 import { ShareExport } from "@/components/progression/ShareExport";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChordInfoPanel } from "@/components/theory/ChordInfoPanel";
 import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportControls } from "@/components/transport/TransportControls";
@@ -65,8 +66,9 @@ export default function Page() {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-semibold tracking-tight">FretFlow</h1>
+          <ThemeToggle />
         </div>
       </header>
 
