@@ -39,6 +39,7 @@ export default function Page() {
   const setShowVoiceLeading = useAppStore((state) => state.setShowVoiceLeading);
   const noteLabelMode = useAppStore((state) => state.noteLabelMode);
   const setNoteLabelMode = useAppStore((state) => state.setNoteLabelMode);
+  const previewScale = useAppStore((state) => state.previewScale);
 
   // Panel states
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -90,10 +91,14 @@ export default function Page() {
     setChordInfoOpen(true);
   }, []);
 
+  // Use preview scale if set, otherwise use the first suggested scale
+  const activeScale =
+    previewScale || (showScaleTones ? currentChord?.suggestedScales[0] : null);
+
   const fretNotes = currentChord
     ? getFretNotesForChord(currentChord, {
-        includeScale: showScaleTones,
-        scaleName: showScaleTones ? currentChord.suggestedScales[0] : undefined,
+        includeScale: showScaleTones || !!previewScale,
+        scaleName: activeScale || undefined,
       })
     : [];
 

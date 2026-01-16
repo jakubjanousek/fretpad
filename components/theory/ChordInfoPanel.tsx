@@ -1,7 +1,10 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Chord } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { useAppStore } from "@/state/useAppStore";
 
 interface ChordInfoPanelProps {
   chord: Chord | null;
@@ -36,6 +39,11 @@ function formatQuality(quality: string): string {
 }
 
 export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
+  const previewScale = useAppStore((state) => state.previewScale);
+  const setPreviewScale = useAppStore((state) => state.setPreviewScale);
+  const showScaleTones = useAppStore((state) => state.showScaleTones);
+  const setShowScaleTones = useAppStore((state) => state.setShowScaleTones);
+
   if (!chord) {
     return (
       <div className="text-sm text-muted-foreground">
@@ -43,6 +51,26 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
       </div>
     );
   }
+
+  const handleScaleClick = (scale: string) => {
+    if (previewScale === scale) {
+      // Clicking active scale clears it
+      setPreviewScale(null);
+    } else {
+      // Set the preview scale and enable scale tones if not already
+      setPreviewScale(scale);
+      if (!showScaleTones) {
+        setShowScaleTones(true);
+      }
+    }
+  };
+
+  const handleScaleHover = (scale: string | null) => {
+    // Only set hover preview if no scale is actively selected
+    if (!previewScale) {
+      setPreviewScale(scale);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -121,18 +149,47 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
       <div>
         <h4 className="text-xs font-medium text-muted-foreground mb-2">
           Suggested Scales
+          <span className="font-normal text-muted-foreground/70 ml-1">
+            (click to preview)
+          </span>
         </h4>
         <div className="flex flex-wrap gap-1.5">
-          {chord.suggestedScales.map((scale, index) => (
-            <Badge
-              key={`scale-${scale}-${index}`}
-              variant="secondary"
-              className="text-xs"
-            >
-              {scale}
-            </Badge>
-          ))}
+          {chord.suggestedScales.map((scale, index) => {
+            const isActive = previewScale === scale;
+            const isFirst = index === 0;
+
+            return (
+              <button
+                key={`scale-${scale}-${index}`}
+                type="button"
+                onClick={() => handleScaleClick(scale)}
+                onMouseEnter={() => handleScaleHover(scale)}
+                onMouseLeave={() => handleScaleHover(null)}
+                className={cn(
+                  "inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-150",
+                  "border active:scale-95",
+                  isActive
+                    ? "bg-cyan-500/20 border-cyan-500 text-cyan-700 dark:text-cyan-300"
+                    : "bg-secondary/50 border-transparent hover:bg-secondary hover:border-muted-foreground/20",
+                  isFirst && !isActive && "ring-1 ring-muted-foreground/10",
+                )}
+              >
+                {isActive && <Check className="w-3 h-3" />}
+                {scale}
+                {isFirst && !isActive && (
+                  <span className="text-[9px] text-muted-foreground ml-0.5">
+                    recommended
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
+        {previewScale && (
+          <p className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-2">
+            Showing {previewScale} on fretboard. Click again to clear.
+          </p>
+        )}
       </div>
     </div>
   );

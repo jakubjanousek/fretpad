@@ -39,6 +39,9 @@ interface AppState {
   showVoiceLeading: boolean;
   noteLabelMode: NoteLabelMode;
 
+  // Scale preview state (for interactive scale suggestions)
+  previewScale: string | null;
+
   // Error state
   error: ErrorInfo | null;
 
@@ -72,6 +75,9 @@ interface AppState {
   setShowScaleTones: (show: boolean) => void;
   setShowVoiceLeading: (show: boolean) => void;
   setNoteLabelMode: (mode: NoteLabelMode) => void;
+
+  // Scale preview actions
+  setPreviewScale: (scale: string | null) => void;
 
   // Helper to advance to next chord (for playback)
   advanceToNextChord: () => void;
@@ -124,6 +130,7 @@ export const useAppStore = create<AppState>()(
       showScaleTones: false,
       showVoiceLeading: false,
       noteLabelMode: "notes",
+      previewScale: null,
       error: null,
 
       // Error actions
@@ -233,6 +240,10 @@ export const useAppStore = create<AppState>()(
 
       setNoteLabelMode: (mode) => {
         set({ noteLabelMode: mode });
+      },
+
+      setPreviewScale: (scale) => {
+        set({ previewScale: scale });
       },
 
       updateBar: (barIndex, barString) => {

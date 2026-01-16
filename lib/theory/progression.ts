@@ -175,11 +175,18 @@ function assertProgression(
  */
 export type PresetCategory = "jazz" | "pop" | "blues" | "modal";
 
+/**
+ * Difficulty levels for presets
+ */
+export type PresetDifficulty = "beginner" | "intermediate" | "advanced";
+
 export interface PresetMetadata {
   key: string;
   label: string;
   description: string;
   category: PresetCategory;
+  difficulty: PresetDifficulty;
+  barCount: number;
 }
 
 /**
@@ -321,24 +328,32 @@ export const PRESET_METADATA: Record<
     label: "ii–V–I",
     description: "The most common jazz cadence",
     category: "jazz",
+    difficulty: "beginner",
+    barCount: 4,
   },
   "Autumn Leaves (A section)": {
     key: "Autumn Leaves (A section)",
     label: "Autumn Leaves",
     description: "Classic jazz standard in G major",
     category: "jazz",
+    difficulty: "intermediate",
+    barCount: 8,
   },
   "Rhythm Changes (A)": {
     key: "Rhythm Changes (A)",
     label: "Rhythm Changes",
     description: "Based on 'I Got Rhythm'",
     category: "jazz",
+    difficulty: "advanced",
+    barCount: 8,
   },
   "All The Things You Are (A)": {
     key: "All The Things You Are (A)",
     label: "All The Things",
     description: "Jerome Kern classic",
     category: "jazz",
+    difficulty: "advanced",
+    barCount: 8,
   },
 
   // Pop
@@ -347,24 +362,32 @@ export const PRESET_METADATA: Record<
     label: "I–V–vi–IV",
     description: "Most popular pop progression",
     category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
   },
   "vi-IV-I-V in C": {
     key: "vi-IV-I-V in C",
     label: "vi–IV–I–V",
     description: "Sensitive/emotional progression",
     category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
   },
   "I-vi-IV-V in C": {
     key: "I-vi-IV-V in C",
     label: "I–vi–IV–V",
     description: "'50s doo-wop progression",
     category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
   },
   "I-IV-V-IV in G": {
     key: "I-IV-V-IV in G",
     label: "I–IV–V–IV",
     description: "Classic rock progression",
     category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
   },
 
   // Blues
@@ -373,24 +396,32 @@ export const PRESET_METADATA: Record<
     label: "12-Bar Blues",
     description: "Standard blues form in A",
     category: "blues",
+    difficulty: "beginner",
+    barCount: 12,
   },
   "Minor Blues in Am": {
     key: "Minor Blues in Am",
     label: "Minor Blues",
     description: "12-bar minor blues",
     category: "blues",
+    difficulty: "intermediate",
+    barCount: 12,
   },
   "Jazz Blues in Bb": {
     key: "Jazz Blues in Bb",
     label: "Jazz Blues",
     description: "Blues with jazz substitutions",
     category: "blues",
+    difficulty: "advanced",
+    barCount: 12,
   },
   "8-bar Blues in E": {
     key: "8-bar Blues in E",
     label: "8-Bar Blues",
     description: "Shorter blues form",
     category: "blues",
+    difficulty: "beginner",
+    barCount: 8,
   },
 
   // Modal
@@ -399,24 +430,32 @@ export const PRESET_METADATA: Record<
     label: "Dorian (Dm7)",
     description: "D Dorian mode vamp",
     category: "modal",
+    difficulty: "beginner",
+    barCount: 4,
   },
   "Mixolydian Vamp (G7)": {
     key: "Mixolydian Vamp (G7)",
     label: "Mixolydian (G7)",
     description: "G Mixolydian mode vamp",
     category: "modal",
+    difficulty: "beginner",
+    barCount: 4,
   },
   "Phrygian Vamp (Em)": {
     key: "Phrygian Vamp (Em)",
     label: "Phrygian (Em)",
     description: "E Phrygian mode vamp",
     category: "modal",
+    difficulty: "intermediate",
+    barCount: 4,
   },
   "Lydian Vamp (Fmaj7)": {
     key: "Lydian Vamp (Fmaj7)",
     label: "Lydian (Fmaj7)",
     description: "F Lydian mode vamp",
     category: "modal",
+    difficulty: "intermediate",
+    barCount: 4,
   },
 };
 

@@ -15,8 +15,10 @@ import {
   getPresetsByCategory,
   PRESET_PROGRESSIONS,
   type PresetCategory,
+  type PresetDifficulty,
   type PresetMetadata,
 } from "@/lib/theory/progression";
+import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
 const CATEGORY_LABELS: Record<PresetCategory, string> = {
@@ -24,6 +26,36 @@ const CATEGORY_LABELS: Record<PresetCategory, string> = {
   pop: "Pop/Rock",
   blues: "Blues",
   modal: "Modal Vamps",
+};
+
+const CATEGORY_ICONS: Record<PresetCategory, string> = {
+  jazz: "🎷",
+  pop: "🎸",
+  blues: "🎹",
+  modal: "🎵",
+};
+
+const CATEGORY_COLORS: Record<PresetCategory, string> = {
+  jazz: "bg-purple-500/10 hover:bg-purple-500/20 border-purple-500/30",
+  pop: "bg-pink-500/10 hover:bg-pink-500/20 border-pink-500/30",
+  blues: "bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/30",
+  modal: "bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30",
+};
+
+const CATEGORY_ACTIVE_COLORS: Record<PresetCategory, string> = {
+  jazz: "bg-purple-500/30 border-purple-500",
+  pop: "bg-pink-500/30 border-pink-500",
+  blues: "bg-blue-500/30 border-blue-500",
+  modal: "bg-amber-500/30 border-amber-500",
+};
+
+const DIFFICULTY_CONFIG: Record<
+  PresetDifficulty,
+  { label: string; color: string }
+> = {
+  beginner: { label: "Easy", color: "bg-emerald-500/80 text-white" },
+  intermediate: { label: "Med", color: "bg-amber-500/80 text-white" },
+  advanced: { label: "Hard", color: "bg-red-500/80 text-white" },
 };
 
 const CATEGORY_ORDER: PresetCategory[] = ["jazz", "pop", "blues", "modal"];
@@ -37,16 +69,40 @@ function PresetButton({
   isActive: boolean;
   onClick: () => void;
 }) {
+  const difficultyConfig = DIFFICULTY_CONFIG[preset.difficulty];
+
   return (
-    <Button
-      variant={isActive ? "secondary" : "outline"}
-      size="sm"
+    <button
+      type="button"
       onClick={onClick}
-      className="text-xs"
+      className={cn(
+        "group relative flex flex-col items-start gap-1 rounded-lg border p-2.5 text-left transition-all duration-150 active:scale-[0.98] min-w-30",
+        isActive
+          ? CATEGORY_ACTIVE_COLORS[preset.category]
+          : CATEGORY_COLORS[preset.category],
+      )}
       title={preset.description}
     >
-      {preset.label}
-    </Button>
+      {/* Header: Label + Difficulty */}
+      <div className="flex items-center gap-1.5 w-full">
+        <span className="text-xs font-medium truncate flex-1">
+          {preset.label}
+        </span>
+        <span
+          className={cn(
+            "text-[9px] font-medium px-1.5 py-0.5 rounded shrink-0",
+            difficultyConfig.color,
+          )}
+        >
+          {difficultyConfig.label}
+        </span>
+      </div>
+
+      {/* Footer: Bar count */}
+      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+        <span>{preset.barCount} bars</span>
+      </div>
+    </button>
   );
 }
 
@@ -258,14 +314,17 @@ export function ProgressionPresets() {
                   size="sm"
                   className="w-full justify-between px-2 h-8 text-xs font-medium"
                 >
-                  {CATEGORY_LABELS[category]}
+                  <span className="flex items-center gap-1.5">
+                    <span>{CATEGORY_ICONS[category]}</span>
+                    <span>{CATEGORY_LABELS[category]}</span>
+                  </span>
                   <ChevronDown
                     className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
                   />
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <div className="flex flex-wrap gap-1.5 px-2 py-1.5">
+                <div className="flex flex-wrap gap-2 px-2 py-2">
                   {presets.map((preset) => (
                     <PresetButton
                       key={preset.key}

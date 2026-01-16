@@ -141,7 +141,7 @@ components/fretboard/Fretboard.tsx       # Replace button group
 
 ## 3. Preset Dropdown Enhancement
 
-### 3.1 Visual Preset Categories (P1)
+### 3.1 Visual Preset Categories (P1) ✅ COMPLETE
 
 Add visual cues to preset dropdown for better discovery.
 
@@ -150,11 +150,11 @@ Add visual cues to preset dropdown for better discovery.
 **Target:** Rich preset cards with metadata
 
 **Tasks:**
-- [ ] Add category icons (🎷 Jazz, 🎸 Rock, 🎹 Blues, 🎵 Modal)
-- [ ] Add difficulty badges (Beginner, Intermediate, Advanced)
-- [ ] Add bar count indicator (e.g., "4 bars", "12 bars")
-- [ ] Color-code categories with subtle background tints
-- [ ] Add "Popular" or "Trending" section
+- [x] Add category icons (🎷 Jazz, 🎸 Rock, 🎹 Blues, 🎵 Modal)
+- [x] Add difficulty badges (Beginner, Intermediate, Advanced)
+- [x] Add bar count indicator (e.g., "4 bars", "12 bars")
+- [x] Color-code categories with subtle background tints
+- [ ] Add "Popular" or "Trending" section (deferred)
 
 **Files to modify:**
 ```
@@ -182,7 +182,7 @@ components/progression/PresetPreview.tsx       # New component (create)
 
 ## 4. Fretboard Legend Improvements
 
-### 4.1 Interactive Legend (P1)
+### 4.1 Interactive Legend (P1) ✅ COMPLETE
 
 Make the legend more discoverable and interactive.
 
@@ -191,11 +191,11 @@ Make the legend more discoverable and interactive.
 **Target:** Interactive legend that highlights notes on hover
 
 **Tasks:**
-- [ ] Increase legend size and spacing
-- [ ] Highlight corresponding notes on fretboard when hovering legend item
-- [ ] Add tooltip explaining each note type on first visit
-- [ ] Consider floating legend position (top-right corner)
-- [ ] Add toggle to show/hide legend
+- [x] Increase legend size and spacing
+- [x] Highlight corresponding notes on fretboard when hovering legend item
+- [ ] Add tooltip explaining each note type on first visit (deferred to 4.2)
+- [ ] Consider floating legend position (top-right corner) (deferred)
+- [ ] Add toggle to show/hide legend (deferred)
 
 **Files to modify:**
 ```
@@ -278,7 +278,7 @@ components/ui/sheet.tsx                   # Panel animations
 
 ## 6. Chord Info Panel Enhancement
 
-### 6.1 Interactive Scale Suggestions (P1)
+### 6.1 Interactive Scale Suggestions (P1) ✅ COMPLETE
 
 Make scale suggestions more useful and interactive.
 
@@ -287,10 +287,10 @@ Make scale suggestions more useful and interactive.
 **Target:** Clickable scales that preview on fretboard
 
 **Tasks:**
-- [ ] Make scale names clickable
-- [ ] Preview scale on fretboard when hovering/clicking
-- [ ] Add "Apply" button to lock in scale view
-- [ ] Show scale degree labels (1, 2, b3, 4, 5, 6, b7)
+- [x] Make scale names clickable
+- [x] Preview scale on fretboard when hovering/clicking
+- [x] Add click to lock in scale view (click again to clear)
+- [ ] Show scale degree labels (1, 2, b3, 4, 5, 6, b7) (deferred)
 
 **Files to modify:**
 ```
@@ -365,10 +365,10 @@ components/share/ShareButton.tsx          # New component (create)
 6. ~~Chord Change Animation (5.1)~~ ✅
 7. ~~Button Press Feedback (5.2)~~ ✅
 
-### Phase 3 – Discovery & Learning (P1)
-8. Visual Preset Categories (3.1)
-9. Interactive Legend (4.1)
-10. Interactive Scale Suggestions (6.1)
+### Phase 3 – Discovery & Learning (P1) ✅ COMPLETE
+8. ~~Visual Preset Categories (3.1)~~ ✅
+9. ~~Interactive Legend (4.1)~~ ✅
+10. ~~Interactive Scale Suggestions (6.1)~~ ✅
 
 ### Phase 4 – Polish & Engagement (P2)
 11. Preset Preview (3.2)

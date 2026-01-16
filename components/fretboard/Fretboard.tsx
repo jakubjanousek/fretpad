@@ -7,6 +7,7 @@ import type { FretNote, NoteLabelMode, NoteName } from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import { FretboardLegend, type LegendNoteType } from "./FretboardLegend";
 import { FretMarker } from "./FretMarker";
 import { VoiceLeadingOverlay } from "./VoiceLeadingOverlay";
 
@@ -68,6 +69,25 @@ export function Fretboard({
   onNoteLabelModeChange,
 }: FretboardProps) {
   const responsiveFretCount = useResponsiveFrets(numFrets);
+  const [hoveredLegendType, setHoveredLegendType] =
+    useState<LegendNoteType>(null);
+
+  // Helper to determine if a note matches the hovered legend type
+  const getNoteHighlightState = (
+    note: FretNote,
+  ): "highlighted" | "dimmed" | "normal" => {
+    if (!hoveredLegendType) return "normal";
+
+    const noteType: LegendNoteType = note.isRoot
+      ? "root"
+      : note.isGuideTone
+        ? "guide"
+        : note.isChordTone
+          ? "chord"
+          : "scale";
+
+    return noteType === hoveredLegendType ? "highlighted" : "dimmed";
+  };
 
   // Create a map for quick lookup of notes at positions
   const noteMap = new Map<string, FretNote>();
@@ -156,7 +176,11 @@ export function Fretboard({
                   {(() => {
                     const nutNote = noteMap.get(`${stringNum}-0`);
                     return nutNote ? (
-                      <FretMarker note={nutNote} labelMode={noteLabelMode} />
+                      <FretMarker
+                        note={nutNote}
+                        labelMode={noteLabelMode}
+                        highlightState={getNoteHighlightState(nutNote)}
+                      />
                     ) : (
                       <div className="w-8 h-8 sm:w-7 sm:h-7" />
                     );
@@ -183,7 +207,11 @@ export function Fretboard({
                       {/* Note marker */}
                       {note ? (
                         <div className="relative z-10">
-                          <FretMarker note={note} labelMode={noteLabelMode} />
+                          <FretMarker
+                            note={note}
+                            labelMode={noteLabelMode}
+                            highlightState={getNoteHighlightState(note)}
+                          />
                         </div>
                       ) : (
                         <div className="w-8 h-8 sm:w-7 sm:h-7" />
@@ -198,28 +226,11 @@ export function Fretboard({
 
         {/* Legend and controls */}
         <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          {/* Legend */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-4 gap-y-1.5 sm:gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-orange-500 shrink-0" />
-              <span className="text-muted-foreground">Root</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-blue-500 shrink-0" />
-              <span className="text-muted-foreground">
-                <span className="sm:hidden">Guide</span>
-                <span className="hidden sm:inline">Guide tone (3rd/7th)</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500 shrink-0" />
-              <span className="text-muted-foreground">Chord tone</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-slate-400 shrink-0" />
-              <span className="text-muted-foreground">Scale tone</span>
-            </div>
-          </div>
+          {/* Interactive Legend */}
+          <FretboardLegend
+            hoveredType={hoveredLegendType}
+            onHoverChange={setHoveredLegendType}
+          />
 
           {/* Controls */}
           <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
