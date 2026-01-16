@@ -50,7 +50,7 @@ export function FretboardHeader({
 }: FretboardHeaderProps) {
   if (!chord) {
     return (
-      <div className="text-center py-4">
+      <div className="text-center py-2">
         <span className="text-muted-foreground text-sm">
           Select a chord to display
         </span>
@@ -64,7 +64,7 @@ export function FretboardHeader({
         type="button"
         onClick={onChordClick}
         className={cn(
-          "flex flex-col items-center gap-0.5 sm:gap-1 py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all",
+          "flex flex-col items-center gap-0.5 py-1.5 sm:py-2 px-4 sm:px-6 rounded-lg transition-all",
           "hover:bg-muted/50 focus-ring",
           isPlaying && "animate-pulse-subtle",
         )}

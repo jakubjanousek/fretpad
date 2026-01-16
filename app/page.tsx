@@ -136,7 +136,7 @@ export default function Page() {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-30">
-        <div className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+        <div className="container mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2">
           <h1 className="text-lg sm:text-xl font-semibold tracking-tight shrink-0">
             FretFlow
           </h1>
@@ -149,11 +149,11 @@ export default function Page() {
       </header>
 
       {/* Main Content - add bottom padding for fixed transport bar */}
-      <main className="flex-1 container mx-auto px-3 sm:px-4 py-4 sm:py-6 flex flex-col gap-4 sm:gap-6 pb-20">
+      <main className="flex-1 container mx-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-col gap-2 sm:gap-3 pb-20">
         {/* Progression Editor Section */}
         <section>
           <Card>
-            <CardContent className="py-3 sm:py-4 px-3 sm:px-6">
+            <CardContent className="py-2 sm:py-3 px-3 sm:px-6">
               <ProgressionEditor />
             </CardContent>
           </Card>
@@ -162,7 +162,7 @@ export default function Page() {
         {/* Fretboard Visualization Section */}
         <section className="flex-1">
           <Card className="h-full">
-            <CardContent className="flex flex-col gap-2 py-4 px-3 sm:px-6">
+            <CardContent className="flex flex-col gap-1.5 py-2 sm:py-3 px-3 sm:px-6">
               {/* Prominent chord header */}
               <div className="flex justify-center">
                 <FretboardHeader

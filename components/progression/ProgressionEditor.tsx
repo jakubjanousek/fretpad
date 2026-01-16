@@ -178,10 +178,10 @@ export function ProgressionEditor() {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1.5">
       {/* Progression bars - wrap on mobile, scroll on larger screens */}
       <div className="relative">
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
           {progression.bars.map((bar, barIndex) => {
             // Convert bar chords to string for editing
             const chordString = bar.chords.map((bc) => bc.chord).join(" ");

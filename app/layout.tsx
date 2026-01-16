@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
@@ -18,6 +18,23 @@ export const metadata: Metadata = {
   title: "FretFlow",
   description:
     "Practice tool for guitarists to improvise over chord progressions",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "FretFlow",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
 };
 
 const themeScript = `
@@ -36,6 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Required for theme flash prevention */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
