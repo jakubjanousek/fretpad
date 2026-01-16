@@ -1,7 +1,15 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Play, Volume2 } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  playChordArpeggio,
+  playChordPreview,
+  playScalePreview,
+  stopPreview,
+} from "@/lib/audio/preview";
 import type { Chord } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
@@ -43,6 +51,10 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
   const setPreviewScale = useAppStore((state) => state.setPreviewScale);
   const showScaleTones = useAppStore((state) => state.showScaleTones);
   const setShowScaleTones = useAppStore((state) => state.setShowScaleTones);
+  const [playingChord, setPlayingChord] = useState<"chord" | "arpeggio" | null>(
+    null,
+  );
+  const [playingScale, setPlayingScale] = useState<string | null>(null);
 
   if (!chord) {
     return (
@@ -51,6 +63,39 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
       </div>
     );
   }
+
+  const handlePlayChord = async () => {
+    if (playingChord) {
+      stopPreview();
+      setPlayingChord(null);
+      return;
+    }
+    setPlayingChord("chord");
+    await playChordPreview(chord.symbol, 1.5);
+    setPlayingChord(null);
+  };
+
+  const handlePlayArpeggio = async () => {
+    if (playingChord) {
+      stopPreview();
+      setPlayingChord(null);
+      return;
+    }
+    setPlayingChord("arpeggio");
+    await playChordArpeggio(chord.symbol, 1.5);
+    setPlayingChord(null);
+  };
+
+  const handlePlayScale = async (scale: string) => {
+    if (playingScale === scale) {
+      stopPreview();
+      setPlayingScale(null);
+      return;
+    }
+    setPlayingScale(scale);
+    await playScalePreview(scale, 2);
+    setPlayingScale(null);
+  };
 
   const handleScaleClick = (scale: string) => {
     if (previewScale === scale) {
@@ -76,11 +121,47 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
     <div className="space-y-4">
       {/* Chord Symbol & Quality */}
       <div>
-        <div className="flex items-baseline gap-2 mb-1">
+        <div className="flex items-center gap-3 mb-1">
           <span className="text-2xl font-bold">{chord.symbol}</span>
           <span className="text-sm text-muted-foreground">
             {formatQuality(chord.quality)}
           </span>
+          {/* Audio preview buttons */}
+          <div className="flex items-center gap-1 ml-auto">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handlePlayChord}
+              className={cn(
+                "h-7 px-2 text-xs gap-1",
+                playingChord === "chord" && "text-cyan-500",
+              )}
+              title="Play chord"
+            >
+              <Volume2
+                className={cn("w-3.5 h-3.5", playingChord === "chord" && "animate-pulse")}
+              />
+              Chord
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handlePlayArpeggio}
+              className={cn(
+                "h-7 px-2 text-xs gap-1",
+                playingChord === "arpeggio" && "text-cyan-500",
+              )}
+              title="Play arpeggio"
+            >
+              <Play
+                className={cn(
+                  "w-3.5 h-3.5",
+                  playingChord === "arpeggio" && "animate-pulse",
+                )}
+              />
+              Arp
+            </Button>
+          </div>
         </div>
         <p className="text-xs text-muted-foreground">Root: {chord.root}</p>
       </div>
@@ -150,38 +231,61 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
         <h4 className="text-xs font-medium text-muted-foreground mb-2">
           Suggested Scales
           <span className="font-normal text-muted-foreground/70 ml-1">
-            (click to preview)
+            (click to preview on fretboard)
           </span>
         </h4>
         <div className="flex flex-wrap gap-1.5">
           {chord.suggestedScales.map((scale, index) => {
             const isActive = previewScale === scale;
             const isFirst = index === 0;
+            const isPlayingThisScale = playingScale === scale;
 
             return (
-              <button
+              <div
                 key={`scale-${scale}-${index}`}
-                type="button"
-                onClick={() => handleScaleClick(scale)}
-                onMouseEnter={() => handleScaleHover(scale)}
-                onMouseLeave={() => handleScaleHover(null)}
-                className={cn(
-                  "inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all duration-150",
-                  "border active:scale-95",
-                  isActive
-                    ? "bg-cyan-500/20 border-cyan-500 text-cyan-700 dark:text-cyan-300"
-                    : "bg-secondary/50 border-transparent hover:bg-secondary hover:border-muted-foreground/20",
-                  isFirst && !isActive && "ring-1 ring-muted-foreground/10",
-                )}
+                className="flex items-center gap-0.5"
               >
-                {isActive && <Check className="w-3 h-3" />}
-                {scale}
-                {isFirst && !isActive && (
-                  <span className="text-[9px] text-muted-foreground ml-0.5">
-                    recommended
-                  </span>
-                )}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => handleScaleClick(scale)}
+                  onMouseEnter={() => handleScaleHover(scale)}
+                  onMouseLeave={() => handleScaleHover(null)}
+                  className={cn(
+                    "inline-flex items-center gap-1 px-2.5 py-1 rounded-l-md text-xs font-medium transition-all duration-150",
+                    "border-y border-l active:scale-95",
+                    isActive
+                      ? "bg-cyan-500/20 border-cyan-500 text-cyan-700 dark:text-cyan-300"
+                      : "bg-secondary/50 border-transparent hover:bg-secondary hover:border-muted-foreground/20",
+                    isFirst && !isActive && "ring-1 ring-muted-foreground/10",
+                  )}
+                >
+                  {isActive && <Check className="w-3 h-3" />}
+                  {scale}
+                  {isFirst && !isActive && (
+                    <span className="text-[9px] text-muted-foreground ml-0.5">
+                      recommended
+                    </span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePlayScale(scale)}
+                  className={cn(
+                    "p-1 rounded-r-md border-y border-r transition-colors",
+                    isPlayingThisScale
+                      ? "bg-cyan-500/20 border-cyan-500 text-cyan-500"
+                      : "bg-secondary/50 border-transparent hover:bg-secondary hover:border-muted-foreground/20 text-muted-foreground hover:text-foreground",
+                  )}
+                  title={`Play ${scale}`}
+                >
+                  <Volume2
+                    className={cn(
+                      "w-3 h-3",
+                      isPlayingThisScale && "animate-pulse",
+                    )}
+                  />
+                </button>
+              </div>
             );
           })}
         </div>

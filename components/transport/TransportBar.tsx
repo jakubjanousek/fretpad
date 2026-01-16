@@ -20,6 +20,7 @@ interface TransportBarProps {
   onSettingsClick: () => void;
   onHelpClick: () => void;
   onGuideClick: () => void;
+  onStatsClick: () => void;
 }
 
 /**
@@ -30,6 +31,7 @@ export function TransportBar({
   onSettingsClick,
   onHelpClick,
   onGuideClick,
+  onStatsClick,
 }: TransportBarProps) {
   const progression = useAppStore((state) => state.progression);
   const tempo = useAppStore((state) => state.tempo);
@@ -214,6 +216,7 @@ export function TransportBar({
               onSettingsClick={onSettingsClick}
               onHelpClick={onHelpClick}
               onGuideClick={onGuideClick}
+              onStatsClick={onStatsClick}
             />
           </div>
         </div>

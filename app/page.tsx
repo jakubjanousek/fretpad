@@ -7,6 +7,7 @@ import { HelpGuide } from "@/components/help/HelpGuide";
 import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ShareExport } from "@/components/progression/ShareExport";
+import { PracticeStats } from "@/components/stats/PracticeStats";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChordInfoSheet } from "@/components/theory/ChordInfoSheet";
 import { KeyboardShortcutsHelp } from "@/components/transport/KeyboardShortcutsHelp";
@@ -15,6 +16,7 @@ import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { Card, CardContent } from "@/components/ui/card";
 import { useFirstVisit } from "@/hooks/useFirstVisit";
+import { usePracticeTracker } from "@/hooks/usePracticeTracker";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import {
@@ -46,6 +48,13 @@ export default function Page() {
   const [chordInfoOpen, setChordInfoOpen] = useState(false);
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
   const [helpGuideOpen, setHelpGuideOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
+
+  // Practice time tracking
+  const { todayTimeMs } = usePracticeTracker({
+    isPlaying,
+    progressionName: progression.name,
+  });
 
   // First-time user detection
   const { isFirstVisit, markAsVisited } = useFirstVisit();
@@ -189,6 +198,7 @@ export default function Page() {
         onSettingsClick={() => setSettingsOpen(true)}
         onHelpClick={() => setShortcutsHelpOpen(true)}
         onGuideClick={() => setHelpGuideOpen(true)}
+        onStatsClick={() => setStatsOpen(true)}
       />
 
       {/* Settings Drawer */}
@@ -209,6 +219,13 @@ export default function Page() {
 
       {/* Help Guide */}
       <HelpGuide open={helpGuideOpen} onOpenChange={setHelpGuideOpen} />
+
+      {/* Practice Stats */}
+      <PracticeStats
+        open={statsOpen}
+        onOpenChange={setStatsOpen}
+        todayTimeMs={todayTimeMs}
+      />
     </div>
   );
 }

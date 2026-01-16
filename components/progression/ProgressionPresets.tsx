@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Plus, Trash2, X } from "lucide-react";
+import { ChevronDown, Play, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +9,13 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useCustomPresets } from "@/hooks/useCustomPresets";
+import { playChordPreview, stopPreview } from "@/lib/audio/preview";
 import type { CustomPreset } from "@/lib/persistence";
 import {
   getPresetsByCategory,
@@ -60,6 +66,19 @@ const DIFFICULTY_CONFIG: Record<
 
 const CATEGORY_ORDER: PresetCategory[] = ["jazz", "pop", "blues", "modal"];
 
+/**
+ * Get a preview of the chord sequence from a preset
+ */
+function getPresetChordSequence(presetKey: string): string[] {
+  const progression =
+    PRESET_PROGRESSIONS[presetKey as keyof typeof PRESET_PROGRESSIONS];
+  if (!progression) return [];
+
+  // Get first 4 bars (or all if less than 4)
+  const barsToShow = progression.bars.slice(0, 4);
+  return barsToShow.flatMap((bar) => bar.chords.map((c) => c.chord));
+}
+
 function PresetButton({
   preset,
   isActive,
@@ -70,39 +89,106 @@ function PresetButton({
   onClick: () => void;
 }) {
   const difficultyConfig = DIFFICULTY_CONFIG[preset.difficulty];
+  const chordSequence = getPresetChordSequence(preset.key);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handlePlayPreview = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isPlaying) {
+      stopPreview();
+      setIsPlaying(false);
+      return;
+    }
+
+    setIsPlaying(true);
+    // Play first 2-4 chords as preview
+    const chordsToPlay = chordSequence.slice(0, 4);
+    for (let i = 0; i < chordsToPlay.length; i++) {
+      const chord = chordsToPlay[i];
+      if (chord) {
+        await playChordPreview(chord, 0.8);
+        // Wait between chords
+        await new Promise((resolve) => setTimeout(resolve, 700));
+      }
+    }
+    setIsPlaying(false);
+  };
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "group relative flex flex-col items-start gap-1 rounded-lg border p-2.5 text-left transition-all duration-150 active:scale-[0.98] min-w-30",
-        isActive
-          ? CATEGORY_ACTIVE_COLORS[preset.category]
-          : CATEGORY_COLORS[preset.category],
-      )}
-      title={preset.description}
-    >
-      {/* Header: Label + Difficulty */}
-      <div className="flex items-center gap-1.5 w-full">
-        <span className="text-xs font-medium truncate flex-1">
-          {preset.label}
-        </span>
-        <span
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          onClick={onClick}
           className={cn(
-            "text-[9px] font-medium px-1.5 py-0.5 rounded shrink-0",
-            difficultyConfig.color,
+            "group relative flex flex-col items-start gap-1 rounded-lg border p-2.5 text-left transition-all duration-150 active:scale-[0.98] min-w-30",
+            isActive
+              ? CATEGORY_ACTIVE_COLORS[preset.category]
+              : CATEGORY_COLORS[preset.category],
           )}
         >
-          {difficultyConfig.label}
-        </span>
-      </div>
+          {/* Header: Label + Difficulty */}
+          <div className="flex items-center gap-1.5 w-full">
+            <span className="text-xs font-medium truncate flex-1">
+              {preset.label}
+            </span>
+            <span
+              className={cn(
+                "text-[9px] font-medium px-1.5 py-0.5 rounded shrink-0",
+                difficultyConfig.color,
+              )}
+            >
+              {difficultyConfig.label}
+            </span>
+          </div>
 
-      {/* Footer: Bar count */}
-      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-        <span>{preset.barCount} bars</span>
-      </div>
-    </button>
+          {/* Footer: Bar count */}
+          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+            <span>{preset.barCount} bars</span>
+          </div>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent
+        side="top"
+        className="p-3 max-w-70 bg-popover text-popover-foreground border shadow-lg"
+        sideOffset={8}
+      >
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-medium text-sm">{preset.label}</p>
+            <button
+              type="button"
+              onClick={handlePlayPreview}
+              className={cn(
+                "p-1.5 rounded-md transition-colors",
+                isPlaying
+                  ? "bg-cyan-500/20 text-cyan-500"
+                  : "hover:bg-muted text-muted-foreground hover:text-foreground",
+              )}
+              title={isPlaying ? "Stop preview" : "Play preview"}
+            >
+              <Play className={cn("w-3.5 h-3.5", isPlaying && "animate-pulse")} />
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground">{preset.description}</p>
+          <div className="flex flex-wrap gap-1 pt-1">
+            {chordSequence.map((chord, i) => (
+              <span
+                key={`${chord}-${i}`}
+                className="px-1.5 py-0.5 text-[10px] font-mono bg-muted rounded"
+              >
+                {chord}
+              </span>
+            ))}
+            {preset.barCount > 4 && (
+              <span className="px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                +{preset.barCount - 4} more
+              </span>
+            )}
+          </div>
+        </div>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 

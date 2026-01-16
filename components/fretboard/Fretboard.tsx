@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 import { FretboardLegend, type LegendNoteType } from "./FretboardLegend";
 import { FretMarker } from "./FretMarker";
+import { LegendTooltip } from "./LegendTooltip";
 import { VoiceLeadingOverlay } from "./VoiceLeadingOverlay";
 
 interface FretboardProps {
@@ -71,6 +72,12 @@ export function Fretboard({
   const responsiveFretCount = useResponsiveFrets(numFrets);
   const [hoveredLegendType, setHoveredLegendType] =
     useState<LegendNoteType>(null);
+  const [showLegendTooltip, setShowLegendTooltip] = useState(true);
+
+  const handleLegendTooltipComplete = () => {
+    setShowLegendTooltip(false);
+    setHoveredLegendType(null);
+  };
 
   // Helper to determine if a note matches the hovered legend type
   const getNoteHighlightState = (
@@ -349,6 +356,14 @@ export function Fretboard({
           </div>
         </div>
       </div>
+
+      {/* First-time legend tooltip */}
+      {showLegendTooltip && (
+        <LegendTooltip
+          onHighlightChange={setHoveredLegendType}
+          onComplete={handleLegendTooltipComplete}
+        />
+      )}
     </div>
   );
 }

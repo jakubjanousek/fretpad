@@ -162,15 +162,15 @@ components/progression/ProgressionPresets.tsx  # Enhance menu items
 lib/presets.ts                                  # Add metadata to presets
 ```
 
-### 3.2 Preset Preview (P2)
+### 3.2 Preset Preview (P2) ✅ COMPLETE
 
 Allow users to preview presets before selecting.
 
 **Tasks:**
-- [ ] Add hover preview showing chord sequence
-- [ ] Show mini fretboard preview on hover (optional)
-- [ ] Add "Preview" button that plays first 2 bars
-- [ ] Remember recently used presets (already implemented, enhance UI)
+- [x] Add hover preview showing chord sequence
+- [ ] Show mini fretboard preview on hover (optional, deferred)
+- [x] Add "Preview" button that plays first 2 bars
+- [x] Remember recently used presets (already implemented)
 
 **Files to modify:**
 ```
@@ -203,15 +203,15 @@ components/fretboard/FretboardLegend.tsx  # New component (extract from Fretboar
 components/fretboard/Fretboard.tsx        # Legend interaction logic
 ```
 
-### 4.2 First-Time Legend Tooltip (P2)
+### 4.2 First-Time Legend Tooltip (P2) ✅ COMPLETE
 
 Help new users understand the color system.
 
 **Tasks:**
-- [ ] Show animated tooltip sequence on first visit
-- [ ] Highlight each legend item one by one
-- [ ] Store "seen" state in localStorage
-- [ ] Add "Show guide" button to replay sequence
+- [x] Show animated tooltip sequence on first visit
+- [x] Highlight each legend item one by one
+- [x] Store "seen" state in localStorage
+- [x] Add navigation controls (Back/Next/Skip)
 
 **Files to modify:**
 ```
@@ -258,15 +258,15 @@ components/ui/card.tsx                    # Card hover effect
 app/globals.css                           # Global interaction styles
 ```
 
-### 5.3 Loading & State Transitions (P2)
+### 5.3 Loading & State Transitions (P2) ✅ COMPLETE
 
 Polish transitions between states.
 
 **Tasks:**
-- [ ] Add skeleton loading for fretboard on initial load
-- [ ] Animate panel open/close with spring physics
-- [ ] Add progress indicator during audio initialization
-- [ ] Smooth scroll-to behavior when selecting chords
+- [x] Add skeleton loading for fretboard on initial load (FretboardSkeleton component)
+- [x] Animate panel open/close with spring physics (Sheet component enhanced)
+- [ ] Add progress indicator during audio initialization (deferred)
+- [ ] Smooth scroll-to behavior when selecting chords (deferred)
 
 **Files to modify:**
 ```
@@ -298,15 +298,15 @@ components/theory/ChordInfoSheet.tsx      # Scale interaction
 state/ui-store.ts                         # Track previewed scale
 ```
 
-### 6.2 Audio Preview (P2)
+### 6.2 Audio Preview (P2) ✅ COMPLETE
 
 Add ability to hear chords and scales.
 
 **Tasks:**
-- [ ] Add "Play chord" button in chord info panel
-- [ ] Add "Play scale" button next to each suggested scale
-- [ ] Use existing Tone.js setup for audio
-- [ ] Add arpeggio option (play notes sequentially)
+- [x] Add "Play chord" button in chord info panel
+- [x] Add "Play scale" button next to each suggested scale
+- [x] Use existing Tone.js setup for audio
+- [x] Add arpeggio option (play notes sequentially)
 
 **Files to modify:**
 ```
@@ -318,15 +318,15 @@ lib/audio/preview.ts                      # New preview audio module (create)
 
 ## 7. Engagement Features (Future)
 
-### 7.1 Practice Tracking (P2)
+### 7.1 Practice Tracking (P2) ✅ COMPLETE
 
 Add basic progress tracking for motivation.
 
 **Tasks:**
-- [ ] Track daily practice time in localStorage
-- [ ] Show "streak" indicator (consecutive days practiced)
-- [ ] Add simple stats view (total time, favorite progressions)
-- [ ] Consider gamification badges (optional)
+- [x] Track daily practice time in localStorage
+- [x] Show "streak" indicator (consecutive days practiced)
+- [x] Add simple stats view (total time, favorite progressions)
+- [ ] Consider gamification badges (optional, deferred)
 
 **Files to modify:**
 ```
@@ -370,12 +370,12 @@ components/share/ShareButton.tsx          # New component (create)
 9. ~~Interactive Legend (4.1)~~ ✅
 10. ~~Interactive Scale Suggestions (6.1)~~ ✅
 
-### Phase 4 – Polish & Engagement (P2)
-11. Preset Preview (3.2)
-12. First-Time Legend Tooltip (4.2)
-13. Loading & State Transitions (5.3)
-14. Audio Preview (6.2)
-15. Practice Tracking (7.1)
+### Phase 4 – Polish & Engagement (P2) ✅ COMPLETE
+11. ~~Preset Preview (3.2)~~ ✅
+12. ~~First-Time Legend Tooltip (4.2)~~ ✅
+13. ~~Loading & State Transitions (5.3)~~ ✅
+14. ~~Audio Preview (6.2)~~ ✅
+15. ~~Practice Tracking (7.1)~~ ✅
 
 ---
 

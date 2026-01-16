@@ -1,11 +1,12 @@
 "use client";
 
-import { BookOpen, CircleHelp, Settings } from "lucide-react";
+import { BookOpen, CircleHelp, Settings, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -13,6 +14,7 @@ interface MoreMenuProps {
   onSettingsClick: () => void;
   onHelpClick: () => void;
   onGuideClick: () => void;
+  onStatsClick: () => void;
 }
 
 /**
@@ -23,6 +25,7 @@ export function MoreMenu({
   onSettingsClick,
   onHelpClick,
   onGuideClick,
+  onStatsClick,
 }: MoreMenuProps) {
   return (
     <DropdownMenu>
@@ -38,6 +41,14 @@ export function MoreMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem
+          onClick={onStatsClick}
+          className="gap-2 cursor-pointer"
+        >
+          <Trophy className="h-4 w-4 text-amber-500" />
+          <span>Practice Stats</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={onGuideClick}
           className="gap-2 cursor-pointer"
