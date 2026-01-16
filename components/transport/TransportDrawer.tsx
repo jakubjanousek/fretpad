@@ -36,10 +36,10 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
   const setMetronomeVolume = useAppStore((state) => state.setMetronomeVolume);
   const setMetronomeCountIn = useAppStore((state) => state.setMetronomeCountIn);
   const setBackingTrackVolume = useAppStore(
-    (state) => state.setBackingTrackVolume,
+    (state) => state.setBackingTrackVolume
   );
   const setBackingTrackMuted = useAppStore(
-    (state) => state.setBackingTrackMuted,
+    (state) => state.setBackingTrackMuted
   );
 
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -51,7 +51,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
         setMetronomeVolume(newVolume);
       }
     },
-    [setMetronomeVolume],
+    [setMetronomeVolume]
   );
 
   const handleBassVolumeChange = useCallback(
@@ -61,7 +61,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
         setBackingTrackVolume("bass", newVolume);
       }
     },
-    [setBackingTrackVolume],
+    [setBackingTrackVolume]
   );
 
   const handleChordVolumeChange = useCallback(
@@ -71,7 +71,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
         setBackingTrackVolume("chord", newVolume);
       }
     },
-    [setBackingTrackVolume],
+    [setBackingTrackVolume]
   );
 
   const handleBassMuteToggle = useCallback(() => {
@@ -143,7 +143,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                       className={cn(
                         "h-7 w-12 text-xs",
                         metronome.countIn === bars &&
-                          "bg-orange-500 hover:bg-orange-600",
+                          "bg-orange-500 hover:bg-orange-600"
                       )}
                     >
                       {bars === 0 ? "Off" : `${bars} bar${bars > 1 ? "s" : ""}`}
@@ -209,7 +209,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                   disabled={backingTrack.bassMuted}
                   className={cn(
                     "w-full",
-                    backingTrack.bassMuted && "opacity-50",
+                    backingTrack.bassMuted && "opacity-50"
                   )}
                   aria-label="Bass volume"
                 />
@@ -264,64 +264,12 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                   disabled={backingTrack.chordMuted}
                   className={cn(
                     "w-full",
-                    backingTrack.chordMuted && "opacity-50",
+                    backingTrack.chordMuted && "opacity-50"
                   )}
                   aria-label="Chord volume"
                 />
               </div>
             </div>
-          </div>
-
-          {/* Keyboard Shortcuts */}
-          <div className="pt-2 border-t">
-            <button
-              type="button"
-              onClick={() => setShowShortcuts(!showShortcuts)}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Keyboard className="h-4 w-4" />
-              <span>Keyboard shortcuts</span>
-            </button>
-            {showShortcuts && (
-              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-muted-foreground">
-                <div>
-                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
-                    Space
-                  </kbd>{" "}
-                  Play/Stop
-                </div>
-                <div>
-                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
-                    R
-                  </kbd>{" "}
-                  Reset
-                </div>
-                <div>
-                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
-                    M
-                  </kbd>{" "}
-                  Metronome
-                </div>
-                <div>
-                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
-                    I
-                  </kbd>{" "}
-                  Chord Info
-                </div>
-                <div>
-                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
-                    Up/Down
-                  </kbd>{" "}
-                  Tempo
-                </div>
-                <div>
-                  <kbd className="px-1.5 py-0.5 bg-muted rounded text-[11px]">
-                    1-3
-                  </kbd>{" "}
-                  Presets
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </SheetContent>

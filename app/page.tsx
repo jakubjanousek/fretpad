@@ -140,8 +140,13 @@ export default function Page() {
           <h1 className="text-lg sm:text-xl font-semibold tracking-tight shrink-0">
             FretFlow
           </h1>
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-muted-foreground hidden sm:inline">
+              Progression
+            </span>
             <PresetDropdown />
+          </div>
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <ShareExport />
             <ThemeToggle />
           </div>

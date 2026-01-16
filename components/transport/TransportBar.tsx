@@ -1,6 +1,16 @@
 "use client";
 
-import { Play, RotateCcw, Square, Timer } from "lucide-react";
+import {
+  BookOpen,
+  CircleHelp,
+  Keyboard,
+  Play,
+  RotateCcw,
+  Settings,
+  Square,
+  Timer,
+  Trophy,
+} from "lucide-react";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -14,7 +24,6 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { getStyle } from "@/lib/audio/styles";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
-import { MoreMenu } from "./MoreMenu";
 
 interface TransportBarProps {
   onSettingsClick: () => void;
@@ -25,7 +34,7 @@ interface TransportBarProps {
 
 /**
  * Fixed bottom transport bar with grouped playback controls.
- * Layout: [Playback Group] [Tempo Group] [Utilities]
+ * Layout: [Tempo Group] [Playback Group] [Utilities]
  */
 export function TransportBar({
   onSettingsClick,
@@ -50,7 +59,7 @@ export function TransportBar({
     (barIndex: number, chordIndex: number) => {
       setCurrentPosition(barIndex, chordIndex);
     },
-    [setCurrentPosition],
+    [setCurrentPosition]
   );
 
   const handleStop = useCallback(() => {
@@ -98,7 +107,7 @@ export function TransportBar({
         setTempo(newTempo);
       }
     },
-    [setTempo],
+    [setTempo]
   );
 
   const handleMetronomeToggle = useCallback(() => {
@@ -109,6 +118,24 @@ export function TransportBar({
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 backdrop-blur-sm safe-area-inset-bottom">
       <div className="container mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between gap-3 sm:gap-4 h-16 sm:h-16">
+          {/* Tempo Group - hidden on very small screens */}
+          <div className="hidden xs:flex items-center gap-2 sm:gap-3 flex-1 max-w-48 sm:max-w-xs">
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-muted/50 rounded-xl px-3 py-1.5">
+              <Slider
+                min={40}
+                max={200}
+                step={1}
+                value={[tempo]}
+                onValueChange={handleTempoChange}
+                className="flex-1"
+                aria-label="Tempo"
+              />
+              <span className="text-xs font-mono tabular-nums w-14 sm:w-16 text-right">
+                {tempo} <span className="text-muted-foreground">BPM</span>
+              </span>
+            </div>
+          </div>
+
           {/* Playback Group */}
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Hero Play/Stop Button */}
@@ -179,7 +206,7 @@ export function TransportBar({
                       "h-9 w-9 rounded-full active:scale-95 transition-all duration-150",
                       metronome.enabled
                         ? "bg-orange-500 text-white hover:bg-orange-400"
-                        : "hover:bg-background/80",
+                        : "hover:bg-background/80"
                     )}
                   >
                     <Timer className="h-4 w-4" />
@@ -192,32 +219,67 @@ export function TransportBar({
             </Tooltip>
           </div>
 
-          {/* Tempo Group - hidden on very small screens */}
-          <div className="hidden xs:flex items-center gap-2 sm:gap-3 flex-1 max-w-48 sm:max-w-xs">
-            <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-muted/50 rounded-xl px-3 py-1.5">
-              <Slider
-                min={40}
-                max={200}
-                step={1}
-                value={[tempo]}
-                onValueChange={handleTempoChange}
-                className="flex-1"
-                aria-label="Tempo"
-              />
-              <span className="text-xs font-mono tabular-nums w-14 sm:w-16 text-right">
-                {tempo} <span className="text-muted-foreground">BPM</span>
-              </span>
-            </div>
-          </div>
-
           {/* Utilities Group */}
-          <div className="flex items-center gap-2">
-            <MoreMenu
-              onSettingsClick={onSettingsClick}
-              onHelpClick={onHelpClick}
-              onGuideClick={onGuideClick}
-              onStatsClick={onStatsClick}
-            />
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onStatsClick}
+                  aria-label="Practice Stats"
+                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                >
+                  <Trophy className="h-4 w-4 text-amber-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Practice Stats</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onGuideClick}
+                  aria-label="Help Guide"
+                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                >
+                  <BookOpen className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Help Guide (H)</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onHelpClick}
+                  aria-label="Keyboard Shortcuts"
+                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                >
+                  <Keyboard className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Keyboard Shortcuts (?)</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onSettingsClick}
+                  aria-label="Settings"
+                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Settings</TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>
