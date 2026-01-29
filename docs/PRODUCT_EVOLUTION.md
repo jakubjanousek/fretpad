@@ -97,7 +97,7 @@ FretFlow is a polished MVP: interactive fretboard with color-coded theory, 4 bac
 | **P2** | Community preset library | Growth flywheel | High | ⬜ Todo |
 | **P2** | Shareable practice cards | Organic acquisition | Medium | ⬜ Todo |
 | **P2** | Alternate tunings | Power user feature | Medium | ⬜ Todo |
-| **P2** | Key detection & chord subs | Theory depth | Medium | ⬜ Todo |
+| **P2** | Key detection & chord subs | Theory depth | Medium | ✅ Done |
 | **P3** | Audio input / pitch detection | Game-changer but complex | High | ⬜ Todo |
 | **P3** | Multi-instrument modes | TAM expansion | High | ⬜ Todo |
 | **P3** | Real-time shared sessions | Unique differentiator | Very High | ⬜ Todo |
