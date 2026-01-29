@@ -85,22 +85,22 @@ FretFlow is a polished MVP: interactive fretboard with color-coded theory, 4 bac
 
 ## Suggested Prioritization (Impact x Effort)
 
-| Priority | Feature | Impact | Effort |
-|----------|---------|--------|--------|
-| ~~**P0**~~ | ~~Tempo ramp mode~~ ✅ | ~~High retention~~ | ~~Low~~ |
-| **P0** | Scale degree labels | High demand, already designed | Low |
-| **P0** | Drum patterns per style | Major audio quality jump | Medium |
-| **P1** | Chord tone quiz / ear training | Differentiation + retention | Medium |
-| **P1** | CAGED / pentatonic overlays | Core ask from intermediate players | Medium |
-| **P1** | Practice session planner | Structured practice = stickiness | Medium |
-| **P1** | Additional styles (Funk, Neo-Soul) | Broader appeal | Medium |
-| **P2** | Community preset library | Growth flywheel | High |
-| **P2** | Shareable practice cards | Organic acquisition | Medium |
-| **P2** | Alternate tunings | Power user feature | Medium |
-| **P2** | Key detection & chord subs | Theory depth | Medium |
-| **P3** | Audio input / pitch detection | Game-changer but complex | High |
-| **P3** | Multi-instrument modes | TAM expansion | High |
-| **P3** | Real-time shared sessions | Unique differentiator | Very High |
+| Priority | Feature | Impact | Effort | Status |
+|----------|---------|--------|--------|--------|
+| **P0** | Tempo ramp mode | High retention | Low | ✅ Done |
+| **P0** | Scale degree labels | High demand, already designed | Low | ⬜ Todo |
+| **P0** | Drum patterns per style | Major audio quality jump | Medium | ⬜ Todo |
+| **P1** | Chord tone quiz / ear training | Differentiation + retention | Medium | ⬜ Todo |
+| **P1** | CAGED / pentatonic overlays | Core ask from intermediate players | Medium | ⬜ Todo |
+| **P1** | Practice session planner | Structured practice = stickiness | Medium | ⬜ Todo |
+| **P1** | Additional styles (Funk, Neo-Soul) | Broader appeal | Medium | ⬜ Todo |
+| **P2** | Community preset library | Growth flywheel | High | ⬜ Todo |
+| **P2** | Shareable practice cards | Organic acquisition | Medium | ⬜ Todo |
+| **P2** | Alternate tunings | Power user feature | Medium | ⬜ Todo |
+| **P2** | Key detection & chord subs | Theory depth | Medium | ⬜ Todo |
+| **P3** | Audio input / pitch detection | Game-changer but complex | High | ⬜ Todo |
+| **P3** | Multi-instrument modes | TAM expansion | High | ⬜ Todo |
+| **P3** | Real-time shared sessions | Unique differentiator | Very High | ⬜ Todo |
 
 ---
 
