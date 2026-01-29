@@ -66,9 +66,9 @@ All existing imports of `useAppStore` continue to work unchanged.
 
 ## Step 6: Split TransportControls into Sub-components
 
-- [ ] `components/transport/MetronomeControls.tsx` (~70 lines) — volume slider, count-in
-- [ ] `components/transport/BackingTrackControls.tsx` (~100 lines) — bass/chord volume + mute toggles
-- [ ] `TransportControls.tsx` becomes a ~180-line compositor
+- [x] `components/transport/MetronomeControls.tsx` (~70 lines) — volume slider, count-in
+- [x] `components/transport/BackingTrackControls.tsx` (~100 lines) — bass/chord volume + mute toggles
+- [x] `TransportControls.tsx` becomes a ~180-line compositor
 
 ---
 
