@@ -27,7 +27,6 @@ const PRESET_KEYS = Object.keys(PRESET_PROGRESSIONS) as Array<
 export function useKeyboardShortcuts({
   onPlay,
   onStop,
-  onReset,
 }: KeyboardShortcutHandlers): void {
   const isPlaying = useAppStore((state) => state.isPlaying);
   const tempo = useAppStore((state) => state.tempo);
@@ -56,15 +55,6 @@ export function useKeyboardShortcuts({
           } else {
             onPlay();
           }
-          break;
-
-        case "KeyR":
-          // Allow CMD+R / Ctrl+R for browser reload
-          if (event.metaKey || event.ctrlKey) {
-            return;
-          }
-          event.preventDefault();
-          onReset();
           break;
 
         case "ArrowUp":
@@ -123,7 +113,6 @@ export function useKeyboardShortcuts({
     metronome.enabled,
     onPlay,
     onStop,
-    onReset,
     setTempo,
     setMetronomeEnabled,
     loadPreset,

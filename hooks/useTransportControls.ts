@@ -69,17 +69,10 @@ export function useTransportControls() {
     resetLoopCount();
   }, [stop, setIsPlaying, resetLoopCount]);
 
-  const handleReset = useCallback(() => {
-    stop();
-    setCurrentPosition(0, 0);
-    setIsPlaying(false);
-    resetLoopCount();
-  }, [stop, setCurrentPosition, setIsPlaying, resetLoopCount]);
 
   useKeyboardShortcuts({
     onPlay: handlePlay,
     onStop: handleStopClick,
-    onReset: handleReset,
   });
 
   const handleTempoChange = useCallback(
@@ -103,7 +96,6 @@ export function useTransportControls() {
     metronome,
     handlePlay,
     handleStopClick,
-    handleReset,
     handleTempoChange,
     handleMetronomeToggle,
   };

@@ -4,10 +4,8 @@ import {
   BookOpen,
   Keyboard,
   Play,
-  RotateCcw,
   Settings,
   Square,
-  Timer,
   Trophy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,7 +16,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTransportControls } from "@/hooks/useTransportControls";
-import { cn } from "@/lib/utils";
 
 interface TransportBarProps {
   onSettingsClick: () => void;
@@ -40,12 +37,9 @@ export function TransportBar({
   const {
     isPlaying,
     tempo,
-    metronome,
     handlePlay,
     handleStopClick,
-    handleReset,
     handleTempoChange,
-    handleMetronomeToggle,
   } = useTransportControls();
 
   return (
@@ -101,54 +95,6 @@ export function TransportBar({
               </TooltipTrigger>
               <TooltipContent side="top" className="sm:hidden">
                 {isPlaying ? "Stop" : "Play"} (Space)
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex flex-col items-center">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleReset}
-                    aria-label="Reset to beginning"
-                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="sm:hidden">
-                Reset (R)
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex flex-col items-center">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    data-state={metronome.enabled ? "on" : "off"}
-                    onClick={handleMetronomeToggle}
-                    aria-label={
-                      metronome.enabled
-                        ? "Disable metronome"
-                        : "Enable metronome"
-                    }
-                    className={cn(
-                      "h-9 w-9 rounded-full active:scale-95 transition-all duration-150",
-                      metronome.enabled
-                        ? "bg-orange-500 text-white hover:bg-orange-400"
-                        : "hover:bg-background/80",
-                    )}
-                  >
-                    <Timer className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="sm:hidden">
-                Metronome (M)
               </TooltipContent>
             </Tooltip>
           </div>
