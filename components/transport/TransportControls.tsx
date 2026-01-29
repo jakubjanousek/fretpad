@@ -1,6 +1,13 @@
 "use client";
 
-import { Keyboard, Play, RotateCcw, Square, Timer } from "lucide-react";
+import {
+  Keyboard,
+  Play,
+  RotateCcw,
+  Square,
+  Timer,
+  TrendingUp,
+} from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,9 +19,11 @@ import {
 } from "@/components/ui/tooltip";
 import { useTransportControls } from "@/hooks/useTransportControls";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/state/useAppStore";
 import { BackingTrackControls } from "./BackingTrackControls";
 import { MetronomeControls } from "./MetronomeControls";
 import { StyleSelector } from "./StyleSelector";
+import { TempoRampControls } from "./TempoRampControls";
 
 /**
  * Transport controls for playback: play/stop buttons and tempo slider.
@@ -24,6 +33,7 @@ export function TransportControls() {
   const {
     isPlaying,
     tempo,
+    tempoRamp,
     metronome,
     handlePlay,
     handleStopClick,
@@ -31,6 +41,8 @@ export function TransportControls() {
     handleTempoChange,
     handleMetronomeToggle,
   } = useTransportControls();
+
+  const setTempoRampEnabled = useAppStore((state) => state.setTempoRampEnabled);
 
   const [showShortcuts, setShowShortcuts] = useState(false);
 
@@ -119,6 +131,29 @@ export function TransportControls() {
           aria-label="Tempo"
         />
       </div>
+
+      {/* Tempo Ramp Toggle */}
+      <div className="flex items-center justify-between">
+        <Label className="text-sm text-muted-foreground">Tempo Ramp</Label>
+        <Button
+          variant={tempoRamp.enabled ? "default" : "outline"}
+          size="sm"
+          onClick={() => setTempoRampEnabled(!tempoRamp.enabled)}
+          aria-label={
+            tempoRamp.enabled ? "Disable tempo ramp" : "Enable tempo ramp"
+          }
+          className={cn(
+            "h-7 gap-1.5 text-xs",
+            tempoRamp.enabled && "bg-orange-500 hover:bg-orange-600",
+          )}
+        >
+          <TrendingUp className="h-3 w-3" />
+          {tempoRamp.enabled ? "On" : "Off"}
+        </Button>
+      </div>
+
+      {/* Tempo Ramp Controls (shown when tempo ramp is enabled) */}
+      {tempoRamp.enabled && <TempoRampControls tempoRamp={tempoRamp} />}
 
       {/* Metronome Controls (shown when metronome is enabled) */}
       {metronome.enabled && <MetronomeControls metronome={metronome} />}

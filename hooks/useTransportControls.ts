@@ -18,10 +18,13 @@ export function useTransportControls() {
   const selectedStyle = useAppStore((state) => state.selectedStyle);
   const metronome = useAppStore((state) => state.metronome);
   const backingTrack = useAppStore((state) => state.backingTrack);
+  const tempoRamp = useAppStore((state) => state.tempoRamp);
   const setTempo = useAppStore((state) => state.setTempo);
   const setIsPlaying = useAppStore((state) => state.setIsPlaying);
   const setCurrentPosition = useAppStore((state) => state.setCurrentPosition);
   const setMetronomeEnabled = useAppStore((state) => state.setMetronomeEnabled);
+  const incrementLoopCount = useAppStore((state) => state.incrementLoopCount);
+  const resetLoopCount = useAppStore((state) => state.resetLoopCount);
 
   const style = getStyle(selectedStyle);
 
@@ -35,7 +38,12 @@ export function useTransportControls() {
   const handleStop = useCallback(() => {
     setCurrentPosition(0, 0);
     setIsPlaying(false);
-  }, [setCurrentPosition, setIsPlaying]);
+    resetLoopCount();
+  }, [setCurrentPosition, setIsPlaying, resetLoopCount]);
+
+  const handleLoop = useCallback(() => {
+    incrementLoopCount();
+  }, [incrementLoopCount]);
 
   const { start, stop } = useAudioEngine({
     progression,
@@ -43,25 +51,30 @@ export function useTransportControls() {
     style,
     metronome,
     backingTrack,
+    tempoRamp,
     onChordChange: handleChordChange,
+    onLoop: handleLoop,
     onStop: handleStop,
   });
 
   const handlePlay = useCallback(async () => {
+    resetLoopCount();
     await start();
     setIsPlaying(true);
-  }, [start, setIsPlaying]);
+  }, [start, setIsPlaying, resetLoopCount]);
 
   const handleStopClick = useCallback(() => {
     stop();
     setIsPlaying(false);
-  }, [stop, setIsPlaying]);
+    resetLoopCount();
+  }, [stop, setIsPlaying, resetLoopCount]);
 
   const handleReset = useCallback(() => {
     stop();
     setCurrentPosition(0, 0);
     setIsPlaying(false);
-  }, [stop, setCurrentPosition, setIsPlaying]);
+    resetLoopCount();
+  }, [stop, setCurrentPosition, setIsPlaying, resetLoopCount]);
 
   useKeyboardShortcuts({
     onPlay: handlePlay,
@@ -86,6 +99,7 @@ export function useTransportControls() {
   return {
     isPlaying,
     tempo,
+    tempoRamp,
     metronome,
     handlePlay,
     handleStopClick,

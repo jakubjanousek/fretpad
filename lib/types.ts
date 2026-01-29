@@ -139,6 +139,13 @@ export interface ChordInstrumentConfig {
   };
 }
 
+export interface TempoRampConfig {
+  enabled: boolean;
+  increment: number; // BPM to add each ramp (1-20)
+  everyNLoops: number; // ramp after N loops (1, 2, 4, 8)
+  maxTempo: number; // ceiling BPM
+}
+
 export interface MetronomeConfig {
   enabled: boolean;
   volume: number; // dB, -20 to 0

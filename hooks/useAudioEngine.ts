@@ -18,6 +18,7 @@ import type {
   MetronomeConfig,
   Progression,
   StyleDefinition,
+  TempoRampConfig,
 } from "@/lib/types";
 
 type AudioContextState = "suspended" | "running" | "closed";
@@ -28,7 +29,9 @@ interface UseAudioEngineOptions {
   style: StyleDefinition;
   metronome: MetronomeConfig;
   backingTrack: BackingTrackConfig;
+  tempoRamp: TempoRampConfig;
   onChordChange: (barIndex: number, chordIndex: number) => void;
+  onLoop: () => void;
   onStop: () => void;
 }
 
@@ -49,7 +52,9 @@ export function useAudioEngine({
   style,
   metronome,
   backingTrack,
+  tempoRamp,
   onChordChange,
+  onLoop,
   onStop,
 }: UseAudioEngineOptions): AudioEngineReturn {
   const bassRef = useRef<Tone.Synth | null>(null);
@@ -154,6 +159,24 @@ export function useAudioEngine({
   useEffect(() => {
     Tone.getTransport().bpm.value = tempo;
   }, [tempo]);
+
+  // Handle loop event for tempo ramp
+  const onLoopRef = useRef(onLoop);
+  onLoopRef.current = onLoop;
+
+  useEffect(() => {
+    if (!tempoRamp.enabled) return;
+
+    const transport = Tone.getTransport();
+    const handler = () => {
+      onLoopRef.current();
+    };
+    transport.on("loop", handler);
+
+    return () => {
+      transport.off("loop", handler);
+    };
+  }, [tempoRamp.enabled]);
 
   // Update swing setting when style changes
   useEffect(() => {

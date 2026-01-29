@@ -42,6 +42,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         progression: state.progression,
         tempo: state.tempo,
+        tempoRamp: state.tempoRamp,
         selectedStyle: state.selectedStyle,
         metronome: state.metronome,
         backingTrack: state.backingTrack,
