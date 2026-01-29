@@ -68,6 +68,7 @@ export function useAudioEngine({
   const scheduledEventsRef = useRef<number[]>([]);
   const isReadyRef = useRef(false);
   const isPlayingRef = useRef(false);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const [audioContextState, setAudioContextState] =
     useState<AudioContextState>("suspended");
   // Counter that increments when instruments are recreated, triggering volume effect
@@ -89,6 +90,31 @@ export function useAudioEngine({
 
     return () => {
       context.rawContext.removeEventListener("statechange", updateState);
+    };
+  }, []);
+
+  // Re-acquire wake lock when tab becomes visible again (Safari releases it on background)
+  useEffect(() => {
+    if (!("wakeLock" in navigator)) return;
+
+    const onVisibilityChange = () => {
+      if (
+        document.visibilityState === "visible" &&
+        isPlayingRef.current &&
+        (!wakeLockRef.current || wakeLockRef.current.released)
+      ) {
+        navigator.wakeLock.request("screen").then(
+          (sentinel) => {
+            wakeLockRef.current = sentinel;
+          },
+          () => {},
+        );
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
 
@@ -294,6 +320,18 @@ export function useAudioEngine({
     // Mark as playing
     isPlayingRef.current = true;
 
+    // Request wake lock to prevent screen dimming during practice
+    if ("wakeLock" in navigator) {
+      navigator.wakeLock.request("screen").then(
+        (sentinel) => {
+          wakeLockRef.current = sentinel;
+        },
+        () => {
+          // Fail silently — wake lock not available or denied
+        },
+      );
+    }
+
     // Start playback
     transport.start();
   }, [progression, style, onChordChange, metronome]);
@@ -306,6 +344,10 @@ export function useAudioEngine({
 
     // Mark as not playing
     isPlayingRef.current = false;
+
+    // Release wake lock
+    wakeLockRef.current?.release();
+    wakeLockRef.current = null;
 
     // Clear scheduled events
     clearScheduledEvents(scheduledEventsRef.current);

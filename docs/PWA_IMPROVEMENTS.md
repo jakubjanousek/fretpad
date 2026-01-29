@@ -21,10 +21,10 @@ Enhancements to make FretFlow a polished offline-capable PWA, especially on iPad
 
 Prevent the iPad screen from dimming during practice. Without this, the screen auto-locks mid-session and audio stops.
 
-- [ ] Request `navigator.wakeLock.request("screen")` when playback starts
-- [ ] Release wake lock when playback stops
-- [ ] Re-acquire on `visibilitychange` (Safari releases it when tab is backgrounded)
-- [ ] Fail silently if API is unavailable (supported Safari 16.4+)
+- [x] Request `navigator.wakeLock.request("screen")` when playback starts
+- [x] Release wake lock when playback stops
+- [x] Re-acquire on `visibilitychange` (Safari releases it when tab is backgrounded)
+- [x] Fail silently if API is unavailable (supported Safari 16.4+)
 
 ### P0 — AudioContext Interruption Recovery
 
