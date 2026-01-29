@@ -22,14 +22,14 @@ Each step is independently shippable. Verify after each with `pnpm validate && p
 
 `state/useAppStore.ts` is 421 lines with 30+ properties and 20+ actions covering unrelated concerns. Every component interaction requires this entire file in context.
 
-- [ ] `state/slices/progressionSlice.ts` (~120 lines) — progression, currentBar/ChordIndex, currentChord, bar CRUD, advanceToNextChord
-- [ ] `state/slices/playbackSlice.ts` (~40 lines) — tempo, isPlaying, selectedStyle
-- [ ] `state/slices/metronomeSlice.ts` (~35 lines) — metronome config
-- [ ] `state/slices/backingTrackSlice.ts` (~30 lines) — bass/chord volume and mute
-- [ ] `state/slices/displaySlice.ts` (~35 lines) — showScaleTones, showVoiceLeading, noteLabelMode, previewScale
-- [ ] `state/slices/errorSlice.ts` (~20 lines) — error state
-- [ ] `state/selectors.ts` — common selector hooks (`useProgression()`, `useTempo()`, etc.) to replace repetitive `useAppStore((s) => s.X)` calls
-- [ ] `state/useAppStore.ts` — rewrite to ~30-line combiner with persist middleware
+- [x] `state/slices/progressionSlice.ts` (~120 lines) — progression, currentBar/ChordIndex, currentChord, bar CRUD, advanceToNextChord
+- [x] `state/slices/playbackSlice.ts` (~40 lines) — tempo, isPlaying, selectedStyle
+- [x] `state/slices/metronomeSlice.ts` (~35 lines) — metronome config
+- [x] `state/slices/backingTrackSlice.ts` (~30 lines) — bass/chord volume and mute
+- [x] `state/slices/displaySlice.ts` (~35 lines) — showScaleTones, showVoiceLeading, noteLabelMode, previewScale
+- [x] `state/slices/errorSlice.ts` (~20 lines) — error state
+- [x] `state/selectors.ts` — common selector hooks (`useProgression()`, `useTempo()`, etc.) to replace repetitive `useAppStore((s) => s.X)` calls
+- [x] `state/useAppStore.ts` — rewrite to ~30-line combiner with persist middleware
 
 All existing imports of `useAppStore` continue to work unchanged.
 
