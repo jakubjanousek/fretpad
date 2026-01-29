@@ -55,10 +55,10 @@ Safari doesn't show install banners. Guide users to add the app to their home sc
 
 Subtle feedback so users know they're running from cache.
 
-- [ ] Create `OfflineIndicator` component
-- [ ] Listen to `online` / `offline` events
-- [ ] Show a small badge or toast when offline
-- [ ] Auto-dismiss when back online
+- [x] Create `OfflineIndicator` component
+- [x] Listen to `online` / `offline` events
+- [x] Show a small badge or toast when offline
+- [x] Auto-dismiss when back online
 
 ### P2 — Safe Area & Standalone Viewport
 
