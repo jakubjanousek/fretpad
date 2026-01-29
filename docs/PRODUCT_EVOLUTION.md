@@ -46,7 +46,7 @@ FretFlow is a polished MVP: interactive fretboard with color-coded theory, 4 bac
 - **CAGED / 3-notes-per-string overlays** — Show common positional systems as toggleable layers
 - **Pentatonic / blues scale quick-switch** — One-tap to overlay common improv scales
 - **Arpeggio patterns** — Visualize sweep/economy picking shapes
-- **Scale degree labels** — Show "1 b3 4 5 b7" instead of note names (already deferred, high demand)
+- ~~**Scale degree labels** — Show "1 b3 4 5 b7" instead of note names (already deferred, high demand)~~ ✅
 - **Chord substitution suggestions** — "Try tritone sub: Db7 instead of G7"
 - **Key detection** — Auto-detect the key of a user-entered progression and suggest parent scale
 - **Modulation awareness** — Highlight when a progression modulates and suggest pivot chords
@@ -88,7 +88,7 @@ FretFlow is a polished MVP: interactive fretboard with color-coded theory, 4 bac
 | Priority | Feature | Impact | Effort | Status |
 |----------|---------|--------|--------|--------|
 | **P0** | Tempo ramp mode | High retention | Low | ✅ Done |
-| **P0** | Scale degree labels | High demand, already designed | Low | ⬜ Todo |
+| **P0** | Scale degree labels | High demand, already designed | Low | ✅ Done |
 | **P0** | Drum patterns per style | Major audio quality jump | Medium | ⬜ Todo |
 | **P1** | Chord tone quiz / ear training | Differentiation + retention | Medium | ⬜ Todo |
 | **P1** | CAGED / pentatonic overlays | Core ask from intermediate players | Medium | ⬜ Todo |

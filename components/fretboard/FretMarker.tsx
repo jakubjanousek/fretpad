@@ -23,8 +23,8 @@ export function FretMarker({
 
   const getLabel = (): string => {
     switch (labelMode) {
-      case "intervals":
-        return note.interval;
+      case "degrees":
+        return note.interval.replace(/b/g, "\u266D").replace(/#/g, "\u266F");
       case "none":
         return "";
       default:

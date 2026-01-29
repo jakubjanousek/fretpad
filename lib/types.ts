@@ -179,4 +179,4 @@ export interface StyleDefinition {
 // Fretboard Display Types
 // ============================================
 
-export type NoteLabelMode = "notes" | "intervals" | "none";
+export type NoteLabelMode = "notes" | "degrees" | "none";

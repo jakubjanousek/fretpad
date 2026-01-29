@@ -54,6 +54,10 @@ export const useAppStore = create<AppState>()(
         if (state) {
           const chord = getChordAtPosition(state.progression, 0, 0);
           state.currentChord = chord;
+          // Migrate legacy "intervals" label mode to "degrees"
+          if ((state.noteLabelMode as string) === "intervals") {
+            state.noteLabelMode = "degrees";
+          }
         }
       },
     },

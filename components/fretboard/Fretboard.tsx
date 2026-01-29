@@ -254,7 +254,7 @@ export function Fretboard({
                       "absolute top-0.5 bottom-0.5 rounded-md bg-background shadow-sm transition-all duration-200 ease-out",
                       noteLabelMode === "notes" &&
                         "left-0.5 w-[calc(33.33%-2px)]",
-                      noteLabelMode === "intervals" &&
+                      noteLabelMode === "degrees" &&
                         "left-[33.33%] w-[calc(33.33%-2px)]",
                       noteLabelMode === "none" &&
                         "left-[66.66%] w-[calc(33.33%-2px)]",
@@ -274,15 +274,15 @@ export function Fretboard({
                   </button>
                   <button
                     type="button"
-                    onClick={() => onNoteLabelModeChange("intervals")}
+                    onClick={() => onNoteLabelModeChange("degrees")}
                     className={cn(
                       "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
-                      noteLabelMode === "intervals"
+                      noteLabelMode === "degrees"
                         ? "text-foreground"
                         : "text-muted-foreground hover:text-foreground",
                     )}
                   >
-                    Intervals
+                    Degrees
                   </button>
                   <button
                     type="button"
