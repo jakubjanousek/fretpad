@@ -2,6 +2,7 @@
 
 import { Pencil, Plus, Redo2, Undo2, X } from "lucide-react";
 import { useState } from "react";
+import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePlaybackPosition } from "@/hooks/usePlaybackPosition";
@@ -209,6 +210,8 @@ export function ProgressionEditor() {
       {/* Progression bars - compact strip */}
       <div className="relative">
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-1 sm:overflow-x-auto pb-0.5 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+          <PresetDropdown />
+
           {progression.bars.map((bar, barIndex) => {
             // Convert bar chords to string for editing
             const chordString = bar.chords.map((bc) => bc.chord).join(" ");

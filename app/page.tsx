@@ -5,7 +5,6 @@ import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
 import { HelpGuide } from "@/components/help/HelpGuide";
 import { SessionPlanner } from "@/components/planner/SessionPlanner";
-import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ShareExport } from "@/components/progression/ShareExport";
 import { ChordToneQuiz } from "@/components/quiz/ChordToneQuiz";
@@ -185,12 +184,6 @@ export default function Page() {
           <h1 className="text-lg sm:text-xl font-semibold tracking-tight shrink-0">
             FretFlow
           </h1>
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground hidden sm:inline">
-              Progression
-            </span>
-            <PresetDropdown />
-          </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
             <ShareExport />
             <ThemeToggle />
