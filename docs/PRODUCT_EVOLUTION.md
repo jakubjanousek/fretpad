@@ -23,7 +23,7 @@ FretFlow is a polished MVP: interactive fretboard with color-coded theory, 4 bac
 **Why:** Guitarists plateau when they repeat the same routines. Smart practice guidance differentiates FretFlow from a static reference tool.
 
 - **Practice session planner** — Suggest a structured warmup → technique → improv → cooldown flow
-- **Tempo ramp mode** — Auto-increment BPM by N every M loops (gradual speed building)
+- ~~**Tempo ramp mode** — Auto-increment BPM by N every M loops (gradual speed building)~~ ✅
 - **Weak-spot detection** — Track which chord changes or positions the user avoids / struggles with (based on quiz data or manual logging)
 - **Spaced repetition for progressions** — Surface progressions the user hasn't practiced recently
 - **Practice streaks & goals** — Daily/weekly minute targets, visual streak calendar (extend existing stats)
@@ -87,7 +87,7 @@ FretFlow is a polished MVP: interactive fretboard with color-coded theory, 4 bac
 
 | Priority | Feature | Impact | Effort |
 |----------|---------|--------|--------|
-| **P0** | Tempo ramp mode | High retention | Low |
+| ~~**P0**~~ | ~~Tempo ramp mode~~ ✅ | ~~High retention~~ | ~~Low~~ |
 | **P0** | Scale degree labels | High demand, already designed | Low |
 | **P0** | Drum patterns per style | Major audio quality jump | Medium |
 | **P1** | Chord tone quiz / ear training | Differentiation + retention | Medium |
