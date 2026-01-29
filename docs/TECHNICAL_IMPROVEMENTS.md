@@ -75,12 +75,12 @@ All existing imports of `useAppStore` continue to work unchanged.
 ## Step 7: Add Tests for New Modules
 
 **Store slice tests:**
-- [ ] `__tests__/state/progressionSlice.test.ts` — position resets, preset loading, bar CRUD, chord advancement
-- [ ] `__tests__/state/playbackSlice.test.ts` — tempo clamping, style selection
-- [ ] `__tests__/state/metronomeSlice.test.ts` — volume clamping, count-in
-- [ ] `__tests__/state/backingTrackSlice.test.ts` — volume clamping, mute toggles
+- [x] `__tests__/state/progressionSlice.test.ts` — position resets, preset loading, bar CRUD, chord advancement
+- [x] `__tests__/state/playbackSlice.test.ts` — tempo clamping, style selection
+- [x] `__tests__/state/metronomeSlice.test.ts` — volume clamping, count-in
+- [x] `__tests__/state/backingTrackSlice.test.ts` — volume clamping, mute toggles
 
 **Persistence tests:**
-- [ ] `__tests__/lib/persistence/urlState.test.ts` — encode/decode roundtrip, invalid input
-- [ ] `__tests__/lib/persistence/customPresets.test.ts` — save/load roundtrip
-- [ ] `__tests__/lib/persistence/practiceStats.test.ts` — streak calculation, session recording
+- [x] `__tests__/lib/persistence/urlState.test.ts` — encode/decode roundtrip, invalid input
+- [x] `__tests__/lib/persistence/customPresets.test.ts` — save/load roundtrip
+- [x] `__tests__/lib/persistence/practiceStats.test.ts` — streak calculation, session recording
