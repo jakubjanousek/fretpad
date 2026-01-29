@@ -68,6 +68,34 @@ export const PRESET_PROGRESSIONS = {
     "All The Things You Are (A)",
   ),
 
+  "Blue Bossa": assertProgression(
+    parseProgression(
+      "| Cm7 | Cm7 | Fm7 | Fm7 | Dm7b5 | G7 | Cm7 | Cm7 | Ebm7 | Ab7 | Dbmaj7 | Dbmaj7 | Dm7b5 | G7 | Cm7 | Cm7 |",
+      { name: "Blue Bossa" },
+    ),
+    "Blue Bossa",
+  ),
+
+  "Fly Me to the Moon (A)": assertProgression(
+    parseProgression("| Am7 | Dm7 | G7 | Cmaj7 | Fmaj7 | Bm7b5 | E7 | Am7 |", {
+      name: "Fly Me to the Moon (A)",
+    }),
+    "Fly Me to the Moon (A)",
+  ),
+
+  "So What": assertProgression(
+    parseProgression(
+      "| Dm7 | Dm7 | Dm7 | Dm7 | Dm7 | Dm7 | Dm7 | Dm7 | Ebm7 | Ebm7 | Ebm7 | Ebm7 | Ebm7 | Ebm7 | Ebm7 | Ebm7 |",
+      { name: "So What" },
+    ),
+    "So What",
+  ),
+
+  "iii-vi-ii-V in C": assertProgression(
+    parseProgression("| Em7 | Am7 | Dm7 | G7 |", { name: "iii-vi-ii-V in C" }),
+    "iii-vi-ii-V in C",
+  ),
+
   // Pop Progressions
   "I-V-vi-IV in C": assertProgression(
     createProgression(["C", "G", "Am", "F"], {
@@ -95,6 +123,34 @@ export const PRESET_PROGRESSIONS = {
       name: "I-IV-V-IV in G",
     }),
     "I-IV-V-IV in G",
+  ),
+
+  "I-IV-vi-V in G": assertProgression(
+    createProgression(["G", "C", "Em", "D"], {
+      name: "I-IV-vi-V in G",
+    }),
+    "I-IV-vi-V in G",
+  ),
+
+  "i-bVI-bIII-bVII in Am": assertProgression(
+    createProgression(["Am", "F", "C", "G"], {
+      name: "i-bVI-bIII-bVII in Am",
+    }),
+    "i-bVI-bIII-bVII in Am",
+  ),
+
+  "I-iii-IV-V in D": assertProgression(
+    createProgression(["D", "F#m", "G", "A"], {
+      name: "I-iii-IV-V in D",
+    }),
+    "I-iii-IV-V in D",
+  ),
+
+  "IV-V-iii-vi in C": assertProgression(
+    createProgression(["F", "G", "Em", "Am"], {
+      name: "IV-V-iii-vi in C",
+    }),
+    "IV-V-iii-vi in C",
   ),
 
   // Blues Progressions
@@ -129,6 +185,66 @@ export const PRESET_PROGRESSIONS = {
     "8-bar Blues in E",
   ),
 
+  "Slow Blues in G": assertProgression(
+    parseProgression(
+      "| G7 | C7 | G7 | G7 | C7 | C7 | G7 | Em7 | Am7 | D7 | G7 D7 | G7 D7 |",
+      { name: "Slow Blues in G" },
+    ),
+    "Slow Blues in G",
+  ),
+
+  "Blues Shuffle in E": assertProgression(
+    parseProgression(
+      "| E7 | E7 | E7 | E7 | A7 | A7 | E7 | E7 | B7 | A7 | E7 | B7 |",
+      { name: "Blues Shuffle in E" },
+    ),
+    "Blues Shuffle in E",
+  ),
+
+  "Stormy Monday in G": assertProgression(
+    parseProgression(
+      "| G7 | C7 | G7 | Gm7 C7 | C7 | C#dim7 | G7 | Am7 D7 | Am7 | D7 | G7 C7 | G7 D7 |",
+      { name: "Stormy Monday in G" },
+    ),
+    "Stormy Monday in G",
+  ),
+
+  "Quick Change Blues in A": assertProgression(
+    parseProgression(
+      "| A7 | D7 | A7 | A7 | D7 | D7 | A7 | A7 | E7 | D7 | A7 | E7 |",
+      { name: "Quick Change Blues in A" },
+    ),
+    "Quick Change Blues in A",
+  ),
+
+  "Jockey Full of Bourbon": assertProgression(
+    createProgression(["Em", "D", "C", "D"], {
+      name: "Jockey Full of Bourbon",
+    }),
+    "Jockey Full of Bourbon",
+  ),
+
+  "Way Down in the Hole": assertProgression(
+    parseProgression("| Em | Em | Am | Am | Em | Em | B7 | Em |", {
+      name: "Way Down in the Hole",
+    }),
+    "Way Down in the Hole",
+  ),
+
+  "Downtown Train": assertProgression(
+    parseProgression("| F | C | Bb | C | F | C | Bb | C |", {
+      name: "Downtown Train",
+    }),
+    "Downtown Train",
+  ),
+
+  "Hold On": assertProgression(
+    createProgression(["Cm", "Bb", "Ab", "Bb"], {
+      name: "Hold On",
+    }),
+    "Hold On",
+  ),
+
   // Modal Vamps
   "Dorian Vamp (Dm7)": assertProgression(
     createProgression(["Dm7", "Em7", "Dm7", "Dm7"], {
@@ -156,6 +272,34 @@ export const PRESET_PROGRESSIONS = {
       name: "Lydian Vamp (Fmaj7)",
     }),
     "Lydian Vamp (Fmaj7)",
+  ),
+
+  "Aeolian Vamp (Am)": assertProgression(
+    createProgression(["Am", "F", "G", "Am"], {
+      name: "Aeolian Vamp (Am)",
+    }),
+    "Aeolian Vamp (Am)",
+  ),
+
+  "Locrian Vamp (Bm7b5)": assertProgression(
+    createProgression(["Bm7b5", "Cmaj7", "Bm7b5", "Bm7b5"], {
+      name: "Locrian Vamp (Bm7b5)",
+    }),
+    "Locrian Vamp (Bm7b5)",
+  ),
+
+  "Dorian Funk (Am7)": assertProgression(
+    createProgression(["Am7", "D7", "Am7", "Am7"], {
+      name: "Dorian Funk (Am7)",
+    }),
+    "Dorian Funk (Am7)",
+  ),
+
+  "Mixolydian Blues (E7)": assertProgression(
+    createProgression(["E7", "D", "A", "E7"], {
+      name: "Mixolydian Blues (E7)",
+    }),
+    "Mixolydian Blues (E7)",
   ),
 } as const;
 
@@ -200,6 +344,39 @@ export const PRESET_METADATA: Record<
     barCount: 8,
   },
 
+  "Blue Bossa": {
+    key: "Blue Bossa",
+    label: "Blue Bossa",
+    description: "Latin jazz classic in C minor",
+    category: "jazz",
+    difficulty: "intermediate",
+    barCount: 16,
+  },
+  "Fly Me to the Moon (A)": {
+    key: "Fly Me to the Moon (A)",
+    label: "Fly Me to the Moon",
+    description: "Circle-of-fourths jazz standard",
+    category: "jazz",
+    difficulty: "intermediate",
+    barCount: 8,
+  },
+  "So What": {
+    key: "So What",
+    label: "So What",
+    description: "Miles Davis modal jazz classic",
+    category: "jazz",
+    difficulty: "beginner",
+    barCount: 16,
+  },
+  "iii-vi-ii-V in C": {
+    key: "iii-vi-ii-V in C",
+    label: "iii–vi–ii–V",
+    description: "Extended turnaround progression",
+    category: "jazz",
+    difficulty: "intermediate",
+    barCount: 4,
+  },
+
   // Pop
   "I-V-vi-IV in C": {
     key: "I-V-vi-IV in C",
@@ -229,6 +406,39 @@ export const PRESET_METADATA: Record<
     key: "I-IV-V-IV in G",
     label: "I–IV–V–IV",
     description: "Classic rock progression",
+    category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+
+  "I-IV-vi-V in G": {
+    key: "I-IV-vi-V in G",
+    label: "I–IV–vi–V",
+    description: "Modern pop/worship progression",
+    category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "i-bVI-bIII-bVII in Am": {
+    key: "i-bVI-bIII-bVII in Am",
+    label: "i–bVI–bIII–bVII",
+    description: "Andalusian cadence / epic minor",
+    category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "I-iii-IV-V in D": {
+    key: "I-iii-IV-V in D",
+    label: "I–iii–IV–V",
+    description: "Bright folk/pop progression in D",
+    category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "IV-V-iii-vi in C": {
+    key: "IV-V-iii-vi in C",
+    label: "IV–V–iii–vi",
+    description: "Royal road progression (J-pop staple)",
     category: "pop",
     difficulty: "beginner",
     barCount: 4,
@@ -268,6 +478,71 @@ export const PRESET_METADATA: Record<
     barCount: 8,
   },
 
+  "Slow Blues in G": {
+    key: "Slow Blues in G",
+    label: "Slow Blues",
+    description: "Laid-back blues with passing chords",
+    category: "blues",
+    difficulty: "intermediate",
+    barCount: 12,
+  },
+  "Blues Shuffle in E": {
+    key: "Blues Shuffle in E",
+    label: "Blues Shuffle",
+    description: "Classic shuffle feel in E",
+    category: "blues",
+    difficulty: "beginner",
+    barCount: 12,
+  },
+  "Stormy Monday in G": {
+    key: "Stormy Monday in G",
+    label: "Stormy Monday",
+    description: "T-Bone Walker style with chromatic movement",
+    category: "blues",
+    difficulty: "advanced",
+    barCount: 12,
+  },
+  "Quick Change Blues in A": {
+    key: "Quick Change Blues in A",
+    label: "Quick Change Blues",
+    description: "Blues with IV chord in bar 2",
+    category: "blues",
+    difficulty: "beginner",
+    barCount: 12,
+  },
+  "Jockey Full of Bourbon": {
+    key: "Jockey Full of Bourbon",
+    label: "Jockey Full of Bourbon",
+    description: "Tom Waits i–bVII–bVI–bVII riff",
+    category: "blues",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "Way Down in the Hole": {
+    key: "Way Down in the Hole",
+    label: "Way Down in the Hole",
+    description: "Tom Waits dark gospel blues",
+    category: "blues",
+    difficulty: "intermediate",
+    barCount: 8,
+  },
+  "Downtown Train": {
+    key: "Downtown Train",
+    label: "Downtown Train",
+    description: "Tom Waits bittersweet pop-rock",
+    category: "blues",
+    difficulty: "beginner",
+    barCount: 8,
+  },
+  "Hold On": {
+    key: "Hold On",
+    label: "Hold On",
+    description: "Tom Waits gritty minor vamp",
+    category: "blues",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+
   // Modal
   "Dorian Vamp (Dm7)": {
     key: "Dorian Vamp (Dm7)",
@@ -297,6 +572,38 @@ export const PRESET_METADATA: Record<
     key: "Lydian Vamp (Fmaj7)",
     label: "Lydian (Fmaj7)",
     description: "F Lydian mode vamp",
+    category: "modal",
+    difficulty: "intermediate",
+    barCount: 4,
+  },
+  "Aeolian Vamp (Am)": {
+    key: "Aeolian Vamp (Am)",
+    label: "Aeolian (Am)",
+    description: "A natural minor mode vamp",
+    category: "modal",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "Locrian Vamp (Bm7b5)": {
+    key: "Locrian Vamp (Bm7b5)",
+    label: "Locrian (Bm7b5)",
+    description: "Rare Locrian mode exploration",
+    category: "modal",
+    difficulty: "advanced",
+    barCount: 4,
+  },
+  "Dorian Funk (Am7)": {
+    key: "Dorian Funk (Am7)",
+    label: "Dorian Funk (Am7)",
+    description: "A Dorian with funk feel",
+    category: "modal",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "Mixolydian Blues (E7)": {
+    key: "Mixolydian Blues (E7)",
+    label: "Mixolydian Blues (E7)",
+    description: "E Mixolydian with bluesy motion",
     category: "modal",
     difficulty: "intermediate",
     barCount: 4,
