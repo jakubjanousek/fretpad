@@ -67,6 +67,7 @@ export interface SessionPlannerSlice {
   sessionPaused: boolean;
 
   startSession: () => void;
+  startSessionAtPhase: (index: number) => void;
   endSession: () => void;
   advancePhase: () => void;
   goToPhase: (index: number) => void;
@@ -97,6 +98,25 @@ export const createSessionPlannerSlice: StateCreator<
 
     // Apply first phase settings
     const phase = SESSION_PHASES[0];
+    if (phase) {
+      get().setTempo(phase.suggestedTempo);
+      get().setSelectedStyle(phase.suggestedStyle);
+      get().loadPreset(phase.suggestedPreset);
+    }
+  },
+
+  startSessionAtPhase: (index: number) => {
+    if (index < 0 || index >= SESSION_PHASES.length) return;
+
+    set({
+      sessionActive: true,
+      sessionPhaseIndex: index,
+      sessionPhaseElapsedMs: 0,
+      sessionTotalElapsedMs: 0,
+      sessionPaused: false,
+    });
+
+    const phase = SESSION_PHASES[index];
     if (phase) {
       get().setTempo(phase.suggestedTempo);
       get().setSelectedStyle(phase.suggestedStyle);

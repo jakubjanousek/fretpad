@@ -67,6 +67,7 @@ export function SessionPlanner({ open, onOpenChange }: SessionPlannerProps) {
   const sessionPaused = useAppStore((s) => s.sessionPaused);
 
   const startSession = useAppStore((s) => s.startSession);
+  const startSessionAtPhase = useAppStore((s) => s.startSessionAtPhase);
   const endSession = useAppStore((s) => s.endSession);
   const advancePhase = useAppStore((s) => s.advancePhase);
   const goToPhase = useAppStore((s) => s.goToPhase);
@@ -202,20 +203,20 @@ export function SessionPlanner({ open, onOpenChange }: SessionPlannerProps) {
                   key={phase.phase}
                   type="button"
                   onClick={() => {
-                    if (sessionActive) goToPhase(index);
+                    if (sessionActive) {
+                      goToPhase(index);
+                    } else {
+                      startSessionAtPhase(index);
+                    }
                   }}
-                  disabled={!sessionActive}
                   className={cn(
-                    "w-full text-left rounded-xl border p-3.5 transition-all duration-200",
+                    "w-full text-left rounded-xl border p-3.5 transition-all duration-200 cursor-pointer hover:opacity-80 active:scale-[0.99]",
                     isActive &&
                       `bg-gradient-to-br ${PHASE_BG[phase.phase]} ring-1 ring-inset ring-white/10`,
                     isCompleted && "bg-muted/30 border-muted opacity-60",
                     isFuture && "bg-muted/20 border-muted/50 opacity-50",
                     !sessionActive &&
                       `bg-gradient-to-br ${PHASE_BG[phase.phase]}`,
-                    sessionActive &&
-                      "cursor-pointer hover:opacity-80 active:scale-[0.99]",
-                    !sessionActive && "cursor-default",
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">
