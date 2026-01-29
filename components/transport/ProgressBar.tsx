@@ -1,9 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePlaybackPosition } from "@/hooks/usePlaybackPosition";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
+
+// Color palette for chord segments — each entry has Tailwind text/bg classes and raw rgba for effects
+const SEGMENT_COLORS = [
+  { text: "text-orange-500", bg: "bg-orange-500", rgba: "249,115,22" },
+  { text: "text-sky-500", bg: "bg-sky-500", rgba: "14,165,233" },
+  { text: "text-emerald-500", bg: "bg-emerald-500", rgba: "16,185,129" },
+  { text: "text-violet-500", bg: "bg-violet-500", rgba: "139,92,246" },
+  { text: "text-rose-500", bg: "bg-rose-500", rgba: "244,63,94" },
+  { text: "text-amber-500", bg: "bg-amber-500", rgba: "245,158,11" },
+];
 
 export function ProgressBar() {
   const progression = useAppStore((state) => state.progression);
@@ -45,6 +55,20 @@ export function ProgressBar() {
     progression.bars.length,
   ]);
 
+  // Map each unique chord to a color
+  const chordColorMap = useMemo(() => {
+    const map: Record<string, (typeof SEGMENT_COLORS)[number]> = {};
+    let colorIndex = 0;
+    for (const bar of progression.bars) {
+      const key = bar.chords.map((bc) => bc.chord).join(" ");
+      if (!(key in map)) {
+        map[key] = SEGMENT_COLORS[colorIndex % SEGMENT_COLORS.length]!;
+        colorIndex++;
+      }
+    }
+    return map;
+  }, [progression.bars]);
+
   // Calculate overall progress across the entire progression
   const totalBars = progression.bars.length;
   const beatsPerBar = progression.timeSignature.numerator;
@@ -57,6 +81,8 @@ export function ProgressBar() {
   // Build bar segments for the progress bar
   const barSegments = progression.bars.map((bar, index) => {
     const chordNames = bar.chords.map((bc) => bc.chord).join(" ");
+    // Color is guaranteed to exist since chordColorMap is built from the same bars
+    const color = chordColorMap[chordNames] as (typeof SEGMENT_COLORS)[number];
     // Don't highlight bars during count-in
     const isCurrentBar =
       playbackPosition.isActive &&
@@ -70,6 +96,7 @@ export function ProgressBar() {
     return {
       id: bar.id,
       chordNames,
+      color,
       isCurrentBar,
       isPastBar,
       width: 100 / totalBars,
@@ -104,7 +131,7 @@ export function ProgressBar() {
             <span
               className={cn(
                 "font-mono transition-colors",
-                segment.isCurrentBar && "text-orange-500 font-medium",
+                segment.isCurrentBar && `${segment.color.text} font-medium`,
                 segment.isPastBar && "text-foreground/70",
               )}
             >
@@ -115,16 +142,31 @@ export function ProgressBar() {
       </div>
 
       {/* Progress bar track */}
-      <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+      <div className="relative h-5 bg-muted rounded-full overflow-hidden">
+        {/* Active segment background highlight */}
+        {barSegments.map((segment, index) => (
+          <div
+            key={`segment-bg-${segment.id}`}
+            className="absolute top-0 bottom-0 transition-colors duration-200"
+            style={{
+              left: `${index * segment.width}%`,
+              width: `${segment.width}%`,
+              backgroundColor: segment.isCurrentBar
+                ? `rgba(${segment.color.rgba},0.15)`
+                : segment.isPastBar
+                  ? `rgba(${segment.color.rgba},0.05)`
+                  : undefined,
+            }}
+          />
+        ))}
+
         {/* Beat markers */}
         {beatMarkers.map((marker) => (
           <div
             key={marker.id}
             className={cn(
               "absolute top-1/2 -translate-y-1/2 rounded-full z-5",
-              marker.isDownbeat
-                ? "w-1.5 h-1.5 bg-border"
-                : "w-1 h-1 bg-border/60",
+              marker.isDownbeat ? "w-2 h-2 bg-border" : "w-1 h-1 bg-border/60",
             )}
             style={{ left: `${marker.position}%` }}
           />
@@ -139,35 +181,60 @@ export function ProgressBar() {
           />
         ))}
 
-        {/* Progress fill */}
-        <div
-          className={cn(
-            "absolute top-0 bottom-0 left-0 bg-orange-500/80 transition-none",
-            !playbackPosition.isActive && "bg-muted",
-          )}
-          style={{ width: `${overallProgress * 100}%` }}
-        />
+        {/* Per-segment progress fill */}
+        {playbackPosition.isActive &&
+          !playbackPosition.isCountingIn &&
+          barSegments.map((segment, index) => {
+            const segStart = index / totalBars;
+            const segEnd = (index + 1) / totalBars;
+            // How much of this segment is filled (0 to 1)
+            const fill =
+              overallProgress <= segStart
+                ? 0
+                : overallProgress >= segEnd
+                  ? 1
+                  : (overallProgress - segStart) / (segEnd - segStart);
+            if (fill <= 0) return null;
+            return (
+              <div
+                key={`fill-${segment.id}`}
+                className="absolute top-0 bottom-0 transition-none"
+                style={{
+                  left: `${segStart * 100}%`,
+                  width: `${segment.width * fill}%`,
+                  backgroundColor: `rgba(${segment.color.rgba},0.8)`,
+                }}
+              />
+            );
+          })}
 
         {/* Playhead indicator - enhanced with glow */}
-        {playbackPosition.isActive && !playbackPosition.isCountingIn && (
-          <div
-            className="absolute top-0 bottom-0 w-0.75 bg-orange-500 rounded-full transition-none shadow-[0_0_8px_2px_rgba(249,115,22,0.5)]"
-            style={{
-              left: `${overallProgress * 100}%`,
-              transform: "translateX(-50%)",
-            }}
-          />
-        )}
+        {(() => {
+          if (!playbackPosition.isActive || playbackPosition.isCountingIn)
+            return null;
+          const currentRgba =
+            barSegments[playbackPosition.barIndex]?.color.rgba ?? "249,115,22";
+          return (
+            <div
+              className="absolute -top-0.5 -bottom-0.5 w-1 rounded-full transition-none"
+              style={{
+                left: `${overallProgress * 100}%`,
+                transform: "translateX(-50%)",
+                backgroundColor: `rgb(${currentRgba})`,
+                boxShadow: `0 0 10px 3px rgba(${currentRgba},0.6)`,
+              }}
+            />
+          );
+        })()}
 
         {/* Chord boundary flash effect */}
         {flashPosition !== null && (
           <div
-            className="absolute top-0 bottom-0 w-4 animate-chord-flash pointer-events-none z-20"
+            className="absolute top-0 bottom-0 w-6 animate-chord-flash pointer-events-none z-20"
             style={{
               left: `${flashPosition}%`,
               transform: "translateX(-50%)",
-              background:
-                "radial-gradient(ellipse at center, rgba(249, 115, 22, 0.8) 0%, transparent 70%)",
+              background: `radial-gradient(ellipse at center, rgba(${barSegments[playbackPosition.barIndex]?.color.rgba ?? "249,115,22"},0.8) 0%, transparent 70%)`,
             }}
           />
         )}

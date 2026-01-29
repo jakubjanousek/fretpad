@@ -27,7 +27,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 |----|----------|---------|----------------|
 | VH-1 | Medium | ✅ **IMPLEMENTED** — The progression bar area and fretboard area competed for attention with the fretboard. | Removed the Card wrapper from the progression editor, reduced chord font size to xs, tightened padding/gaps throughout, made buttons and undo/redo controls smaller, and softened the helper text. The fretboard now clearly dominates the viewport. |
 | VH-2 | Low | The "Click for details" CTA under the chord name is styled as muted italic text, making it easy to miss. This is a key discovery action. | Make it a subtle but clear link or button style. Consider a small info icon next to the chord name instead. |
-| VH-3 | Medium | The playhead/progress bar between chord info and fretboard (showing Dm7 → G7 → Cmaj7 → Cmaj7) is very small and hard to notice. It's a critical navigation element during playback. | Increase the height of the playhead track. Add a clearer active-segment indicator. Consider color-coding the segments to match the chord that's playing. |
+| VH-3 | Medium | ✅ **IMPLEMENTED** — The playhead/progress bar between chord info and fretboard was very small and hard to notice. | Increased the track height from 12px to 20px, added an active-segment background highlight (orange tint on the current bar), enlarged downbeat markers, made the playhead indicator wider with a stronger glow that extends beyond the track, and widened the chord boundary flash effect. |
 | VH-4 | Low | "Bar 1 of 4" and "4/4" labels flanking the fretboard are in small grey text, blending into the background. | Slightly increase contrast or font weight for these contextual labels. |
 | VH-5 | Medium | ✅ **IMPLEMENTED** — The bottom transport bar icons (Practice Session, Chord Tone Quiz, Practice Stats, Help Guide, Settings) were icon-only with no labels visible. | Added visible text labels below each icon on desktop/tablet (sm+ breakpoint). On mobile, icons remain compact with tooltip support. Labels use 10px muted text for a clean, unobtrusive look. |
 
@@ -146,7 +146,7 @@ Ranked by impact-to-effort ratio:
 6. **VH-1** — ✅ Reduce progression editor visual weight (medium hierarchy impact, low effort)
 7. **MR-3** — ✅ Fix Display button truncation on mobile (medium mobile polish, low effort)
 8. **IS-1** — ✅ Add fretboard transition animation between chords (medium delight, moderate effort)
-9. **VH-3** — Improve playhead visibility (medium playback UX, low effort)
+9. **VH-3** — ✅ Improve playhead visibility (medium playback UX, low effort)
 10. **TS-3** — Fix chord details panel heading spacing (low polish, low effort)
 
 ---
