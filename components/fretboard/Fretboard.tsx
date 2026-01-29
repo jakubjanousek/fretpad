@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
 import type {
+  CAGEDPosition,
   FretboardOverlay,
   FretNote,
   FretPosition,
@@ -14,7 +20,7 @@ import { CAGED_POSITION_LABELS, STANDARD_TUNING } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import { FretboardLegend, type LegendNoteType } from "./FretboardLegend";
-import { FretMarker } from "./FretMarker";
+import { FretMarker, type OverlayColorMode } from "./FretMarker";
 import { LegendTooltip } from "./LegendTooltip";
 import { VoiceLeadingOverlay } from "./VoiceLeadingOverlay";
 
@@ -27,10 +33,14 @@ interface FretboardProps {
   showScaleTones?: boolean;
   noteLabelMode?: NoteLabelMode;
   fretboardOverlay?: FretboardOverlay;
+  showCAGEDPositions?: boolean;
+  focusedPosition?: CAGEDPosition | null;
   onToggleVoiceLeading?: () => void;
   onToggleScaleTones?: () => void;
   onNoteLabelModeChange?: (mode: NoteLabelMode) => void;
   onOverlayChange?: (overlay: FretboardOverlay) => void;
+  onToggleCAGEDPositions?: () => void;
+  onFocusedPositionChange?: (pos: CAGEDPosition | null) => void;
   quizMode?: boolean;
   quizTargetPosition?: FretPosition | null;
 }
@@ -72,7 +82,19 @@ const OVERLAY_OPTIONS: { value: FretboardOverlay; label: string }[] = [
   { value: "pentatonicMinor", label: "Minor Pentatonic" },
   { value: "pentatonicMajor", label: "Major Pentatonic" },
   { value: "blues", label: "Blues" },
+  { value: "threeNotePerString", label: "3-Note-Per-String" },
 ];
+
+const LABEL_OPTIONS: { value: NoteLabelMode; label: string }[] = [
+  { value: "notes", label: "Notes" },
+  { value: "degrees", label: "Degrees" },
+  { value: "none", label: "None" },
+];
+
+function getOverlayDisplayName(overlay: FretboardOverlay): string {
+  const opt = OVERLAY_OPTIONS.find((o) => o.value === overlay);
+  return opt?.label ?? "None";
+}
 
 export function Fretboard({
   fretNotes,
@@ -83,10 +105,14 @@ export function Fretboard({
   showScaleTones = false,
   noteLabelMode = "notes",
   fretboardOverlay = "none",
+  showCAGEDPositions = false,
+  focusedPosition = null,
   onToggleVoiceLeading,
   onToggleScaleTones,
   onNoteLabelModeChange,
   onOverlayChange,
+  onToggleCAGEDPositions,
+  onFocusedPositionChange,
   quizMode = false,
   quizTargetPosition = null,
 }: FretboardProps) {
@@ -110,8 +136,18 @@ export function Fretboard({
   };
 
   const isOverlayActive = fretboardOverlay !== "none";
+  const isThreeNPS = fretboardOverlay === "threeNotePerString";
 
-  // Helper to determine if a note matches the hovered legend type
+  // Determine the overlay color mode for notes
+  const getOverlayColorMode = (note: FretNote): OverlayColorMode => {
+    if (!isOverlayActive) return "none";
+    if (showCAGEDPositions && (note.cagedPosition || note.threeNPSPosition)) {
+      return "caged";
+    }
+    return "chord-role";
+  };
+
+  // Helper to determine if a note matches the hovered legend type or focused position
   const getNoteHighlightState = (
     note: FretNote,
   ): "highlighted" | "dimmed" | "normal" => {
@@ -120,15 +156,29 @@ export function Fretboard({
       return isQuizTarget(note) ? "highlighted" : "dimmed";
     }
 
-    if (!hoveredLegendType) return "normal";
-
-    // In overlay mode, highlight by CAGED position
-    if (isOverlayActive && note.cagedPosition) {
-      const posLabel = CAGED_POSITION_LABELS[note.cagedPosition];
-      const legendKey = `pos-${posLabel}`;
-      return hoveredLegendType === legendKey ? "highlighted" : "dimmed";
+    // Focus position mode — dim notes not in the focused position
+    if (focusedPosition !== null && isOverlayActive && showCAGEDPositions) {
+      const notePos = isThreeNPS ? note.threeNPSPosition : note.cagedPosition;
+      if (notePos !== focusedPosition) return "dimmed";
+      if (!hoveredLegendType) return "normal";
     }
 
+    if (!hoveredLegendType) return "normal";
+
+    // In overlay mode with CAGED positions on, highlight by position
+    if (isOverlayActive && showCAGEDPositions) {
+      if (note.cagedPosition) {
+        const posLabel = CAGED_POSITION_LABELS[note.cagedPosition];
+        const legendKey = `pos-${posLabel}`;
+        return hoveredLegendType === legendKey ? "highlighted" : "dimmed";
+      }
+      if (note.threeNPSPosition) {
+        const legendKey = `pos-${note.threeNPSPosition}`;
+        return hoveredLegendType === legendKey ? "highlighted" : "dimmed";
+      }
+    }
+
+    // Chord-role highlighting
     const noteType: LegendNoteType = note.isRoot
       ? "root"
       : note.isGuideTone
@@ -149,6 +199,14 @@ export function Fretboard({
 
   // Generate fret numbers for header (use responsive count)
   const frets = Array.from({ length: responsiveFretCount + 1 }, (_, i) => i);
+
+  // Build summary chips for the display popover trigger
+  const activeChips: string[] = [];
+  if (isOverlayActive)
+    activeChips.push(getOverlayDisplayName(fretboardOverlay));
+  if (showVoiceLeading) activeChips.push("Voice Leading");
+  if (showScaleTones) activeChips.push("Fill Scale");
+  if (showCAGEDPositions && isOverlayActive) activeChips.push("Positions");
 
   return (
     <div className="w-full overflow-x-auto scrollbar-hide sm:scrollbar-thin sm:scrollbar-thumb-muted sm:scrollbar-track-transparent">
@@ -231,7 +289,7 @@ export function Fretboard({
                         note={nutNote}
                         labelMode={noteLabelMode}
                         highlightState={getNoteHighlightState(nutNote)}
-                        overlayMode={isOverlayActive && !!nutNote.cagedPosition}
+                        overlayMode={getOverlayColorMode(nutNote)}
                         labelOverride={
                           quizMode && isQuizTarget(nutNote) ? "?" : undefined
                         }
@@ -266,9 +324,7 @@ export function Fretboard({
                             note={note}
                             labelMode={noteLabelMode}
                             highlightState={getNoteHighlightState(note)}
-                            overlayMode={
-                              isOverlayActive && !!note.cagedPosition
-                            }
+                            overlayMode={getOverlayColorMode(note)}
                             labelOverride={
                               quizMode && isQuizTarget(note) ? "?" : undefined
                             }
@@ -293,149 +349,135 @@ export function Fretboard({
               hoveredType={hoveredLegendType}
               onHoverChange={setHoveredLegendType}
               overlayActive={isOverlayActive}
+              showCAGEDPositions={showCAGEDPositions}
+              isThreeNPS={isThreeNPS}
+              focusedPosition={focusedPosition}
+              onFocusPosition={onFocusedPositionChange}
             />
 
-            {/* Controls */}
-            <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
-              {/* Overlay selector */}
-              {onOverlayChange && (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground hidden sm:inline">
-                    Overlay:
-                  </span>
-                  <div className="relative flex rounded-lg bg-muted/60 p-0.5">
-                    {OVERLAY_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => onOverlayChange(opt.value)}
-                        className={cn(
-                          "relative z-10 h-7 px-2 text-xs font-medium rounded-md transition-colors duration-150",
-                          fretboardOverlay === opt.value
-                            ? "bg-background text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground",
-                        )}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Note label mode selector - segmented control style */}
-              {onNoteLabelModeChange && (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground hidden sm:inline">
-                    Labels:
-                  </span>
-                  <div className="relative flex rounded-lg bg-muted/60 p-0.5">
-                    {/* Sliding indicator */}
-                    <div
-                      className={cn(
-                        "absolute top-0.5 bottom-0.5 rounded-md bg-background shadow-sm transition-all duration-200 ease-out",
-                        noteLabelMode === "notes" &&
-                          "left-0.5 w-[calc(33.33%-2px)]",
-                        noteLabelMode === "degrees" &&
-                          "left-[33.33%] w-[calc(33.33%-2px)]",
-                        noteLabelMode === "none" &&
-                          "left-[66.66%] w-[calc(33.33%-2px)]",
-                      )}
+            {/* Display Popover */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs gap-1.5"
+                >
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    role="img"
+                    aria-label="Display settings"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
                     />
-                    <button
-                      type="button"
-                      onClick={() => onNoteLabelModeChange("notes")}
-                      className={cn(
-                        "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
-                        noteLabelMode === "notes"
-                          ? "text-foreground"
-                          : "text-muted-foreground hover:text-foreground",
-                      )}
-                    >
-                      Notes
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onNoteLabelModeChange("degrees")}
-                      className={cn(
-                        "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
-                        noteLabelMode === "degrees"
-                          ? "text-foreground"
-                          : "text-muted-foreground hover:text-foreground",
-                      )}
-                    >
-                      Degrees
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onNoteLabelModeChange("none")}
-                      className={cn(
-                        "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
-                        noteLabelMode === "none"
-                          ? "text-foreground"
-                          : "text-muted-foreground hover:text-foreground",
-                      )}
-                    >
-                      None
-                    </button>
+                  </svg>
+                  Display
+                  {activeChips.length > 0 && (
+                    <span className="text-muted-foreground">
+                      ({activeChips.join(" · ")})
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-80 p-0">
+                <div className="p-4 space-y-4">
+                  {/* Scale Overlay */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      Scale Overlay
+                    </h4>
+                    <div className="flex flex-wrap gap-1">
+                      {OVERLAY_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => onOverlayChange?.(opt.value)}
+                          className={cn(
+                            "h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                            fretboardOverlay === opt.value
+                              ? "bg-foreground text-background"
+                              : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80",
+                          )}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              {/* Toggle buttons with enhanced states */}
-              {(onToggleVoiceLeading || onToggleScaleTones) && (
-                <div className="flex gap-1.5 sm:gap-2">
-                  {onToggleVoiceLeading && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      data-state={showVoiceLeading ? "on" : "off"}
-                      onClick={onToggleVoiceLeading}
-                      className={cn(
-                        "h-7 text-xs transition-all duration-150 active:scale-95",
-                        showVoiceLeading
-                          ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
-                          : "hover:border-blue-500/50",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
-                          showVoiceLeading
-                            ? "bg-blue-500"
-                            : "bg-muted-foreground/30",
-                        )}
+                  {/* Note Labels */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      Note Labels
+                    </h4>
+                    <div className="flex gap-1">
+                      {LABEL_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => onNoteLabelModeChange?.(opt.value)}
+                          className={cn(
+                            "h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                            noteLabelMode === opt.value
+                              ? "bg-foreground text-background"
+                              : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80",
+                          )}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Display Layers */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                      Display Layers
+                    </h4>
+                    <div className="space-y-1.5">
+                      <ToggleRow
+                        label="Voice Leading"
+                        description="Show voice leading paths between chords"
+                        active={showVoiceLeading}
+                        onToggle={onToggleVoiceLeading}
                       />
-                      Voice Leading
-                    </Button>
-                  )}
-                  {onToggleScaleTones && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      data-state={showScaleTones ? "on" : "off"}
-                      onClick={onToggleScaleTones}
-                      className={cn(
-                        "h-7 text-xs transition-all duration-150 active:scale-95",
-                        showScaleTones
-                          ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
-                          : "hover:border-slate-500/50",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
-                          showScaleTones
-                            ? "bg-slate-500"
-                            : "bg-muted-foreground/30",
-                        )}
+                      <ToggleRow
+                        label="Fill Scale"
+                        description="Show remaining diatonic notes as faded dots"
+                        active={showScaleTones}
+                        onToggle={onToggleScaleTones}
                       />
-                      Scale Tones
-                    </Button>
+                    </div>
+                  </div>
+
+                  {/* CAGED Positions — only when overlay is active */}
+                  {isOverlayActive && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                        {isThreeNPS ? "3NPS Positions" : "CAGED Positions"}
+                      </h4>
+                      <ToggleRow
+                        label="Show positions"
+                        description={
+                          isThreeNPS
+                            ? "Color notes by 3NPS position (1-7)"
+                            : "Color notes by CAGED shape position"
+                        }
+                        active={showCAGEDPositions}
+                        onToggle={onToggleCAGEDPositions}
+                      />
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              </PopoverContent>
+            </Popover>
           </div>
         )}
       </div>
@@ -448,5 +490,48 @@ export function Fretboard({
         />
       )}
     </div>
+  );
+}
+
+function ToggleRow({
+  label,
+  description,
+  active,
+  onToggle,
+}: {
+  label: string;
+  description: string;
+  active: boolean;
+  onToggle?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className={cn(
+        "w-full flex items-center gap-3 px-2.5 py-2 rounded-md text-left transition-colors",
+        active ? "bg-blue-500/10 dark:bg-blue-500/15" : "hover:bg-muted/60",
+      )}
+    >
+      <div
+        className={cn(
+          "w-8 h-5 rounded-full relative transition-colors shrink-0",
+          active ? "bg-blue-500" : "bg-muted-foreground/30",
+        )}
+      >
+        <div
+          className={cn(
+            "absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform",
+            active ? "translate-x-3.5" : "translate-x-0.5",
+          )}
+        />
+      </div>
+      <div className="min-w-0">
+        <div className="text-xs font-medium">{label}</div>
+        <div className="text-[10px] text-muted-foreground leading-tight">
+          {description}
+        </div>
+      </div>
+    </button>
   );
 }

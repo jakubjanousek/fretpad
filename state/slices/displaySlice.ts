@@ -1,5 +1,9 @@
 import type { StateCreator } from "zustand";
-import type { FretboardOverlay, NoteLabelMode } from "@/lib/types";
+import type {
+  CAGEDPosition,
+  FretboardOverlay,
+  NoteLabelMode,
+} from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
 export interface DisplaySlice {
@@ -8,12 +12,16 @@ export interface DisplaySlice {
   noteLabelMode: NoteLabelMode;
   previewScale: string | null;
   fretboardOverlay: FretboardOverlay;
+  showCAGEDPositions: boolean;
+  focusedPosition: CAGEDPosition | null;
 
   setShowScaleTones: (show: boolean) => void;
   setShowVoiceLeading: (show: boolean) => void;
   setNoteLabelMode: (mode: NoteLabelMode) => void;
   setPreviewScale: (scale: string | null) => void;
   setFretboardOverlay: (overlay: FretboardOverlay) => void;
+  setShowCAGEDPositions: (show: boolean) => void;
+  setFocusedPosition: (pos: CAGEDPosition | null) => void;
 }
 
 export const createDisplaySlice: StateCreator<
@@ -27,6 +35,8 @@ export const createDisplaySlice: StateCreator<
   noteLabelMode: "notes",
   previewScale: null,
   fretboardOverlay: "none",
+  showCAGEDPositions: false,
+  focusedPosition: null,
 
   setShowScaleTones: (show) => {
     set({ showScaleTones: show });
@@ -45,6 +55,14 @@ export const createDisplaySlice: StateCreator<
   },
 
   setFretboardOverlay: (overlay) => {
-    set({ fretboardOverlay: overlay });
+    set({ fretboardOverlay: overlay, focusedPosition: null });
+  },
+
+  setShowCAGEDPositions: (show) => {
+    set({ showCAGEDPositions: show, focusedPosition: show ? null : null });
+  },
+
+  setFocusedPosition: (pos) => {
+    set({ focusedPosition: pos });
   },
 });

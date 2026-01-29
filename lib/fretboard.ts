@@ -5,7 +5,13 @@ import {
   isRoot,
 } from "@/lib/theory/chords";
 import { getScaleNotes } from "@/lib/theory/scales";
-import type { CAGEDPosition, Chord, FretNote, NoteName } from "@/lib/types";
+import type {
+  CAGEDPosition,
+  Chord,
+  FretNote,
+  NoteName,
+  ThreeNPSPosition,
+} from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
 
 /**
@@ -228,8 +234,46 @@ export function getOverlayNoteColor(note: FretNote): string {
 }
 
 /**
+ * Gets the color for an overlay note using chord-role coloring.
+ * When CAGED is off, overlay notes use chord-role colors so users
+ * can see which pentatonic notes are chord tones.
+ */
+export function getOverlayChordRoleColor(note: FretNote): string {
+  if (note.isRoot) return "bg-orange-500";
+  if (note.isGuideTone) return "bg-blue-500";
+  if (note.isChordTone) return "bg-emerald-500";
+  return "bg-slate-400";
+}
+
+/**
  * Gets the text color for overlay notes
  */
 export function getOverlayNoteTextColor(_note: FretNote): string {
   return "text-white";
 }
+
+/**
+ * Color classes for 3NPS positions (7 positions for 7 scale degrees)
+ */
+const THREE_NPS_POSITION_COLORS: Record<ThreeNPSPosition, string> = {
+  1: "bg-purple-500",
+  2: "bg-pink-500",
+  3: "bg-cyan-500",
+  4: "bg-amber-500",
+  5: "bg-rose-500",
+  6: "bg-teal-500",
+  7: "bg-indigo-500",
+};
+
+/**
+ * Gets the color for a 3NPS position overlay note.
+ */
+export function getThreeNPSNoteColor(note: FretNote): string {
+  if (note.isRoot) return "bg-orange-500";
+  if (note.threeNPSPosition) {
+    return THREE_NPS_POSITION_COLORS[note.threeNPSPosition];
+  }
+  return "bg-slate-400";
+}
+
+export { CAGED_POSITION_COLORS, THREE_NPS_POSITION_COLORS };

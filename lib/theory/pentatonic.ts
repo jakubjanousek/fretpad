@@ -1,7 +1,13 @@
 import { generateFretboardLayout } from "@/lib/fretboard";
-import { getIntervalName } from "@/lib/theory/chords";
+import {
+  getIntervalName,
+  isChordTone,
+  isGuideTone,
+  isRoot,
+} from "@/lib/theory/chords";
 import type {
   CAGEDPosition,
+  Chord,
   FretboardOverlay,
   FretNote,
   NoteName,
@@ -42,7 +48,10 @@ function sameChroma(a: string, b: string): boolean {
 /**
  * Semitone intervals for each overlay scale type (relative to root)
  */
-const SCALE_INTERVALS: Record<Exclude<FretboardOverlay, "none">, number[]> = {
+const SCALE_INTERVALS: Record<
+  Exclude<FretboardOverlay, "none" | "threeNotePerString">,
+  number[]
+> = {
   pentatonicMinor: [0, 3, 5, 7, 10],
   pentatonicMajor: [0, 2, 4, 7, 9],
   blues: [0, 3, 5, 6, 7, 10],
@@ -108,7 +117,7 @@ function getCAGEDPosition(
  */
 function getOverlayPitchClasses(
   root: NoteName,
-  overlay: Exclude<FretboardOverlay, "none">,
+  overlay: Exclude<FretboardOverlay, "none" | "threeNotePerString">,
 ): Set<number> {
   const rootPC = getPitchClass(root);
   const intervals = SCALE_INTERVALS[overlay];
@@ -118,14 +127,14 @@ function getOverlayPitchClasses(
 /**
  * Compute overlay FretNotes for the given root and overlay type.
  * Returns notes for all pentatonic/blues positions on the fretboard,
- * with CAGED position assignment.
+ * with CAGED position assignment and chord-tone classification.
  */
 export function getOverlayNotes(
   root: NoteName,
-  overlay: Exclude<FretboardOverlay, "none">,
-  options: { numFrets?: number; tuning?: NoteName[] } = {},
+  overlay: Exclude<FretboardOverlay, "none" | "threeNotePerString">,
+  options: { numFrets?: number; tuning?: NoteName[]; chord?: Chord } = {},
 ): FretNote[] {
-  const { numFrets = 12, tuning = STANDARD_TUNING } = options;
+  const { numFrets = 12, tuning = STANDARD_TUNING, chord } = options;
   const rootPC = getPitchClass(root);
   const scalePCs = getOverlayPitchClasses(root, overlay);
   const layout = generateFretboardLayout(numFrets, tuning);
@@ -142,7 +151,9 @@ export function getOverlayNotes(
       const notePC = getPitchClass(note);
       if (!scalePCs.has(notePC)) continue;
 
-      const isRoot = sameChroma(note, root);
+      const noteIsRoot = chord ? isRoot(chord, note) : sameChroma(note, root);
+      const noteIsChordTone = chord ? isChordTone(chord, note) : false;
+      const noteIsGuideTone = chord ? isGuideTone(chord, note) : false;
       const interval = getIntervalName(root, note);
       const cagedPosition = getCAGEDPosition(fret, rootPC, overlay);
 
@@ -151,10 +162,10 @@ export function getOverlayNotes(
         fret,
         note,
         interval,
-        isRoot,
-        isChordTone: false,
-        isGuideTone: false,
-        isScaleTone: true,
+        isRoot: noteIsRoot,
+        isChordTone: noteIsChordTone,
+        isGuideTone: noteIsGuideTone,
+        isScaleTone: !noteIsChordTone,
         cagedPosition,
       });
     }

@@ -80,7 +80,10 @@ export interface FretNote extends FretPosition {
   isGuideTone: boolean;
   isScaleTone: boolean;
   cagedPosition?: CAGEDPosition;
+  threeNPSPosition?: ThreeNPSPosition;
 }
+
+export type ThreeNPSPosition = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 // Standard tuning - can be extended later for alternate tunings
 export const STANDARD_TUNING: NoteName[] = ["E", "B", "G", "D", "A", "E"]; // high to low (string 1-6)
@@ -212,7 +215,8 @@ export type FretboardOverlay =
   | "none"
   | "pentatonicMinor"
   | "pentatonicMajor"
-  | "blues";
+  | "blues"
+  | "threeNotePerString";
 
 export type CAGEDPosition = 1 | 2 | 3 | 4 | 5;
 

@@ -4,20 +4,24 @@ import { NoteInfoTooltip } from "@/components/theory/NoteInfoTooltip";
 import {
   getFretNoteColor,
   getFretNoteTextColor,
+  getOverlayChordRoleColor,
   getOverlayNoteColor,
   getOverlayNoteTextColor,
+  getThreeNPSNoteColor,
 } from "@/lib/fretboard";
 import type { FretNote, NoteLabelMode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export type NoteHighlightState = "highlighted" | "dimmed" | "normal";
 
+export type OverlayColorMode = "none" | "caged" | "chord-role";
+
 interface FretMarkerProps {
   note: FretNote;
   labelMode?: NoteLabelMode;
   highlightState?: NoteHighlightState;
   labelOverride?: string;
-  overlayMode?: boolean;
+  overlayMode?: OverlayColorMode;
 }
 
 export function FretMarker({
@@ -25,14 +29,20 @@ export function FretMarker({
   labelMode = "notes",
   highlightState = "normal",
   labelOverride,
-  overlayMode = false,
+  overlayMode = "none",
 }: FretMarkerProps) {
-  const bgColor = overlayMode
-    ? getOverlayNoteColor(note)
-    : getFretNoteColor(note);
-  const textColor = overlayMode
-    ? getOverlayNoteTextColor(note)
-    : getFretNoteTextColor(note);
+  const bgColor =
+    overlayMode === "caged"
+      ? note.threeNPSPosition
+        ? getThreeNPSNoteColor(note)
+        : getOverlayNoteColor(note)
+      : overlayMode === "chord-role"
+        ? getOverlayChordRoleColor(note)
+        : getFretNoteColor(note);
+  const textColor =
+    overlayMode !== "none"
+      ? getOverlayNoteTextColor(note)
+      : getFretNoteTextColor(note);
 
   const getLabel = (): string => {
     switch (labelMode) {

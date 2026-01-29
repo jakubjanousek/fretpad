@@ -21,6 +21,7 @@ import { usePracticeTracker } from "@/hooks/usePracticeTracker";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import { getOverlayNotes } from "@/lib/theory/pentatonic";
+import { getThreeNPSNotes } from "@/lib/theory/threeNPS";
 import {
   calculateVoiceLeadingPaths,
   filterBestPaths,
@@ -46,6 +47,12 @@ export default function Page() {
   const previewScale = useAppStore((state) => state.previewScale);
   const fretboardOverlay = useAppStore((state) => state.fretboardOverlay);
   const setFretboardOverlay = useAppStore((state) => state.setFretboardOverlay);
+  const showCAGEDPositions = useAppStore((state) => state.showCAGEDPositions);
+  const setShowCAGEDPositions = useAppStore(
+    (state) => state.setShowCAGEDPositions,
+  );
+  const focusedPosition = useAppStore((state) => state.focusedPosition);
+  const setFocusedPosition = useAppStore((state) => state.setFocusedPosition);
 
   // Quiz state
   const quizActive = useAppStore((state) => state.quizActive);
@@ -117,9 +124,22 @@ export default function Page() {
     if (!currentChord) return [];
 
     if (isOverlayActive) {
+      if (fretboardOverlay === "threeNotePerString") {
+        const scaleName =
+          currentChord.suggestedScales[0]?.split(" ").slice(1).join(" ") ||
+          "major";
+        return getThreeNPSNotes(currentChord.root, {
+          chord: currentChord,
+          scaleName,
+        });
+      }
       return getOverlayNotes(
         currentChord.root,
-        fretboardOverlay as Exclude<typeof fretboardOverlay, "none">,
+        fretboardOverlay as Exclude<
+          typeof fretboardOverlay,
+          "none" | "threeNotePerString"
+        >,
+        { chord: currentChord },
       );
     }
 
@@ -213,12 +233,18 @@ export default function Page() {
                 showScaleTones={showScaleTones}
                 noteLabelMode={noteLabelMode}
                 fretboardOverlay={fretboardOverlay}
+                showCAGEDPositions={showCAGEDPositions}
+                focusedPosition={focusedPosition}
                 onToggleVoiceLeading={() =>
                   setShowVoiceLeading(!showVoiceLeading)
                 }
                 onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
                 onNoteLabelModeChange={setNoteLabelMode}
                 onOverlayChange={setFretboardOverlay}
+                onToggleCAGEDPositions={() =>
+                  setShowCAGEDPositions(!showCAGEDPositions)
+                }
+                onFocusedPositionChange={setFocusedPosition}
                 quizMode={quizActive}
                 quizTargetPosition={
                   quizQuestion ? quizQuestion.targetNote : null
