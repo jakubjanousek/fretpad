@@ -7,7 +7,7 @@ import { getStyle } from "@/lib/audio/styles";
 import { useAppStore } from "@/state/useAppStore";
 
 /**
- * Shared transport control logic used by both TransportBar and TransportControls.
+ * Shared transport control logic used by TransportBar and TransportDrawer.
  * Manages audio engine integration, play/stop/reset actions, tempo changes,
  * metronome toggle, and keyboard shortcuts.
  */
