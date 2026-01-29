@@ -107,7 +107,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 |----|----------|---------|----------------|
 | NA-1 | Medium | The share button (top-right) has no label and its purpose is ambiguous — does it share a URL? Export? Copy the progression? | Add a tooltip. Consider renaming/re-iconizing based on what it actually does. |
 | NA-2 | Low | The "Progression" label in the header serves no interactive purpose — it's just a static label next to the dropdown. It takes up space without adding value. | Either remove it (the dropdown is self-explanatory) or make it a link/button that opens the progression editor in a more expanded view. |
-| NA-3 | Medium | There's no obvious way to undo/redo changes to the progression. If a user accidentally changes a chord or removes a bar, they lose their work. | Add undo/redo support (Cmd+Z / Cmd+Shift+Z) with a visual indicator. |
+| NA-3 | Medium | ✅ **IMPLEMENTED** — There was no way to undo/redo changes to the progression. If a user accidentally changed a chord or removed a bar, they lost their work. | Added undo/redo support with history tracking (up to 50 states). Keyboard shortcuts (⌘Z / ⌘⇧Z) and undo/redo buttons in the progression editor. All progression mutations (edit chord, add bar, remove bar, load preset, set progression) are tracked. |
 | NA-4 | Low | The Practice Stats button in the transport bar presumably tracks practice history, but there's no persistent indicator of whether stats are being recorded. | Show a small recording dot or session timer when practice tracking is active. |
 | NA-5 | Low | The keyboard shortcuts are buried inside Settings > "Keyboard shortcuts" button. Power users would benefit from faster access. | Support a `?` keyboard shortcut to show the shortcuts overlay, which is a common convention. |
 
@@ -141,7 +141,7 @@ Ranked by impact-to-effort ratio:
 1. **A-1** — ✅ Add non-color indicators to fretboard notes (high accessibility impact, moderate effort)
 2. **MR-1** — ✅ Add mobile fretboard scroll indicator (high mobile UX impact, low effort)
 3. **VH-5** — ✅ Add text labels to transport bar icons (medium UX impact, low effort)
-4. **NA-3** — Add undo/redo for progression edits (high safety impact, moderate effort)
+4. **NA-3** — ✅ Add undo/redo for progression edits (high safety impact, moderate effort)
 5. **IS-2** — Clarify chord editing interaction (medium learnability impact, low effort)
 6. **VH-1** — Reduce progression editor visual weight (medium hierarchy impact, low effort)
 7. **MR-3** — Fix Display button truncation on mobile (medium mobile polish, low effort)

@@ -21,6 +21,8 @@ const PRESET_KEYS = Object.keys(PRESET_PROGRESSIONS) as Array<
  * - R: Reset to beginning
  * - ↑/↓: Adjust tempo by 5 BPM
  * - M: Toggle metronome
+ * - Cmd/Ctrl+Z: Undo progression edit
+ * - Cmd/Ctrl+Shift+Z: Redo progression edit
  * - 1-3: Quick load first 3 presets (ii-V-I, Autumn Leaves, Rhythm Changes)
  */
 export function useKeyboardShortcuts({
@@ -33,6 +35,8 @@ export function useKeyboardShortcuts({
   const setTempo = useAppStore((state) => state.setTempo);
   const setMetronomeEnabled = useAppStore((state) => state.setMetronomeEnabled);
   const loadPreset = useAppStore((state) => state.loadPreset);
+  const undo = useAppStore((state) => state.undo);
+  const redo = useAppStore((state) => state.redo);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -43,6 +47,17 @@ export function useKeyboardShortcuts({
         target.tagName === "TEXTAREA" ||
         target.isContentEditable
       ) {
+        return;
+      }
+
+      // Undo/Redo: Cmd+Z / Cmd+Shift+Z (or Ctrl+Z / Ctrl+Shift+Z)
+      if (event.code === "KeyZ" && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        if (event.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
         return;
       }
 
@@ -115,5 +130,7 @@ export function useKeyboardShortcuts({
     setTempo,
     setMetronomeEnabled,
     loadPreset,
+    undo,
+    redo,
   ]);
 }

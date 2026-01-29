@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { Plus, Redo2, Undo2, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -166,6 +166,10 @@ export function ProgressionEditor() {
   const updateBar = useAppStore((state) => state.updateBar);
   const addBar = useAppStore((state) => state.addBar);
   const removeBar = useAppStore((state) => state.removeBar);
+  const undo = useAppStore((state) => state.undo);
+  const redo = useAppStore((state) => state.redo);
+  const historyLength = useAppStore((state) => state.progressionHistory.length);
+  const futureLength = useAppStore((state) => state.progressionFuture.length);
 
   const playbackPosition = usePlaybackPosition({
     progression,
@@ -221,6 +225,32 @@ export function ProgressionEditor() {
           >
             <Plus className="h-4 w-4" />
           </Button>
+
+          {/* Undo/Redo buttons */}
+          <div className="flex items-center gap-0.5 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={undo}
+              disabled={historyLength === 0}
+              className="h-8 w-8 p-0"
+              aria-label="Undo"
+              title="Undo (⌘Z)"
+            >
+              <Undo2 className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={redo}
+              disabled={futureLength === 0}
+              className="h-8 w-8 p-0"
+              aria-label="Redo"
+              title="Redo (⌘⇧Z)"
+            >
+              <Redo2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
 
           {/* Time signature display */}
           <span className="text-xs text-muted-foreground shrink-0 ml-auto pl-2">

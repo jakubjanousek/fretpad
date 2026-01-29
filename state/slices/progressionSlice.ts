@@ -6,11 +6,17 @@ import { parseBar } from "@/lib/theory/progression";
 import type { Chord, Progression, ProgressionBar } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
+const MAX_HISTORY = 50;
+
 export interface ProgressionSlice {
   progression: Progression;
   currentBarIndex: number;
   currentChordIndex: number;
   currentChord: Chord | null;
+
+  /** Undo/redo history stacks */
+  progressionHistory: Progression[];
+  progressionFuture: Progression[];
 
   setProgression: (progression: Progression) => void;
   loadPreset: (presetName: keyof typeof PRESET_PROGRESSIONS) => void;
@@ -19,6 +25,10 @@ export interface ProgressionSlice {
   addBar: () => void;
   removeBar: (barIndex: number) => void;
   advanceToNextChord: () => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
 }
 
 /**
@@ -42,6 +52,22 @@ export function getChordAtPosition(
 export const defaultProgression = PRESET_PROGRESSIONS["ii-V-I in C"];
 export const defaultChord = getChordAtPosition(defaultProgression, 0, 0);
 
+/**
+ * Push current progression onto the history stack before a mutation.
+ * Clears the future stack (redo is invalidated on new edits).
+ */
+function pushHistory(
+  get: () => AppState,
+  set: (state: Partial<AppState>) => void,
+) {
+  const { progression, progressionHistory } = get();
+  const newHistory = [...progressionHistory, progression];
+  if (newHistory.length > MAX_HISTORY) {
+    newHistory.shift();
+  }
+  set({ progressionHistory: newHistory, progressionFuture: [] });
+}
+
 export const createProgressionSlice: StateCreator<
   AppState,
   [],
@@ -52,8 +78,11 @@ export const createProgressionSlice: StateCreator<
   currentBarIndex: 0,
   currentChordIndex: 0,
   currentChord: defaultChord,
+  progressionHistory: [],
+  progressionFuture: [],
 
   setProgression: (progression) => {
+    pushHistory(get, set);
     const chord = getChordAtPosition(progression, 0, 0);
     set({
       progression,
@@ -64,6 +93,7 @@ export const createProgressionSlice: StateCreator<
   },
 
   loadPreset: (presetName) => {
+    pushHistory(get, set);
     const progression = PRESET_PROGRESSIONS[presetName];
     const chord = getChordAtPosition(progression, 0, 0);
     set({
@@ -91,6 +121,8 @@ export const createProgressionSlice: StateCreator<
     if (!newBar) {
       return false;
     }
+
+    pushHistory(get, set);
 
     const existingBar = progression.bars[barIndex];
     if (existingBar) {
@@ -130,6 +162,7 @@ export const createProgressionSlice: StateCreator<
   },
 
   addBar: () => {
+    pushHistory(get, set);
     const { progression } = get();
 
     const newBar: ProgressionBar = {
@@ -150,6 +183,8 @@ export const createProgressionSlice: StateCreator<
     const { progression, currentBarIndex, currentChordIndex } = get();
 
     if (progression.bars.length <= 1) return;
+
+    pushHistory(get, set);
 
     const newBars = progression.bars.filter((_, idx) => idx !== barIndex);
     const newProgression: Progression = {
@@ -221,4 +256,53 @@ export const createProgressionSlice: StateCreator<
       currentChord: chord,
     });
   },
+
+  undo: () => {
+    const { progressionHistory, progression } = get();
+    if (progressionHistory.length === 0) return;
+
+    const previous = progressionHistory.at(-1);
+    if (!previous) return;
+    const newHistory = progressionHistory.slice(0, -1);
+    const newFuture = [progression, ...get().progressionFuture];
+
+    const barIndex = 0;
+    const chordIndex = 0;
+    const chord = getChordAtPosition(previous, barIndex, chordIndex);
+
+    set({
+      progression: previous,
+      progressionHistory: newHistory,
+      progressionFuture: newFuture,
+      currentBarIndex: barIndex,
+      currentChordIndex: chordIndex,
+      currentChord: chord,
+    });
+  },
+
+  redo: () => {
+    const { progressionFuture, progression } = get();
+    if (progressionFuture.length === 0) return;
+
+    const next = progressionFuture[0];
+    if (!next) return;
+    const newFuture = progressionFuture.slice(1);
+    const newHistory = [...get().progressionHistory, progression];
+
+    const barIndex = 0;
+    const chordIndex = 0;
+    const chord = getChordAtPosition(next, barIndex, chordIndex);
+
+    set({
+      progression: next,
+      progressionHistory: newHistory,
+      progressionFuture: newFuture,
+      currentBarIndex: barIndex,
+      currentChordIndex: chordIndex,
+      currentChord: chord,
+    });
+  },
+
+  canUndo: () => get().progressionHistory.length > 0,
+  canRedo: () => get().progressionFuture.length > 0,
 });
