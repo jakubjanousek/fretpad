@@ -7,7 +7,6 @@ import { useAppStore } from "@/state/useAppStore";
 interface KeyboardShortcutHandlers {
   onPlay: () => void;
   onStop: () => void;
-  onReset: () => void;
 }
 
 const PRESET_KEYS = Object.keys(PRESET_PROGRESSIONS) as Array<

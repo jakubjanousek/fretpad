@@ -10,7 +10,6 @@ import { ShareExport } from "@/components/progression/ShareExport";
 import { PracticeStats } from "@/components/stats/PracticeStats";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChordInfoSheet } from "@/components/theory/ChordInfoSheet";
-import { KeyboardShortcutsHelp } from "@/components/transport/KeyboardShortcutsHelp";
 import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
@@ -46,7 +45,6 @@ export default function Page() {
   // Panel states
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [chordInfoOpen, setChordInfoOpen] = useState(false);
-  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
   const [helpGuideOpen, setHelpGuideOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
 
@@ -79,14 +77,12 @@ export default function Page() {
         setChordInfoOpen((prev) => !prev);
       }
 
-      // Toggle shortcuts help (? key)
-      if (e.key === "?" && !hasModifier && !isInputFocused) {
-        e.preventDefault();
-        setShortcutsHelpOpen((prev) => !prev);
-      }
-
-      // Toggle help guide (H key)
-      if (e.key.toLowerCase() === "h" && !hasModifier && !isInputFocused) {
+      // Toggle help guide (H or ? key)
+      if (
+        (e.key.toLowerCase() === "h" || e.key === "?") &&
+        !hasModifier &&
+        !isInputFocused
+      ) {
         e.preventDefault();
         setHelpGuideOpen((prev) => !prev);
       }
@@ -201,7 +197,6 @@ export default function Page() {
       {/* Fixed Transport Bar */}
       <TransportBar
         onSettingsClick={() => setSettingsOpen(true)}
-        onHelpClick={() => setShortcutsHelpOpen(true)}
         onGuideClick={() => setHelpGuideOpen(true)}
         onStatsClick={() => setStatsOpen(true)}
       />
@@ -214,12 +209,6 @@ export default function Page() {
         chord={currentChord}
         open={chordInfoOpen}
         onOpenChange={setChordInfoOpen}
-      />
-
-      {/* Keyboard Shortcuts Help */}
-      <KeyboardShortcutsHelp
-        open={shortcutsHelpOpen}
-        onOpenChange={setShortcutsHelpOpen}
       />
 
       {/* Help Guide */}

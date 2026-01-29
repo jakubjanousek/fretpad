@@ -69,7 +69,6 @@ export function useTransportControls() {
     resetLoopCount();
   }, [stop, setIsPlaying, resetLoopCount]);
 
-
   useKeyboardShortcuts({
     onPlay: handlePlay,
     onStop: handleStopClick,

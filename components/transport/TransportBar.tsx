@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  BookOpen,
-  Keyboard,
-  Play,
-  Settings,
-  Square,
-  Trophy,
-} from "lucide-react";
+import { BookOpen, Play, Settings, Square, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -19,7 +12,6 @@ import { useTransportControls } from "@/hooks/useTransportControls";
 
 interface TransportBarProps {
   onSettingsClick: () => void;
-  onHelpClick: () => void;
   onGuideClick: () => void;
   onStatsClick: () => void;
 }
@@ -30,17 +22,11 @@ interface TransportBarProps {
  */
 export function TransportBar({
   onSettingsClick,
-  onHelpClick,
   onGuideClick,
   onStatsClick,
 }: TransportBarProps) {
-  const {
-    isPlaying,
-    tempo,
-    handlePlay,
-    handleStopClick,
-    handleTempoChange,
-  } = useTransportControls();
+  const { isPlaying, tempo, handlePlay, handleStopClick, handleTempoChange } =
+    useTransportControls();
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 backdrop-blur-sm safe-area-inset-bottom">
@@ -128,22 +114,7 @@ export function TransportBar({
                   <BookOpen className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="top">Help Guide (H)</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onHelpClick}
-                  aria-label="Keyboard Shortcuts"
-                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
-                >
-                  <Keyboard className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Keyboard Shortcuts (?)</TooltipContent>
+              <TooltipContent side="top">Help Guide</TooltipContent>
             </Tooltip>
 
             <Tooltip>

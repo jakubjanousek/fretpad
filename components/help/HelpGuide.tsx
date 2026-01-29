@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Guitar, HelpCircle, Music, X } from "lucide-react";
+import { BookOpen, Guitar, HelpCircle, Keyboard, Music, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,11 @@ interface HelpGuideProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type TabId = "getting-started" | "chord-symbols" | "glossary";
+type TabId =
+  | "getting-started"
+  | "keyboard-shortcuts"
+  | "chord-symbols"
+  | "glossary";
 
 interface Tab {
   id: TabId;
@@ -23,6 +27,11 @@ const TABS: Tab[] = [
     id: "getting-started",
     label: "Getting Started",
     icon: <HelpCircle className="h-4 w-4" />,
+  },
+  {
+    id: "keyboard-shortcuts",
+    label: "Shortcuts",
+    icon: <Keyboard className="h-4 w-4" />,
   },
   {
     id: "chord-symbols",
@@ -119,6 +128,7 @@ export function HelpGuide({ open, onOpenChange }: HelpGuideProps) {
         {/* Tab content */}
         <div className="flex-1 overflow-y-auto p-4">
           {activeTab === "getting-started" && <GettingStartedContent />}
+          {activeTab === "keyboard-shortcuts" && <KeyboardShortcutsContent />}
           {activeTab === "chord-symbols" && <ChordSymbolsContent />}
           {activeTab === "glossary" && <GlossaryContent />}
         </div>
@@ -217,12 +227,44 @@ function GettingStartedContent() {
           </li>
           <li>Enable the metronome for better time feel</li>
           <li>
-            Use keyboard shortcuts for faster control (press{" "}
-            <kbd className="px-1 py-0.5 text-xs bg-muted rounded">?</kbd> to see
-            all)
+            Use keyboard shortcuts for faster control — see the{" "}
+            <strong className="text-foreground">Shortcuts</strong> tab above
           </li>
         </ul>
       </section>
+    </div>
+  );
+}
+
+const SHORTCUTS = [
+  { key: "Space", description: "Play / Stop" },
+  { key: "R", description: "Reset to beginning" },
+  { key: "M", description: "Toggle metronome" },
+  { key: "I", description: "Toggle chord info panel" },
+  { key: "H", description: "Open help guide" },
+  { key: "↑", description: "Increase tempo (+5 BPM)" },
+  { key: "↓", description: "Decrease tempo (-5 BPM)" },
+  { key: "1", description: "Load preset: ii-V-I in C" },
+  { key: "2", description: "Load preset: Autumn Leaves" },
+  { key: "3", description: "Load preset: Rhythm Changes" },
+];
+
+function KeyboardShortcutsContent() {
+  return (
+    <div className="space-y-2">
+      {SHORTCUTS.map((shortcut) => (
+        <div
+          key={shortcut.key}
+          className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0"
+        >
+          <span className="text-sm text-muted-foreground">
+            {shortcut.description}
+          </span>
+          <kbd className="px-2 py-1 text-xs font-mono bg-muted rounded border border-border">
+            {shortcut.key}
+          </kbd>
+        </div>
+      ))}
     </div>
   );
 }
