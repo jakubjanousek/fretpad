@@ -13,8 +13,8 @@ describe("parseBar", () => {
     const bar = parseBar("Dm7");
     expect(bar).not.toBeNull();
     expect(bar?.chords).toHaveLength(1);
-    expect(bar?.chords[0].chord).toBe("Dm7");
-    expect(bar?.chords[0].beats).toBe(4);
+    expect(bar?.chords[0]?.chord).toBe("Dm7");
+    expect(bar?.chords[0]?.beats).toBe(4);
     expect(bar?.totalBeats).toBe(4);
   });
 
@@ -22,22 +22,22 @@ describe("parseBar", () => {
     const bar = parseBar("Dm7 G7");
     expect(bar).not.toBeNull();
     expect(bar?.chords).toHaveLength(2);
-    expect(bar?.chords[0].chord).toBe("Dm7");
-    expect(bar?.chords[0].beats).toBe(2);
-    expect(bar?.chords[1].chord).toBe("G7");
-    expect(bar?.chords[1].beats).toBe(2);
+    expect(bar?.chords[0]?.chord).toBe("Dm7");
+    expect(bar?.chords[0]?.beats).toBe(2);
+    expect(bar?.chords[1]?.chord).toBe("G7");
+    expect(bar?.chords[1]?.beats).toBe(2);
   });
 
   it("respects custom total beats", () => {
     const bar = parseBar("C", 3);
     expect(bar?.totalBeats).toBe(3);
-    expect(bar?.chords[0].beats).toBe(3);
+    expect(bar?.chords[0]?.beats).toBe(3);
   });
 
   it("distributes beats evenly across multiple chords", () => {
     const bar = parseBar("Am Em", 4);
-    expect(bar?.chords[0].beats).toBe(2);
-    expect(bar?.chords[1].beats).toBe(2);
+    expect(bar?.chords[0]?.beats).toBe(2);
+    expect(bar?.chords[1]?.beats).toBe(2);
   });
 
   it("returns null for empty string", () => {
@@ -52,7 +52,7 @@ describe("parseBar", () => {
 
   it("trims whitespace", () => {
     const bar = parseBar("  Cmaj7  ");
-    expect(bar?.chords[0].chord).toBe("Cmaj7");
+    expect(bar?.chords[0]?.chord).toBe("Cmaj7");
   });
 
   it("generates unique ID for each bar", () => {
@@ -68,18 +68,18 @@ describe("parseProgression", () => {
       const prog = parseProgression("| Dm7 | G7 | Cmaj7 |");
       expect(prog).not.toBeNull();
       expect(prog?.bars).toHaveLength(3);
-      expect(prog?.bars[0].chords[0].chord).toBe("Dm7");
-      expect(prog?.bars[1].chords[0].chord).toBe("G7");
-      expect(prog?.bars[2].chords[0].chord).toBe("Cmaj7");
+      expect(prog?.bars[0]?.chords[0]?.chord).toBe("Dm7");
+      expect(prog?.bars[1]?.chords[0]?.chord).toBe("G7");
+      expect(prog?.bars[2]?.chords[0]?.chord).toBe("Cmaj7");
     });
 
     it("parses multiple chords per bar", () => {
       const prog = parseProgression("| Dm7 G7 | Cmaj7 |");
       expect(prog).not.toBeNull();
       expect(prog?.bars).toHaveLength(2);
-      expect(prog?.bars[0].chords).toHaveLength(2);
-      expect(prog?.bars[0].chords[0].chord).toBe("Dm7");
-      expect(prog?.bars[0].chords[1].chord).toBe("G7");
+      expect(prog?.bars[0]?.chords).toHaveLength(2);
+      expect(prog?.bars[0]?.chords[0]?.chord).toBe("Dm7");
+      expect(prog?.bars[0]?.chords[1]?.chord).toBe("G7");
     });
 
     it("handles leading/trailing pipes", () => {
@@ -95,9 +95,9 @@ describe("parseProgression", () => {
       const prog = parseProgression("Dm7, G7, Cmaj7");
       expect(prog).not.toBeNull();
       expect(prog?.bars).toHaveLength(3);
-      expect(prog?.bars[0].chords[0].chord).toBe("Dm7");
-      expect(prog?.bars[1].chords[0].chord).toBe("G7");
-      expect(prog?.bars[2].chords[0].chord).toBe("Cmaj7");
+      expect(prog?.bars[0]?.chords[0]?.chord).toBe("Dm7");
+      expect(prog?.bars[1]?.chords[0]?.chord).toBe("G7");
+      expect(prog?.bars[2]?.chords[0]?.chord).toBe("Cmaj7");
     });
   });
 
@@ -120,7 +120,7 @@ describe("parseProgression", () => {
         timeSignature: { numerator: 3, denominator: 4 },
       });
       expect(prog?.timeSignature).toEqual({ numerator: 3, denominator: 4 });
-      expect(prog?.bars[0].totalBeats).toBe(3);
+      expect(prog?.bars[0]?.totalBeats).toBe(3);
     });
 
     it("uses default name", () => {
@@ -156,16 +156,16 @@ describe("createProgression", () => {
     const prog = createProgression(["Dm7", "G7", "Cmaj7"]);
     expect(prog).not.toBeNull();
     expect(prog?.bars).toHaveLength(3);
-    expect(prog?.bars[0].chords[0].chord).toBe("Dm7");
-    expect(prog?.bars[1].chords[0].chord).toBe("G7");
-    expect(prog?.bars[2].chords[0].chord).toBe("Cmaj7");
+    expect(prog?.bars[0]?.chords[0]?.chord).toBe("Dm7");
+    expect(prog?.bars[1]?.chords[0]?.chord).toBe("G7");
+    expect(prog?.bars[2]?.chords[0]?.chord).toBe("Cmaj7");
   });
 
   it("each chord gets its own bar", () => {
     const prog = createProgression(["C", "G"]);
     expect(prog?.bars).toHaveLength(2);
-    expect(prog?.bars[0].chords).toHaveLength(1);
-    expect(prog?.bars[1].chords).toHaveLength(1);
+    expect(prog?.bars[0]?.chords).toHaveLength(1);
+    expect(prog?.bars[1]?.chords).toHaveLength(1);
   });
 
   it("uses custom options", () => {

@@ -1,5 +1,5 @@
-import * as Tone from "tone";
 import { Scale } from "tonal";
+import * as Tone from "tone";
 import { parseChordSymbol } from "@/lib/theory/chords";
 import { getFullVoicing } from "./voicings";
 
@@ -109,7 +109,11 @@ export async function playScalePreview(
   for (let i = 0; i < notesWithOctave.length; i++) {
     const note = notesWithOctave[i];
     if (note) {
-      previewSynth.triggerAttackRelease(note, noteDuration, now + i * noteDelay);
+      previewSynth.triggerAttackRelease(
+        note,
+        noteDuration,
+        now + i * noteDelay,
+      );
     }
   }
 }
@@ -143,7 +147,11 @@ export async function playChordArpeggio(
   for (let i = 0; i < voicing.notes.length; i++) {
     const note = voicing.notes[i];
     if (note) {
-      previewSynth.triggerAttackRelease(note, noteDuration, now + i * noteDelay);
+      previewSynth.triggerAttackRelease(
+        note,
+        noteDuration,
+        now + i * noteDelay,
+      );
     }
   }
 }

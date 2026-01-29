@@ -2,7 +2,6 @@
 
 import {
   BookOpen,
-  CircleHelp,
   Keyboard,
   Play,
   RotateCcw,
@@ -59,7 +58,7 @@ export function TransportBar({
     (barIndex: number, chordIndex: number) => {
       setCurrentPosition(barIndex, chordIndex);
     },
-    [setCurrentPosition]
+    [setCurrentPosition],
   );
 
   const handleStop = useCallback(() => {
@@ -107,7 +106,7 @@ export function TransportBar({
         setTempo(newTempo);
       }
     },
-    [setTempo]
+    [setTempo],
   );
 
   const handleMetronomeToggle = useCallback(() => {
@@ -206,7 +205,7 @@ export function TransportBar({
                       "h-9 w-9 rounded-full active:scale-95 transition-all duration-150",
                       metronome.enabled
                         ? "bg-orange-500 text-white hover:bg-orange-400"
-                        : "hover:bg-background/80"
+                        : "hover:bg-background/80",
                     )}
                   >
                     <Timer className="h-4 w-4" />

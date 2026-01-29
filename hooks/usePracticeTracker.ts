@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { recordPracticeTime, getTodayPracticeTime } from "@/lib/persistence";
+import { useEffect, useRef, useState } from "react";
+import { getTodayPracticeTime, recordPracticeTime } from "@/lib/persistence";
 
 const SAVE_INTERVAL_MS = 10000; // Save every 10 seconds while playing
 

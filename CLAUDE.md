@@ -9,12 +9,16 @@ FretFlow is a browser-based guitar practice tool that helps guitarists improvise
 ## Commands
 
 ```bash
-pnpm dev      # Start dev server
-pnpm build    # Production build
-pnpm test     # Run Vitest tests
-pnpm lint     # Run Biome linter
-pnpm format   # Format with Biome
+pnpm dev        # Start dev server
+pnpm build      # Production build
+pnpm test       # Run Vitest tests
+pnpm lint       # Run Biome linter
+pnpm format     # Format with Biome
+pnpm type-check # TypeScript type checking (tsc --noEmit)
+pnpm validate   # Run all checks: lint + type-check + tests
 ```
+
+**After making changes, run `pnpm validate` to verify nothing is broken.**
 
 ## Tech Stack
 

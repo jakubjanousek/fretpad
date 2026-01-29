@@ -57,7 +57,9 @@ export function FretboardSkeleton({
                   className={cn(
                     "w-7 h-7 rounded-full bg-muted",
                     // Animate different rows at different times
-                    stringIndex % 2 === 0 ? "animate-pulse" : "animate-pulse delay-75",
+                    stringIndex % 2 === 0
+                      ? "animate-pulse"
+                      : "animate-pulse delay-75",
                   )}
                 />
               </div>

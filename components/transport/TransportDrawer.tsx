@@ -1,6 +1,6 @@
 "use client";
 
-import { Keyboard, Music, Volume2, VolumeOff } from "lucide-react";
+import { Music, Volume2, VolumeOff } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -36,13 +36,13 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
   const setMetronomeVolume = useAppStore((state) => state.setMetronomeVolume);
   const setMetronomeCountIn = useAppStore((state) => state.setMetronomeCountIn);
   const setBackingTrackVolume = useAppStore(
-    (state) => state.setBackingTrackVolume
+    (state) => state.setBackingTrackVolume,
   );
   const setBackingTrackMuted = useAppStore(
-    (state) => state.setBackingTrackMuted
+    (state) => state.setBackingTrackMuted,
   );
 
-  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [_showShortcuts, _setShowShortcuts] = useState(false);
 
   const handleMetronomeVolumeChange = useCallback(
     (value: number[]) => {
@@ -51,7 +51,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
         setMetronomeVolume(newVolume);
       }
     },
-    [setMetronomeVolume]
+    [setMetronomeVolume],
   );
 
   const handleBassVolumeChange = useCallback(
@@ -61,7 +61,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
         setBackingTrackVolume("bass", newVolume);
       }
     },
-    [setBackingTrackVolume]
+    [setBackingTrackVolume],
   );
 
   const handleChordVolumeChange = useCallback(
@@ -71,7 +71,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
         setBackingTrackVolume("chord", newVolume);
       }
     },
-    [setBackingTrackVolume]
+    [setBackingTrackVolume],
   );
 
   const handleBassMuteToggle = useCallback(() => {
@@ -143,7 +143,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                       className={cn(
                         "h-7 w-12 text-xs",
                         metronome.countIn === bars &&
-                          "bg-orange-500 hover:bg-orange-600"
+                          "bg-orange-500 hover:bg-orange-600",
                       )}
                     >
                       {bars === 0 ? "Off" : `${bars} bar${bars > 1 ? "s" : ""}`}
@@ -209,7 +209,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                   disabled={backingTrack.bassMuted}
                   className={cn(
                     "w-full",
-                    backingTrack.bassMuted && "opacity-50"
+                    backingTrack.bassMuted && "opacity-50",
                   )}
                   aria-label="Bass volume"
                 />
@@ -264,7 +264,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                   disabled={backingTrack.chordMuted}
                   className={cn(
                     "w-full",
-                    backingTrack.chordMuted && "opacity-50"
+                    backingTrack.chordMuted && "opacity-50",
                   )}
                   aria-label="Chord volume"
                 />

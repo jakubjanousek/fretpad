@@ -46,7 +46,9 @@ const LEGEND_STEPS: LegendStep[] = [
 ];
 
 interface LegendTooltipProps {
-  onHighlightChange: (type: "root" | "guide" | "chord" | "scale" | null) => void;
+  onHighlightChange: (
+    type: "root" | "guide" | "chord" | "scale" | null,
+  ) => void;
   onComplete: () => void;
 }
 
@@ -110,8 +112,13 @@ export function LegendTooltip({
     <>
       {/* Overlay backdrop */}
       <div
+        role="button"
+        tabIndex={0}
         className="fixed inset-0 bg-black/40 z-40 animate-in fade-in duration-300"
         onClick={handleSkip}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") handleSkip();
+        }}
       />
 
       {/* Tooltip card */}

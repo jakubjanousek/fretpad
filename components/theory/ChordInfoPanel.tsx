@@ -139,7 +139,10 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
               title="Play chord"
             >
               <Volume2
-                className={cn("w-3.5 h-3.5", playingChord === "chord" && "animate-pulse")}
+                className={cn(
+                  "w-3.5 h-3.5",
+                  playingChord === "chord" && "animate-pulse",
+                )}
               />
               Chord
             </Button>

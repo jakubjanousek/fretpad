@@ -6,7 +6,7 @@ import {
   getFretNoteTextColor,
   getNoteAtFret,
 } from "@/lib/fretboard";
-import type { Chord, FretNote, STANDARD_TUNING } from "@/lib/types";
+import type { Chord, FretNote, NoteName, STANDARD_TUNING } from "@/lib/types";
 
 describe("getNoteAtFret", () => {
   it("returns open string note at fret 0", () => {
@@ -48,12 +48,12 @@ describe("generateFretboardLayout", () => {
   it("generates standard tuning layout by default", () => {
     const layout = generateFretboardLayout();
     // String 0 (high E)
-    expect(layout[0][0]).toBe("E");
-    expect(layout[0][1]).toBe("F");
+    expect(layout[0]?.[0]).toBe("E");
+    expect(layout[0]?.[1]).toBe("F");
     // String 1 (B)
-    expect(layout[1][0]).toBe("B");
+    expect(layout[1]?.[0]).toBe("B");
     // String 5 (low E)
-    expect(layout[5][0]).toBe("E");
+    expect(layout[5]?.[0]).toBe("E");
   });
 
   it("generates correct number of frets", () => {
@@ -74,7 +74,7 @@ describe("generateFretboardLayout", () => {
   it("respects custom tuning", () => {
     const dropD: typeof STANDARD_TUNING = ["E", "B", "G", "D", "A", "D"];
     const layout = generateFretboardLayout(12, dropD);
-    expect(layout[5][0]).toBe("D"); // Low string is now D
+    expect(layout[5]?.[0]).toBe("D"); // Low string is now D
   });
 });
 
@@ -251,7 +251,7 @@ describe("getFretNoteColor", () => {
     const note: FretNote = {
       string: 1,
       fret: 0,
-      note: "X",
+      note: "X" as NoteName,
       interval: "?",
       isRoot: false,
       isChordTone: false,
@@ -338,7 +338,7 @@ describe("getFretNoteTextColor", () => {
     const note: FretNote = {
       string: 1,
       fret: 0,
-      note: "X",
+      note: "X" as NoteName,
       interval: "?",
       isRoot: false,
       isChordTone: false,

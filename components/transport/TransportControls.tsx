@@ -44,10 +44,10 @@ export function TransportControls() {
   const setMetronomeVolume = useAppStore((state) => state.setMetronomeVolume);
   const setMetronomeCountIn = useAppStore((state) => state.setMetronomeCountIn);
   const setBackingTrackVolume = useAppStore(
-    (state) => state.setBackingTrackVolume
+    (state) => state.setBackingTrackVolume,
   );
   const setBackingTrackMuted = useAppStore(
-    (state) => state.setBackingTrackMuted
+    (state) => state.setBackingTrackMuted,
   );
 
   const style = getStyle(selectedStyle);
@@ -57,7 +57,7 @@ export function TransportControls() {
     (barIndex: number, chordIndex: number) => {
       setCurrentPosition(barIndex, chordIndex);
     },
-    [setCurrentPosition]
+    [setCurrentPosition],
   );
 
   const handleStop = useCallback(() => {
@@ -105,7 +105,7 @@ export function TransportControls() {
         setTempo(newTempo);
       }
     },
-    [setTempo]
+    [setTempo],
   );
 
   const handleMetronomeToggle = useCallback(() => {
@@ -119,7 +119,7 @@ export function TransportControls() {
         setMetronomeVolume(newVolume);
       }
     },
-    [setMetronomeVolume]
+    [setMetronomeVolume],
   );
 
   const handleBassVolumeChange = useCallback(
@@ -129,7 +129,7 @@ export function TransportControls() {
         setBackingTrackVolume("bass", newVolume);
       }
     },
-    [setBackingTrackVolume]
+    [setBackingTrackVolume],
   );
 
   const handleChordVolumeChange = useCallback(
@@ -139,7 +139,7 @@ export function TransportControls() {
         setBackingTrackVolume("chord", newVolume);
       }
     },
-    [setBackingTrackVolume]
+    [setBackingTrackVolume],
   );
 
   const handleBassMuteToggle = useCallback(() => {
@@ -203,7 +203,7 @@ export function TransportControls() {
                 metronome.enabled ? "Disable metronome" : "Enable metronome"
               }
               className={cn(
-                metronome.enabled && "bg-orange-500 hover:bg-orange-600"
+                metronome.enabled && "bg-orange-500 hover:bg-orange-600",
               )}
             >
               <Timer className="h-4 w-4" />
@@ -277,7 +277,7 @@ export function TransportControls() {
                   className={cn(
                     "h-7 w-12 text-xs",
                     metronome.countIn === bars &&
-                      "bg-orange-500 hover:bg-orange-600"
+                      "bg-orange-500 hover:bg-orange-600",
                   )}
                 >
                   {bars === 0 ? "Off" : `${bars} bar${bars > 1 ? "s" : ""}`}

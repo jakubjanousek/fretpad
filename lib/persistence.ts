@@ -504,7 +504,10 @@ export function recordPracticeTime(
 
   if (todaySession) {
     todaySession.durationMs += durationMs;
-    if (progressionName && !todaySession.progressionNames.includes(progressionName)) {
+    if (
+      progressionName &&
+      !todaySession.progressionNames.includes(progressionName)
+    ) {
       todaySession.progressionNames.push(progressionName);
     }
   } else {

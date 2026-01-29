@@ -49,7 +49,10 @@ function formatShortDuration(ms: number): { value: string; unit: string } {
 
   if (hours > 0) {
     const mins = totalMinutes % 60;
-    return { value: `${hours}:${mins.toString().padStart(2, "0")}`, unit: "hours" };
+    return {
+      value: `${hours}:${mins.toString().padStart(2, "0")}`,
+      unit: "hours",
+    };
   }
   return { value: totalMinutes.toString(), unit: "min" };
 }
@@ -100,7 +103,9 @@ export function PracticeStats({
 
   // Use live today time if provided, otherwise from stats
   const todayTime = todayTimeMs ?? getTodayPracticeTime();
-  const totalTime = (stats?.totalTimeMs ?? 0) + (todayTimeMs ? todayTimeMs - getTodayPracticeTime() : 0);
+  const totalTime =
+    (stats?.totalTimeMs ?? 0) +
+    (todayTimeMs ? todayTimeMs - getTodayPracticeTime() : 0);
 
   const todayFormatted = formatShortDuration(todayTime);
   const totalFormatted = formatShortDuration(totalTime);

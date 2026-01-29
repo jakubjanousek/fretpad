@@ -167,7 +167,9 @@ function PresetButton({
               )}
               title={isPlaying ? "Stop preview" : "Play preview"}
             >
-              <Play className={cn("w-3.5 h-3.5", isPlaying && "animate-pulse")} />
+              <Play
+                className={cn("w-3.5 h-3.5", isPlaying && "animate-pulse")}
+              />
             </button>
           </div>
           <p className="text-xs text-muted-foreground">{preset.description}</p>
