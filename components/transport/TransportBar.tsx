@@ -3,6 +3,7 @@
 import {
   BookOpen,
   BrainCircuit,
+  ListMusic,
   Play,
   Settings,
   Square,
@@ -22,6 +23,7 @@ interface TransportBarProps {
   onGuideClick: () => void;
   onStatsClick: () => void;
   onQuizClick: () => void;
+  onPlannerClick: () => void;
 }
 
 /**
@@ -33,6 +35,7 @@ export function TransportBar({
   onGuideClick,
   onStatsClick,
   onQuizClick,
+  onPlannerClick,
 }: TransportBarProps) {
   const { isPlaying, tempo, handlePlay, handleStopClick, handleTempoChange } =
     useTransportControls();
@@ -96,6 +99,21 @@ export function TransportBar({
 
           {/* Utilities Group */}
           <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onPlannerClick}
+                  aria-label="Practice Session"
+                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                >
+                  <ListMusic className="h-4 w-4 text-cyan-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Practice Session</TooltipContent>
+            </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

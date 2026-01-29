@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
 import { HelpGuide } from "@/components/help/HelpGuide";
+import { SessionPlanner } from "@/components/planner/SessionPlanner";
 import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ShareExport } from "@/components/progression/ShareExport";
@@ -56,6 +57,7 @@ export default function Page() {
   const [chordInfoOpen, setChordInfoOpen] = useState(false);
   const [helpGuideOpen, setHelpGuideOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
+  const [plannerOpen, setPlannerOpen] = useState(false);
 
   // Practice time tracking
   const { todayTimeMs } = usePracticeTracker({
@@ -236,6 +238,7 @@ export default function Page() {
         onGuideClick={() => setHelpGuideOpen(true)}
         onStatsClick={() => setStatsOpen(true)}
         onQuizClick={startQuiz}
+        onPlannerClick={() => setPlannerOpen(true)}
       />
 
       {/* Settings Drawer */}
@@ -250,6 +253,9 @@ export default function Page() {
 
       {/* Help Guide */}
       <HelpGuide open={helpGuideOpen} onOpenChange={setHelpGuideOpen} />
+
+      {/* Practice Session Planner */}
+      <SessionPlanner open={plannerOpen} onOpenChange={setPlannerOpen} />
 
       {/* Practice Stats */}
       <PracticeStats

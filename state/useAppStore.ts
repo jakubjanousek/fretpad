@@ -20,6 +20,10 @@ import {
   type ProgressionSlice,
 } from "./slices/progressionSlice";
 import { createQuizSlice, type QuizSlice } from "./slices/quizSlice";
+import {
+  createSessionPlannerSlice,
+  type SessionPlannerSlice,
+} from "./slices/sessionPlannerSlice";
 
 export type AppState = ProgressionSlice &
   PlaybackSlice &
@@ -27,7 +31,8 @@ export type AppState = ProgressionSlice &
   BackingTrackSlice &
   DisplaySlice &
   ErrorSlice &
-  QuizSlice;
+  QuizSlice &
+  SessionPlannerSlice;
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -39,6 +44,7 @@ export const useAppStore = create<AppState>()(
       ...createDisplaySlice(...a),
       ...createErrorSlice(...a),
       ...createQuizSlice(...a),
+      ...createSessionPlannerSlice(...a),
     }),
     {
       name: "fretflow-state",
