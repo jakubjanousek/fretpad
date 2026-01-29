@@ -66,8 +66,8 @@ Subtle feedback so users know they're running from cache.
 
 In standalone mode on iPad (rounded corners, no Safari chrome), content can be clipped.
 
-- [ ] Add `viewport-fit=cover` to viewport meta
-- [ ] Apply `env(safe-area-inset-*)` padding to root layout
+- [x] Add `viewport-fit=cover` to viewport meta
+- [x] Apply `env(safe-area-inset-*)` padding to root layout
 - [ ] Test in standalone mode on iPad with notch/rounded corners
 
 ### P2 — Touch Target Audit

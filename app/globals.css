@@ -216,6 +216,14 @@
   display: none;
 }
 
+/* Safe area padding for standalone PWA (viewport-fit=cover) */
+.safe-area-pad {
+  padding-top: env(safe-area-inset-top, 0);
+  padding-right: env(safe-area-inset-right, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+}
+
 /* Safe area padding for mobile devices */
 .safe-area-inset-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0);
