@@ -9,7 +9,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { Chord } from "@/lib/types";
+import { useAppStore } from "@/state/useAppStore";
 import { ChordInfoPanel } from "./ChordInfoPanel";
+import { ChordSubstitutionsPanel } from "./ChordSubstitutionsPanel";
+import { KeyAnalysisPanel } from "./KeyAnalysisPanel";
 
 interface ChordInfoSheetProps {
   chord: Chord | null;
@@ -46,6 +49,7 @@ export function ChordInfoSheet({
   onOpenChange,
 }: ChordInfoSheetProps) {
   const isMobile = useIsMobile();
+  const progression = useAppStore((state) => state.progression);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -69,12 +73,20 @@ export function ChordInfoSheet({
           </SheetTitle>
           <SheetDescription className="text-sm">
             {chord
-              ? "View chord tones, guide tones, and suggested scales."
+              ? "View chord tones, guide tones, scales, and substitutions."
               : "Select a chord to see its details."}
           </SheetDescription>
         </SheetHeader>
-        <div className="p-4 pb-safe">
+        <div className="p-4 pb-safe space-y-5">
           <ChordInfoPanel chord={chord} />
+          {chord && (
+            <>
+              <hr className="border-border" />
+              <ChordSubstitutionsPanel chord={chord} />
+            </>
+          )}
+          <hr className="border-border" />
+          <KeyAnalysisPanel progression={progression} />
         </div>
       </SheetContent>
     </Sheet>
