@@ -58,6 +58,13 @@ export const useAppStore = create<AppState>()(
           if ((state.noteLabelMode as string) === "intervals") {
             state.noteLabelMode = "degrees";
           }
+          // Migrate legacy backingTrack state missing drums fields
+          if (state.backingTrack.drumsVolume === undefined) {
+            state.backingTrack.drumsVolume = -8;
+          }
+          if (state.backingTrack.drumsMuted === undefined) {
+            state.backingTrack.drumsMuted = false;
+          }
         }
       },
     },
