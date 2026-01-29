@@ -58,9 +58,9 @@ All existing imports of `useAppStore` continue to work unchanged.
 
 `TransportBar.tsx` and `TransportControls.tsx` duplicate audio control logic (play/stop, tempo, audio engine integration).
 
-- [ ] `hooks/useTransportControls.ts` (~60 lines) — shared audio control callbacks
-- [ ] Simplify `TransportBar.tsx` (288 → ~180 lines, pure layout)
-- [ ] Simplify `TransportControls.tsx` (449 → ~320 lines)
+- [x] `hooks/useTransportControls.ts` (~60 lines) — shared audio control callbacks
+- [x] Simplify `TransportBar.tsx` (288 → ~180 lines, pure layout)
+- [x] Simplify `TransportControls.tsx` (449 → ~320 lines)
 
 ---
 
