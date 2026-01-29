@@ -69,5 +69,20 @@ export const balladStyle: StyleDefinition = {
         { time: "0:3:2", duration: "8n", voicingType: "triad", velocity: 0.25 },
       ],
     },
+    drums: {
+      name: "ballad-brushes",
+      events: [
+        // Gentle ballad: soft kick on 1 & 3, brush-like snare on 3, minimal hihats
+        { time: "0:0", sound: "kick", velocity: 0.4 },
+        { time: "0:2", sound: "kick", velocity: 0.3 },
+        // Gentle brush sweep on beat 3
+        { time: "0:2", sound: "snare", velocity: 0.2 },
+        // Sparse hihats on beats
+        { time: "0:0", sound: "hihat", velocity: 0.2 },
+        { time: "0:1", sound: "hihat", velocity: 0.15 },
+        { time: "0:2", sound: "hihat", velocity: 0.2 },
+        { time: "0:3", sound: "hihat", velocity: 0.15 },
+      ],
+    },
   },
 };

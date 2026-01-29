@@ -11,8 +11,10 @@ describe("backingTrackSlice", () => {
       backingTrack: {
         bassVolume: -6,
         chordVolume: -14,
+        drumsVolume: -8,
         bassMuted: false,
         chordMuted: false,
+        drumsMuted: false,
       },
     });
   });

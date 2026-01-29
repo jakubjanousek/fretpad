@@ -5,6 +5,10 @@ import * as Tone from "tone";
 import { createBassInstrument } from "@/lib/audio/instruments/bassInstrument";
 import { createChordInstrument } from "@/lib/audio/instruments/chordInstrument";
 import {
+  createDrumInstrument,
+  type DrumInstrument,
+} from "@/lib/audio/instruments/drumInstrument";
+import {
   createMetronomeInstrument,
   type MetronomeInstrument,
 } from "@/lib/audio/instruments/metronomeInstrument";
@@ -59,6 +63,7 @@ export function useAudioEngine({
 }: UseAudioEngineOptions): AudioEngineReturn {
   const bassRef = useRef<Tone.Synth | null>(null);
   const chordRef = useRef<Tone.PolySynth | null>(null);
+  const drumsRef = useRef<DrumInstrument | null>(null);
   const metronomeRef = useRef<MetronomeInstrument | null>(null);
   const scheduledEventsRef = useRef<number[]>([]);
   const isReadyRef = useRef(false);
@@ -92,11 +97,13 @@ export function useAudioEngine({
     // Dispose previous instruments if they exist
     bassRef.current?.dispose();
     chordRef.current?.dispose();
+    drumsRef.current?.dispose();
     metronomeRef.current?.dispose();
 
     // Create new instruments based on style configuration
     bassRef.current = createBassInstrument(style.instruments.bass);
     chordRef.current = createChordInstrument(style.instruments.chord);
+    drumsRef.current = createDrumInstrument(backingTrack.drumsVolume);
     metronomeRef.current = createMetronomeInstrument(metronome.volume);
 
     isReadyRef.current = true;
@@ -109,13 +116,15 @@ export function useAudioEngine({
       Tone.getTransport().cancel();
       bassRef.current?.dispose();
       chordRef.current?.dispose();
+      drumsRef.current?.dispose();
       metronomeRef.current?.dispose();
       bassRef.current = null;
       chordRef.current = null;
+      drumsRef.current = null;
       metronomeRef.current = null;
       isReadyRef.current = false;
     };
-  }, [style, metronome.volume]);
+  }, [style, metronome.volume, backingTrack.drumsVolume]);
 
   // Handle style/metronome change during playback - reschedule events
   useEffect(() => {
@@ -141,6 +150,7 @@ export function useAudioEngine({
         bass: bassRef.current,
         chord: chordRef.current,
         metronome: metronomeRef.current ?? undefined,
+        drums: drumsRef.current ?? undefined,
       },
       onChordChange,
       { metronomeConfig: metronome },
@@ -199,12 +209,19 @@ export function useAudioEngine({
         ? -Infinity
         : backingTrack.chordVolume;
     }
+    if (drumsRef.current) {
+      drumsRef.current.setVolume(
+        backingTrack.drumsMuted ? -Infinity : backingTrack.drumsVolume,
+      );
+    }
   }, [
     instrumentVersion,
     backingTrack.bassVolume,
     backingTrack.chordVolume,
+    backingTrack.drumsVolume,
     backingTrack.bassMuted,
     backingTrack.chordMuted,
+    backingTrack.drumsMuted,
   ]);
 
   const start = useCallback(async () => {
@@ -248,6 +265,7 @@ export function useAudioEngine({
         bass: bassRef.current,
         chord: chordRef.current,
         metronome: metronomeRef.current ?? undefined,
+        drums: drumsRef.current ?? undefined,
       },
       onChordChange,
       {

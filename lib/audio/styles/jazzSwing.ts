@@ -70,5 +70,25 @@ export const jazzSwingStyle: StyleDefinition = {
         { time: "0:3", duration: "8n", voicingType: "shell", velocity: 0.45 },
       ],
     },
+    drums: {
+      name: "swing-ride",
+      events: [
+        // Ride cymbal pattern (swung) - hihat on every beat with swing feel
+        { time: "0:0", sound: "hihat", velocity: 0.6 },
+        { time: "0:0:2", sound: "hihat", velocity: 0.35 },
+        { time: "0:1", sound: "hihat", velocity: 0.5 },
+        { time: "0:1:2", sound: "hihat", velocity: 0.35 },
+        { time: "0:2", sound: "hihat", velocity: 0.55 },
+        { time: "0:2:2", sound: "hihat", velocity: 0.35 },
+        { time: "0:3", sound: "hihat", velocity: 0.5 },
+        { time: "0:3:2", sound: "hihat", velocity: 0.35 },
+        // Kick on 1
+        { time: "0:0", sound: "kick", velocity: 0.6 },
+        // Light kick on 3
+        { time: "0:2", sound: "kick", velocity: 0.35 },
+        // Snare cross-stick on 4 (ghost)
+        { time: "0:3", sound: "snare", velocity: 0.25 },
+      ],
+    },
   },
 };

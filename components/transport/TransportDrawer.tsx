@@ -85,6 +85,16 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
     [setBackingTrackVolume],
   );
 
+  const handleDrumsVolumeChange = useCallback(
+    (value: number[]) => {
+      const newVolume = value[0];
+      if (newVolume !== undefined) {
+        setBackingTrackVolume("drums", newVolume);
+      }
+    },
+    [setBackingTrackVolume],
+  );
+
   const handleBassMuteToggle = useCallback(() => {
     setBackingTrackMuted("bass", !backingTrack.bassMuted);
   }, [backingTrack.bassMuted, setBackingTrackMuted]);
@@ -92,6 +102,10 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
   const handleChordMuteToggle = useCallback(() => {
     setBackingTrackMuted("chord", !backingTrack.chordMuted);
   }, [backingTrack.chordMuted, setBackingTrackMuted]);
+
+  const handleDrumsMuteToggle = useCallback(() => {
+    setBackingTrackMuted("drums", !backingTrack.drumsMuted);
+  }, [backingTrack.drumsMuted, setBackingTrackMuted]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -326,6 +340,61 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                     backingTrack.chordMuted && "opacity-50",
                   )}
                   aria-label="Chord volume"
+                />
+              </div>
+            </div>
+
+            {/* Drums Volume */}
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleDrumsMuteToggle}
+                    aria-label={
+                      backingTrack.drumsMuted ? "Unmute drums" : "Mute drums"
+                    }
+                    className="h-7 w-7 shrink-0"
+                  >
+                    {backingTrack.drumsMuted ? (
+                      <VolumeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                    ) : (
+                      <Volume2 className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                  {backingTrack.drumsMuted ? "Unmute drums" : "Mute drums"}
+                </TooltipContent>
+              </Tooltip>
+              <div className="flex-1 flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="drums-volume-slider"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Drums
+                  </Label>
+                  <span className="text-xs font-mono tabular-nums text-muted-foreground">
+                    {backingTrack.drumsMuted
+                      ? "Muted"
+                      : `${backingTrack.drumsVolume} dB`}
+                  </span>
+                </div>
+                <Slider
+                  id="drums-volume-slider"
+                  min={-30}
+                  max={0}
+                  step={1}
+                  value={[backingTrack.drumsVolume]}
+                  onValueChange={handleDrumsVolumeChange}
+                  disabled={backingTrack.drumsMuted}
+                  className={cn(
+                    "w-full",
+                    backingTrack.drumsMuted && "opacity-50",
+                  )}
+                  aria-label="Drums volume"
                 />
               </div>
             </div>

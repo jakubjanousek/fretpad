@@ -88,5 +88,25 @@ export const bossaNovaStyle: StyleDefinition = {
         { time: "0:3", duration: "8n", voicingType: "shell", velocity: 0.4 },
       ],
     },
+    drums: {
+      name: "bossa-brushes",
+      events: [
+        // Bossa nova: cross-stick on 2, light kick pattern, soft shaker-like hihats
+        { time: "0:0", sound: "kick", velocity: 0.5 },
+        { time: "0:2", sound: "kick", velocity: 0.35 },
+        // Cross-stick style snare on beat 2 and ghost on 4-and
+        { time: "0:1", sound: "snare", velocity: 0.3 },
+        { time: "0:3:2", sound: "snare", velocity: 0.2 },
+        // Soft shaker-like hihats on 8ths
+        { time: "0:0", sound: "hihat", velocity: 0.3 },
+        { time: "0:0:2", sound: "hihat", velocity: 0.2 },
+        { time: "0:1", sound: "hihat", velocity: 0.3 },
+        { time: "0:1:2", sound: "hihat", velocity: 0.2 },
+        { time: "0:2", sound: "hihat", velocity: 0.3 },
+        { time: "0:2:2", sound: "hihat", velocity: 0.2 },
+        { time: "0:3", sound: "hihat", velocity: 0.3 },
+        { time: "0:3:2", sound: "hihat", velocity: 0.2 },
+      ],
+    },
   },
 };

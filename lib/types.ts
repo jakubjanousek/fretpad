@@ -115,6 +115,19 @@ export interface ChordPattern {
   events: ChordPatternEvent[];
 }
 
+export type DrumSound = "kick" | "snare" | "hihat" | "hihatOpen";
+
+export interface DrumPatternEvent {
+  time: string; // Tone.js time format
+  sound: DrumSound;
+  velocity?: number; // 0-1
+}
+
+export interface DrumPattern {
+  name: string;
+  events: DrumPatternEvent[];
+}
+
 export interface BassInstrumentConfig {
   octave: number;
   volume: number; // dB
@@ -156,8 +169,10 @@ export interface MetronomeConfig {
 export interface BackingTrackConfig {
   bassVolume: number; // dB, -30 to 0
   chordVolume: number; // dB, -30 to 0
+  drumsVolume: number; // dB, -30 to 0
   bassMuted: boolean;
   chordMuted: boolean;
+  drumsMuted: boolean;
 }
 
 export interface StyleDefinition {
@@ -172,6 +187,7 @@ export interface StyleDefinition {
   patterns: {
     bass: BassPattern;
     chord: ChordPattern;
+    drums: DrumPattern;
   };
 }
 

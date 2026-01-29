@@ -5,9 +5,27 @@ import type { AppState } from "../useAppStore";
 export interface BackingTrackSlice {
   backingTrack: BackingTrackConfig;
 
-  setBackingTrackVolume: (type: "bass" | "chord", volume: number) => void;
-  setBackingTrackMuted: (type: "bass" | "chord", muted: boolean) => void;
+  setBackingTrackVolume: (
+    type: "bass" | "chord" | "drums",
+    volume: number,
+  ) => void;
+  setBackingTrackMuted: (
+    type: "bass" | "chord" | "drums",
+    muted: boolean,
+  ) => void;
 }
+
+const volumeKey = {
+  bass: "bassVolume",
+  chord: "chordVolume",
+  drums: "drumsVolume",
+} as const;
+
+const mutedKey = {
+  bass: "bassMuted",
+  chord: "chordMuted",
+  drums: "drumsMuted",
+} as const;
 
 export const createBackingTrackSlice: StateCreator<
   AppState,
@@ -18,8 +36,10 @@ export const createBackingTrackSlice: StateCreator<
   backingTrack: {
     bassVolume: -6,
     chordVolume: -14,
+    drumsVolume: -8,
     bassMuted: false,
     chordMuted: false,
+    drumsMuted: false,
   },
 
   setBackingTrackVolume: (type, volume) => {
@@ -27,7 +47,7 @@ export const createBackingTrackSlice: StateCreator<
     set((state) => ({
       backingTrack: {
         ...state.backingTrack,
-        [type === "bass" ? "bassVolume" : "chordVolume"]: clampedVolume,
+        [volumeKey[type]]: clampedVolume,
       },
     }));
   },
@@ -36,7 +56,7 @@ export const createBackingTrackSlice: StateCreator<
     set((state) => ({
       backingTrack: {
         ...state.backingTrack,
-        [type === "bass" ? "bassMuted" : "chordMuted"]: muted,
+        [mutedKey[type]]: muted,
       },
     }));
   },

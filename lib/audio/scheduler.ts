@@ -1,4 +1,5 @@
 import * as Tone from "tone";
+import type { DrumInstrument } from "@/lib/audio/instruments/drumInstrument";
 import {
   METRONOME_ACCENT_NOTE,
   METRONOME_CLICK_NOTE,
@@ -8,6 +9,7 @@ import { parseChordSymbol } from "@/lib/theory/chords";
 import type {
   Chord,
   ChordPatternEvent,
+  DrumPatternEvent,
   MetronomeConfig,
   PatternEvent,
   Progression,
@@ -19,6 +21,7 @@ interface SchedulerInstruments {
   bass: Tone.Synth;
   chord: Tone.PolySynth;
   metronome?: MetronomeInstrument;
+  drums?: DrumInstrument;
 }
 
 interface ScheduleResult {
@@ -170,6 +173,40 @@ function scheduleChordPattern(
 }
 
 /**
+ * Schedules drum pattern events for a single chord
+ */
+function scheduleDrumPattern(
+  transport: typeof Tone.Transport,
+  pattern: DrumPatternEvent[],
+  startBeat: number,
+  chordBeats: number,
+  drumInstrument: DrumInstrument,
+): number[] {
+  const eventIds: number[] = [];
+  const patternBeats = 4;
+
+  const scale = chordBeats / patternBeats;
+
+  for (const event of pattern) {
+    const eventBeat = parseTimeToBeats(event.time) * scale;
+    const absoluteBeat = startBeat + eventBeat;
+
+    if (eventBeat >= chordBeats) continue;
+
+    const time = beatsToTime(absoluteBeat);
+
+    const eventId = transport.schedule((audioTime) => {
+      const velocity = event.velocity ?? 0.7;
+      drumInstrument.trigger(event.sound, audioTime, velocity);
+    }, time);
+
+    eventIds.push(eventId);
+  }
+
+  return eventIds;
+}
+
+/**
  * Schedules metronome clicks for the entire progression
  */
 function scheduleMetronome(
@@ -302,6 +339,18 @@ export function scheduleProgression(
         style.instruments.chord.octave,
       );
       eventIds.push(...chordEventIds);
+
+      // Schedule drum pattern
+      if (instruments.drums) {
+        const drumEventIds = scheduleDrumPattern(
+          transport,
+          style.patterns.drums.events,
+          currentBeat,
+          barChord.beats,
+          instruments.drums,
+        );
+        eventIds.push(...drumEventIds);
+      }
 
       currentBeat += barChord.beats;
     }
