@@ -11,10 +11,10 @@ Each step is independently shippable. Verify after each with `pnpm validate && p
 
 ## Step 1: Validation Scripts + Pre-push Hook
 
-- [ ] `package.json` — add `"type-check": "tsc --noEmit"` and `"validate": "biome check && tsc --noEmit && vitest run"`
-- [ ] Add `husky` dev dependency, run `npx husky init`
-- [ ] `.husky/pre-push` — runs `pnpm validate && pnpm build` before every push
-- [ ] Update `CLAUDE.md` — document `pnpm validate` as the command to run after changes
+- [x] `package.json` — add `"type-check": "tsc --noEmit"` and `"validate": "biome check && tsc --noEmit && vitest run"`
+- [x] Add `husky` dev dependency, run `npx husky init`
+- [x] `.husky/pre-push` — runs `pnpm validate && pnpm build` before every push
+- [x] Update `CLAUDE.md` — document `pnpm validate` as the command to run after changes
 
 ---
 
