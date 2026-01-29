@@ -29,7 +29,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 | VH-2 | Low | The "Click for details" CTA under the chord name is styled as muted italic text, making it easy to miss. This is a key discovery action. | Make it a subtle but clear link or button style. Consider a small info icon next to the chord name instead. |
 | VH-3 | Medium | The playhead/progress bar between chord info and fretboard (showing Dm7 → G7 → Cmaj7 → Cmaj7) is very small and hard to notice. It's a critical navigation element during playback. | Increase the height of the playhead track. Add a clearer active-segment indicator. Consider color-coding the segments to match the chord that's playing. |
 | VH-4 | Low | "Bar 1 of 4" and "4/4" labels flanking the fretboard are in small grey text, blending into the background. | Slightly increase contrast or font weight for these contextual labels. |
-| VH-5 | Medium | The bottom transport bar icons (Practice Session, Chord Tone Quiz, Practice Stats, Help Guide, Settings) are icon-only with no labels visible. Users must hover or guess what each icon does. | Add text labels below icons, at least on desktop/tablet where there's space. On mobile, keep icons but add tooltips or a first-run walkthrough. |
+| VH-5 | Medium | ✅ **IMPLEMENTED** — The bottom transport bar icons (Practice Session, Chord Tone Quiz, Practice Stats, Help Guide, Settings) were icon-only with no labels visible. | Added visible text labels below each icon on desktop/tablet (sm+ breakpoint). On mobile, icons remain compact with tooltip support. Labels use 10px muted text for a clean, unobtrusive look. |
 
 ## 2. Mobile Responsiveness
 
@@ -140,7 +140,7 @@ Ranked by impact-to-effort ratio:
 
 1. **A-1** — ✅ Add non-color indicators to fretboard notes (high accessibility impact, moderate effort)
 2. **MR-1** — ✅ Add mobile fretboard scroll indicator (high mobile UX impact, low effort)
-3. **VH-5** — Add text labels to transport bar icons (medium UX impact, low effort)
+3. **VH-5** — ✅ Add text labels to transport bar icons (medium UX impact, low effort)
 4. **NA-3** — Add undo/redo for progression edits (high safety impact, moderate effort)
 5. **IS-2** — Clarify chord editing interaction (medium learnability impact, low effort)
 6. **VH-1** — Reduce progression editor visual weight (medium hierarchy impact, low effort)

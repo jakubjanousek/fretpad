@@ -107,80 +107,100 @@ export function TransportBar({
             </div>
 
             {/* Utilities Group */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
                     onClick={onPlannerClick}
                     aria-label="Practice Session"
-                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
                   >
                     <ListMusic className="h-4 w-4 text-cyan-500" />
+                    <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
+                      Practice
+                    </span>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top">Practice Session</TooltipContent>
+                <TooltipContent side="top" className="sm:hidden">
+                  Practice Session
+                </TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
                     onClick={onQuizClick}
                     aria-label="Chord Tone Quiz"
-                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
                   >
                     <BrainCircuit className="h-4 w-4 text-violet-500" />
+                    <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
+                      Quiz
+                    </span>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top">Chord Tone Quiz</TooltipContent>
+                <TooltipContent side="top" className="sm:hidden">
+                  Chord Tone Quiz
+                </TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
                     onClick={onStatsClick}
                     aria-label="Practice Stats"
-                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
                   >
                     <Trophy className="h-4 w-4 text-amber-500" />
+                    <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
+                      Stats
+                    </span>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top">Practice Stats</TooltipContent>
+                <TooltipContent side="top" className="sm:hidden">
+                  Practice Stats
+                </TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
                     onClick={onGuideClick}
                     aria-label="Help Guide"
-                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
                   >
                     <BookOpen className="h-4 w-4" />
+                    <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
+                      Help
+                    </span>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top">Help Guide</TooltipContent>
+                <TooltipContent side="top" className="sm:hidden">
+                  Help Guide
+                </TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
                     onClick={onSettingsClick}
                     aria-label="Settings"
-                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
                   >
                     <Settings className="h-4 w-4" />
+                    <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
+                      Settings
+                    </span>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top">Settings</TooltipContent>
+                <TooltipContent side="top" className="sm:hidden">
+                  Settings
+                </TooltipContent>
               </Tooltip>
             </div>
           </div>
