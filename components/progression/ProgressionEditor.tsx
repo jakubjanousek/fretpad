@@ -1,6 +1,14 @@
 "use client";
 
-import { Pencil, Plus, Redo2, Undo2, X } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Pencil,
+  Plus,
+  Redo2,
+  Undo2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { Button } from "@/components/ui/button";
@@ -192,6 +200,9 @@ export function ProgressionEditor() {
   const removeBar = useAppStore((state) => state.removeBar);
   const undo = useAppStore((state) => state.undo);
   const redo = useAppStore((state) => state.redo);
+  const transposeProgression = useAppStore(
+    (state) => state.transposeProgression,
+  );
   const historyLength = useAppStore((state) => state.progressionHistory.length);
   const futureLength = useAppStore((state) => state.progressionFuture.length);
 
@@ -251,6 +262,30 @@ export function ProgressionEditor() {
           >
             <Plus className="h-3.5 w-3.5" />
           </Button>
+
+          {/* Transpose buttons */}
+          <div className="flex items-center gap-0.5 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => transposeProgression(-1)}
+              className="h-7 w-7 p-0"
+              aria-label="Transpose down"
+              title="Transpose down one semitone"
+            >
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => transposeProgression(1)}
+              className="h-7 w-7 p-0"
+              aria-label="Transpose up"
+              title="Transpose up one semitone"
+            >
+              <ChevronUp className="h-3 w-3" />
+            </Button>
+          </div>
 
           {/* Undo/Redo buttons */}
           <div className="flex items-center gap-0.5 shrink-0">

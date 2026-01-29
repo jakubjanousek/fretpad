@@ -3,6 +3,7 @@ import { generateId } from "@/lib/id";
 import { parseChordSymbol } from "@/lib/theory/chords";
 import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
 import { parseBar } from "@/lib/theory/progression";
+import { transposeProgression as transposeProgressionUtil } from "@/lib/theory/transpose";
 import type { Chord, Progression, ProgressionBar } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
@@ -25,6 +26,7 @@ export interface ProgressionSlice {
   addBar: () => void;
   removeBar: (barIndex: number) => void;
   advanceToNextChord: () => void;
+  transposeProgression: (semitones: number) => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
@@ -253,6 +255,21 @@ export const createProgressionSlice: StateCreator<
     set({
       currentBarIndex: 0,
       currentChordIndex: 0,
+      currentChord: chord,
+    });
+  },
+
+  transposeProgression: (semitones) => {
+    pushHistory(get, set);
+    const { progression, currentBarIndex, currentChordIndex } = get();
+    const newProgression = transposeProgressionUtil(progression, semitones);
+    const chord = getChordAtPosition(
+      newProgression,
+      currentBarIndex,
+      currentChordIndex,
+    );
+    set({
+      progression: newProgression,
       currentChord: chord,
     });
   },
