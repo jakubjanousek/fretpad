@@ -10,7 +10,7 @@ import {
   SkipForward,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -70,7 +70,6 @@ export function SessionPlanner({ open, onOpenChange }: SessionPlannerProps) {
   const endSession = useAppStore((s) => s.endSession);
   const advancePhase = useAppStore((s) => s.advancePhase);
   const goToPhase = useAppStore((s) => s.goToPhase);
-  const tickSessionTimer = useAppStore((s) => s.tickSessionTimer);
   const toggleSessionPause = useAppStore((s) => s.toggleSessionPause);
 
   const currentPhase = SESSION_PHASES[sessionPhaseIndex];
@@ -79,36 +78,7 @@ export function SessionPlanner({ open, onOpenChange }: SessionPlannerProps) {
     0,
   );
 
-  // Timer tick
-  const lastTickRef = useRef<number>(0);
-  useEffect(() => {
-    if (!sessionActive || sessionPaused) {
-      lastTickRef.current = 0;
-      return;
-    }
-
-    const interval = setInterval(() => {
-      const now = Date.now();
-      if (lastTickRef.current === 0) {
-        lastTickRef.current = now;
-        return;
-      }
-      const delta = now - lastTickRef.current;
-      lastTickRef.current = now;
-      tickSessionTimer(delta);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [sessionActive, sessionPaused, tickSessionTimer]);
-
-  // Auto-advance when phase time is exceeded
-  useEffect(() => {
-    if (!sessionActive || !currentPhase) return;
-    const phaseMs = currentPhase.durationMinutes * 60 * 1000;
-    if (sessionPhaseElapsedMs >= phaseMs) {
-      advancePhase();
-    }
-  }, [sessionActive, sessionPhaseElapsedMs, currentPhase, advancePhase]);
+  // Timer tick and auto-advance are handled by useSessionTimer hook in page.tsx
 
   const handleStart = useCallback(() => {
     startSession();

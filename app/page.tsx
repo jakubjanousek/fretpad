@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
 import { HelpGuide } from "@/components/help/HelpGuide";
+import { SessionDock } from "@/components/planner/SessionDock";
 import { SessionPlanner } from "@/components/planner/SessionPlanner";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ShareExport } from "@/components/progression/ShareExport";
@@ -17,6 +18,7 @@ import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { Card, CardContent } from "@/components/ui/card";
 import { useFirstVisit } from "@/hooks/useFirstVisit";
 import { usePracticeTracker } from "@/hooks/usePracticeTracker";
+import { useSessionTimer } from "@/hooks/useSessionTimer";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import { getOverlayNotes } from "@/lib/theory/pentatonic";
@@ -26,11 +28,16 @@ import {
   filterBestPaths,
   getNextChord,
 } from "@/lib/theory/voiceLeading";
+import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
 export default function Page() {
   // Load state from URL if present
   useUrlState();
+
+  // Run session timer (must be at page level so it ticks even when sheet is closed)
+  useSessionTimer();
+  const sessionActive = useAppStore((state) => state.sessionActive);
 
   const currentChord = useAppStore((state) => state.currentChord);
   const progression = useAppStore((state) => state.progression);
@@ -191,8 +198,13 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Main Content - add bottom padding for fixed transport bar */}
-      <main className="flex-1 container mx-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-col gap-2 sm:gap-3 pb-20">
+      {/* Main Content - add bottom padding for fixed transport bar (+ dock when session active) */}
+      <main
+        className={cn(
+          "flex-1 container mx-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-col gap-2 sm:gap-3",
+          sessionActive ? "pb-32" : "pb-20",
+        )}
+      >
         {/* Progression Editor Section - compact strip, fretboard should dominate */}
         <section>
           <ProgressionEditor />
@@ -246,6 +258,9 @@ export default function Page() {
           </Card>
         </section>
       </main>
+
+      {/* Session Dock - compact bar above transport when practice session is active */}
+      <SessionDock onExpand={() => setPlannerOpen(true)} />
 
       {/* Fixed Transport Bar */}
       <TransportBar
