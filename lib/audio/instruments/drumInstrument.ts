@@ -81,19 +81,21 @@ export function createDrumInstrument(volume: number): DrumInstrument {
 
   return {
     trigger: (sound: DrumSound, time: number, velocity: number) => {
+      // Guard against stale times that have already passed in the audio context
+      const safeTime = Math.max(time, Tone.now());
       switch (sound) {
         case "kick":
-          kick.triggerAttackRelease("C1", "8n", time, velocity);
+          kick.triggerAttackRelease("C1", "8n", safeTime, velocity);
           break;
         case "snare":
-          snareNoise.triggerAttackRelease("16n", time, velocity * 0.7);
-          snareBody.triggerAttackRelease("E3", "16n", time, velocity * 0.5);
+          snareNoise.triggerAttackRelease("16n", safeTime, velocity * 0.7);
+          snareBody.triggerAttackRelease("E3", "16n", safeTime, velocity * 0.5);
           break;
         case "hihat":
-          hihat.triggerAttackRelease("16n", time, velocity * 0.5);
+          hihat.triggerAttackRelease("16n", safeTime, velocity * 0.5);
           break;
         case "hihatOpen":
-          hihatOpen.triggerAttackRelease("8n", time, velocity * 0.5);
+          hihatOpen.triggerAttackRelease("8n", safeTime, velocity * 0.5);
           break;
       }
     },

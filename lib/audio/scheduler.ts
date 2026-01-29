@@ -98,6 +98,7 @@ function scheduleBassPattern(
     const time = beatsToTime(absoluteBeat);
 
     const eventId = transport.schedule((audioTime) => {
+      const safeTime = Math.max(audioTime, Tone.now());
       let noteToPlay: string;
 
       if (event.type === "approach" && nextChord) {
@@ -118,7 +119,7 @@ function scheduleBassPattern(
       bassInstrument.triggerAttackRelease(
         noteToPlay,
         event.duration,
-        audioTime,
+        safeTime,
         velocity,
       );
     }, time);
@@ -155,13 +156,14 @@ function scheduleChordPattern(
     const time = beatsToTime(absoluteBeat);
 
     const eventId = transport.schedule((audioTime) => {
+      const safeTime = Math.max(audioTime, Tone.now());
       const voicing = getVoicing(chord, event.voicingType, chordOctave);
       const velocity = event.velocity ?? 0.6;
 
       chordInstrument.triggerAttackRelease(
         voicing.notes,
         event.duration,
-        audioTime,
+        safeTime,
         velocity,
       );
     }, time);
@@ -225,12 +227,13 @@ function scheduleMetronome(
     const isDownbeat = beat % beatsPerBar === 0;
 
     const eventId = transport.schedule((audioTime) => {
+      const safeTime = Math.max(audioTime, Tone.now());
       if (isDownbeat && accentDownbeat) {
         // Accented downbeat
         metronomeInstrument.accent.triggerAttackRelease(
           METRONOME_ACCENT_NOTE,
           "32n",
-          audioTime,
+          safeTime,
           0.9,
         );
       } else {
@@ -238,7 +241,7 @@ function scheduleMetronome(
         metronomeInstrument.click.triggerAttackRelease(
           METRONOME_CLICK_NOTE,
           "32n",
-          audioTime,
+          safeTime,
           0.7,
         );
       }
