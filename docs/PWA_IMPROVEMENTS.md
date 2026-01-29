@@ -76,7 +76,7 @@ In standalone mode on iPad (rounded corners, no Safari chrome), content can be c
 
 Ensure all interactive elements meet the 44×44pt minimum (Apple HIG).
 
-- [ ] Audit fretboard note dots — ensure tap targets are at least 44×44pt
-- [ ] Audit transport controls (play, stop, tempo, metronome toggle)
-- [ ] Audit progression editor chord cells
-- [ ] Add padding/hit areas where needed without changing visual size
+- [x] Audit fretboard note dots — ensure tap targets are at least 44×44pt
+- [x] Audit transport controls (play, stop, tempo, metronome toggle)
+- [x] Audit progression editor chord cells
+- [x] Add padding/hit areas where needed without changing visual size

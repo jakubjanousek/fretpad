@@ -177,7 +177,7 @@ export function FretboardLegend({
             onMouseLeave={() => onHoverChange(null)}
             onClick={() => handleClick(item)}
             className={cn(
-              "flex items-center gap-2 py-1 px-1.5 -mx-1.5 rounded-md transition-all duration-150",
+              "flex items-center gap-2 py-2 px-2 -mx-2 rounded-md transition-all duration-150",
               "hover:bg-muted/60",
               hoveredType === item.type &&
                 "bg-muted/80 ring-1 ring-muted-foreground/20",

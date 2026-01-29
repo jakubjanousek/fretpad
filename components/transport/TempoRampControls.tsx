@@ -72,7 +72,7 @@ export function TempoRampControls({ tempoRamp }: TempoRampControlsProps) {
               size="sm"
               onClick={() => setTempoRampEveryNLoops(n)}
               className={cn(
-                "h-7 w-10 text-xs",
+                "h-9 w-10 text-xs",
                 tempoRamp.everyNLoops === n &&
                   "bg-orange-500 hover:bg-orange-600",
               )}

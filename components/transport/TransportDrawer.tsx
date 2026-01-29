@@ -136,7 +136,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                   metronome.enabled ? "Disable metronome" : "Enable metronome"
                 }
                 className={cn(
-                  "h-7 gap-1.5 text-xs",
+                  "h-9 gap-1.5 text-xs",
                   metronome.enabled && "bg-orange-500 hover:bg-orange-600",
                 )}
               >
@@ -186,7 +186,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                         size="sm"
                         onClick={() => setMetronomeCountIn(bars)}
                         className={cn(
-                          "h-7 w-12 text-xs",
+                          "h-9 w-12 text-xs",
                           metronome.countIn === bars &&
                             "bg-orange-500 hover:bg-orange-600",
                         )}
@@ -217,7 +217,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                   tempoRamp.enabled ? "Disable tempo ramp" : "Enable tempo ramp"
                 }
                 className={cn(
-                  "h-7 gap-1.5 text-xs",
+                  "h-9 gap-1.5 text-xs",
                   tempoRamp.enabled && "bg-orange-500 hover:bg-orange-600",
                 )}
               >
@@ -245,7 +245,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                     aria-label={
                       backingTrack.bassMuted ? "Unmute bass" : "Mute bass"
                     }
-                    className="h-7 w-7 shrink-0"
+                    className="h-9 w-9 shrink-0"
                   >
                     {backingTrack.bassMuted ? (
                       <VolumeOff className="h-3.5 w-3.5 text-muted-foreground" />
@@ -300,7 +300,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                     aria-label={
                       backingTrack.chordMuted ? "Unmute chords" : "Mute chords"
                     }
-                    className="h-7 w-7 shrink-0"
+                    className="h-9 w-9 shrink-0"
                   >
                     {backingTrack.chordMuted ? (
                       <VolumeOff className="h-3.5 w-3.5 text-muted-foreground" />
@@ -355,7 +355,7 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                     aria-label={
                       backingTrack.drumsMuted ? "Unmute drums" : "Mute drums"
                     }
-                    className="h-7 w-7 shrink-0"
+                    className="h-9 w-9 shrink-0"
                   >
                     {backingTrack.drumsMuted ? (
                       <VolumeOff className="h-3.5 w-3.5 text-muted-foreground" />

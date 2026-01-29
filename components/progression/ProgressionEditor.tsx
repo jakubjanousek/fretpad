@@ -123,7 +123,7 @@ function BarInput({
                   handleChordClick(chordIdx);
                 }}
                 className={cn(
-                  "px-1.5 py-0.5 text-sm font-mono rounded transition-colors relative z-0",
+                  "px-2.5 py-1.5 text-sm font-mono rounded transition-colors relative z-0",
                   isSelected && selectedChordIndex === chordIdx
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-muted",
@@ -140,10 +140,10 @@ function BarInput({
                   e.stopPropagation();
                   onRemove(barIndex);
                 }}
-                className="ml-3 opacity-0 group-hover/bar:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                className="ml-2 p-1.5 -m-1.5 rounded-md opacity-0 group-hover/bar:opacity-100 active:opacity-100 transition-opacity text-muted-foreground hover:text-destructive touch-target-expand"
                 aria-label="Remove bar"
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="h-4 w-4" />
               </button>
             )}
           </div>
@@ -217,7 +217,7 @@ export function ProgressionEditor() {
             variant="outline"
             size="sm"
             onClick={addBar}
-            className="h-8 px-2 shrink-0"
+            className="h-10 px-3 shrink-0"
           >
             <Plus className="h-4 w-4" />
           </Button>

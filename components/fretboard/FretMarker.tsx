@@ -62,7 +62,7 @@ export function FretMarker({
           "w-8 h-8 sm:w-7 sm:h-7 rounded-full flex items-center justify-center",
           "text-xs font-medium cursor-pointer",
           "transition-all duration-150 hover:scale-110 active:scale-95",
-          "touch-target-sm animate-note-appear",
+          "touch-target-expand animate-note-appear",
           bgColor,
           textColor,
           highlightState === "highlighted" &&

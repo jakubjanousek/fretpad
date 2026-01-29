@@ -115,7 +115,7 @@ export function TransportBar({
                     size="icon"
                     onClick={onPlannerClick}
                     aria-label="Practice Session"
-                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
                   >
                     <ListMusic className="h-4 w-4 text-cyan-500" />
                   </Button>
@@ -130,7 +130,7 @@ export function TransportBar({
                     size="icon"
                     onClick={onQuizClick}
                     aria-label="Chord Tone Quiz"
-                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
                   >
                     <BrainCircuit className="h-4 w-4 text-violet-500" />
                   </Button>
@@ -145,7 +145,7 @@ export function TransportBar({
                     size="icon"
                     onClick={onStatsClick}
                     aria-label="Practice Stats"
-                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
                   >
                     <Trophy className="h-4 w-4 text-amber-500" />
                   </Button>
@@ -160,7 +160,7 @@ export function TransportBar({
                     size="icon"
                     onClick={onGuideClick}
                     aria-label="Help Guide"
-                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
                   >
                     <BookOpen className="h-4 w-4" />
                   </Button>
@@ -175,7 +175,7 @@ export function TransportBar({
                     size="icon"
                     onClick={onSettingsClick}
                     aria-label="Settings"
-                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                    className="h-11 w-11 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
                   >
                     <Settings className="h-4 w-4" />
                   </Button>

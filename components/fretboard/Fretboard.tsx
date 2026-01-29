@@ -361,7 +361,7 @@ export function Fretboard({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-8 text-xs gap-1.5"
+                  className="h-9 text-xs gap-1.5"
                 >
                   <svg
                     className="w-3.5 h-3.5"
@@ -400,7 +400,7 @@ export function Fretboard({
                           type="button"
                           onClick={() => onOverlayChange?.(opt.value)}
                           className={cn(
-                            "h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                            "h-9 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
                             fretboardOverlay === opt.value
                               ? "bg-foreground text-background"
                               : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80",
@@ -424,7 +424,7 @@ export function Fretboard({
                           type="button"
                           onClick={() => onNoteLabelModeChange?.(opt.value)}
                           className={cn(
-                            "h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                            "h-9 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
                             noteLabelMode === opt.value
                               ? "bg-foreground text-background"
                               : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80",
@@ -509,7 +509,7 @@ function ToggleRow({
       type="button"
       onClick={onToggle}
       className={cn(
-        "w-full flex items-center gap-3 px-2.5 py-2 rounded-md text-left transition-colors",
+        "w-full flex items-center gap-3 px-2.5 py-2.5 rounded-md text-left transition-colors",
         active ? "bg-blue-500/10 dark:bg-blue-500/15" : "hover:bg-muted/60",
       )}
     >
