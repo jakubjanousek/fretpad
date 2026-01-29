@@ -37,12 +37,12 @@ All existing imports of `useAppStore` continue to work unchanged.
 
 ## Step 3: Split `lib/persistence.ts` (562 lines) into Focused Modules
 
-- [ ] `lib/persistence/localStorage.ts` (~65 lines) — save/load/clear + type guards
-- [ ] `lib/persistence/urlState.ts` (~65 lines) — URL encode/decode, share URL generation
-- [ ] `lib/persistence/customPresets.ts` (~65 lines) — custom & recent preset storage
-- [ ] `lib/persistence/practiceStats.ts` (~100 lines) — session recording, streak calculation
-- [ ] `lib/persistence/index.ts` — barrel re-export for backward compatibility
-- [ ] Delete `lib/persistence.ts` (replaced by directory)
+- [x] `lib/persistence/localStorage.ts` (~65 lines) — save/load/clear + type guards
+- [x] `lib/persistence/urlState.ts` (~65 lines) — URL encode/decode, share URL generation
+- [x] `lib/persistence/customPresets.ts` (~65 lines) — custom & recent preset storage
+- [x] `lib/persistence/practiceStats.ts` (~100 lines) — session recording, streak calculation
+- [x] `lib/persistence/index.ts` — barrel re-export for backward compatibility
+- [x] Delete `lib/persistence.ts` (replaced by directory)
 
 ---
 
