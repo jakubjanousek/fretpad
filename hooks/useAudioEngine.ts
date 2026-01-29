@@ -24,6 +24,7 @@ import type {
   StyleDefinition,
   TempoRampConfig,
 } from "@/lib/types";
+import { useAppStore } from "@/state/useAppStore";
 
 type AudioContextState = "suspended" | "running" | "closed";
 
@@ -42,6 +43,7 @@ interface UseAudioEngineOptions {
 interface AudioEngineReturn {
   start: () => Promise<void>;
   stop: () => void;
+  resume: () => Promise<void>;
   isReady: boolean;
   audioContextState: AudioContextState;
 }
@@ -74,11 +76,22 @@ export function useAudioEngine({
   // Counter that increments when instruments are recreated, triggering volume effect
   const [instrumentVersion, setInstrumentVersion] = useState(0);
 
-  // Track audio context state
+  const setIsInterrupted = useAppStore((state) => state.setIsInterrupted);
+
+  // Track audio context state and detect interruptions
   useEffect(() => {
     const updateState = () => {
       const context = Tone.getContext();
-      setAudioContextState(context.state as AudioContextState);
+      const newState = context.state as AudioContextState;
+      setAudioContextState(newState);
+
+      // Detect interruption: context suspended/interrupted while we were playing
+      if (
+        (newState === "suspended" || newState === ("interrupted" as string)) &&
+        isPlayingRef.current
+      ) {
+        setIsInterrupted(true);
+      }
     };
 
     // Update on mount
@@ -91,7 +104,7 @@ export function useAudioEngine({
     return () => {
       context.rawContext.removeEventListener("statechange", updateState);
     };
-  }, []);
+  }, [setIsInterrupted]);
 
   // Re-acquire wake lock when tab becomes visible again (Safari releases it on background)
   useEffect(() => {
@@ -336,6 +349,31 @@ export function useAudioEngine({
     transport.start();
   }, [progression, style, onChordChange, metronome]);
 
+  const resume = useCallback(async () => {
+    // Resume the AudioContext after iOS interruption
+    await Tone.start();
+    await Tone.getContext().resume();
+
+    const transport = Tone.getTransport();
+
+    // If transport was playing before interruption, restart it
+    if (isPlayingRef.current && transport.state !== "started") {
+      transport.start();
+    }
+
+    // Re-acquire wake lock
+    if ("wakeLock" in navigator) {
+      navigator.wakeLock.request("screen").then(
+        (sentinel) => {
+          wakeLockRef.current = sentinel;
+        },
+        () => {},
+      );
+    }
+
+    setIsInterrupted(false);
+  }, [setIsInterrupted]);
+
   const stop = useCallback(() => {
     const transport = Tone.getTransport();
     transport.stop();
@@ -344,6 +382,9 @@ export function useAudioEngine({
 
     // Mark as not playing
     isPlayingRef.current = false;
+
+    // Clear interruption state
+    setIsInterrupted(false);
 
     // Release wake lock
     wakeLockRef.current?.release();
@@ -355,11 +396,12 @@ export function useAudioEngine({
 
     // Reset to first chord
     onStop();
-  }, [onStop]);
+  }, [onStop, setIsInterrupted]);
 
   return {
     start,
     stop,
+    resume,
     isReady: isReadyRef.current,
     audioContextState,
   };

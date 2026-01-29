@@ -45,7 +45,7 @@ export function useTransportControls() {
     incrementLoopCount();
   }, [incrementLoopCount]);
 
-  const { start, stop } = useAudioEngine({
+  const { start, stop, resume } = useAudioEngine({
     progression,
     tempo,
     style,
@@ -88,6 +88,10 @@ export function useTransportControls() {
     setMetronomeEnabled(!metronome.enabled);
   }, [metronome.enabled, setMetronomeEnabled]);
 
+  const handleResume = useCallback(async () => {
+    await resume();
+  }, [resume]);
+
   return {
     isPlaying,
     tempo,
@@ -95,6 +99,7 @@ export function useTransportControls() {
     metronome,
     handlePlay,
     handleStopClick,
+    handleResume,
     handleTempoChange,
     handleMetronomeToggle,
   };

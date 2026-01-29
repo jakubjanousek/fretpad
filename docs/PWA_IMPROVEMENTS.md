@@ -32,10 +32,10 @@ Prevent the iPad screen from dimming during practice. Without this, the screen a
 
 On iOS, the AudioContext suspends on phone calls, app switches, lock screen. The app should recover gracefully.
 
-- [ ] Detect `AudioContext.state` transition to `"interrupted"` / `"suspended"` during playback
-- [ ] Show a "Tap to resume" overlay when audio is interrupted
-- [ ] Auto-resume AudioContext and Transport on user tap
-- [ ] Restore playback position (or restart from current bar)
+- [x] Detect `AudioContext.state` transition to `"interrupted"` / `"suspended"` during playback
+- [x] Show a "Tap to resume" overlay when audio is interrupted
+- [x] Auto-resume AudioContext and Transport on user tap
+- [x] Restore playback position (or restart from current bar)
 
 ### P1 — Install Prompt
 

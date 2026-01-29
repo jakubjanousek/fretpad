@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTransportControls } from "@/hooks/useTransportControls";
+import { AudioInterruptedOverlay } from "./AudioInterruptedOverlay";
 
 interface TransportBarProps {
   onSettingsClick: () => void;
@@ -37,145 +38,154 @@ export function TransportBar({
   onQuizClick,
   onPlannerClick,
 }: TransportBarProps) {
-  const { isPlaying, tempo, handlePlay, handleStopClick, handleTempoChange } =
-    useTransportControls();
+  const {
+    isPlaying,
+    tempo,
+    handlePlay,
+    handleStopClick,
+    handleResume,
+    handleTempoChange,
+  } = useTransportControls();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 backdrop-blur-sm safe-area-inset-bottom">
-      <div className="container mx-auto px-3 sm:px-4">
-        <div className="flex items-center justify-between gap-3 sm:gap-4 h-16 sm:h-16">
-          {/* Tempo Group - hidden on very small screens */}
-          <div className="hidden xs:flex items-center gap-2 sm:gap-3 flex-1 max-w-48 sm:max-w-xs">
-            <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-muted/50 rounded-xl px-3 py-1.5">
-              <Slider
-                min={40}
-                max={200}
-                step={1}
-                value={[tempo]}
-                onValueChange={handleTempoChange}
-                className="flex-1"
-                aria-label="Tempo"
-              />
-              <span className="text-xs font-mono tabular-nums w-14 sm:w-16 text-right">
-                {tempo} <span className="text-muted-foreground">BPM</span>
-              </span>
+    <>
+      <AudioInterruptedOverlay onResume={handleResume} />
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 backdrop-blur-sm safe-area-inset-bottom">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex items-center justify-between gap-3 sm:gap-4 h-16 sm:h-16">
+            {/* Tempo Group - hidden on very small screens */}
+            <div className="hidden xs:flex items-center gap-2 sm:gap-3 flex-1 max-w-48 sm:max-w-xs">
+              <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-muted/50 rounded-xl px-3 py-1.5">
+                <Slider
+                  min={40}
+                  max={200}
+                  step={1}
+                  value={[tempo]}
+                  onValueChange={handleTempoChange}
+                  className="flex-1"
+                  aria-label="Tempo"
+                />
+                <span className="text-xs font-mono tabular-nums w-14 sm:w-16 text-right">
+                  {tempo} <span className="text-muted-foreground">BPM</span>
+                </span>
+              </div>
             </div>
-          </div>
 
-          {/* Playback Group */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* Hero Play/Stop Button */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex flex-col items-center">
-                  {isPlaying ? (
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleStopClick}
-                      aria-label="Stop"
-                      className="hero-button h-11 w-11 sm:h-10 sm:w-10 rounded-full bg-muted border-border hover:bg-muted/80 active:scale-95 transition-all duration-150"
-                    >
-                      <Square className="h-4 w-4" />
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="default"
-                      size="icon"
-                      onClick={handlePlay}
-                      aria-label="Play"
-                      className="hero-button hero-play h-11 w-11 sm:h-10 sm:w-10 rounded-full bg-cyan-500 hover:bg-cyan-400 border-cyan-500 text-white shadow-lg shadow-cyan-500/30 hover:shadow-cyan-400/40 active:scale-95 transition-all duration-150"
-                    >
-                      <Play className="h-5 w-5 ml-0.5" />
-                    </Button>
-                  )}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="sm:hidden">
-                {isPlaying ? "Stop" : "Play"} (Space)
-              </TooltipContent>
-            </Tooltip>
-          </div>
+            {/* Playback Group */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Hero Play/Stop Button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex flex-col items-center">
+                    {isPlaying ? (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleStopClick}
+                        aria-label="Stop"
+                        className="hero-button h-11 w-11 sm:h-10 sm:w-10 rounded-full bg-muted border-border hover:bg-muted/80 active:scale-95 transition-all duration-150"
+                      >
+                        <Square className="h-4 w-4" />
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="default"
+                        size="icon"
+                        onClick={handlePlay}
+                        aria-label="Play"
+                        className="hero-button hero-play h-11 w-11 sm:h-10 sm:w-10 rounded-full bg-cyan-500 hover:bg-cyan-400 border-cyan-500 text-white shadow-lg shadow-cyan-500/30 hover:shadow-cyan-400/40 active:scale-95 transition-all duration-150"
+                      >
+                        <Play className="h-5 w-5 ml-0.5" />
+                      </Button>
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="sm:hidden">
+                  {isPlaying ? "Stop" : "Play"} (Space)
+                </TooltipContent>
+              </Tooltip>
+            </div>
 
-          {/* Utilities Group */}
-          <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onPlannerClick}
-                  aria-label="Practice Session"
-                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
-                >
-                  <ListMusic className="h-4 w-4 text-cyan-500" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Practice Session</TooltipContent>
-            </Tooltip>
+            {/* Utilities Group */}
+            <div className="flex items-center gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onPlannerClick}
+                    aria-label="Practice Session"
+                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                  >
+                    <ListMusic className="h-4 w-4 text-cyan-500" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Practice Session</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onQuizClick}
-                  aria-label="Chord Tone Quiz"
-                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
-                >
-                  <BrainCircuit className="h-4 w-4 text-violet-500" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Chord Tone Quiz</TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onQuizClick}
+                    aria-label="Chord Tone Quiz"
+                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                  >
+                    <BrainCircuit className="h-4 w-4 text-violet-500" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Chord Tone Quiz</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onStatsClick}
-                  aria-label="Practice Stats"
-                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
-                >
-                  <Trophy className="h-4 w-4 text-amber-500" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Practice Stats</TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onStatsClick}
+                    aria-label="Practice Stats"
+                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                  >
+                    <Trophy className="h-4 w-4 text-amber-500" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Practice Stats</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onGuideClick}
-                  aria-label="Help Guide"
-                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
-                >
-                  <BookOpen className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Help Guide</TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onGuideClick}
+                    aria-label="Help Guide"
+                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Help Guide</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onSettingsClick}
-                  aria-label="Settings"
-                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
-                >
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Settings</TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onSettingsClick}
+                    aria-label="Settings"
+                    className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Settings</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

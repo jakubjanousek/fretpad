@@ -13,12 +13,14 @@ const DEFAULT_TEMPO_RAMP: TempoRampConfig = {
 export interface PlaybackSlice {
   tempo: number;
   isPlaying: boolean;
+  isInterrupted: boolean;
   selectedStyle: StyleId;
   tempoRamp: TempoRampConfig;
   loopCount: number;
 
   setTempo: (tempo: number) => void;
   setIsPlaying: (isPlaying: boolean) => void;
+  setIsInterrupted: (isInterrupted: boolean) => void;
   setSelectedStyle: (style: StyleId) => void;
   setTempoRampEnabled: (enabled: boolean) => void;
   setTempoRampIncrement: (increment: number) => void;
@@ -36,6 +38,7 @@ export const createPlaybackSlice: StateCreator<
 > = (set, get) => ({
   tempo: 120,
   isPlaying: false,
+  isInterrupted: false,
   selectedStyle: DEFAULT_STYLE_ID,
   tempoRamp: DEFAULT_TEMPO_RAMP,
   loopCount: 0,
@@ -47,6 +50,10 @@ export const createPlaybackSlice: StateCreator<
 
   setIsPlaying: (isPlaying) => {
     set({ isPlaying });
+  },
+
+  setIsInterrupted: (isInterrupted) => {
+    set({ isInterrupted });
   },
 
   setSelectedStyle: (style) => {
