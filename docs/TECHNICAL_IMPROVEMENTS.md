@@ -48,9 +48,9 @@ All existing imports of `useAppStore` continue to work unchanged.
 
 ## Step 4: Split `lib/theory/progression.ts` (497 lines) — Separate Data from Logic
 
-- [ ] `lib/theory/progression.ts` (~120 lines) — keep parsing logic only (parseBar, parseProgression, createProgression)
-- [ ] `lib/theory/presets.ts` (~200 lines) — PRESET_PROGRESSIONS data, PRESET_METADATA, category helpers
-- [ ] Update imports in ~4 files that reference preset data
+- [x] `lib/theory/progression.ts` (~120 lines) — keep parsing logic only (parseBar, parseProgression, createProgression)
+- [x] `lib/theory/presets.ts` (~200 lines) — PRESET_PROGRESSIONS data, PRESET_METADATA, category helpers
+- [x] Update imports in ~4 files that reference preset data
 
 ---
 

@@ -23,7 +23,7 @@ import {
   type PresetCategory,
   type PresetDifficulty,
   type PresetMetadata,
-} from "@/lib/theory/progression";
+} from "@/lib/theory/presets";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 

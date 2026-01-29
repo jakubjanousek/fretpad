@@ -1,7 +1,8 @@
 import type { StateCreator } from "zustand";
 import { generateId } from "@/lib/id";
 import { parseChordSymbol } from "@/lib/theory/chords";
-import { PRESET_PROGRESSIONS, parseBar } from "@/lib/theory/progression";
+import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
+import { parseBar } from "@/lib/theory/progression";
 import type { Chord, Progression, ProgressionBar } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { PRESET_PROGRESSIONS } from "@/lib/theory/progression";
+import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
 import { useAppStore } from "@/state/useAppStore";
 
 interface KeyboardShortcutHandlers {

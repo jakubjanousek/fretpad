@@ -1,0 +1,325 @@
+import type { Progression } from "@/lib/types";
+import { createProgression, parseProgression } from "./progression";
+
+/**
+ * Helper to assert a progression was created successfully
+ */
+function assertProgression(
+  progression: Progression | null,
+  name: string,
+): Progression {
+  if (!progression) {
+    throw new Error(`Failed to create preset progression: ${name}`);
+  }
+  return progression;
+}
+
+/**
+ * Preset categories for UI organization
+ */
+export type PresetCategory = "jazz" | "pop" | "blues" | "modal";
+
+/**
+ * Difficulty levels for presets
+ */
+export type PresetDifficulty = "beginner" | "intermediate" | "advanced";
+
+export interface PresetMetadata {
+  key: string;
+  label: string;
+  description: string;
+  category: PresetCategory;
+  difficulty: PresetDifficulty;
+  barCount: number;
+}
+
+/**
+ * Preset progressions organized by category
+ */
+export const PRESET_PROGRESSIONS = {
+  // Jazz Standards
+  "ii-V-I in C": assertProgression(
+    createProgression(["Dm7", "G7", "Cmaj7", "Cmaj7"], {
+      name: "ii-V-I in C",
+    }),
+    "ii-V-I in C",
+  ),
+
+  "Autumn Leaves (A section)": assertProgression(
+    parseProgression("| Am7 | D7 | Gmaj7 | Cmaj7 | F#m7b5 | B7 | Em | Em |", {
+      name: "Autumn Leaves (A section)",
+    }),
+    "Autumn Leaves (A section)",
+  ),
+
+  "Rhythm Changes (A)": assertProgression(
+    parseProgression(
+      "| Bbmaj7 Gm7 | Cm7 F7 | Dm7 Gm7 | Cm7 F7 | Fm7 Bb7 | Ebmaj7 Ab7 | Dm7 Gm7 | Cm7 F7 |",
+      { name: "Rhythm Changes (A)" },
+    ),
+    "Rhythm Changes (A)",
+  ),
+
+  "All The Things You Are (A)": assertProgression(
+    parseProgression(
+      "| Fm7 | Bbm7 | Eb7 | Abmaj7 | Dbmaj7 | G7 | Cmaj7 | Cmaj7 |",
+      { name: "All The Things You Are (A)" },
+    ),
+    "All The Things You Are (A)",
+  ),
+
+  // Pop Progressions
+  "I-V-vi-IV in C": assertProgression(
+    createProgression(["C", "G", "Am", "F"], {
+      name: "I-V-vi-IV in C",
+    }),
+    "I-V-vi-IV in C",
+  ),
+
+  "vi-IV-I-V in C": assertProgression(
+    createProgression(["Am", "F", "C", "G"], {
+      name: "vi-IV-I-V in C",
+    }),
+    "vi-IV-I-V in C",
+  ),
+
+  "I-vi-IV-V in C": assertProgression(
+    createProgression(["C", "Am", "F", "G"], {
+      name: "I-vi-IV-V in C",
+    }),
+    "I-vi-IV-V in C",
+  ),
+
+  "I-IV-V-IV in G": assertProgression(
+    createProgression(["G", "C", "D", "C"], {
+      name: "I-IV-V-IV in G",
+    }),
+    "I-IV-V-IV in G",
+  ),
+
+  // Blues Progressions
+  "12-bar blues in A": assertProgression(
+    parseProgression(
+      "| A7 | A7 | A7 | A7 | D7 | D7 | A7 | A7 | E7 | D7 | A7 | E7 |",
+      { name: "12-bar blues in A" },
+    ),
+    "12-bar blues in A",
+  ),
+
+  "Minor Blues in Am": assertProgression(
+    parseProgression(
+      "| Am7 | Am7 | Am7 | Am7 | Dm7 | Dm7 | Am7 | Am7 | Fmaj7 | E7 | Am7 | E7 |",
+      { name: "Minor Blues in Am" },
+    ),
+    "Minor Blues in Am",
+  ),
+
+  "Jazz Blues in Bb": assertProgression(
+    parseProgression(
+      "| Bb7 | Eb7 | Bb7 | Fm7 Bb7 | Eb7 | Edim7 | Bb7 | Dm7 G7 | Cm7 | F7 | Bb7 G7 | Cm7 F7 |",
+      { name: "Jazz Blues in Bb" },
+    ),
+    "Jazz Blues in Bb",
+  ),
+
+  "8-bar Blues in E": assertProgression(
+    parseProgression("| E7 | A7 | E7 | E7 | A7 | B7 | E7 | B7 |", {
+      name: "8-bar Blues in E",
+    }),
+    "8-bar Blues in E",
+  ),
+
+  // Modal Vamps
+  "Dorian Vamp (Dm7)": assertProgression(
+    createProgression(["Dm7", "Em7", "Dm7", "Dm7"], {
+      name: "Dorian Vamp (Dm7)",
+    }),
+    "Dorian Vamp (Dm7)",
+  ),
+
+  "Mixolydian Vamp (G7)": assertProgression(
+    createProgression(["G7", "F", "G7", "G7"], {
+      name: "Mixolydian Vamp (G7)",
+    }),
+    "Mixolydian Vamp (G7)",
+  ),
+
+  "Phrygian Vamp (Em)": assertProgression(
+    createProgression(["Em", "Fmaj7", "Em", "Em"], {
+      name: "Phrygian Vamp (Em)",
+    }),
+    "Phrygian Vamp (Em)",
+  ),
+
+  "Lydian Vamp (Fmaj7)": assertProgression(
+    createProgression(["Fmaj7", "G", "Fmaj7", "Fmaj7"], {
+      name: "Lydian Vamp (Fmaj7)",
+    }),
+    "Lydian Vamp (Fmaj7)",
+  ),
+} as const;
+
+/**
+ * Metadata for each preset (for UI display)
+ */
+export const PRESET_METADATA: Record<
+  keyof typeof PRESET_PROGRESSIONS,
+  PresetMetadata
+> = {
+  // Jazz
+  "ii-V-I in C": {
+    key: "ii-V-I in C",
+    label: "ii–V–I",
+    description: "The most common jazz cadence",
+    category: "jazz",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "Autumn Leaves (A section)": {
+    key: "Autumn Leaves (A section)",
+    label: "Autumn Leaves",
+    description: "Classic jazz standard in G major",
+    category: "jazz",
+    difficulty: "intermediate",
+    barCount: 8,
+  },
+  "Rhythm Changes (A)": {
+    key: "Rhythm Changes (A)",
+    label: "Rhythm Changes",
+    description: "Based on 'I Got Rhythm'",
+    category: "jazz",
+    difficulty: "advanced",
+    barCount: 8,
+  },
+  "All The Things You Are (A)": {
+    key: "All The Things You Are (A)",
+    label: "All The Things",
+    description: "Jerome Kern classic",
+    category: "jazz",
+    difficulty: "advanced",
+    barCount: 8,
+  },
+
+  // Pop
+  "I-V-vi-IV in C": {
+    key: "I-V-vi-IV in C",
+    label: "I–V–vi–IV",
+    description: "Most popular pop progression",
+    category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "vi-IV-I-V in C": {
+    key: "vi-IV-I-V in C",
+    label: "vi–IV–I–V",
+    description: "Sensitive/emotional progression",
+    category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "I-vi-IV-V in C": {
+    key: "I-vi-IV-V in C",
+    label: "I–vi–IV–V",
+    description: "'50s doo-wop progression",
+    category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "I-IV-V-IV in G": {
+    key: "I-IV-V-IV in G",
+    label: "I–IV–V–IV",
+    description: "Classic rock progression",
+    category: "pop",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+
+  // Blues
+  "12-bar blues in A": {
+    key: "12-bar blues in A",
+    label: "12-Bar Blues",
+    description: "Standard blues form in A",
+    category: "blues",
+    difficulty: "beginner",
+    barCount: 12,
+  },
+  "Minor Blues in Am": {
+    key: "Minor Blues in Am",
+    label: "Minor Blues",
+    description: "12-bar minor blues",
+    category: "blues",
+    difficulty: "intermediate",
+    barCount: 12,
+  },
+  "Jazz Blues in Bb": {
+    key: "Jazz Blues in Bb",
+    label: "Jazz Blues",
+    description: "Blues with jazz substitutions",
+    category: "blues",
+    difficulty: "advanced",
+    barCount: 12,
+  },
+  "8-bar Blues in E": {
+    key: "8-bar Blues in E",
+    label: "8-Bar Blues",
+    description: "Shorter blues form",
+    category: "blues",
+    difficulty: "beginner",
+    barCount: 8,
+  },
+
+  // Modal
+  "Dorian Vamp (Dm7)": {
+    key: "Dorian Vamp (Dm7)",
+    label: "Dorian (Dm7)",
+    description: "D Dorian mode vamp",
+    category: "modal",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "Mixolydian Vamp (G7)": {
+    key: "Mixolydian Vamp (G7)",
+    label: "Mixolydian (G7)",
+    description: "G Mixolydian mode vamp",
+    category: "modal",
+    difficulty: "beginner",
+    barCount: 4,
+  },
+  "Phrygian Vamp (Em)": {
+    key: "Phrygian Vamp (Em)",
+    label: "Phrygian (Em)",
+    description: "E Phrygian mode vamp",
+    category: "modal",
+    difficulty: "intermediate",
+    barCount: 4,
+  },
+  "Lydian Vamp (Fmaj7)": {
+    key: "Lydian Vamp (Fmaj7)",
+    label: "Lydian (Fmaj7)",
+    description: "F Lydian mode vamp",
+    category: "modal",
+    difficulty: "intermediate",
+    barCount: 4,
+  },
+};
+
+/**
+ * Get presets grouped by category
+ */
+export function getPresetsByCategory(): Record<
+  PresetCategory,
+  PresetMetadata[]
+> {
+  const categories: Record<PresetCategory, PresetMetadata[]> = {
+    jazz: [],
+    pop: [],
+    blues: [],
+    modal: [],
+  };
+
+  for (const metadata of Object.values(PRESET_METADATA)) {
+    categories[metadata.category].push(metadata);
+  }
+
+  return categories;
+}
