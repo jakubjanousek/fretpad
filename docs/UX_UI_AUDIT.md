@@ -25,7 +25,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 
 | ID | Severity | Finding | Recommendation |
 |----|----------|---------|----------------|
-| VH-1 | Medium | The progression bar area and fretboard area compete for attention. The progression editor has equal visual weight to the fretboard, but the fretboard is the primary workspace. | Reduce the progression editor's visual prominence — smaller font, tighter padding, or collapse it into a more compact strip. The fretboard should dominate the viewport. |
+| VH-1 | Medium | ✅ **IMPLEMENTED** — The progression bar area and fretboard area competed for attention with the fretboard. | Removed the Card wrapper from the progression editor, reduced chord font size to xs, tightened padding/gaps throughout, made buttons and undo/redo controls smaller, and softened the helper text. The fretboard now clearly dominates the viewport. |
 | VH-2 | Low | The "Click for details" CTA under the chord name is styled as muted italic text, making it easy to miss. This is a key discovery action. | Make it a subtle but clear link or button style. Consider a small info icon next to the chord name instead. |
 | VH-3 | Medium | The playhead/progress bar between chord info and fretboard (showing Dm7 → G7 → Cmaj7 → Cmaj7) is very small and hard to notice. It's a critical navigation element during playback. | Increase the height of the playhead track. Add a clearer active-segment indicator. Consider color-coding the segments to match the chord that's playing. |
 | VH-4 | Low | "Bar 1 of 4" and "4/4" labels flanking the fretboard are in small grey text, blending into the background. | Slightly increase contrast or font weight for these contextual labels. |
@@ -143,7 +143,7 @@ Ranked by impact-to-effort ratio:
 3. **VH-5** — ✅ Add text labels to transport bar icons (medium UX impact, low effort)
 4. **NA-3** — ✅ Add undo/redo for progression edits (high safety impact, moderate effort)
 5. **IS-2** — ✅ Clarify chord editing interaction (medium learnability impact, low effort)
-6. **VH-1** — Reduce progression editor visual weight (medium hierarchy impact, low effort)
+6. **VH-1** — ✅ Reduce progression editor visual weight (medium hierarchy impact, low effort)
 7. **MR-3** — Fix Display button truncation on mobile (medium mobile polish, low effort)
 8. **IS-1** — Add fretboard transition animation between chords (medium delight, moderate effort)
 9. **VH-3** — Improve playhead visibility (medium playback UX, low effort)

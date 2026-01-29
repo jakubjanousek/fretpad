@@ -84,7 +84,7 @@ function BarInput({
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             className={cn(
-              "w-28 h-8 text-sm font-mono",
+              "w-28 h-7 text-xs font-mono",
               error && "border-red-500 focus-visible:ring-red-500",
             )}
             autoFocus
@@ -94,7 +94,7 @@ function BarInput({
             role="button"
             tabIndex={0}
             className={cn(
-              "relative flex flex-wrap items-center gap-y-0.5 border rounded-md px-1.5 py-1 transition-all overflow-hidden",
+              "relative flex flex-wrap items-center gap-y-0.5 border rounded px-1.5 py-0.5 transition-all overflow-hidden",
               isSelected &&
                 "border-primary ring-1 ring-primary/30 border-l-4 border-l-primary bg-primary/5",
               isPlaying &&
@@ -131,7 +131,7 @@ function BarInput({
                   setIsEditing(true);
                 }}
                 className={cn(
-                  "px-2.5 py-1.5 text-sm font-mono rounded transition-colors relative z-0 cursor-pointer",
+                  "px-2 py-1 text-xs font-mono rounded transition-colors relative z-0 cursor-pointer",
                   isSelected && selectedChordIndex === chordIdx
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-muted",
@@ -205,10 +205,10 @@ export function ProgressionEditor() {
   };
 
   return (
-    <div className="flex flex-col gap-1.5">
-      {/* Progression bars - wrap on mobile, scroll on larger screens */}
+    <div className="flex flex-col gap-1">
+      {/* Progression bars - compact strip */}
       <div className="relative">
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1 sm:overflow-x-auto pb-0.5 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
           {progression.bars.map((bar, barIndex) => {
             // Convert bar chords to string for editing
             const chordString = bar.chords.map((bc) => bc.chord).join(" ");
@@ -244,9 +244,9 @@ export function ProgressionEditor() {
             variant="outline"
             size="sm"
             onClick={addBar}
-            className="h-10 px-3 shrink-0"
+            className="h-7 px-2 shrink-0"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3.5 w-3.5" />
           </Button>
 
           {/* Undo/Redo buttons */}
@@ -256,22 +256,22 @@ export function ProgressionEditor() {
               size="sm"
               onClick={undo}
               disabled={historyLength === 0}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 p-0"
               aria-label="Undo"
               title="Undo (⌘Z)"
             >
-              <Undo2 className="h-3.5 w-3.5" />
+              <Undo2 className="h-3 w-3" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={redo}
               disabled={futureLength === 0}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 p-0"
               aria-label="Redo"
               title="Redo (⌘⇧Z)"
             >
-              <Redo2 className="h-3.5 w-3.5" />
+              <Redo2 className="h-3 w-3" />
             </Button>
           </div>
 
@@ -283,10 +283,10 @@ export function ProgressionEditor() {
         </div>
       </div>
 
-      <p className="text-[11px] text-muted-foreground">
+      <p className="text-[10px] text-muted-foreground/70">
         Click chord to select. Click{" "}
         <Pencil className="inline h-2.5 w-2.5 align-baseline" /> or double-click
-        to edit. Use spaces for multiple chords (e.g., "Dm7 G7").
+        to edit. Spaces separate multiple chords.
       </p>
     </div>
   );

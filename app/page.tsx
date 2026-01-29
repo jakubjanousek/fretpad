@@ -200,13 +200,9 @@ export default function Page() {
 
       {/* Main Content - add bottom padding for fixed transport bar */}
       <main className="flex-1 container mx-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-col gap-2 sm:gap-3 pb-20">
-        {/* Progression Editor Section */}
+        {/* Progression Editor Section - compact strip, fretboard should dominate */}
         <section>
-          <Card>
-            <CardContent className="py-2 sm:py-3 px-3 sm:px-6">
-              <ProgressionEditor />
-            </CardContent>
-          </Card>
+          <ProgressionEditor />
         </section>
 
         {/* Fretboard Visualization Section */}
