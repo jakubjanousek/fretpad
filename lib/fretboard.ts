@@ -5,7 +5,7 @@ import {
   isRoot,
 } from "@/lib/theory/chords";
 import { getScaleNotes } from "@/lib/theory/scales";
-import type { Chord, FretNote, NoteName } from "@/lib/types";
+import type { CAGEDPosition, Chord, FretNote, NoteName } from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
 
 /**
@@ -200,4 +200,36 @@ export function getFretNoteTextColor(note: FretNote): string {
     return "text-white";
   }
   return "text-slate-600";
+}
+
+/**
+ * Color classes for CAGED positions (used in overlay mode)
+ */
+const CAGED_POSITION_COLORS: Record<CAGEDPosition, string> = {
+  1: "bg-purple-500",
+  2: "bg-pink-500",
+  3: "bg-cyan-500",
+  4: "bg-amber-500",
+  5: "bg-rose-500",
+};
+
+/**
+ * Gets the color class for a CAGED position overlay note.
+ * Root notes keep orange; others get position-specific colors.
+ */
+export function getOverlayNoteColor(note: FretNote): string {
+  if (note.isRoot) {
+    return "bg-orange-500";
+  }
+  if (note.cagedPosition) {
+    return CAGED_POSITION_COLORS[note.cagedPosition];
+  }
+  return "bg-slate-400";
+}
+
+/**
+ * Gets the text color for overlay notes
+ */
+export function getOverlayNoteTextColor(_note: FretNote): string {
+  return "text-white";
 }

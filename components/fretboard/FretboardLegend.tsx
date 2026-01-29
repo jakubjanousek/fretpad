@@ -1,18 +1,20 @@
 "use client";
 
+import type { CAGEDPosition } from "@/lib/types";
+import { CAGED_POSITION_LABELS } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export type LegendNoteType = "root" | "guide" | "chord" | "scale" | null;
+export type LegendNoteType = string | null;
 
 interface LegendItem {
-  type: LegendNoteType;
+  type: string;
   color: string;
   label: string;
   shortLabel: string;
   description: string;
 }
 
-const LEGEND_ITEMS: LegendItem[] = [
+const CHORD_LEGEND_ITEMS: LegendItem[] = [
   {
     type: "root",
     color: "bg-orange-500",
@@ -43,17 +45,54 @@ const LEGEND_ITEMS: LegendItem[] = [
   },
 ];
 
+const CAGED_COLORS: Record<CAGEDPosition, string> = {
+  1: "bg-purple-500",
+  2: "bg-pink-500",
+  3: "bg-cyan-500",
+  4: "bg-amber-500",
+  5: "bg-rose-500",
+};
+
+function getOverlayLegendItems(): LegendItem[] {
+  const items: LegendItem[] = [
+    {
+      type: "root",
+      color: "bg-orange-500",
+      label: "Root",
+      shortLabel: "Root",
+      description: "The root note",
+    },
+  ];
+
+  for (const pos of [1, 2, 3, 4, 5] as CAGEDPosition[]) {
+    const shape = CAGED_POSITION_LABELS[pos];
+    items.push({
+      type: `pos-${shape}`,
+      color: CAGED_COLORS[pos],
+      label: `Pos ${pos} (${shape} shape)`,
+      shortLabel: `Pos ${pos}`,
+      description: `CAGED position ${pos} — ${shape} shape`,
+    });
+  }
+
+  return items;
+}
+
 interface FretboardLegendProps {
   hoveredType: LegendNoteType;
   onHoverChange: (type: LegendNoteType) => void;
+  overlayActive?: boolean;
   className?: string;
 }
 
 export function FretboardLegend({
   hoveredType,
   onHoverChange,
+  overlayActive = false,
   className,
 }: FretboardLegendProps) {
+  const items = overlayActive ? getOverlayLegendItems() : CHORD_LEGEND_ITEMS;
+
   return (
     <div
       className={cn(
@@ -61,7 +100,7 @@ export function FretboardLegend({
         className,
       )}
     >
-      {LEGEND_ITEMS.map((item) => (
+      {items.map((item) => (
         <button
           key={item.type}
           type="button"

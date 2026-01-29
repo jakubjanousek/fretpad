@@ -1,7 +1,12 @@
 "use client";
 
 import { NoteInfoTooltip } from "@/components/theory/NoteInfoTooltip";
-import { getFretNoteColor, getFretNoteTextColor } from "@/lib/fretboard";
+import {
+  getFretNoteColor,
+  getFretNoteTextColor,
+  getOverlayNoteColor,
+  getOverlayNoteTextColor,
+} from "@/lib/fretboard";
 import type { FretNote, NoteLabelMode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +17,7 @@ interface FretMarkerProps {
   labelMode?: NoteLabelMode;
   highlightState?: NoteHighlightState;
   labelOverride?: string;
+  overlayMode?: boolean;
 }
 
 export function FretMarker({
@@ -19,9 +25,14 @@ export function FretMarker({
   labelMode = "notes",
   highlightState = "normal",
   labelOverride,
+  overlayMode = false,
 }: FretMarkerProps) {
-  const bgColor = getFretNoteColor(note);
-  const textColor = getFretNoteTextColor(note);
+  const bgColor = overlayMode
+    ? getOverlayNoteColor(note)
+    : getFretNoteColor(note);
+  const textColor = overlayMode
+    ? getOverlayNoteTextColor(note)
+    : getFretNoteTextColor(note);
 
   const getLabel = (): string => {
     switch (labelMode) {

@@ -52,6 +52,7 @@ export const useAppStore = create<AppState>()(
         showScaleTones: state.showScaleTones,
         showVoiceLeading: state.showVoiceLeading,
         noteLabelMode: state.noteLabelMode,
+        fretboardOverlay: state.fretboardOverlay,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

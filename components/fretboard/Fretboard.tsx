@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
 import type {
+  FretboardOverlay,
   FretNote,
   FretPosition,
   NoteLabelMode,
   NoteName,
 } from "@/lib/types";
-import { STANDARD_TUNING } from "@/lib/types";
+import { CAGED_POSITION_LABELS, STANDARD_TUNING } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import { FretboardLegend, type LegendNoteType } from "./FretboardLegend";
@@ -25,9 +26,11 @@ interface FretboardProps {
   showVoiceLeading?: boolean;
   showScaleTones?: boolean;
   noteLabelMode?: NoteLabelMode;
+  fretboardOverlay?: FretboardOverlay;
   onToggleVoiceLeading?: () => void;
   onToggleScaleTones?: () => void;
   onNoteLabelModeChange?: (mode: NoteLabelMode) => void;
+  onOverlayChange?: (overlay: FretboardOverlay) => void;
   quizMode?: boolean;
   quizTargetPosition?: FretPosition | null;
 }
@@ -64,6 +67,13 @@ function useResponsiveFrets(maxFrets: number): number {
   return fretCount;
 }
 
+const OVERLAY_OPTIONS: { value: FretboardOverlay; label: string }[] = [
+  { value: "none", label: "None" },
+  { value: "pentatonicMinor", label: "Minor Pentatonic" },
+  { value: "pentatonicMajor", label: "Major Pentatonic" },
+  { value: "blues", label: "Blues" },
+];
+
 export function Fretboard({
   fretNotes,
   numFrets = DESKTOP_FRETS,
@@ -72,9 +82,11 @@ export function Fretboard({
   showVoiceLeading = false,
   showScaleTones = false,
   noteLabelMode = "notes",
+  fretboardOverlay = "none",
   onToggleVoiceLeading,
   onToggleScaleTones,
   onNoteLabelModeChange,
+  onOverlayChange,
   quizMode = false,
   quizTargetPosition = null,
 }: FretboardProps) {
@@ -97,6 +109,8 @@ export function Fretboard({
     );
   };
 
+  const isOverlayActive = fretboardOverlay !== "none";
+
   // Helper to determine if a note matches the hovered legend type
   const getNoteHighlightState = (
     note: FretNote,
@@ -107,6 +121,13 @@ export function Fretboard({
     }
 
     if (!hoveredLegendType) return "normal";
+
+    // In overlay mode, highlight by CAGED position
+    if (isOverlayActive && note.cagedPosition) {
+      const posLabel = CAGED_POSITION_LABELS[note.cagedPosition];
+      const legendKey = `pos-${posLabel}`;
+      return hoveredLegendType === legendKey ? "highlighted" : "dimmed";
+    }
 
     const noteType: LegendNoteType = note.isRoot
       ? "root"
@@ -210,6 +231,7 @@ export function Fretboard({
                         note={nutNote}
                         labelMode={noteLabelMode}
                         highlightState={getNoteHighlightState(nutNote)}
+                        overlayMode={isOverlayActive && !!nutNote.cagedPosition}
                         labelOverride={
                           quizMode && isQuizTarget(nutNote) ? "?" : undefined
                         }
@@ -244,6 +266,9 @@ export function Fretboard({
                             note={note}
                             labelMode={noteLabelMode}
                             highlightState={getNoteHighlightState(note)}
+                            overlayMode={
+                              isOverlayActive && !!note.cagedPosition
+                            }
                             labelOverride={
                               quizMode && isQuizTarget(note) ? "?" : undefined
                             }
@@ -267,10 +292,37 @@ export function Fretboard({
             <FretboardLegend
               hoveredType={hoveredLegendType}
               onHoverChange={setHoveredLegendType}
+              overlayActive={isOverlayActive}
             />
 
             {/* Controls */}
             <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
+              {/* Overlay selector */}
+              {onOverlayChange && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-muted-foreground hidden sm:inline">
+                    Overlay:
+                  </span>
+                  <div className="relative flex rounded-lg bg-muted/60 p-0.5">
+                    {OVERLAY_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => onOverlayChange(opt.value)}
+                        className={cn(
+                          "relative z-10 h-7 px-2 text-xs font-medium rounded-md transition-colors duration-150",
+                          fretboardOverlay === opt.value
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground",
+                        )}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Note label mode selector - segmented control style */}
               {onNoteLabelModeChange && (
                 <div className="flex items-center gap-1.5">

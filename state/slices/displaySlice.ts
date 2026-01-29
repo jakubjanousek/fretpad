@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand";
-import type { NoteLabelMode } from "@/lib/types";
+import type { FretboardOverlay, NoteLabelMode } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
 export interface DisplaySlice {
@@ -7,11 +7,13 @@ export interface DisplaySlice {
   showVoiceLeading: boolean;
   noteLabelMode: NoteLabelMode;
   previewScale: string | null;
+  fretboardOverlay: FretboardOverlay;
 
   setShowScaleTones: (show: boolean) => void;
   setShowVoiceLeading: (show: boolean) => void;
   setNoteLabelMode: (mode: NoteLabelMode) => void;
   setPreviewScale: (scale: string | null) => void;
+  setFretboardOverlay: (overlay: FretboardOverlay) => void;
 }
 
 export const createDisplaySlice: StateCreator<
@@ -24,6 +26,7 @@ export const createDisplaySlice: StateCreator<
   showVoiceLeading: false,
   noteLabelMode: "notes",
   previewScale: null,
+  fretboardOverlay: "none",
 
   setShowScaleTones: (show) => {
     set({ showScaleTones: show });
@@ -39,5 +42,9 @@ export const createDisplaySlice: StateCreator<
 
   setPreviewScale: (scale) => {
     set({ previewScale: scale });
+  },
+
+  setFretboardOverlay: (overlay) => {
+    set({ fretboardOverlay: overlay });
   },
 });

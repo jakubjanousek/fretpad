@@ -79,6 +79,7 @@ export interface FretNote extends FretPosition {
   isChordTone: boolean;
   isGuideTone: boolean;
   isScaleTone: boolean;
+  cagedPosition?: CAGEDPosition;
 }
 
 // Standard tuning - can be extended later for alternate tunings
@@ -196,6 +197,22 @@ export interface StyleDefinition {
 // ============================================
 
 export type NoteLabelMode = "notes" | "degrees" | "none";
+
+export type FretboardOverlay =
+  | "none"
+  | "pentatonicMinor"
+  | "pentatonicMajor"
+  | "blues";
+
+export type CAGEDPosition = 1 | 2 | 3 | 4 | 5;
+
+export const CAGED_POSITION_LABELS: Record<CAGEDPosition, string> = {
+  1: "E",
+  2: "D",
+  3: "C",
+  4: "A",
+  5: "G",
+};
 
 // ============================================
 // Quiz Types

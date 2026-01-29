@@ -19,6 +19,7 @@ import { useFirstVisit } from "@/hooks/useFirstVisit";
 import { usePracticeTracker } from "@/hooks/usePracticeTracker";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
+import { getOverlayNotes } from "@/lib/theory/pentatonic";
 import {
   calculateVoiceLeadingPaths,
   filterBestPaths,
@@ -42,6 +43,8 @@ export default function Page() {
   const noteLabelMode = useAppStore((state) => state.noteLabelMode);
   const setNoteLabelMode = useAppStore((state) => state.setNoteLabelMode);
   const previewScale = useAppStore((state) => state.previewScale);
+  const fretboardOverlay = useAppStore((state) => state.fretboardOverlay);
+  const setFretboardOverlay = useAppStore((state) => state.setFretboardOverlay);
 
   // Quiz state
   const quizActive = useAppStore((state) => state.quizActive);
@@ -106,12 +109,30 @@ export default function Page() {
   const activeScale =
     previewScale || (showScaleTones ? currentChord?.suggestedScales[0] : null);
 
-  const fretNotes = currentChord
-    ? getFretNotesForChord(currentChord, {
-        includeScale: showScaleTones || !!previewScale,
-        scaleName: activeScale || undefined,
-      })
-    : [];
+  const isOverlayActive = fretboardOverlay !== "none";
+
+  const fretNotes = useMemo(() => {
+    if (!currentChord) return [];
+
+    if (isOverlayActive) {
+      return getOverlayNotes(
+        currentChord.root,
+        fretboardOverlay as Exclude<typeof fretboardOverlay, "none">,
+      );
+    }
+
+    return getFretNotesForChord(currentChord, {
+      includeScale: showScaleTones || !!previewScale,
+      scaleName: activeScale || undefined,
+    });
+  }, [
+    currentChord,
+    isOverlayActive,
+    fretboardOverlay,
+    showScaleTones,
+    previewScale,
+    activeScale,
+  ]);
 
   // Calculate voice leading paths to next chord
   const voiceLeadingPaths = useMemo(() => {
@@ -189,11 +210,13 @@ export default function Page() {
                 showVoiceLeading={showVoiceLeading}
                 showScaleTones={showScaleTones}
                 noteLabelMode={noteLabelMode}
+                fretboardOverlay={fretboardOverlay}
                 onToggleVoiceLeading={() =>
                   setShowVoiceLeading(!showVoiceLeading)
                 }
                 onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
                 onNoteLabelModeChange={setNoteLabelMode}
+                onOverlayChange={setFretboardOverlay}
                 quizMode={quizActive}
                 quizTargetPosition={
                   quizQuestion ? quizQuestion.targetNote : null
