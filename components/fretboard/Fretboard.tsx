@@ -146,6 +146,14 @@ export function Fretboard({
   const responsiveFretCount = useResponsiveFrets(numFrets);
   const { scrollRef, canScroll, checkScroll } = useScrollIndicator();
 
+  // Track chord changes for crossfade animation
+  const chordChangeKey = useRef(0);
+  const prevFretNotesRef = useRef(fretNotes);
+  if (fretNotes !== prevFretNotesRef.current) {
+    prevFretNotesRef.current = fretNotes;
+    chordChangeKey.current += 1;
+  }
+
   // Re-check scroll state when fret count changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-run when responsiveFretCount changes
   useEffect(() => {
@@ -305,79 +313,88 @@ export function Fretboard({
               </div>
             </div>
 
-            {/* Strings */}
-            {tuning.map((openNote, stringIndex) => {
-              const stringNum = stringIndex + 1; // 1-indexed
+            {/* Strings — crossfade on chord change */}
+            <div
+              key={chordChangeKey.current}
+              className="animate-fretboard-crossfade"
+            >
+              {tuning.map((openNote, stringIndex) => {
+                const stringNum = stringIndex + 1; // 1-indexed
 
-              return (
-                <div
-                  key={stringNum}
-                  className="flex items-center border-b last:border-b-0 border-slate-300/50 dark:border-slate-600/50"
-                >
-                  {/* String label */}
-                  <div className="w-8 shrink-0 flex items-center justify-center text-xs text-muted-foreground font-medium py-3">
-                    {openNote}
-                  </div>
+                return (
+                  <div
+                    key={stringNum}
+                    className="flex items-center border-b last:border-b-0 border-slate-300/50 dark:border-slate-600/50"
+                  >
+                    {/* String label */}
+                    <div className="w-8 shrink-0 flex items-center justify-center text-xs text-muted-foreground font-medium py-3">
+                      {openNote}
+                    </div>
 
-                  {/* Nut position (fret 0) */}
-                  <div className="w-10 shrink-0 flex items-center justify-center border-r-4 border-slate-400 dark:border-slate-500 py-2.5 sm:py-3">
-                    {(() => {
-                      const nutNote = noteMap.get(`${stringNum}-0`);
-                      return nutNote ? (
-                        <FretMarker
-                          note={nutNote}
-                          labelMode={noteLabelMode}
-                          highlightState={getNoteHighlightState(nutNote)}
-                          overlayMode={getOverlayColorMode(nutNote)}
-                          labelOverride={
-                            quizMode && isQuizTarget(nutNote) ? "?" : undefined
-                          }
-                        />
-                      ) : (
-                        <div className="w-8 h-8 sm:w-7 sm:h-7" />
-                      );
-                    })()}
-                  </div>
-
-                  {/* Frets */}
-                  {frets.slice(1).map((fret) => {
-                    const key = `${stringNum}-${fret}`;
-                    const note = noteMap.get(key);
-
-                    return (
-                      <div
-                        key={fret}
-                        className="flex-1 min-w-10 sm:min-w-12 flex items-center justify-center border-r border-slate-400/60 dark:border-slate-500/60 py-2.5 sm:py-3 relative"
-                      >
-                        {/* String wire */}
-                        <div
-                          className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-px bg-slate-400 dark:bg-slate-500"
-                          style={{
-                            height: `${1 + stringIndex * 0.3}px`,
-                          }}
-                        />
-                        {/* Note marker */}
-                        {note ? (
-                          <div className="relative z-10">
-                            <FretMarker
-                              note={note}
-                              labelMode={noteLabelMode}
-                              highlightState={getNoteHighlightState(note)}
-                              overlayMode={getOverlayColorMode(note)}
-                              labelOverride={
-                                quizMode && isQuizTarget(note) ? "?" : undefined
-                              }
-                            />
-                          </div>
+                    {/* Nut position (fret 0) */}
+                    <div className="w-10 shrink-0 flex items-center justify-center border-r-4 border-slate-400 dark:border-slate-500 py-2.5 sm:py-3">
+                      {(() => {
+                        const nutNote = noteMap.get(`${stringNum}-0`);
+                        return nutNote ? (
+                          <FretMarker
+                            note={nutNote}
+                            labelMode={noteLabelMode}
+                            highlightState={getNoteHighlightState(nutNote)}
+                            overlayMode={getOverlayColorMode(nutNote)}
+                            labelOverride={
+                              quizMode && isQuizTarget(nutNote)
+                                ? "?"
+                                : undefined
+                            }
+                          />
                         ) : (
                           <div className="w-8 h-8 sm:w-7 sm:h-7" />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
+                        );
+                      })()}
+                    </div>
+
+                    {/* Frets */}
+                    {frets.slice(1).map((fret) => {
+                      const key = `${stringNum}-${fret}`;
+                      const note = noteMap.get(key);
+
+                      return (
+                        <div
+                          key={fret}
+                          className="flex-1 min-w-10 sm:min-w-12 flex items-center justify-center border-r border-slate-400/60 dark:border-slate-500/60 py-2.5 sm:py-3 relative"
+                        >
+                          {/* String wire */}
+                          <div
+                            className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-px bg-slate-400 dark:bg-slate-500"
+                            style={{
+                              height: `${1 + stringIndex * 0.3}px`,
+                            }}
+                          />
+                          {/* Note marker */}
+                          {note ? (
+                            <div className="relative z-10">
+                              <FretMarker
+                                note={note}
+                                labelMode={noteLabelMode}
+                                highlightState={getNoteHighlightState(note)}
+                                overlayMode={getOverlayColorMode(note)}
+                                labelOverride={
+                                  quizMode && isQuizTarget(note)
+                                    ? "?"
+                                    : undefined
+                                }
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-8 h-8 sm:w-7 sm:h-7" />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Legend and controls (hidden in quiz mode) */}
