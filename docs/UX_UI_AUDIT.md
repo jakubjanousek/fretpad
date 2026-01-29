@@ -88,7 +88,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 
 | ID | Severity | Finding | Recommendation |
 |----|----------|---------|----------------|
-| A-1 | High | The fretboard note colors (orange, blue, green, grey) rely solely on color to convey meaning. Users with color vision deficiency cannot distinguish root from guide tone from chord tone. | Add secondary indicators: shapes (circle, diamond, square), patterns (solid, dashed border, ring), or text labels (R, G, C, S) inside the note circles. The dashed borders on guide tones are a good start but not sufficient alone. |
+| A-1 | High | ✅ **IMPLEMENTED** — The fretboard note colors (orange, blue, green, grey) rely solely on color to convey meaning. Users with color vision deficiency cannot distinguish root from guide tone from chord tone. | Added non-color shape indicators: roots use rounded squares, guide tones have dashed borders, chord tones are plain circles, scale tones have ring outlines. Legend updated to match. |
 | A-2 | Medium | Many interactive elements in the fretboard area use `generic` roles in the accessibility tree instead of proper semantic roles (buttons, links). Screen reader users will struggle to navigate. | Add proper ARIA roles and labels to fretboard notes, the playhead, and the legend items. |
 | A-3 | Medium | The bottom toolbar icons have no visible text labels. While they have `aria-label`, sighted users who can't memorize icons are left guessing. | Add visible text labels, at least on larger viewports. |
 | A-4 | Low | The tempo slider lacks visible min/max labels. The user sees "120 BPM" but doesn't know the range without dragging. | Add "40" and "240" (or whatever the range is) labels at the ends of the slider. |
@@ -138,7 +138,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 
 Ranked by impact-to-effort ratio:
 
-1. **A-1** — Add non-color indicators to fretboard notes (high accessibility impact, moderate effort)
+1. **A-1** — ✅ Add non-color indicators to fretboard notes (high accessibility impact, moderate effort)
 2. **MR-1** — Add mobile fretboard scroll indicator (high mobile UX impact, low effort)
 3. **VH-5** — Add text labels to transport bar icons (medium UX impact, low effort)
 4. **NA-3** — Add undo/redo for progression edits (high safety impact, moderate effort)

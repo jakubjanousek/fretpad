@@ -1,5 +1,6 @@
 "use client";
 
+import { getLegendShapeClasses } from "@/lib/fretboard";
 import type { CAGEDPosition } from "@/lib/types";
 import { CAGED_POSITION_LABELS } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -138,6 +139,7 @@ export function FretboardLegend({
 }: FretboardLegendProps) {
   // When overlay is active with CAGED/3NPS positions on, show position legend
   // Otherwise show chord-role legend (which works for both overlay and non-overlay modes)
+  const isChordRoleLegend = !(overlayActive && showCAGEDPositions);
   const items =
     overlayActive && showCAGEDPositions
       ? isThreeNPS
@@ -192,7 +194,10 @@ export function FretboardLegend({
           >
             <div
               className={cn(
-                "w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full shrink-0 transition-transform duration-150",
+                "w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 transition-transform duration-150",
+                isChordRoleLegend
+                  ? getLegendShapeClasses(item.type)
+                  : "rounded-full",
                 item.color,
                 hoveredType === item.type && "scale-125",
                 isFocused &&

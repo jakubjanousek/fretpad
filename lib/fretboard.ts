@@ -276,4 +276,47 @@ export function getThreeNPSNoteColor(note: FretNote): string {
   return "bg-slate-400";
 }
 
+/**
+ * Gets CSS classes for non-color shape indicators per note role.
+ * Provides accessibility for users with color vision deficiency.
+ *
+ * - Root: rounded square
+ * - Guide Tone: circle with dashed border
+ * - Chord Tone: plain circle
+ * - Scale Tone: circle with ring outline
+ */
+export function getFretNoteShapeClasses(note: FretNote): string {
+  if (note.isRoot) {
+    return "rounded-md";
+  }
+  if (note.isGuideTone) {
+    return "rounded-full border-2 border-dashed border-white/70";
+  }
+  if (note.isChordTone) {
+    return "rounded-full";
+  }
+  if (note.isScaleTone) {
+    return "rounded-full ring-1 ring-inset ring-white/50";
+  }
+  return "rounded-full";
+}
+
+/**
+ * Gets the shape class for a legend dot based on note type.
+ */
+export function getLegendShapeClasses(type: string): string {
+  switch (type) {
+    case "root":
+      return "rounded-sm";
+    case "guide":
+      return "rounded-full border-[1.5px] border-dashed border-white/70";
+    case "chord":
+      return "rounded-full";
+    case "scale":
+      return "rounded-full ring-1 ring-inset ring-white/50";
+    default:
+      return "rounded-full";
+  }
+}
+
 export { CAGED_POSITION_COLORS, THREE_NPS_POSITION_COLORS };
