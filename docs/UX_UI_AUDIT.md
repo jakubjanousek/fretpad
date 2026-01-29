@@ -80,7 +80,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 | TS-1 | Low | The fret numbers (0-12) use a small, light grey font that's hard to read, especially on the warm yellow fretboard background. | Increase font weight or use a slightly darker shade for fret numbers. |
 | TS-2 | Low | String labels (E, B, G, D, A, E) on the left side of the fretboard are the same size and weight as fret numbers, but they serve a different purpose. No visual differentiation. | Consider making string labels slightly bolder or using a different color to distinguish them from fret numbers. |
 | TS-3 | Medium | ✅ **IMPLEMENTED** — The chord details panel section headings had inconsistent spacing, and parenthetical hints ran inline with headings. | Moved parenthetical hints ("click to preview on fretboard", "try instead of X", "in Key") to separate subtitle lines below each heading. Standardized section spacing to `space-y-4` across ChordInfoPanel, ChordSubstitutionsPanel, and KeyAnalysisPanel for consistent vertical rhythm. |
-| TS-4 | Low | The bottom transport bar has uneven spacing between the tempo slider/BPM label on the left and the icon buttons on the right. The play button sits centered but the flanking areas aren't balanced. | Equalize the left and right zones of the transport bar, or use a more structured grid layout. |
+| TS-4 | Low | ✅ **IMPLEMENTED** — The bottom transport bar had uneven spacing between the tempo slider/BPM label on the left and the icon buttons on the right. The play button sat centered but the flanking areas weren't balanced. | Equalized the left and right zones of the transport bar using a more structured grid layout. |
 
 ## 5. Accessibility
 
