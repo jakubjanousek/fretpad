@@ -67,7 +67,7 @@ export function SessionDock({ onExpand }: SessionDockProps) {
   return (
     <div
       className={cn(
-        "fixed bottom-16 left-0 right-0 z-40 border-t border-l-4 bg-card/95 backdrop-blur-sm animate-in slide-in-from-bottom-2 duration-300",
+        "fixed bottom-transport left-0 right-0 z-40 border-t border-l-4 bg-card/95 backdrop-blur-sm animate-in slide-in-from-bottom-2 duration-300",
         PHASE_ACCENT[currentPhase.phase],
       )}
     >

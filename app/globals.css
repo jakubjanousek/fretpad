@@ -247,6 +247,11 @@
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
 }
 
+/* Position above transport bar, accounting for safe area */
+.bottom-transport {
+  bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+}
+
 /* Extra small breakpoint for very narrow devices */
 @media (min-width: 400px) {
   .xs\:inline {
