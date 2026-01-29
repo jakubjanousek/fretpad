@@ -79,7 +79,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 |----|----------|---------|----------------|
 | TS-1 | Low | The fret numbers (0-12) use a small, light grey font that's hard to read, especially on the warm yellow fretboard background. | Increase font weight or use a slightly darker shade for fret numbers. |
 | TS-2 | Low | String labels (E, B, G, D, A, E) on the left side of the fretboard are the same size and weight as fret numbers, but they serve a different purpose. No visual differentiation. | Consider making string labels slightly bolder or using a different color to distinguish them from fret numbers. |
-| TS-3 | Medium | In the chord details panel, the section headings ("Chord Tones", "Guide Tones", "Suggested Scales", "Chord Substitutions") have inconsistent spacing. "Suggested Scales" has a parenthetical "(click to preview on fretboard)" that runs directly into the heading without a line break. | Add consistent spacing between sections. Put parenthetical hints on a separate line or as a subtitle. |
+| TS-3 | Medium | ✅ **IMPLEMENTED** — The chord details panel section headings had inconsistent spacing, and parenthetical hints ran inline with headings. | Moved parenthetical hints ("click to preview on fretboard", "try instead of X", "in Key") to separate subtitle lines below each heading. Standardized section spacing to `space-y-4` across ChordInfoPanel, ChordSubstitutionsPanel, and KeyAnalysisPanel for consistent vertical rhythm. |
 | TS-4 | Low | The bottom transport bar has uneven spacing between the tempo slider/BPM label on the left and the icon buttons on the right. The play button sits centered but the flanking areas aren't balanced. | Equalize the left and right zones of the transport bar, or use a more structured grid layout. |
 
 ## 5. Accessibility
@@ -147,7 +147,7 @@ Ranked by impact-to-effort ratio:
 7. **MR-3** — ✅ Fix Display button truncation on mobile (medium mobile polish, low effort)
 8. **IS-1** — ✅ Add fretboard transition animation between chords (medium delight, moderate effort)
 9. **VH-3** — ✅ Improve playhead visibility (medium playback UX, low effort)
-10. **TS-3** — Fix chord details panel heading spacing (low polish, low effort)
+10. **TS-3** — ✅ Fix chord details panel heading spacing (low polish, low effort)
 
 ---
 

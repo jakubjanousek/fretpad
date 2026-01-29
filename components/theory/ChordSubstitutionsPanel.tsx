@@ -25,13 +25,15 @@ export function ChordSubstitutionsPanel({
   }
 
   return (
-    <div className="space-y-2">
-      <h4 className="text-xs font-medium text-muted-foreground">
-        Chord Substitutions
-        <span className="font-normal text-muted-foreground/70 ml-1">
-          (try instead of {chord.symbol})
-        </span>
-      </h4>
+    <div className="space-y-4">
+      <div>
+        <h4 className="text-xs font-medium text-muted-foreground">
+          Chord Substitutions
+        </h4>
+        <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+          Try instead of {chord.symbol}
+        </p>
+      </div>
       <div className="space-y-1.5">
         {substitutions.map((sub) => (
           <div

@@ -231,12 +231,14 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
 
       {/* Suggested Scales */}
       <div>
-        <h4 className="text-xs font-medium text-muted-foreground mb-2">
-          Suggested Scales
-          <span className="font-normal text-muted-foreground/70 ml-1">
-            (click to preview on fretboard)
-          </span>
-        </h4>
+        <div className="mb-2">
+          <h4 className="text-xs font-medium text-muted-foreground">
+            Suggested Scales
+          </h4>
+          <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+            Click to preview on fretboard
+          </p>
+        </div>
         <div className="flex flex-wrap gap-1.5">
           {chord.suggestedScales.map((scale, index) => {
             const isActive = previewScale === scale;

@@ -62,12 +62,14 @@ export function KeyAnalysisPanel({ progression }: KeyAnalysisPanelProps) {
 
       {/* Roman numeral analysis */}
       <div>
-        <h4 className="text-xs font-medium text-muted-foreground mb-1.5">
-          Roman Numeral Analysis
-          <span className="font-normal text-muted-foreground/70 ml-1">
-            (in {primaryKey.label})
-          </span>
-        </h4>
+        <div className="mb-1.5">
+          <h4 className="text-xs font-medium text-muted-foreground">
+            Roman Numeral Analysis
+          </h4>
+          <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+            In {primaryKey.label}
+          </p>
+        </div>
         <div className="flex flex-wrap gap-1">
           {primaryKey.romanNumerals.map((numeral, index) => (
             <Badge
