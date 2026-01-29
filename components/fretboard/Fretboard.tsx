@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
-import type { FretNote, NoteLabelMode, NoteName } from "@/lib/types";
+import type {
+  FretNote,
+  FretPosition,
+  NoteLabelMode,
+  NoteName,
+} from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +28,8 @@ interface FretboardProps {
   onToggleVoiceLeading?: () => void;
   onToggleScaleTones?: () => void;
   onNoteLabelModeChange?: (mode: NoteLabelMode) => void;
+  quizMode?: boolean;
+  quizTargetPosition?: FretPosition | null;
 }
 
 // Fret markers positions (standard dots)
@@ -68,6 +75,8 @@ export function Fretboard({
   onToggleVoiceLeading,
   onToggleScaleTones,
   onNoteLabelModeChange,
+  quizMode = false,
+  quizTargetPosition = null,
 }: FretboardProps) {
   const responsiveFretCount = useResponsiveFrets(numFrets);
   const [hoveredLegendType, setHoveredLegendType] =
@@ -79,10 +88,24 @@ export function Fretboard({
     setHoveredLegendType(null);
   };
 
+  // Helper to check if a note is the quiz target
+  const isQuizTarget = (note: FretNote): boolean => {
+    if (!quizMode || !quizTargetPosition) return false;
+    return (
+      note.string === quizTargetPosition.string &&
+      note.fret === quizTargetPosition.fret
+    );
+  };
+
   // Helper to determine if a note matches the hovered legend type
   const getNoteHighlightState = (
     note: FretNote,
   ): "highlighted" | "dimmed" | "normal" => {
+    // In quiz mode, highlight only the target note
+    if (quizMode && quizTargetPosition) {
+      return isQuizTarget(note) ? "highlighted" : "dimmed";
+    }
+
     if (!hoveredLegendType) return "normal";
 
     const noteType: LegendNoteType = note.isRoot
@@ -187,6 +210,9 @@ export function Fretboard({
                         note={nutNote}
                         labelMode={noteLabelMode}
                         highlightState={getNoteHighlightState(nutNote)}
+                        labelOverride={
+                          quizMode && isQuizTarget(nutNote) ? "?" : undefined
+                        }
                       />
                     ) : (
                       <div className="w-8 h-8 sm:w-7 sm:h-7" />
@@ -218,6 +244,9 @@ export function Fretboard({
                             note={note}
                             labelMode={noteLabelMode}
                             highlightState={getNoteHighlightState(note)}
+                            labelOverride={
+                              quizMode && isQuizTarget(note) ? "?" : undefined
+                            }
                           />
                         </div>
                       ) : (
@@ -231,134 +260,136 @@ export function Fretboard({
           })}
         </div>
 
-        {/* Legend and controls */}
-        <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          {/* Interactive Legend */}
-          <FretboardLegend
-            hoveredType={hoveredLegendType}
-            onHoverChange={setHoveredLegendType}
-          />
+        {/* Legend and controls (hidden in quiz mode) */}
+        {!quizMode && (
+          <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            {/* Interactive Legend */}
+            <FretboardLegend
+              hoveredType={hoveredLegendType}
+              onHoverChange={setHoveredLegendType}
+            />
 
-          {/* Controls */}
-          <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
-            {/* Note label mode selector - segmented control style */}
-            {onNoteLabelModeChange && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs text-muted-foreground hidden sm:inline">
-                  Labels:
-                </span>
-                <div className="relative flex rounded-lg bg-muted/60 p-0.5">
-                  {/* Sliding indicator */}
-                  <div
-                    className={cn(
-                      "absolute top-0.5 bottom-0.5 rounded-md bg-background shadow-sm transition-all duration-200 ease-out",
-                      noteLabelMode === "notes" &&
-                        "left-0.5 w-[calc(33.33%-2px)]",
-                      noteLabelMode === "degrees" &&
-                        "left-[33.33%] w-[calc(33.33%-2px)]",
-                      noteLabelMode === "none" &&
-                        "left-[66.66%] w-[calc(33.33%-2px)]",
-                    )}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => onNoteLabelModeChange("notes")}
-                    className={cn(
-                      "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
-                      noteLabelMode === "notes"
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    Notes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onNoteLabelModeChange("degrees")}
-                    className={cn(
-                      "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
-                      noteLabelMode === "degrees"
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    Degrees
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onNoteLabelModeChange("none")}
-                    className={cn(
-                      "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
-                      noteLabelMode === "none"
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    None
-                  </button>
+            {/* Controls */}
+            <div className="flex flex-wrap gap-2 sm:gap-3 items-center">
+              {/* Note label mode selector - segmented control style */}
+              {onNoteLabelModeChange && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-muted-foreground hidden sm:inline">
+                    Labels:
+                  </span>
+                  <div className="relative flex rounded-lg bg-muted/60 p-0.5">
+                    {/* Sliding indicator */}
+                    <div
+                      className={cn(
+                        "absolute top-0.5 bottom-0.5 rounded-md bg-background shadow-sm transition-all duration-200 ease-out",
+                        noteLabelMode === "notes" &&
+                          "left-0.5 w-[calc(33.33%-2px)]",
+                        noteLabelMode === "degrees" &&
+                          "left-[33.33%] w-[calc(33.33%-2px)]",
+                        noteLabelMode === "none" &&
+                          "left-[66.66%] w-[calc(33.33%-2px)]",
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => onNoteLabelModeChange("notes")}
+                      className={cn(
+                        "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                        noteLabelMode === "notes"
+                          ? "text-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      Notes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onNoteLabelModeChange("degrees")}
+                      className={cn(
+                        "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                        noteLabelMode === "degrees"
+                          ? "text-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      Degrees
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onNoteLabelModeChange("none")}
+                      className={cn(
+                        "relative z-10 h-7 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                        noteLabelMode === "none"
+                          ? "text-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      None
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Toggle buttons with enhanced states */}
-            {(onToggleVoiceLeading || onToggleScaleTones) && (
-              <div className="flex gap-1.5 sm:gap-2">
-                {onToggleVoiceLeading && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    data-state={showVoiceLeading ? "on" : "off"}
-                    onClick={onToggleVoiceLeading}
-                    className={cn(
-                      "h-7 text-xs transition-all duration-150 active:scale-95",
-                      showVoiceLeading
-                        ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
-                        : "hover:border-blue-500/50",
-                    )}
-                  >
-                    <span
+              {/* Toggle buttons with enhanced states */}
+              {(onToggleVoiceLeading || onToggleScaleTones) && (
+                <div className="flex gap-1.5 sm:gap-2">
+                  {onToggleVoiceLeading && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      data-state={showVoiceLeading ? "on" : "off"}
+                      onClick={onToggleVoiceLeading}
                       className={cn(
-                        "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
+                        "h-7 text-xs transition-all duration-150 active:scale-95",
                         showVoiceLeading
-                          ? "bg-blue-500"
-                          : "bg-muted-foreground/30",
+                          ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
+                          : "hover:border-blue-500/50",
                       )}
-                    />
-                    Voice Leading
-                  </Button>
-                )}
-                {onToggleScaleTones && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    data-state={showScaleTones ? "on" : "off"}
-                    onClick={onToggleScaleTones}
-                    className={cn(
-                      "h-7 text-xs transition-all duration-150 active:scale-95",
-                      showScaleTones
-                        ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
-                        : "hover:border-slate-500/50",
-                    )}
-                  >
-                    <span
+                    >
+                      <span
+                        className={cn(
+                          "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
+                          showVoiceLeading
+                            ? "bg-blue-500"
+                            : "bg-muted-foreground/30",
+                        )}
+                      />
+                      Voice Leading
+                    </Button>
+                  )}
+                  {onToggleScaleTones && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      data-state={showScaleTones ? "on" : "off"}
+                      onClick={onToggleScaleTones}
                       className={cn(
-                        "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
+                        "h-7 text-xs transition-all duration-150 active:scale-95",
                         showScaleTones
-                          ? "bg-slate-500"
-                          : "bg-muted-foreground/30",
+                          ? "bg-blue-500/15 border-blue-500 text-blue-600 hover:bg-blue-500/25 dark:text-blue-400 dark:bg-blue-500/20 dark:hover:bg-blue-500/30"
+                          : "hover:border-slate-500/50",
                       )}
-                    />
-                    Scale Tones
-                  </Button>
-                )}
-              </div>
-            )}
+                    >
+                      <span
+                        className={cn(
+                          "mr-1.5 inline-block w-1.5 h-1.5 rounded-full transition-colors duration-150",
+                          showScaleTones
+                            ? "bg-slate-500"
+                            : "bg-muted-foreground/30",
+                        )}
+                      />
+                      Scale Tones
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* First-time legend tooltip */}
-      {showLegendTooltip && (
+      {showLegendTooltip && !quizMode && (
         <LegendTooltip
           onHighlightChange={setHoveredLegendType}
           onComplete={handleLegendTooltipComplete}

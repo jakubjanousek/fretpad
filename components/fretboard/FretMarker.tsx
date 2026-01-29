@@ -11,12 +11,14 @@ interface FretMarkerProps {
   note: FretNote;
   labelMode?: NoteLabelMode;
   highlightState?: NoteHighlightState;
+  labelOverride?: string;
 }
 
 export function FretMarker({
   note,
   labelMode = "notes",
   highlightState = "normal",
+  labelOverride,
 }: FretMarkerProps) {
   const bgColor = getFretNoteColor(note);
   const textColor = getFretNoteTextColor(note);
@@ -47,7 +49,7 @@ export function FretMarker({
           highlightState === "dimmed" && "opacity-25 scale-90",
         )}
       >
-        {getLabel()}
+        {labelOverride ?? getLabel()}
       </div>
     </NoteInfoTooltip>
   );

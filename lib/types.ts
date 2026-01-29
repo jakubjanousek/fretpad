@@ -196,3 +196,13 @@ export interface StyleDefinition {
 // ============================================
 
 export type NoteLabelMode = "notes" | "degrees" | "none";
+
+// ============================================
+// Quiz Types
+// ============================================
+
+export interface QuizQuestion {
+  targetNote: FretNote;
+  chord: Chord;
+  availableIntervals: string[]; // unique intervals like ["1", "b3", "5", "b7"]
+}

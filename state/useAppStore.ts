@@ -19,13 +19,15 @@ import {
   getChordAtPosition,
   type ProgressionSlice,
 } from "./slices/progressionSlice";
+import { createQuizSlice, type QuizSlice } from "./slices/quizSlice";
 
 export type AppState = ProgressionSlice &
   PlaybackSlice &
   MetronomeSlice &
   BackingTrackSlice &
   DisplaySlice &
-  ErrorSlice;
+  ErrorSlice &
+  QuizSlice;
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -36,6 +38,7 @@ export const useAppStore = create<AppState>()(
       ...createBackingTrackSlice(...a),
       ...createDisplaySlice(...a),
       ...createErrorSlice(...a),
+      ...createQuizSlice(...a),
     }),
     {
       name: "fretflow-state",

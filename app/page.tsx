@@ -7,6 +7,7 @@ import { HelpGuide } from "@/components/help/HelpGuide";
 import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ShareExport } from "@/components/progression/ShareExport";
+import { ChordToneQuiz } from "@/components/quiz/ChordToneQuiz";
 import { PracticeStats } from "@/components/stats/PracticeStats";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChordInfoSheet } from "@/components/theory/ChordInfoSheet";
@@ -41,6 +42,11 @@ export default function Page() {
   const noteLabelMode = useAppStore((state) => state.noteLabelMode);
   const setNoteLabelMode = useAppStore((state) => state.setNoteLabelMode);
   const previewScale = useAppStore((state) => state.previewScale);
+
+  // Quiz state
+  const quizActive = useAppStore((state) => state.quizActive);
+  const quizQuestion = useAppStore((state) => state.quizQuestion);
+  const startQuiz = useAppStore((state) => state.startQuiz);
 
   // Panel states
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -188,7 +194,14 @@ export default function Page() {
                 }
                 onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
                 onNoteLabelModeChange={setNoteLabelMode}
+                quizMode={quizActive}
+                quizTargetPosition={
+                  quizQuestion ? quizQuestion.targetNote : null
+                }
               />
+
+              {/* Chord Tone Quiz */}
+              <ChordToneQuiz />
             </CardContent>
           </Card>
         </section>
@@ -199,6 +212,7 @@ export default function Page() {
         onSettingsClick={() => setSettingsOpen(true)}
         onGuideClick={() => setHelpGuideOpen(true)}
         onStatsClick={() => setStatsOpen(true)}
+        onQuizClick={startQuiz}
       />
 
       {/* Settings Drawer */}

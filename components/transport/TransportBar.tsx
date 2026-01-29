@@ -1,6 +1,13 @@
 "use client";
 
-import { BookOpen, Play, Settings, Square, Trophy } from "lucide-react";
+import {
+  BookOpen,
+  BrainCircuit,
+  Play,
+  Settings,
+  Square,
+  Trophy,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -14,6 +21,7 @@ interface TransportBarProps {
   onSettingsClick: () => void;
   onGuideClick: () => void;
   onStatsClick: () => void;
+  onQuizClick: () => void;
 }
 
 /**
@@ -24,6 +32,7 @@ export function TransportBar({
   onSettingsClick,
   onGuideClick,
   onStatsClick,
+  onQuizClick,
 }: TransportBarProps) {
   const { isPlaying, tempo, handlePlay, handleStopClick, handleTempoChange } =
     useTransportControls();
@@ -87,6 +96,21 @@ export function TransportBar({
 
           {/* Utilities Group */}
           <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onQuizClick}
+                  aria-label="Chord Tone Quiz"
+                  className="h-9 w-9 rounded-full hover:bg-background/80 active:scale-95 transition-all duration-150"
+                >
+                  <BrainCircuit className="h-4 w-4 text-violet-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Chord Tone Quiz</TooltipContent>
+            </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

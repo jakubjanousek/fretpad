@@ -90,7 +90,7 @@ FretFlow is a polished MVP: interactive fretboard with color-coded theory, 4 bac
 | **P0** | Tempo ramp mode | High retention | Low | ✅ Done |
 | **P0** | Scale degree labels | High demand, already designed | Low | ✅ Done |
 | **P0** | Drum patterns per style | Major audio quality jump | Medium | ✅ Done |
-| **P1** | Chord tone quiz / ear training | Differentiation + retention | Medium | ⬜ Todo |
+| **P1** | Chord tone quiz / ear training | Differentiation + retention | Medium | ✅ Done |
 | **P1** | CAGED / pentatonic overlays | Core ask from intermediate players | Medium | ⬜ Todo |
 | **P1** | Practice session planner | Structured practice = stickiness | Medium | ⬜ Todo |
 | **P1** | Additional styles (Funk, Neo-Soul) | Broader appeal | Medium | ⬜ Todo |
