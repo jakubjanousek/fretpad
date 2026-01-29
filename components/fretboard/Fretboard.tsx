@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -77,6 +77,33 @@ function useResponsiveFrets(maxFrets: number): number {
   return fretCount;
 }
 
+function useScrollIndicator() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScroll, setCanScroll] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const hasMoreToScroll = el.scrollWidth - el.scrollLeft - el.clientWidth > 2;
+    setCanScroll(hasMoreToScroll);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    checkScroll();
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll]);
+
+  return { scrollRef, canScroll, checkScroll };
+}
+
 const OVERLAY_OPTIONS: { value: FretboardOverlay; label: string }[] = [
   { value: "none", label: "None" },
   { value: "pentatonicMinor", label: "Minor Pentatonic" },
@@ -117,6 +144,14 @@ export function Fretboard({
   quizTargetPosition = null,
 }: FretboardProps) {
   const responsiveFretCount = useResponsiveFrets(numFrets);
+  const { scrollRef, canScroll, checkScroll } = useScrollIndicator();
+
+  // Re-check scroll state when fret count changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-run when responsiveFretCount changes
+  useEffect(() => {
+    checkScroll();
+  }, [responsiveFretCount, checkScroll]);
+
   const [hoveredLegendType, setHoveredLegendType] =
     useState<LegendNoteType>(null);
   const [showLegendTooltip, setShowLegendTooltip] = useState(true);
@@ -209,285 +244,315 @@ export function Fretboard({
   if (showCAGEDPositions && isOverlayActive) activeChips.push("Positions");
 
   return (
-    <div className="w-full overflow-x-auto scrollbar-hide sm:scrollbar-thin sm:scrollbar-thumb-muted sm:scrollbar-track-transparent">
-      <div className="min-w-125 sm:min-w-150 md:min-w-175">
-        {/* Fret numbers header */}
-        <div className="flex mb-1">
-          {/* String label placeholder */}
-          <div className="w-8 shrink-0" />
-          {/* Nut */}
-          <div className="w-10 shrink-0 flex items-center justify-center text-xs text-muted-foreground font-medium">
-            0
-          </div>
-          {/* Fret numbers */}
-          {frets.slice(1).map((fret) => (
-            <div
-              key={fret}
-              className="flex-1 min-w-12 flex items-center justify-center text-xs text-muted-foreground"
-            >
-              {fret}
+    <div className="relative">
+      <div
+        ref={scrollRef}
+        className="w-full overflow-x-auto scrollbar-hide sm:scrollbar-thin sm:scrollbar-thumb-muted sm:scrollbar-track-transparent"
+      >
+        <div className="min-w-125 sm:min-w-150 md:min-w-175">
+          {/* Fret numbers header */}
+          <div className="flex mb-1">
+            {/* String label placeholder */}
+            <div className="w-8 shrink-0" />
+            {/* Nut */}
+            <div className="w-10 shrink-0 flex items-center justify-center text-xs text-muted-foreground font-medium">
+              0
             </div>
-          ))}
-        </div>
-
-        {/* Fretboard grid */}
-        <div className="relative border rounded-lg bg-linear-to-b from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30">
-          {/* Voice leading overlay */}
-          {voiceLeadingPaths.length > 0 && (
-            <VoiceLeadingOverlay
-              paths={voiceLeadingPaths}
-              numFrets={responsiveFretCount}
-              numStrings={tuning.length}
-            />
-          )}
-
-          {/* Fret marker dots (behind the grid) */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="flex h-full">
-              {/* Offset for string label and nut */}
-              <div className="w-8 shrink-0" />
-              <div className="w-10 shrink-0" />
-              {/* Fret cells */}
-              {frets.slice(1).map((fret) => (
-                <div
-                  key={fret}
-                  className="flex-1 min-w-12 flex items-center justify-center"
-                >
-                  {FRET_MARKERS.includes(fret) && (
-                    <div className="flex flex-col gap-8">
-                      <div className="w-2 h-2 rounded-full bg-slate-400/40" />
-                      {DOUBLE_MARKER_FRETS.includes(fret) && (
-                        <div className="w-2 h-2 rounded-full bg-slate-400/40" />
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Strings */}
-          {tuning.map((openNote, stringIndex) => {
-            const stringNum = stringIndex + 1; // 1-indexed
-
-            return (
+            {/* Fret numbers */}
+            {frets.slice(1).map((fret) => (
               <div
-                key={stringNum}
-                className="flex items-center border-b last:border-b-0 border-slate-300/50 dark:border-slate-600/50"
+                key={fret}
+                className="flex-1 min-w-12 flex items-center justify-center text-xs text-muted-foreground"
               >
-                {/* String label */}
-                <div className="w-8 shrink-0 flex items-center justify-center text-xs text-muted-foreground font-medium py-3">
-                  {openNote}
-                </div>
+                {fret}
+              </div>
+            ))}
+          </div>
 
-                {/* Nut position (fret 0) */}
-                <div className="w-10 shrink-0 flex items-center justify-center border-r-4 border-slate-400 dark:border-slate-500 py-2.5 sm:py-3">
-                  {(() => {
-                    const nutNote = noteMap.get(`${stringNum}-0`);
-                    return nutNote ? (
-                      <FretMarker
-                        note={nutNote}
-                        labelMode={noteLabelMode}
-                        highlightState={getNoteHighlightState(nutNote)}
-                        overlayMode={getOverlayColorMode(nutNote)}
-                        labelOverride={
-                          quizMode && isQuizTarget(nutNote) ? "?" : undefined
-                        }
-                      />
-                    ) : (
-                      <div className="w-8 h-8 sm:w-7 sm:h-7" />
-                    );
-                  })()}
-                </div>
+          {/* Fretboard grid */}
+          <div className="relative border rounded-lg bg-linear-to-b from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30">
+            {/* Voice leading overlay */}
+            {voiceLeadingPaths.length > 0 && (
+              <VoiceLeadingOverlay
+                paths={voiceLeadingPaths}
+                numFrets={responsiveFretCount}
+                numStrings={tuning.length}
+              />
+            )}
 
-                {/* Frets */}
-                {frets.slice(1).map((fret) => {
-                  const key = `${stringNum}-${fret}`;
-                  const note = noteMap.get(key);
+            {/* Fret marker dots (behind the grid) */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="flex h-full">
+                {/* Offset for string label and nut */}
+                <div className="w-8 shrink-0" />
+                <div className="w-10 shrink-0" />
+                {/* Fret cells */}
+                {frets.slice(1).map((fret) => (
+                  <div
+                    key={fret}
+                    className="flex-1 min-w-12 flex items-center justify-center"
+                  >
+                    {FRET_MARKERS.includes(fret) && (
+                      <div className="flex flex-col gap-8">
+                        <div className="w-2 h-2 rounded-full bg-slate-400/40" />
+                        {DOUBLE_MARKER_FRETS.includes(fret) && (
+                          <div className="w-2 h-2 rounded-full bg-slate-400/40" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                  return (
-                    <div
-                      key={fret}
-                      className="flex-1 min-w-10 sm:min-w-12 flex items-center justify-center border-r border-slate-400/60 dark:border-slate-500/60 py-2.5 sm:py-3 relative"
-                    >
-                      {/* String wire */}
-                      <div
-                        className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-px bg-slate-400 dark:bg-slate-500"
-                        style={{
-                          height: `${1 + stringIndex * 0.3}px`,
-                        }}
-                      />
-                      {/* Note marker */}
-                      {note ? (
-                        <div className="relative z-10">
-                          <FretMarker
-                            note={note}
-                            labelMode={noteLabelMode}
-                            highlightState={getNoteHighlightState(note)}
-                            overlayMode={getOverlayColorMode(note)}
-                            labelOverride={
-                              quizMode && isQuizTarget(note) ? "?" : undefined
-                            }
-                          />
-                        </div>
+            {/* Strings */}
+            {tuning.map((openNote, stringIndex) => {
+              const stringNum = stringIndex + 1; // 1-indexed
+
+              return (
+                <div
+                  key={stringNum}
+                  className="flex items-center border-b last:border-b-0 border-slate-300/50 dark:border-slate-600/50"
+                >
+                  {/* String label */}
+                  <div className="w-8 shrink-0 flex items-center justify-center text-xs text-muted-foreground font-medium py-3">
+                    {openNote}
+                  </div>
+
+                  {/* Nut position (fret 0) */}
+                  <div className="w-10 shrink-0 flex items-center justify-center border-r-4 border-slate-400 dark:border-slate-500 py-2.5 sm:py-3">
+                    {(() => {
+                      const nutNote = noteMap.get(`${stringNum}-0`);
+                      return nutNote ? (
+                        <FretMarker
+                          note={nutNote}
+                          labelMode={noteLabelMode}
+                          highlightState={getNoteHighlightState(nutNote)}
+                          overlayMode={getOverlayColorMode(nutNote)}
+                          labelOverride={
+                            quizMode && isQuizTarget(nutNote) ? "?" : undefined
+                          }
+                        />
                       ) : (
                         <div className="w-8 h-8 sm:w-7 sm:h-7" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
+                      );
+                    })()}
+                  </div>
 
-        {/* Legend and controls (hidden in quiz mode) */}
-        {!quizMode && (
-          <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            {/* Interactive Legend */}
-            <FretboardLegend
-              hoveredType={hoveredLegendType}
-              onHoverChange={setHoveredLegendType}
-              overlayActive={isOverlayActive}
-              showCAGEDPositions={showCAGEDPositions}
-              isThreeNPS={isThreeNPS}
-              focusedPosition={focusedPosition}
-              onFocusPosition={onFocusedPositionChange}
-            />
+                  {/* Frets */}
+                  {frets.slice(1).map((fret) => {
+                    const key = `${stringNum}-${fret}`;
+                    const note = noteMap.get(key);
 
-            {/* Display Popover */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-9 text-xs gap-1.5"
-                >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    role="img"
-                    aria-label="Display settings"
+                    return (
+                      <div
+                        key={fret}
+                        className="flex-1 min-w-10 sm:min-w-12 flex items-center justify-center border-r border-slate-400/60 dark:border-slate-500/60 py-2.5 sm:py-3 relative"
+                      >
+                        {/* String wire */}
+                        <div
+                          className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-px bg-slate-400 dark:bg-slate-500"
+                          style={{
+                            height: `${1 + stringIndex * 0.3}px`,
+                          }}
+                        />
+                        {/* Note marker */}
+                        {note ? (
+                          <div className="relative z-10">
+                            <FretMarker
+                              note={note}
+                              labelMode={noteLabelMode}
+                              highlightState={getNoteHighlightState(note)}
+                              overlayMode={getOverlayColorMode(note)}
+                              labelOverride={
+                                quizMode && isQuizTarget(note) ? "?" : undefined
+                              }
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 sm:w-7 sm:h-7" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Legend and controls (hidden in quiz mode) */}
+          {!quizMode && (
+            <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              {/* Interactive Legend */}
+              <FretboardLegend
+                hoveredType={hoveredLegendType}
+                onHoverChange={setHoveredLegendType}
+                overlayActive={isOverlayActive}
+                showCAGEDPositions={showCAGEDPositions}
+                isThreeNPS={isThreeNPS}
+                focusedPosition={focusedPosition}
+                onFocusPosition={onFocusedPositionChange}
+              />
+
+              {/* Display Popover */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 text-xs gap-1.5"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
-                    />
-                  </svg>
-                  Display
-                  {activeChips.length > 0 && (
-                    <span className="text-muted-foreground">
-                      ({activeChips.join(" · ")})
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-80 p-0">
-                <div className="p-4 space-y-4">
-                  {/* Scale Overlay */}
-                  <div>
-                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                      Scale Overlay
-                    </h4>
-                    <div className="flex flex-wrap gap-1">
-                      {OVERLAY_OPTIONS.map((opt) => (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => onOverlayChange?.(opt.value)}
-                          className={cn(
-                            "h-9 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
-                            fretboardOverlay === opt.value
-                              ? "bg-foreground text-background"
-                              : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80",
-                          )}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Note Labels */}
-                  <div>
-                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                      Note Labels
-                    </h4>
-                    <div className="flex gap-1">
-                      {LABEL_OPTIONS.map((opt) => (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => onNoteLabelModeChange?.(opt.value)}
-                          className={cn(
-                            "h-9 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
-                            noteLabelMode === opt.value
-                              ? "bg-foreground text-background"
-                              : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80",
-                          )}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Display Layers */}
-                  <div>
-                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                      Display Layers
-                    </h4>
-                    <div className="space-y-1.5">
-                      <ToggleRow
-                        label="Voice Leading"
-                        description="Show voice leading paths between chords"
-                        active={showVoiceLeading}
-                        onToggle={onToggleVoiceLeading}
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      role="img"
+                      aria-label="Display settings"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
                       />
-                      <ToggleRow
-                        label="Fill Scale"
-                        description="Show remaining diatonic notes as faded dots"
-                        active={showScaleTones}
-                        onToggle={onToggleScaleTones}
-                      />
-                    </div>
-                  </div>
-
-                  {/* CAGED Positions — only when overlay is active */}
-                  {isOverlayActive && (
+                    </svg>
+                    Display
+                    {activeChips.length > 0 && (
+                      <span className="text-muted-foreground">
+                        ({activeChips.join(" · ")})
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-80 p-0">
+                  <div className="p-4 space-y-4">
+                    {/* Scale Overlay */}
                     <div>
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                        {isThreeNPS ? "3NPS Positions" : "CAGED Positions"}
+                        Scale Overlay
                       </h4>
-                      <ToggleRow
-                        label="Show positions"
-                        description={
-                          isThreeNPS
-                            ? "Color notes by 3NPS position (1-7)"
-                            : "Color notes by CAGED shape position"
-                        }
-                        active={showCAGEDPositions}
-                        onToggle={onToggleCAGEDPositions}
-                      />
+                      <div className="flex flex-wrap gap-1">
+                        {OVERLAY_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => onOverlayChange?.(opt.value)}
+                            className={cn(
+                              "h-9 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                              fretboardOverlay === opt.value
+                                ? "bg-foreground text-background"
+                                : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80",
+                            )}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
+
+                    {/* Note Labels */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                        Note Labels
+                      </h4>
+                      <div className="flex gap-1">
+                        {LABEL_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => onNoteLabelModeChange?.(opt.value)}
+                            className={cn(
+                              "h-9 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                              noteLabelMode === opt.value
+                                ? "bg-foreground text-background"
+                                : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80",
+                            )}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Display Layers */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                        Display Layers
+                      </h4>
+                      <div className="space-y-1.5">
+                        <ToggleRow
+                          label="Voice Leading"
+                          description="Show voice leading paths between chords"
+                          active={showVoiceLeading}
+                          onToggle={onToggleVoiceLeading}
+                        />
+                        <ToggleRow
+                          label="Fill Scale"
+                          description="Show remaining diatonic notes as faded dots"
+                          active={showScaleTones}
+                          onToggle={onToggleScaleTones}
+                        />
+                      </div>
+                    </div>
+
+                    {/* CAGED Positions — only when overlay is active */}
+                    {isOverlayActive && (
+                      <div>
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                          {isThreeNPS ? "3NPS Positions" : "CAGED Positions"}
+                        </h4>
+                        <ToggleRow
+                          label="Show positions"
+                          description={
+                            isThreeNPS
+                              ? "Color notes by 3NPS position (1-7)"
+                              : "Color notes by CAGED shape position"
+                          }
+                          active={showCAGEDPositions}
+                          onToggle={onToggleCAGEDPositions}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
+        </div>
+
+        {/* First-time legend tooltip */}
+        {showLegendTooltip && !quizMode && (
+          <LegendTooltip
+            onHighlightChange={setHoveredLegendType}
+            onComplete={handleLegendTooltipComplete}
+          />
         )}
       </div>
 
-      {/* First-time legend tooltip */}
-      {showLegendTooltip && !quizMode && (
-        <LegendTooltip
-          onHighlightChange={setHoveredLegendType}
-          onComplete={handleLegendTooltipComplete}
-        />
+      {/* Mobile scroll indicator */}
+      {canScroll && (
+        <div
+          className="absolute right-0 top-0 bottom-0 w-10 pointer-events-none flex items-center justify-end pr-1 sm:hidden"
+          aria-hidden="true"
+        >
+          <div className="absolute inset-0 bg-linear-to-r from-transparent to-background/80" />
+          <svg
+            className="relative w-5 h-5 text-muted-foreground animate-pulse"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            role="img"
+            aria-label="Scroll right for more frets"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+            />
+          </svg>
+        </div>
       )}
     </div>
   );

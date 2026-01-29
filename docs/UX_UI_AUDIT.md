@@ -42,7 +42,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 
 | ID | Severity | Finding | Recommendation |
 |----|----------|---------|----------------|
-| MR-1 | High | On mobile (375px), the fretboard is cut off at fret 5-6. The user cannot see the full fretboard without horizontal scrolling, but there's no visual cue that scrolling is possible. | Add a scroll indicator (fade gradient on the right edge, or a subtle "scroll for more" hint). Consider allowing pinch-to-zoom. |
+| MR-1 | High | ✅ **IMPLEMENTED** — On mobile (375px), the fretboard is cut off at fret 5-6. The user cannot see the full fretboard without horizontal scrolling, but there's no visual cue that scrolling is possible. | Added a right-edge fade gradient with an animated chevron arrow that appears on mobile when more frets are available to scroll. The indicator automatically hides once the user scrolls to the end. |
 | MR-2 | Medium | On mobile, the legend row at the bottom of the fretboard ("Root", "Guide tone", "Chord tone", "Scale tone") wraps awkwardly — "Scale tone" drops to a second line on its own. | Use a more compact legend format on mobile (e.g. colored dots only with a collapsible legend, or abbreviate labels). |
 | MR-3 | Medium | The "Display" button label gets truncated on mobile: "Display (Minor Pentatonic · Voice Lea..." — the parenthetical state is too long. | On mobile, show just "Display" with a badge dot indicating active filters. Show the full state summary only on desktop. |
 | MR-4 | Low | The progression helper text "Click chord to select, click bar to edit..." wraps to two lines on mobile, taking up valuable vertical space. | Shorten to "Tap chord to select. Tap bar to edit." on mobile, or hide it after first use. |
@@ -139,7 +139,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 Ranked by impact-to-effort ratio:
 
 1. **A-1** — ✅ Add non-color indicators to fretboard notes (high accessibility impact, moderate effort)
-2. **MR-1** — Add mobile fretboard scroll indicator (high mobile UX impact, low effort)
+2. **MR-1** — ✅ Add mobile fretboard scroll indicator (high mobile UX impact, low effort)
 3. **VH-5** — Add text labels to transport bar icons (medium UX impact, low effort)
 4. **NA-3** — Add undo/redo for progression edits (high safety impact, moderate effort)
 5. **IS-2** — Clarify chord editing interaction (medium learnability impact, low effort)
