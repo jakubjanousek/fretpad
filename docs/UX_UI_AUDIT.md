@@ -60,7 +60,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 | ID | Severity | Finding | Recommendation |
 |----|----------|---------|----------------|
 | IS-1 | Medium | When clicking a chord bar to select it, the fretboard updates but there's no transition animation. The note positions just snap instantly, which can be disorienting. | Add a subtle crossfade or slide transition when switching between chords so the user can track which notes moved. |
-| IS-2 | Medium | The chord editing flow is unclear. The instructions say "click bar to edit" but clicking a bar just selects it. Double-clicking the bar doesn't enter an edit mode with a visible text input either — the user needs to click the chord name button inside the bar. This is a two-step process that isn't communicated. | Clarify the editing interaction. Either make single-click on the chord name directly open an inline text edit, or show a visible "edit" affordance (pencil icon) on hover/tap. |
+| IS-2 | Medium | ✅ **IMPLEMENTED** — The chord editing flow was unclear. The instructions said "click bar to edit" but clicking a bar just selected it. The two-step process wasn't communicated. | Added a visible pencil icon edit affordance on each bar (visible on hover, or dimmed on selected bars). Double-clicking a chord name also enters edit mode. Updated helper text to explain the interaction clearly. |
 | IS-3 | Low | The "Remove bar" (X) button on each progression bar is always visible. For a 4-bar progression, accidentally removing a bar is a destructive action. | Show remove buttons only on hover (desktop) or via a swipe gesture (mobile). Add an undo toast when a bar is removed. |
 | IS-4 | Medium | In the chord tone quiz, the quiz panel docks to the bottom of the fretboard area, pushing the question partially below the fold. The user may need to scroll to see the answer buttons. | Pin the quiz panel to the bottom of the viewport (fixed position) or overlay it above the transport bar. |
 | IS-5 | Low | The Display popover opens anchored to the Display button, which is at the bottom-right of the fretboard. On shorter viewports, this popover may extend below the fold. | Consider opening Display settings in a slide-in panel (similar to Settings/Chord Details) rather than a popover, for more consistent UX. |
@@ -142,7 +142,7 @@ Ranked by impact-to-effort ratio:
 2. **MR-1** — ✅ Add mobile fretboard scroll indicator (high mobile UX impact, low effort)
 3. **VH-5** — ✅ Add text labels to transport bar icons (medium UX impact, low effort)
 4. **NA-3** — ✅ Add undo/redo for progression edits (high safety impact, moderate effort)
-5. **IS-2** — Clarify chord editing interaction (medium learnability impact, low effort)
+5. **IS-2** — ✅ Clarify chord editing interaction (medium learnability impact, low effort)
 6. **VH-1** — Reduce progression editor visual weight (medium hierarchy impact, low effort)
 7. **MR-3** — Fix Display button truncation on mobile (medium mobile polish, low effort)
 8. **IS-1** — Add fretboard transition animation between chords (medium delight, moderate effort)

@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Redo2, Undo2, X } from "lucide-react";
+import { Pencil, Plus, Redo2, Undo2, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,6 +66,11 @@ function BarInput({
     onSelect(barIndex, chordIndex);
   };
 
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(true);
+  };
+
   return (
     <div className="flex flex-col gap-1 shrink-0 group/bar">
       <div className="flex items-center">
@@ -89,13 +94,12 @@ function BarInput({
             role="button"
             tabIndex={0}
             className={cn(
-              "relative flex flex-wrap items-center gap-y-0.5 border rounded-md px-1.5 py-1 cursor-pointer hover:border-primary/50 transition-all overflow-hidden",
+              "relative flex flex-wrap items-center gap-y-0.5 border rounded-md px-1.5 py-1 transition-all overflow-hidden",
               isSelected &&
                 "border-primary ring-1 ring-primary/30 border-l-4 border-l-primary bg-primary/5",
               isPlaying &&
                 "border-orange-400 bg-orange-500/10 ring-1 ring-orange-400/50 border-l-4 border-l-orange-500",
             )}
-            onClick={() => setIsEditing(true)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
@@ -122,8 +126,12 @@ function BarInput({
                   e.stopPropagation();
                   handleChordClick(chordIdx);
                 }}
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditing(true);
+                }}
                 className={cn(
-                  "px-2.5 py-1.5 text-sm font-mono rounded transition-colors relative z-0",
+                  "px-2.5 py-1.5 text-sm font-mono rounded transition-colors relative z-0 cursor-pointer",
                   isSelected && selectedChordIndex === chordIdx
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-muted",
@@ -132,6 +140,21 @@ function BarInput({
                 {chord}
               </button>
             ))}
+            {/* Edit button - visible on hover or when selected */}
+            <button
+              type="button"
+              onClick={handleEditClick}
+              className={cn(
+                "p-1 rounded transition-opacity text-muted-foreground hover:text-primary",
+                isSelected
+                  ? "opacity-60 hover:opacity-100"
+                  : "opacity-0 group-hover/bar:opacity-60 hover:opacity-100! active:opacity-100",
+              )}
+              aria-label="Edit bar"
+              title="Edit chords"
+            >
+              <Pencil className="h-3 w-3" />
+            </button>
             {/* Remove button - hover only */}
             {canRemove && (
               <button
@@ -140,7 +163,7 @@ function BarInput({
                   e.stopPropagation();
                   onRemove(barIndex);
                 }}
-                className="ml-2 p-1.5 -m-1.5 rounded-md opacity-0 group-hover/bar:opacity-100 active:opacity-100 transition-opacity text-muted-foreground hover:text-destructive touch-target-expand"
+                className="p-1.5 -m-1.5 rounded-md opacity-0 group-hover/bar:opacity-100 active:opacity-100 transition-opacity text-muted-foreground hover:text-destructive touch-target-expand"
                 aria-label="Remove bar"
               >
                 <X className="h-4 w-4" />
@@ -261,8 +284,9 @@ export function ProgressionEditor() {
       </div>
 
       <p className="text-[11px] text-muted-foreground">
-        Click chord to select, click bar to edit. Use spaces for multiple chords
-        (e.g., "Dm7 G7").
+        Click chord to select. Click{" "}
+        <Pencil className="inline h-2.5 w-2.5 align-baseline" /> or double-click
+        to edit. Use spaces for multiple chords (e.g., "Dm7 G7").
       </p>
     </div>
   );
