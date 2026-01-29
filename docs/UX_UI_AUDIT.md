@@ -44,7 +44,7 @@ FretFlow is a well-structured guitar practice tool with strong music-theory foun
 |----|----------|---------|----------------|
 | MR-1 | High | ✅ **IMPLEMENTED** — On mobile (375px), the fretboard is cut off at fret 5-6. The user cannot see the full fretboard without horizontal scrolling, but there's no visual cue that scrolling is possible. | Added a right-edge fade gradient with an animated chevron arrow that appears on mobile when more frets are available to scroll. The indicator automatically hides once the user scrolls to the end. |
 | MR-2 | Medium | On mobile, the legend row at the bottom of the fretboard ("Root", "Guide tone", "Chord tone", "Scale tone") wraps awkwardly — "Scale tone" drops to a second line on its own. | Use a more compact legend format on mobile (e.g. colored dots only with a collapsible legend, or abbreviate labels). |
-| MR-3 | Medium | The "Display" button label gets truncated on mobile: "Display (Minor Pentatonic · Voice Lea..." — the parenthetical state is too long. | On mobile, show just "Display" with a badge dot indicating active filters. Show the full state summary only on desktop. |
+| MR-3 | Medium | ✅ **IMPLEMENTED** — The "Display" button label was truncated on mobile: "Display (Minor Pentatonic · Voice Lea..." — the parenthetical state was too long. | On mobile, the parenthetical summary is hidden and replaced with a small primary-colored badge dot indicating active filters. The full state summary is shown only on sm+ breakpoints. |
 | MR-4 | Low | The progression helper text "Click chord to select, click bar to edit..." wraps to two lines on mobile, taking up valuable vertical space. | Shorten to "Tap chord to select. Tap bar to edit." on mobile, or hide it after first use. |
 | MR-5 | Medium | On tablet (768px), the fretboard area is slightly cramped with fret numbers beyond 12 getting tight. The note circles at higher frets overlap or crowd each other. | Consider a fretboard zoom level or "focus range" selector (e.g. frets 0-7, 5-12, 7-15). |
 
@@ -144,7 +144,7 @@ Ranked by impact-to-effort ratio:
 4. **NA-3** — ✅ Add undo/redo for progression edits (high safety impact, moderate effort)
 5. **IS-2** — ✅ Clarify chord editing interaction (medium learnability impact, low effort)
 6. **VH-1** — ✅ Reduce progression editor visual weight (medium hierarchy impact, low effort)
-7. **MR-3** — Fix Display button truncation on mobile (medium mobile polish, low effort)
+7. **MR-3** — ✅ Fix Display button truncation on mobile (medium mobile polish, low effort)
 8. **IS-1** — Add fretboard transition animation between chords (medium delight, moderate effort)
 9. **VH-3** — Improve playhead visibility (medium playback UX, low effort)
 10. **TS-3** — Fix chord details panel heading spacing (low polish, low effort)

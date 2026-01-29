@@ -419,9 +419,12 @@ export function Fretboard({
                     </svg>
                     Display
                     {activeChips.length > 0 && (
-                      <span className="text-muted-foreground">
-                        ({activeChips.join(" · ")})
-                      </span>
+                      <>
+                        <span className="hidden sm:inline text-muted-foreground">
+                          ({activeChips.join(" · ")})
+                        </span>
+                        <span className="sm:hidden w-1.5 h-1.5 rounded-full bg-primary" />
+                      </>
                     )}
                   </Button>
                 </PopoverTrigger>
