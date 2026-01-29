@@ -43,11 +43,11 @@ On iOS, the AudioContext suspends on phone calls, app switches, lock screen. The
 
 Safari doesn't show install banners. Guide users to add the app to their home screen.
 
-- [ ] Create `InstallPromptBanner` component
-- [ ] Detect standalone mode via `window.matchMedia("(display-mode: standalone)")`
-- [ ] Show dismissable hint on first visit in browser mode: "Add to Home Screen for the best experience"
-- [ ] Persist dismissal in `localStorage`
-- [ ] Only show on iOS/iPadOS (detect via user agent)
+- [x] Create `InstallPromptBanner` component
+- [x] Detect standalone mode via `window.matchMedia("(display-mode: standalone)")`
+- [x] Show dismissable hint on first visit in browser mode: "Add to Home Screen for the best experience"
+- [x] Persist dismissal in `localStorage`
+- [x] Only show on iOS/iPadOS (detect via user agent)
 
 ### P1 — Offline Indicator
 
