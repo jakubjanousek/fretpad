@@ -145,9 +145,6 @@ export function parseChordSymbol(symbol: ChordSymbol): Chord | null {
  * Returns a display-friendly interval name (e.g., "1", "b3", "5", "b7")
  */
 export function getIntervalName(root: NoteName, note: NoteName): string {
-  const interval = Interval.distance(root, note);
-  if (!interval) return "?";
-
   // Convert tonal interval notation to display format
   const intervalMap: Record<string, string> = {
     "1P": "1",
@@ -166,30 +163,52 @@ export function getIntervalName(root: NoteName, note: NoteName): string {
     "7M": "7",
   };
 
-  return intervalMap[interval] || interval;
+  // Try with original note spelling first
+  const interval = Interval.distance(root, note);
+  if (interval && intervalMap[interval]) {
+    return intervalMap[interval];
+  }
+
+  // The fretboard uses sharps (e.g. "A#") but chord roots may be flat-spelled (e.g. "Bb").
+  // Interval.distance("Bb", "A#") returns "1A" instead of "1P", so try the enharmonic.
+  const enharmonicNote = Note.enharmonic(note);
+  if (enharmonicNote) {
+    const enharmonicInterval = Interval.distance(root, enharmonicNote);
+    if (enharmonicInterval && intervalMap[enharmonicInterval]) {
+      return intervalMap[enharmonicInterval];
+    }
+  }
+
+  // Return the raw interval if no clean mapping found
+  return interval || "?";
+}
+
+/**
+ * Compares two notes by chroma (0-11) to handle enharmonic equivalents.
+ * Note.pitchClass returns strings ("Bb" vs "A#") which don't match,
+ * but Note.chroma returns numbers (both = 10).
+ */
+function sameChroma(a: string, b: string): boolean {
+  return Note.chroma(a) === Note.chroma(b);
 }
 
 /**
  * Checks if a note is a chord tone for the given chord
  */
 export function isChordTone(chord: Chord, note: NoteName): boolean {
-  return chord.notes.some(
-    (chordNote) => Note.pitchClass(chordNote) === Note.pitchClass(note),
-  );
+  return chord.notes.some((chordNote) => sameChroma(chordNote, note));
 }
 
 /**
  * Checks if a note is a guide tone (3rd or 7th) for the given chord
  */
 export function isGuideTone(chord: Chord, note: NoteName): boolean {
-  return chord.guideTones.some(
-    (guideTone) => Note.pitchClass(guideTone) === Note.pitchClass(note),
-  );
+  return chord.guideTones.some((guideTone) => sameChroma(guideTone, note));
 }
 
 /**
  * Checks if a note is the root of the chord
  */
 export function isRoot(chord: Chord, note: NoteName): boolean {
-  return Note.pitchClass(chord.root) === Note.pitchClass(note);
+  return sameChroma(chord.root, note);
 }
