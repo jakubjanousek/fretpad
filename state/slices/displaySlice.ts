@@ -3,6 +3,8 @@ import type {
   CAGEDPosition,
   FretboardOverlay,
   FretPosition,
+  ModeComparisonFretboardView,
+  ModeComparisonState,
   NoteLabelMode,
   TargetNoteMode,
 } from "@/lib/types";
@@ -24,6 +26,10 @@ export interface DisplaySlice {
   showEnclosures: boolean;
   focusedEnclosureTarget: FretPosition | null;
 
+  // Mode Comparison state
+  modeComparison: ModeComparisonState;
+  modeComparisonView: ModeComparisonFretboardView;
+
   setShowScaleTones: (show: boolean) => void;
   setShowVoiceLeading: (show: boolean) => void;
   setNoteLabelMode: (mode: NoteLabelMode) => void;
@@ -38,6 +44,11 @@ export interface DisplaySlice {
   setShowDiatonicApproach: (show: boolean) => void;
   setShowEnclosures: (show: boolean) => void;
   setFocusedEnclosureTarget: (target: FretPosition | null) => void;
+
+  // Mode Comparison actions
+  setModeComparison: (comparison: ModeComparisonState) => void;
+  setModeComparisonView: (view: ModeComparisonFretboardView) => void;
+  clearModeComparison: () => void;
 }
 
 export const createDisplaySlice: StateCreator<
@@ -60,6 +71,10 @@ export const createDisplaySlice: StateCreator<
   showDiatonicApproach: false,
   showEnclosures: false,
   focusedEnclosureTarget: null,
+
+  // Mode Comparison defaults
+  modeComparison: { mode1: null, mode2: null },
+  modeComparisonView: "both",
 
   setShowScaleTones: (show) => {
     set({ showScaleTones: show });
@@ -118,5 +133,21 @@ export const createDisplaySlice: StateCreator<
 
   setFocusedEnclosureTarget: (target) => {
     set({ focusedEnclosureTarget: target });
+  },
+
+  // Mode Comparison actions
+  setModeComparison: (comparison) => {
+    set({ modeComparison: comparison });
+  },
+
+  setModeComparisonView: (view) => {
+    set({ modeComparisonView: view });
+  },
+
+  clearModeComparison: () => {
+    set({
+      modeComparison: { mode1: null, mode2: null },
+      modeComparisonView: "both",
+    });
   },
 });
