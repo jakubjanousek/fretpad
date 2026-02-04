@@ -289,14 +289,14 @@ interface VoicingState {
 - [x] Keyboard shortcuts (`V` to toggle, `[` `]` to cycle voicings)
 - [x] Add to display controls panel (TransportDrawer)
 
-### Milestone 6: Voice Leading Engine
-- [ ] Create `lib/guitar/voice-leading.ts`
-- [ ] Implement `calculateVoiceLeadingDistance()` scoring
-- [ ] Implement `getVoiceLeadingOptions()` for next-chord suggestions
-- [ ] Implement `getOptimalVoicingPath()` for full progressions
-- [ ] Add voice leading toggle to UI
-- [ ] Show voice leading suggestions during playback
-- [ ] Visualize voice movement (optional lines between notes)
+### Milestone 6: Voice Leading Engine ✅
+- [x] Create `lib/guitar/voice-leading.ts`
+- [x] Implement `calculateVoiceLeadingDistance()` scoring
+- [x] Implement `getVoiceLeadingOptions()` for next-chord suggestions
+- [x] Implement `getOptimalVoicingPath()` for full progressions
+- [x] Add voice leading toggle to UI
+- [x] Show voice leading suggestions during playback
+- [x] Visualize voice movement (VoicingTransitionOverlay component)
 
 ### Milestone 7: Polish & Extras
 - [ ] Add voicing difficulty indicators

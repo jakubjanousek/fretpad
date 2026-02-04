@@ -120,6 +120,14 @@ export default function Page() {
     (state) => state.refreshVoicingsForChord,
   );
 
+  // Voice leading state
+  const voiceLeadingEnabled = useAppStore(
+    (state) => state.voiceLeading.enabled,
+  );
+  const updateVoiceLeadingSuggestions = useAppStore(
+    (state) => state.updateVoiceLeadingSuggestions,
+  );
+
   // Panel states
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [chordInfoOpen, setChordInfoOpen] = useState(false);
@@ -150,6 +158,29 @@ export default function Page() {
       refreshVoicingsForChord(currentChord);
     }
   }, [currentChord, showVoicings, refreshVoicingsForChord]);
+
+  // Update voice leading suggestions when the next chord is known
+  // biome-ignore lint/correctness/useExhaustiveDependencies: selectedVoicingIndex triggers recalculation when user changes voicing
+  useEffect(() => {
+    if (!voiceLeadingEnabled || !showVoicings) {
+      return;
+    }
+
+    const nextChord = getNextChord(
+      progression,
+      currentBarIndex,
+      currentChordIndex,
+    );
+    updateVoiceLeadingSuggestions(nextChord);
+  }, [
+    voiceLeadingEnabled,
+    showVoicings,
+    progression,
+    currentBarIndex,
+    currentChordIndex,
+    selectedVoicingIndex,
+    updateVoiceLeadingSuggestions,
+  ]);
 
   // Get the currently selected voicing
   // biome-ignore lint/correctness/useExhaustiveDependencies: availableVoicings and selectedVoicingIndex trigger re-computation when store updates

@@ -1,6 +1,12 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Guitar, RotateCcw } from "lucide-react";
+import {
+  ArrowRightLeft,
+  ChevronLeft,
+  ChevronRight,
+  Guitar,
+  RotateCcw,
+} from "lucide-react";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import type {
   GuitarVoicingType,
   StringGroup,
@@ -131,6 +138,24 @@ export function VoicingControlsPanel() {
   );
   const setInversions = useAppStore((state) => state.setInversions);
   const resetFilters = useAppStore((state) => state.resetFilters);
+
+  // Voice leading state
+  const voiceLeading = useAppStore((state) => state.voiceLeading);
+  const setVoiceLeadingEnabled = useAppStore(
+    (state) => state.setVoiceLeadingEnabled,
+  );
+  const setVoiceLeadingMaxMovement = useAppStore(
+    (state) => state.setVoiceLeadingMaxMovement,
+  );
+  const setShowMovementIndicators = useAppStore(
+    (state) => state.setShowMovementIndicators,
+  );
+  const voiceLeadingSuggestions = useAppStore(
+    (state) => state.voiceLeadingSuggestions,
+  );
+  const selectSuggestedVoicing = useAppStore(
+    (state) => state.selectSuggestedVoicing,
+  );
 
   // Toggle a voicing type in the filter
   const toggleVoicingType = useCallback(
@@ -278,6 +303,113 @@ export function VoicingControlsPanel() {
             >
               {showVoicingFingers ? "On" : "Off"}
             </Button>
+          </div>
+
+          {/* Voice Leading Section */}
+          <div className="flex flex-col gap-2 pt-2 border-t">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ArrowRightLeft className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Voice Leading</span>
+              </div>
+              <Button
+                variant={voiceLeading.enabled ? "default" : "outline"}
+                size="sm"
+                onClick={() => setVoiceLeadingEnabled(!voiceLeading.enabled)}
+                className={cn(
+                  "h-8 text-xs",
+                  voiceLeading.enabled && "bg-emerald-500 hover:bg-emerald-600",
+                )}
+              >
+                {voiceLeading.enabled ? "On" : "Off"}
+              </Button>
+            </div>
+
+            {voiceLeading.enabled && (
+              <>
+                {/* Max Movement Slider */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-muted-foreground">
+                      Max Movement
+                    </Label>
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      {voiceLeading.maxMovement} frets
+                    </span>
+                  </div>
+                  <Slider
+                    value={[voiceLeading.maxMovement]}
+                    onValueChange={(value) =>
+                      setVoiceLeadingMaxMovement(value[0] ?? 3)
+                    }
+                    min={1}
+                    max={5}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Show Movement Indicators */}
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-muted-foreground">
+                    Show Arrows
+                  </Label>
+                  <Button
+                    variant={
+                      voiceLeading.showMovementIndicators
+                        ? "default"
+                        : "outline"
+                    }
+                    size="sm"
+                    onClick={() =>
+                      setShowMovementIndicators(
+                        !voiceLeading.showMovementIndicators,
+                      )
+                    }
+                    className={cn(
+                      "h-7 text-xs",
+                      voiceLeading.showMovementIndicators &&
+                        "bg-emerald-500 hover:bg-emerald-600",
+                    )}
+                  >
+                    {voiceLeading.showMovementIndicators ? "On" : "Off"}
+                  </Button>
+                </div>
+
+                {/* Voice Leading Suggestions */}
+                {voiceLeadingSuggestions.length > 0 && (
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-xs text-muted-foreground">
+                      Suggestions for Next Chord
+                    </Label>
+                    <div className="flex flex-wrap gap-1">
+                      {voiceLeadingSuggestions
+                        .slice(0, 3)
+                        .map((suggestion, idx) => (
+                          <Button
+                            key={suggestion.voicing.id}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => selectSuggestedVoicing(idx)}
+                            className="h-7 text-xs px-2 flex items-center gap-1"
+                            title={`Score: ${suggestion.score.toFixed(1)}, Common tones: ${suggestion.commonToneCount}`}
+                          >
+                            <span className="truncate max-w-20">
+                              {suggestion.voicing.name.split(" - ")[1] ??
+                                suggestion.voicing.type}
+                            </span>
+                            {suggestion.commonToneCount > 0 && (
+                              <span className="text-emerald-500 text-[10px]">
+                                {suggestion.commonToneCount}ct
+                              </span>
+                            )}
+                          </Button>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Voicing Type Filter */}

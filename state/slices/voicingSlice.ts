@@ -1,6 +1,11 @@
 import type { StateCreator } from "zustand";
 import { filterVoicings } from "@/lib/guitar/v-system";
 import {
+  getSuggestedVoicingsForNextChord,
+  getVoiceLeadingOptions,
+  type VoiceLeadingResult,
+} from "@/lib/guitar/voice-leading";
+import {
   generateVoicingsForChord,
   sortVoicingsByPriority,
 } from "@/lib/guitar/voicings";
@@ -33,6 +38,18 @@ export interface VoicingFilterConfig {
   maxFretStretch: number;
 }
 
+/**
+ * Voice leading configuration
+ */
+export interface VoiceLeadingConfig {
+  /** Whether voice leading suggestions are enabled */
+  enabled: boolean;
+  /** Maximum fret movement per voice (default: 3) */
+  maxMovement: number;
+  /** Show visual indicators for voice movement */
+  showMovementIndicators: boolean;
+}
+
 export interface VoicingSlice {
   // Visibility
   showVoicings: boolean;
@@ -51,6 +68,11 @@ export interface VoicingSlice {
 
   // Voicing cache (keyed by chord symbol + filter hash)
   voicingCache: Map<string, GuitarVoicing[]>;
+
+  // Voice leading state
+  voiceLeading: VoiceLeadingConfig;
+  voiceLeadingSuggestions: VoiceLeadingResult[];
+  nextChordVoicings: GuitarVoicing[];
 
   // Actions
   setShowVoicings: (show: boolean) => void;
@@ -73,9 +95,17 @@ export interface VoicingSlice {
   refreshVoicingsForChord: (chord: Chord | null) => void;
   clearVoicingCache: () => void;
 
+  // Voice leading actions
+  setVoiceLeadingEnabled: (enabled: boolean) => void;
+  setVoiceLeadingMaxMovement: (maxMovement: number) => void;
+  setShowMovementIndicators: (show: boolean) => void;
+  updateVoiceLeadingSuggestions: (nextChord: Chord | null) => void;
+  selectSuggestedVoicing: (index: number) => void;
+
   // Computed getters (as actions that return values)
   getSelectedVoicing: () => GuitarVoicing | null;
   getFilteredVoicings: () => GuitarVoicing[];
+  getBestVoiceLeadingSuggestion: () => GuitarVoicing | null;
 }
 
 // Default filter values
@@ -90,6 +120,12 @@ const defaultVSystemFilter: VSystemFilterConfig = {
   stringGroups: [],
   structures: [],
   inversions: [],
+};
+
+const defaultVoiceLeading: VoiceLeadingConfig = {
+  enabled: false,
+  maxMovement: 3,
+  showMovementIndicators: true,
 };
 
 /**
@@ -125,6 +161,11 @@ export const createVoicingSlice: StateCreator<
   voicingFilter: { ...defaultVoicingFilter },
   vSystemFilter: { ...defaultVSystemFilter },
   voicingCache: new Map(),
+
+  // Voice leading state
+  voiceLeading: { ...defaultVoiceLeading },
+  voiceLeadingSuggestions: [],
+  nextChordVoicings: [],
 
   // Visibility toggle
   setShowVoicings: (show) => {
@@ -318,6 +359,85 @@ export const createVoicingSlice: StateCreator<
     set({ voicingCache: new Map() });
   },
 
+  // Voice leading actions
+  setVoiceLeadingEnabled: (enabled) => {
+    set((state) => ({
+      voiceLeading: { ...state.voiceLeading, enabled },
+    }));
+  },
+
+  setVoiceLeadingMaxMovement: (maxMovement) => {
+    set((state) => ({
+      voiceLeading: { ...state.voiceLeading, maxMovement },
+    }));
+    // Refresh suggestions with new max movement
+    const { voiceLeading, getSelectedVoicing } = get();
+    if (voiceLeading.enabled) {
+      // Trigger refresh of suggestions if we have a current voicing
+      const currentVoicing = getSelectedVoicing();
+      if (currentVoicing) {
+        // Suggestions will be refreshed when next chord is calculated
+      }
+    }
+  },
+
+  setShowMovementIndicators: (show) => {
+    set((state) => ({
+      voiceLeading: { ...state.voiceLeading, showMovementIndicators: show },
+    }));
+  },
+
+  updateVoiceLeadingSuggestions: (nextChord) => {
+    const { voiceLeading, getSelectedVoicing } = get();
+
+    if (!voiceLeading.enabled || !nextChord) {
+      set({ voiceLeadingSuggestions: [], nextChordVoicings: [] });
+      return;
+    }
+
+    const currentVoicing = getSelectedVoicing();
+
+    if (!currentVoicing) {
+      // No current voicing - just get default voicings for next chord
+      const voicings = getSuggestedVoicingsForNextChord(null, nextChord, 5);
+      set({
+        voiceLeadingSuggestions: [],
+        nextChordVoicings: voicings,
+      });
+      return;
+    }
+
+    // Get voice leading suggestions
+    const suggestions = getVoiceLeadingOptions(currentVoicing, nextChord, {
+      maxMovement: voiceLeading.maxMovement,
+      maxSuggestions: 5,
+    });
+
+    set({
+      voiceLeadingSuggestions: suggestions,
+      nextChordVoicings: suggestions.map((s) => s.voicing),
+    });
+  },
+
+  selectSuggestedVoicing: (index) => {
+    const { nextChordVoicings, availableVoicings } = get();
+    const suggestedVoicing = nextChordVoicings[index];
+
+    if (!suggestedVoicing) return;
+
+    // Find this voicing in the available voicings by matching positions
+    const matchIndex = availableVoicings.findIndex((v) => {
+      return v.positions.every((pos, i) => {
+        const suggestedPos = suggestedVoicing.positions[i];
+        return suggestedPos && pos.fret === suggestedPos.fret;
+      });
+    });
+
+    if (matchIndex >= 0) {
+      set({ selectedVoicingIndex: matchIndex });
+    }
+  },
+
   // Computed getters
   getSelectedVoicing: () => {
     const { availableVoicings, selectedVoicingIndex } = get();
@@ -327,5 +447,10 @@ export const createVoicingSlice: StateCreator<
   getFilteredVoicings: () => {
     const { availableVoicings } = get();
     return availableVoicings;
+  },
+
+  getBestVoiceLeadingSuggestion: () => {
+    const { voiceLeadingSuggestions } = get();
+    return voiceLeadingSuggestions[0]?.voicing ?? null;
   },
 });
