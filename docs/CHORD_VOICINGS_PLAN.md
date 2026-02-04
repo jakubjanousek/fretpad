@@ -281,13 +281,13 @@ interface VoicingState {
 - [x] Show finger numbers on voicing notes (optional toggle)
 - [x] Connect voicing lines between notes (optional)
 
-### Milestone 5: UI Controls
-- [ ] Create `VoicingSelector` component
-- [ ] Add voicing type filter (open, barre, shell, etc.)
-- [ ] Add V-System filter panel (V-1 through V-6, string groups)
-- [ ] Previous/Next voicing navigation
-- [ ] Keyboard shortcuts (e.g., `V` to cycle voicings)
-- [ ] Add to display controls panel
+### Milestone 5: UI Controls ✅
+- [x] Create `VoicingControlsPanel` component
+- [x] Add voicing type filter (open, barre, shell, etc.)
+- [x] Add V-System filter panel (V-1 through V-6, string groups)
+- [x] Previous/Next voicing navigation
+- [x] Keyboard shortcuts (`V` to toggle, `[` `]` to cycle voicings)
+- [x] Add to display controls panel (TransportDrawer)
 
 ### Milestone 6: Voice Leading Engine
 - [ ] Create `lib/guitar/voice-leading.ts`

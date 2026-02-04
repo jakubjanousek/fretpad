@@ -24,6 +24,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { VoicingControlsPanel } from "@/components/voicing/VoicingControlsPanel";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 import { StyleSelector } from "./StyleSelector";
@@ -400,6 +401,9 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
             </div>
           </div>
 
+          {/* Voicing Controls */}
+          <VoicingControlsPanel />
+
           {/* Keyboard Shortcuts */}
           <div className="pt-2 border-t">
             <button
@@ -441,6 +445,18 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                     Up/Down
                   </kbd>{" "}
                   Tempo
+                </div>
+                <div>
+                  <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">
+                    V
+                  </kbd>{" "}
+                  Voicings
+                </div>
+                <div>
+                  <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">
+                    [ ]
+                  </kbd>{" "}
+                  Prev/Next
                 </div>
               </div>
             )}

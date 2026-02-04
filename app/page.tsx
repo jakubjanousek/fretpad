@@ -157,7 +157,7 @@ export default function Page() {
     return getSelectedVoicing();
   }, [getSelectedVoicing, availableVoicings, selectedVoicingIndex]);
 
-  // Keyboard shortcuts for panels (I and ? keys)
+  // Keyboard shortcuts for panels and voicings
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isInputFocused = document.activeElement?.tagName === "INPUT";
@@ -178,11 +178,29 @@ export default function Page() {
         e.preventDefault();
         setHelpGuideOpen((prev) => !prev);
       }
+
+      // Toggle voicings (V key)
+      if (e.key.toLowerCase() === "v" && !hasModifier && !isInputFocused) {
+        e.preventDefault();
+        setShowVoicings(!showVoicings);
+      }
+
+      // Previous voicing ([ key)
+      if (e.key === "[" && !hasModifier && !isInputFocused) {
+        e.preventDefault();
+        selectPreviousVoicing();
+      }
+
+      // Next voicing (] key)
+      if (e.key === "]" && !hasModifier && !isInputFocused) {
+        e.preventDefault();
+        selectNextVoicing();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [showVoicings, setShowVoicings, selectPreviousVoicing, selectNextVoicing]);
 
   const handleChordHeaderClick = useCallback(() => {
     setChordInfoOpen(true);
