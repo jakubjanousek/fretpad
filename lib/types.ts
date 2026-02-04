@@ -384,3 +384,36 @@ export interface VoicingTemplate {
   voicingStructure?: VoicingStructure;
   inversion: 0 | 1 | 2 | 3;
 }
+
+// Mode Comparison Types
+// ============================================
+
+export interface ModeComparisonState {
+  mode1: string | null; // Full scale name, e.g., "D Dorian"
+  mode2: string | null; // Full scale name, e.g., "D Aeolian"
+}
+
+export interface ModeIntervalDiff {
+  degree: number; // 1-7
+  degreeLabel: string; // "1", "2", "♭3", etc.
+  mode1Note: NoteName;
+  mode2Note: NoteName;
+  mode1Interval: string; // "M2", "m3", etc.
+  mode2Interval: string;
+  isDifferent: boolean;
+  differenceDescription?: string; // "Raised 6th", "Lowered 2nd"
+}
+
+export interface ModeComparisonResult {
+  mode1Name: string;
+  mode2Name: string;
+  mode1Root: NoteName;
+  mode2Root: NoteName;
+  intervals: ModeIntervalDiff[];
+  sharedNotes: NoteName[];
+  mode1UniqueNotes: NoteName[];
+  mode2UniqueNotes: NoteName[];
+  keyDifference: string; // e.g., "Dorian has a natural 6th"
+}
+
+export type ModeComparisonFretboardView = "both" | "mode1" | "mode2";
