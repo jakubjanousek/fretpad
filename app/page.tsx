@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
 import { HelpGuide } from "@/components/help/HelpGuide";
@@ -11,7 +11,7 @@ import { ShareExport } from "@/components/progression/ShareExport";
 import { ChordToneQuiz } from "@/components/quiz/ChordToneQuiz";
 import { PracticeStats } from "@/components/stats/PracticeStats";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ChordInfoSheet } from "@/components/theory/ChordInfoSheet";
+import { TheoryPanel } from "@/components/theory/TheoryPanel";
 import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
@@ -130,7 +130,6 @@ export default function Page() {
 
   // Panel states
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [chordInfoOpen, setChordInfoOpen] = useState(false);
   const [helpGuideOpen, setHelpGuideOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [plannerOpen, setPlannerOpen] = useState(false);
@@ -194,12 +193,6 @@ export default function Page() {
       const isInputFocused = document.activeElement?.tagName === "INPUT";
       const hasModifier = e.metaKey || e.ctrlKey || e.altKey;
 
-      // Toggle chord info panel (I key)
-      if (e.key.toLowerCase() === "i" && !hasModifier && !isInputFocused) {
-        e.preventDefault();
-        setChordInfoOpen((prev) => !prev);
-      }
-
       // Toggle help guide (H or ? key)
       if (
         (e.key.toLowerCase() === "h" || e.key === "?") &&
@@ -232,10 +225,6 @@ export default function Page() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showVoicings, setShowVoicings, selectPreviousVoicing, selectNextVoicing]);
-
-  const handleChordHeaderClick = useCallback(() => {
-    setChordInfoOpen(true);
-  }, []);
 
   // Use preview scale if set, otherwise use the first suggested scale
   const activeScale =
@@ -356,7 +345,7 @@ export default function Page() {
   ]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-30">
         <div className="container mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2">
@@ -373,8 +362,8 @@ export default function Page() {
       {/* Main Content - add bottom padding for fixed transport bar (+ dock when session active) */}
       <main
         className={cn(
-          "flex-1 container mx-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-col gap-2 sm:gap-3",
-          sessionActive ? "pb-32" : "pb-20",
+          "container mx-auto px-3 sm:px-4 pt-2 sm:pt-3 flex flex-col gap-2 sm:gap-3",
+          sessionActive ? "pb-56" : "pb-44",
         )}
       >
         {/* Progression Editor Section - compact strip, fretboard should dominate */}
@@ -383,16 +372,12 @@ export default function Page() {
         </section>
 
         {/* Fretboard Visualization Section */}
-        <section className="flex-1">
+        <section>
           <Card className="h-full">
             <CardContent className="flex flex-col gap-1.5 py-2 sm:py-3 px-3 sm:px-6">
               {/* Prominent chord header */}
               <div className="flex justify-center">
-                <FretboardHeader
-                  chord={currentChord}
-                  isPlaying={isPlaying}
-                  onChordClick={handleChordHeaderClick}
-                />
+                <FretboardHeader chord={currentChord} isPlaying={isPlaying} />
               </div>
 
               {/* Progress bar */}
@@ -461,6 +446,11 @@ export default function Page() {
             </CardContent>
           </Card>
         </section>
+
+        {/* Theory Panel - collapsible panel for chord/scale info */}
+        <section>
+          <TheoryPanel chord={currentChord} progression={progression} />
+        </section>
       </main>
 
       {/* Session Dock - compact bar above transport when practice session is active */}
@@ -477,13 +467,6 @@ export default function Page() {
 
       {/* Settings Drawer */}
       <TransportDrawer open={settingsOpen} onOpenChange={setSettingsOpen} />
-
-      {/* Chord Info Sheet */}
-      <ChordInfoSheet
-        chord={currentChord}
-        open={chordInfoOpen}
-        onOpenChange={setChordInfoOpen}
-      />
 
       {/* Help Guide */}
       <HelpGuide open={helpGuideOpen} onOpenChange={setHelpGuideOpen} />

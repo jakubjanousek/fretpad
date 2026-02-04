@@ -119,186 +119,189 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
 
   return (
     <div className="space-y-4">
-      {/* Chord Symbol & Quality */}
-      <div>
-        <div className="flex items-center gap-3 mb-1">
-          <span className="text-2xl font-bold">{chord.symbol}</span>
-          <span className="text-sm text-muted-foreground">
-            {formatQuality(chord.quality)}
-          </span>
-          {/* Audio preview buttons */}
-          <div className="flex items-center gap-1 ml-auto">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handlePlayChord}
+      {/* Chord Symbol & Quality - Header row */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="text-2xl font-bold">{chord.symbol}</span>
+        <span className="text-sm text-muted-foreground">
+          {formatQuality(chord.quality)}
+        </span>
+        <span className="text-xs text-muted-foreground">
+          Root: {chord.root}
+        </span>
+        {/* Audio preview buttons */}
+        <div className="flex items-center gap-1 ml-auto">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handlePlayChord}
+            className={cn(
+              "h-7 px-2 text-xs gap-1",
+              playingChord === "chord" && "text-cyan-500",
+            )}
+            title="Play chord"
+          >
+            <Volume2
               className={cn(
-                "h-7 px-2 text-xs gap-1",
-                playingChord === "chord" && "text-cyan-500",
+                "w-3.5 h-3.5",
+                playingChord === "chord" && "animate-pulse",
               )}
-              title="Play chord"
-            >
-              <Volume2
-                className={cn(
-                  "w-3.5 h-3.5",
-                  playingChord === "chord" && "animate-pulse",
-                )}
-              />
-              Chord
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handlePlayArpeggio}
+            />
+            Chord
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handlePlayArpeggio}
+            className={cn(
+              "h-7 px-2 text-xs gap-1",
+              playingChord === "arpeggio" && "text-cyan-500",
+            )}
+            title="Play arpeggio"
+          >
+            <Play
               className={cn(
-                "h-7 px-2 text-xs gap-1",
-                playingChord === "arpeggio" && "text-cyan-500",
+                "w-3.5 h-3.5",
+                playingChord === "arpeggio" && "animate-pulse",
               )}
-              title="Play arpeggio"
-            >
-              <Play
-                className={cn(
-                  "w-3.5 h-3.5",
-                  playingChord === "arpeggio" && "animate-pulse",
-                )}
-              />
-              Arp
-            </Button>
+            />
+            Arp
+          </Button>
+        </div>
+      </div>
+
+      {/* Main content - responsive grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        {/* Chord Tones */}
+        <div>
+          <h4 className="text-xs font-medium text-muted-foreground mb-2">
+            Chord Tones
+          </h4>
+          <div className="flex flex-wrap gap-1.5">
+            {chord.notes.map((note, index) => {
+              const isRoot = note === chord.root;
+              const isGuide = chord.guideTones.includes(note);
+
+              return (
+                <Badge
+                  key={`${note}-${index}`}
+                  variant="outline"
+                  className={`
+                    font-mono text-xs px-2 py-0.5
+                    ${isRoot ? "border-orange-500 bg-orange-500/10 text-orange-700 dark:text-orange-400" : ""}
+                    ${isGuide && !isRoot ? "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-400" : ""}
+                    ${!isRoot && !isGuide ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : ""}
+                  `}
+                >
+                  {note}
+                  {isRoot && (
+                    <span className="ml-1 text-[10px] opacity-70">R</span>
+                  )}
+                  {isGuide && !isRoot && (
+                    <span className="ml-1 text-[10px] opacity-70">G</span>
+                  )}
+                </Badge>
+              );
+            })}
           </div>
         </div>
-        <p className="text-xs text-muted-foreground">Root: {chord.root}</p>
-      </div>
 
-      {/* Chord Tones */}
-      <div>
-        <h4 className="text-xs font-medium text-muted-foreground mb-2">
-          Chord Tones
-        </h4>
-        <div className="flex flex-wrap gap-1.5">
-          {chord.notes.map((note, index) => {
-            const isRoot = note === chord.root;
-            const isGuide = chord.guideTones.includes(note);
-
-            return (
-              <Badge
-                key={`${note}-${index}`}
-                variant="outline"
-                className={`
-                  font-mono text-xs px-2 py-0.5
-                  ${isRoot ? "border-orange-500 bg-orange-500/10 text-orange-700 dark:text-orange-400" : ""}
-                  ${isGuide && !isRoot ? "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-400" : ""}
-                  ${!isRoot && !isGuide ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : ""}
-                `}
-              >
-                {note}
-                {isRoot && (
-                  <span className="ml-1 text-[10px] opacity-70">R</span>
-                )}
-                {isGuide && !isRoot && (
-                  <span className="ml-1 text-[10px] opacity-70">G</span>
-                )}
-              </Badge>
-            );
-          })}
+        {/* Guide Tones */}
+        <div>
+          <h4 className="text-xs font-medium text-muted-foreground mb-2">
+            Guide Tones <span className="font-normal">(3rd & 7th)</span>
+          </h4>
+          <div className="flex gap-2">
+            {chord.guideTones.length > 0 ? (
+              chord.guideTones.map((note, index) => (
+                <Badge
+                  key={`guide-${note}-${index}`}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-mono text-xs"
+                >
+                  {note}
+                </Badge>
+              ))
+            ) : (
+              <span className="text-xs text-muted-foreground">
+                No guide tones
+              </span>
+            )}
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-1">
+            Define the chord's character
+          </p>
         </div>
-      </div>
 
-      {/* Guide Tones */}
-      <div>
-        <h4 className="text-xs font-medium text-muted-foreground mb-2">
-          Guide Tones <span className="font-normal">(3rd & 7th)</span>
-        </h4>
-        <div className="flex gap-2">
-          {chord.guideTones.length > 0 ? (
-            chord.guideTones.map((note, index) => (
-              <Badge
-                key={`guide-${note}-${index}`}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-mono text-xs"
-              >
-                {note}
-              </Badge>
-            ))
-          ) : (
-            <span className="text-xs text-muted-foreground">
-              No guide tones
-            </span>
+        {/* Suggested Scales */}
+        <div>
+          <div className="mb-2">
+            <h4 className="text-xs font-medium text-muted-foreground">
+              Suggested Scales
+            </h4>
+            <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+              Click to preview on fretboard
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {chord.suggestedScales.map((scale, index) => {
+              const isActive = previewScale === scale;
+              const isFirst = index === 0;
+              const isPlayingThisScale = playingScale === scale;
+
+              return (
+                <div
+                  key={`scale-${scale}-${index}`}
+                  className="flex items-center gap-0.5"
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleScaleClick(scale)}
+                    onMouseEnter={() => handleScaleHover(scale)}
+                    onMouseLeave={() => handleScaleHover(null)}
+                    className={cn(
+                      "inline-flex items-center gap-1 px-2.5 py-1 rounded-l-md text-xs font-medium transition-all duration-150",
+                      "border-y border-l active:scale-95",
+                      isActive
+                        ? "bg-cyan-500/20 border-cyan-500 text-cyan-700 dark:text-cyan-300"
+                        : "bg-secondary/50 border-transparent hover:bg-secondary hover:border-muted-foreground/20",
+                      isFirst && !isActive && "ring-1 ring-muted-foreground/10",
+                    )}
+                  >
+                    {isActive && <Check className="w-3 h-3" />}
+                    {scale}
+                    {isFirst && !isActive && (
+                      <span className="text-[9px] text-muted-foreground ml-0.5">
+                        recommended
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handlePlayScale(scale)}
+                    className={cn(
+                      "p-1 rounded-r-md border-y border-r transition-colors",
+                      isPlayingThisScale
+                        ? "bg-cyan-500/20 border-cyan-500 text-cyan-500"
+                        : "bg-secondary/50 border-transparent hover:bg-secondary hover:border-muted-foreground/20 text-muted-foreground hover:text-foreground",
+                    )}
+                    title={`Play ${scale}`}
+                  >
+                    <Volume2
+                      className={cn(
+                        "w-3 h-3",
+                        isPlayingThisScale && "animate-pulse",
+                      )}
+                    />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          {previewScale && (
+            <p className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-2">
+              Showing {previewScale}. Click again to clear.
+            </p>
           )}
         </div>
-        <p className="text-[10px] text-muted-foreground mt-1">
-          Guide tones define the chord's character and voice-lead smoothly
-        </p>
-      </div>
-
-      {/* Suggested Scales */}
-      <div>
-        <div className="mb-2">
-          <h4 className="text-xs font-medium text-muted-foreground">
-            Suggested Scales
-          </h4>
-          <p className="text-[10px] text-muted-foreground/70 mt-0.5">
-            Click to preview on fretboard
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {chord.suggestedScales.map((scale, index) => {
-            const isActive = previewScale === scale;
-            const isFirst = index === 0;
-            const isPlayingThisScale = playingScale === scale;
-
-            return (
-              <div
-                key={`scale-${scale}-${index}`}
-                className="flex items-center gap-0.5"
-              >
-                <button
-                  type="button"
-                  onClick={() => handleScaleClick(scale)}
-                  onMouseEnter={() => handleScaleHover(scale)}
-                  onMouseLeave={() => handleScaleHover(null)}
-                  className={cn(
-                    "inline-flex items-center gap-1 px-2.5 py-1 rounded-l-md text-xs font-medium transition-all duration-150",
-                    "border-y border-l active:scale-95",
-                    isActive
-                      ? "bg-cyan-500/20 border-cyan-500 text-cyan-700 dark:text-cyan-300"
-                      : "bg-secondary/50 border-transparent hover:bg-secondary hover:border-muted-foreground/20",
-                    isFirst && !isActive && "ring-1 ring-muted-foreground/10",
-                  )}
-                >
-                  {isActive && <Check className="w-3 h-3" />}
-                  {scale}
-                  {isFirst && !isActive && (
-                    <span className="text-[9px] text-muted-foreground ml-0.5">
-                      recommended
-                    </span>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handlePlayScale(scale)}
-                  className={cn(
-                    "p-1 rounded-r-md border-y border-r transition-colors",
-                    isPlayingThisScale
-                      ? "bg-cyan-500/20 border-cyan-500 text-cyan-500"
-                      : "bg-secondary/50 border-transparent hover:bg-secondary hover:border-muted-foreground/20 text-muted-foreground hover:text-foreground",
-                  )}
-                  title={`Play ${scale}`}
-                >
-                  <Volume2
-                    className={cn(
-                      "w-3 h-3",
-                      isPlayingThisScale && "animate-pulse",
-                    )}
-                  />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-        {previewScale && (
-          <p className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-2">
-            Showing {previewScale} on fretboard. Click again to clear.
-          </p>
-        )}
       </div>
     </div>
   );
