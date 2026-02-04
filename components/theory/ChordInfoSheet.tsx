@@ -1,5 +1,6 @@
 "use client";
 
+import { BarChart3, Music, Scale, Shuffle } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Sheet,
@@ -8,6 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Chord } from "@/lib/types";
 import { useAppStore } from "@/state/useAppStore";
 import { ChordInfoPanel } from "./ChordInfoPanel";
@@ -79,21 +81,56 @@ export function ChordInfoSheet({
               : "Select a chord to see its details."}
           </SheetDescription>
         </SheetHeader>
-        <div className="p-4 pb-safe space-y-5">
-          <ChordInfoPanel chord={chord} />
-          {chord && (
-            <>
-              <hr className="border-border" />
-              <ChordSubstitutionsPanel chord={chord} />
-              <hr className="border-border" />
+        <Tabs defaultValue="chord" className="mt-4 px-4">
+          <TabsList className="grid w-full grid-cols-4 h-9">
+            <TabsTrigger value="chord" className="text-xs gap-1.5">
+              <Music className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Chord</span>
+            </TabsTrigger>
+            <TabsTrigger value="modes" className="text-xs gap-1.5">
+              <Scale className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Modes</span>
+            </TabsTrigger>
+            <TabsTrigger value="subs" className="text-xs gap-1.5">
+              <Shuffle className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Subs</span>
+            </TabsTrigger>
+            <TabsTrigger value="analysis" className="text-xs gap-1.5">
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Analysis</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="chord" className="mt-4 pb-safe">
+            <ChordInfoPanel chord={chord} />
+          </TabsContent>
+
+          <TabsContent value="modes" className="mt-4 pb-safe">
+            {chord ? (
               <ModeComparisonPanel root={chord.root} />
-            </>
-          )}
-          <hr className="border-border" />
-          <KeyAnalysisPanel progression={progression} />
-          <hr className="border-border" />
-          <ProgressionAnalysisPanel progression={progression} />
-        </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                Select a chord to compare modes
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="subs" className="mt-4 pb-safe">
+            {chord ? (
+              <ChordSubstitutionsPanel chord={chord} />
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                Select a chord to see substitutions
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="analysis" className="mt-4 pb-safe space-y-5">
+            <KeyAnalysisPanel progression={progression} />
+            <hr className="border-border" />
+            <ProgressionAnalysisPanel progression={progression} />
+          </TabsContent>
+        </Tabs>
       </SheetContent>
     </Sheet>
   );

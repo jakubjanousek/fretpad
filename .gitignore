@@ -45,6 +45,10 @@ next-env.d.ts
 .claude/settings.local.json
 .playwright-mcp
 
+# Playwright MCP screenshots
+page-*.png
+page-*.jpeg
+
 # Serwist generated service worker
 public/sw.js
 public/sw.js.map
