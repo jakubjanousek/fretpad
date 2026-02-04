@@ -11,6 +11,7 @@ import { getTargetStrength } from "@/lib/theory/targetNotes";
 import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
 import type {
   ApproachNote,
+  ArpeggioConnection,
   CAGEDPosition,
   EnclosurePattern,
   FretboardOverlay,
@@ -23,6 +24,7 @@ import type {
 import { CAGED_POSITION_LABELS, STANDARD_TUNING } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import { ArpeggioOverlay } from "./ArpeggioOverlay";
 import { EnclosureOverlay } from "./EnclosureOverlay";
 import { FretboardLegend, type LegendNoteType } from "./FretboardLegend";
 import { FretMarker, type OverlayColorMode } from "./FretMarker";
@@ -64,6 +66,8 @@ interface FretboardProps {
   onToggleDiatonicApproach?: () => void;
   onToggleEnclosures?: () => void;
   onFocusedEnclosureTargetChange?: (target: FretPosition | null) => void;
+  // Arpeggio props
+  arpeggioConnections?: ArpeggioConnection[];
 }
 
 // Fret markers positions (standard dots)
@@ -131,6 +135,7 @@ const OVERLAY_OPTIONS: { value: FretboardOverlay; label: string }[] = [
   { value: "pentatonicMajor", label: "Major Pentatonic" },
   { value: "blues", label: "Blues" },
   { value: "threeNotePerString", label: "3-Note-Per-String" },
+  { value: "arpeggio", label: "Arpeggio" },
 ];
 
 const LABEL_OPTIONS: { value: NoteLabelMode; label: string }[] = [
@@ -185,6 +190,8 @@ export function Fretboard({
   onToggleDiatonicApproach,
   onToggleEnclosures,
   onFocusedEnclosureTargetChange,
+  // Arpeggio props
+  arpeggioConnections = [],
 }: FretboardProps) {
   const responsiveFretCount = useResponsiveFrets(numFrets);
   const { scrollRef, canScroll, checkScroll } = useScrollIndicator();
@@ -223,6 +230,7 @@ export function Fretboard({
 
   const isOverlayActive = fretboardOverlay !== "none";
   const isThreeNPS = fretboardOverlay === "threeNotePerString";
+  const isArpeggio = fretboardOverlay === "arpeggio";
   const isTargetModeActive = targetNoteMode !== "none";
 
   // Check if mobile for hiding arrows in overlays
@@ -396,6 +404,16 @@ export function Fretboard({
                 focusedTarget={focusedEnclosureTarget}
                 numFrets={responsiveFretCount}
                 numStrings={tuning.length}
+              />
+            )}
+
+            {/* Arpeggio overlay */}
+            {isArpeggio && arpeggioConnections.length > 0 && (
+              <ArpeggioOverlay
+                connections={arpeggioConnections}
+                numFrets={responsiveFretCount}
+                numStrings={tuning.length}
+                focusedPosition={focusedPosition}
               />
             )}
 
@@ -691,14 +709,20 @@ export function Fretboard({
                     {isOverlayActive && (
                       <div>
                         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                          {isThreeNPS ? "3NPS Positions" : "CAGED Positions"}
+                          {isThreeNPS
+                            ? "3NPS Positions"
+                            : isArpeggio
+                              ? "Arpeggio Positions"
+                              : "CAGED Positions"}
                         </h4>
                         <ToggleRow
                           label="Show positions"
                           description={
                             isThreeNPS
                               ? "Color notes by 3NPS position (1-7)"
-                              : "Color notes by CAGED shape position"
+                              : isArpeggio
+                                ? "Color arpeggio notes by CAGED shape"
+                                : "Color notes by CAGED shape position"
                           }
                           active={showCAGEDPositions}
                           onToggle={onToggleCAGEDPositions}

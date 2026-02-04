@@ -21,6 +21,10 @@ import { usePracticeTracker } from "@/hooks/usePracticeTracker";
 import { useSessionTimer } from "@/hooks/useSessionTimer";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
+import {
+  getArpeggioConnections,
+  getArpeggioNotes,
+} from "@/lib/theory/arpeggios";
 import { getOverlayNotes } from "@/lib/theory/pentatonic";
 import {
   filterApproachNotesFromChordTones,
@@ -170,11 +174,16 @@ export default function Page() {
           scaleName,
         });
       }
+      if (fretboardOverlay === "arpeggio") {
+        return getArpeggioNotes(currentChord.root, {
+          chord: currentChord,
+        });
+      }
       return getOverlayNotes(
         currentChord.root,
         fretboardOverlay as Exclude<
           typeof fretboardOverlay,
-          "none" | "threeNotePerString"
+          "none" | "threeNotePerString" | "arpeggio"
         >,
         { chord: currentChord },
       );
@@ -192,6 +201,12 @@ export default function Page() {
     previewScale,
     activeScale,
   ]);
+
+  // Calculate arpeggio connections for SVG overlay
+  const arpeggioConnections = useMemo(() => {
+    if (fretboardOverlay !== "arpeggio") return [];
+    return getArpeggioConnections(fretNotes);
+  }, [fretboardOverlay, fretNotes]);
 
   // Calculate voice leading paths to next chord
   const voiceLeadingPaths = useMemo(() => {
@@ -344,6 +359,7 @@ export default function Page() {
                 }
                 onToggleEnclosures={() => setShowEnclosures(!showEnclosures)}
                 onFocusedEnclosureTargetChange={setFocusedEnclosureTarget}
+                arpeggioConnections={arpeggioConnections}
               />
 
               {/* Chord Tone Quiz */}

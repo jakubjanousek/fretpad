@@ -216,7 +216,8 @@ export type FretboardOverlay =
   | "pentatonicMinor"
   | "pentatonicMajor"
   | "blues"
-  | "threeNotePerString";
+  | "threeNotePerString"
+  | "arpeggio";
 
 export type CAGEDPosition = 1 | 2 | 3 | 4 | 5;
 
@@ -261,6 +262,18 @@ export const CAGED_POSITION_LABELS: Record<CAGEDPosition, string> = {
   4: "A",
   5: "G",
 };
+
+// ============================================
+// Arpeggio Types
+// ============================================
+
+export interface ArpeggioConnection {
+  from: FretPosition;
+  to: FretPosition;
+  fromDegree: string; // "1", "3", "5", "7"
+  toDegree: string;
+  cagedPosition: CAGEDPosition;
+}
 
 // ============================================
 // Quiz Types

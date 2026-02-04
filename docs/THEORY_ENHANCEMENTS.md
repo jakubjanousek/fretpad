@@ -85,9 +85,11 @@ Visualize chromatic enclosures — approach from below + above simultaneously.
 
 ---
 
-## 2. Arpeggio Shapes Overlay
+## 2. Arpeggio Shapes Overlay ✅ COMPLETED
 
 **Priority:** High — builds directly on existing CAGED infrastructure.
+
+**Status:** Implemented on 2026-02-04. Includes arpeggio shape detection per CAGED position, SVG connector lines showing arpeggio patterns, and position-focused display.
 
 While scale overlays show horizontal patterns, arpeggio shapes reveal vertical chord structures across strings. This adds 1-3-5-7 visualization in CAGED positions.
 
