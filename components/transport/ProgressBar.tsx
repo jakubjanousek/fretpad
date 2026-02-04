@@ -62,7 +62,10 @@ export function ProgressBar() {
     for (const bar of progression.bars) {
       const key = bar.chords.map((bc) => bc.chord).join(" ");
       if (!(key in map)) {
-        map[key] = SEGMENT_COLORS[colorIndex % SEGMENT_COLORS.length]!;
+        const color = SEGMENT_COLORS[colorIndex % SEGMENT_COLORS.length];
+        if (color) {
+          map[key] = color;
+        }
         colorIndex++;
       }
     }
