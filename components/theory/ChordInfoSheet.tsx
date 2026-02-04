@@ -13,6 +13,7 @@ import { useAppStore } from "@/state/useAppStore";
 import { ChordInfoPanel } from "./ChordInfoPanel";
 import { ChordSubstitutionsPanel } from "./ChordSubstitutionsPanel";
 import { KeyAnalysisPanel } from "./KeyAnalysisPanel";
+import { ProgressionAnalysisPanel } from "./ProgressionAnalysisPanel";
 
 interface ChordInfoSheetProps {
   chord: Chord | null;
@@ -87,6 +88,8 @@ export function ChordInfoSheet({
           )}
           <hr className="border-border" />
           <KeyAnalysisPanel progression={progression} />
+          <hr className="border-border" />
+          <ProgressionAnalysisPanel progression={progression} />
         </div>
       </SheetContent>
     </Sheet>

@@ -153,9 +153,11 @@ Extends `lib/audio/preview.ts` with `playArpeggioShape()`.
 
 ---
 
-## 3. Harmonic Analysis Depth
+## 3. Harmonic Analysis Depth ✅ COMPLETED
 
 **Priority:** Medium — educational enhancement enriching existing key analysis.
+
+**Status:** Implemented on 2026-02-04. Includes common progression pattern detection (ii-V-I, turnarounds, etc.), modal interchange/borrowed chord detection, secondary dominant detection, and tension scoring per bar.
 
 Adds pattern recognition for common progressions, modal interchange detection, and tension/resolution mapping.
 
