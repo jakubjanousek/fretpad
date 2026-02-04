@@ -237,3 +237,103 @@ export interface QuizQuestion {
   chord: Chord;
   availableIntervals: string[]; // unique intervals like ["1", "b3", "5", "b7"]
 }
+
+// ============================================
+// Guitar Voicing Types
+// ============================================
+
+/**
+ * Ted Greene's V-System: categorizes voicings by which string has the root
+ */
+export type VSystemPosition =
+  | "V-1" // Root on string 1 (high E)
+  | "V-2" // Root on string 2 (B)
+  | "V-3" // Root on string 3 (G)
+  | "V-4" // Root on string 4 (D)
+  | "V-5" // Root on string 5 (A)
+  | "V-6"; // Root on string 6 (low E)
+
+/**
+ * String groups for organizing voicing families
+ */
+export type StringGroup =
+  | "top4" // Strings 1-2-3-4 (high E to D)
+  | "inner4" // Strings 2-3-4-5 (B to A)
+  | "bottom4" // Strings 3-4-5-6 (G to low E)
+  | "spread"; // Non-adjacent strings
+
+/**
+ * Voicing structure types
+ */
+export type VoicingStructure =
+  | "close" // All voices within an octave
+  | "drop2" // Second voice from top dropped an octave
+  | "drop3" // Third voice from top dropped an octave
+  | "drop24" // 2nd and 4th voices dropped
+  | "spread"; // Voices spread across multiple octaves
+
+/**
+ * Guitar voicing type categories
+ */
+export type GuitarVoicingType =
+  | "open" // Open chord shapes (cowboy chords)
+  | "barre" // Movable barre chord shapes
+  | "shell" // Root + 3rd + 7th (jazz voicings)
+  | "drop2" // Drop 2 voicings
+  | "drop3" // Drop 3 voicings
+  | "triadic" // Simple 3-note shapes
+  | "rootless"; // No root (jazz comping)
+
+/**
+ * Position on the fretboard for a single string
+ */
+export interface GuitarFretPosition {
+  string: number; // 1-6 (1 = high E, 6 = low E)
+  fret: number; // 0 = open, -1 = muted
+  finger?: 1 | 2 | 3 | 4 | "T"; // Optional fingering suggestion (T = thumb)
+  isRoot?: boolean;
+  note?: NoteName;
+}
+
+/**
+ * A playable guitar chord voicing
+ */
+export interface GuitarVoicing {
+  id: string;
+  name: string; // e.g., "Open C", "Barre (5th fret)", "Shell"
+  type: GuitarVoicingType;
+  positions: GuitarFretPosition[]; // 6 positions, one per string (can include muted)
+  baseFret: number; // Lowest fret in voicing (0 for open chords)
+  isBarreChord: boolean;
+  barreFret?: number; // The fret where the barre is played
+  barreStrings?: [number, number]; // Range of strings covered by barre [from, to]
+  difficulty: "beginner" | "intermediate" | "advanced";
+
+  // Ted Greene-inspired categorization
+  vSystem?: VSystemPosition; // Which string has the root (V-1 to V-6)
+  stringGroup?: StringGroup; // Which 4-string set is used
+  voicingStructure?: VoicingStructure; // Close, drop2, drop3, etc.
+  inversion: 0 | 1 | 2 | 3; // Root position, 1st, 2nd, 3rd inversion
+}
+
+/**
+ * Template for generating voicings - defines shape relative to root
+ */
+export interface VoicingTemplate {
+  name: string;
+  type: GuitarVoicingType;
+  quality: ChordQuality | ChordQuality[]; // Which chord qualities this template works for
+  // Positions relative to root fret, null = muted
+  // Index 0 = string 1 (high E), Index 5 = string 6 (low E)
+  relativePositions: (number | null)[];
+  // Which position is the root (0-5, corresponding to string 1-6)
+  rootString: number;
+  // Base fret offset (for open shapes, the root fret position)
+  rootFretOffset: number;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  isBarreChord: boolean;
+  barreOffset?: number; // Relative position of barre from root
+  barreStrings?: [number, number];
+  voicingStructure?: VoicingStructure;
+  inversion: 0 | 1 | 2 | 3;
+}

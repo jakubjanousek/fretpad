@@ -250,14 +250,14 @@ interface VoicingState {
 
 ## Implementation Plan
 
-### Milestone 1: Core Data & Generation
-- [ ] Define `GuitarVoicing` types in `lib/types.ts` (including V-System fields)
-- [ ] Create `lib/guitar/voicings.ts` with voicing generator
-- [ ] Add open chord shape templates (C, A, G, E, D families)
-- [ ] Add barre chord templates (E-shape, A-shape)
-- [ ] Add shell voicing templates for 7th chords
-- [ ] Add drop2/drop3 voicing generators
-- [ ] Write tests for voicing generation
+### Milestone 1: Core Data & Generation ✅
+- [x] Define `GuitarVoicing` types in `lib/types.ts` (including V-System fields)
+- [x] Create `lib/guitar/voicings.ts` with voicing generator
+- [x] Add open chord shape templates (C, A, G, E, D families)
+- [x] Add barre chord templates (E-shape, A-shape)
+- [x] Add shell voicing templates for 7th chords
+- [x] Add drop2/drop3 voicing generators
+- [x] Write tests for voicing generation
 
 ### Milestone 2: Ted Greene V-System Framework
 - [ ] Create `lib/guitar/v-system.ts` with V-System utilities
