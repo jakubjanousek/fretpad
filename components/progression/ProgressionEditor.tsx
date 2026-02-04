@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  ChevronDown,
-  ChevronUp,
-  Pencil,
-  Plus,
-  Redo2,
-  Undo2,
-  X,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Pencil, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { Button } from "@/components/ui/button";
@@ -198,13 +190,9 @@ export function ProgressionEditor() {
   const updateBar = useAppStore((state) => state.updateBar);
   const addBar = useAppStore((state) => state.addBar);
   const removeBar = useAppStore((state) => state.removeBar);
-  const undo = useAppStore((state) => state.undo);
-  const redo = useAppStore((state) => state.redo);
   const transposeProgression = useAppStore(
     (state) => state.transposeProgression,
   );
-  const historyLength = useAppStore((state) => state.progressionHistory.length);
-  const futureLength = useAppStore((state) => state.progressionFuture.length);
 
   const playbackPosition = usePlaybackPosition({
     progression,
@@ -220,7 +208,7 @@ export function ProgressionEditor() {
     <div className="flex flex-col gap-1">
       {/* Progression bars - compact strip */}
       <div className="relative">
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1 sm:overflow-x-auto pb-0.5 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+        <div className="flex flex-wrap items-center gap-1 pb-0.5">
           <PresetDropdown />
 
           {progression.bars.map((bar, barIndex) => {
@@ -284,32 +272,6 @@ export function ProgressionEditor() {
               title="Transpose up one semitone"
             >
               <ChevronUp className="h-3 w-3" />
-            </Button>
-          </div>
-
-          {/* Undo/Redo buttons */}
-          <div className="flex items-center gap-0.5 shrink-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={undo}
-              disabled={historyLength === 0}
-              className="h-7 w-7 p-0"
-              aria-label="Undo"
-              title="Undo (⌘Z)"
-            >
-              <Undo2 className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={redo}
-              disabled={futureLength === 0}
-              className="h-7 w-7 p-0"
-              aria-label="Redo"
-              title="Redo (⌘⇧Z)"
-            >
-              <Redo2 className="h-3 w-3" />
             </Button>
           </div>
 
