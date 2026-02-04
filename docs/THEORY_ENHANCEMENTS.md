@@ -6,9 +6,11 @@ Four enhancement areas for FretFlow's music theory capabilities, ordered by prio
 
 ---
 
-## 1. Target Notes & Approach Patterns
+## 1. Target Notes & Approach Patterns ✅ COMPLETED
 
 **Priority:** Highest — most directly useful for improvisation practice.
+
+**Status:** Implemented on 2026-02-04. Includes chord tone targeting, chromatic approaches, diatonic approaches, and enclosure patterns.
 
 Target notes are "landing points" for improvisation — chord tones that provide melodic resolution. Approach patterns are chromatic/diatonic techniques to reach these targets with intentional motion.
 
@@ -83,9 +85,11 @@ Visualize chromatic enclosures — approach from below + above simultaneously.
 
 ---
 
-## 2. Arpeggio Shapes Overlay
+## 2. Arpeggio Shapes Overlay ✅ COMPLETED
 
 **Priority:** High — builds directly on existing CAGED infrastructure.
+
+**Status:** Implemented on 2026-02-04. Includes arpeggio shape detection per CAGED position, SVG connector lines showing arpeggio patterns, and position-focused display.
 
 While scale overlays show horizontal patterns, arpeggio shapes reveal vertical chord structures across strings. This adds 1-3-5-7 visualization in CAGED positions.
 
@@ -149,9 +153,11 @@ Extends `lib/audio/preview.ts` with `playArpeggioShape()`.
 
 ---
 
-## 3. Harmonic Analysis Depth
+## 3. Harmonic Analysis Depth ✅ COMPLETED
 
 **Priority:** Medium — educational enhancement enriching existing key analysis.
+
+**Status:** Implemented on 2026-02-04. Includes common progression pattern detection (ii-V-I, turnarounds, etc.), modal interchange/borrowed chord detection, secondary dominant detection, and tension scoring per bar.
 
 Adds pattern recognition for common progressions, modal interchange detection, and tension/resolution mapping.
 

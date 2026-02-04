@@ -2,7 +2,9 @@ import type { StateCreator } from "zustand";
 import type {
   CAGEDPosition,
   FretboardOverlay,
+  FretPosition,
   NoteLabelMode,
+  TargetNoteMode,
 } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
@@ -15,6 +17,13 @@ export interface DisplaySlice {
   showCAGEDPositions: boolean;
   focusedPosition: CAGEDPosition | null;
 
+  // Target Notes state
+  targetNoteMode: TargetNoteMode;
+  showChromaticApproach: boolean;
+  showDiatonicApproach: boolean;
+  showEnclosures: boolean;
+  focusedEnclosureTarget: FretPosition | null;
+
   setShowScaleTones: (show: boolean) => void;
   setShowVoiceLeading: (show: boolean) => void;
   setNoteLabelMode: (mode: NoteLabelMode) => void;
@@ -22,6 +31,13 @@ export interface DisplaySlice {
   setFretboardOverlay: (overlay: FretboardOverlay) => void;
   setShowCAGEDPositions: (show: boolean) => void;
   setFocusedPosition: (pos: CAGEDPosition | null) => void;
+
+  // Target Notes actions
+  setTargetNoteMode: (mode: TargetNoteMode) => void;
+  setShowChromaticApproach: (show: boolean) => void;
+  setShowDiatonicApproach: (show: boolean) => void;
+  setShowEnclosures: (show: boolean) => void;
+  setFocusedEnclosureTarget: (target: FretPosition | null) => void;
 }
 
 export const createDisplaySlice: StateCreator<
@@ -37,6 +53,13 @@ export const createDisplaySlice: StateCreator<
   fretboardOverlay: "none",
   showCAGEDPositions: false,
   focusedPosition: null,
+
+  // Target Notes defaults
+  targetNoteMode: "none",
+  showChromaticApproach: false,
+  showDiatonicApproach: false,
+  showEnclosures: false,
+  focusedEnclosureTarget: null,
 
   setShowScaleTones: (show) => {
     set({ showScaleTones: show });
@@ -64,5 +87,36 @@ export const createDisplaySlice: StateCreator<
 
   setFocusedPosition: (pos) => {
     set({ focusedPosition: pos });
+  },
+
+  // Target Notes actions
+  setTargetNoteMode: (mode) => {
+    set((state) => ({
+      targetNoteMode: mode,
+      // Reset approach toggles when mode changes to "none"
+      showChromaticApproach:
+        mode === "none" ? false : state.showChromaticApproach,
+      showDiatonicApproach:
+        mode === "none" ? false : state.showDiatonicApproach,
+      showEnclosures: mode === "none" ? false : state.showEnclosures,
+      focusedEnclosureTarget:
+        mode === "none" ? null : state.focusedEnclosureTarget,
+    }));
+  },
+
+  setShowChromaticApproach: (show) => {
+    set({ showChromaticApproach: show });
+  },
+
+  setShowDiatonicApproach: (show) => {
+    set({ showDiatonicApproach: show });
+  },
+
+  setShowEnclosures: (show) => {
+    set({ showEnclosures: show, focusedEnclosureTarget: show ? null : null });
+  },
+
+  setFocusedEnclosureTarget: (target) => {
+    set({ focusedEnclosureTarget: target });
   },
 });

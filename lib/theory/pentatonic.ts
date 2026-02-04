@@ -49,7 +49,7 @@ function sameChroma(a: string, b: string): boolean {
  * Semitone intervals for each overlay scale type (relative to root)
  */
 const SCALE_INTERVALS: Record<
-  Exclude<FretboardOverlay, "none" | "threeNotePerString">,
+  Exclude<FretboardOverlay, "none" | "threeNotePerString" | "arpeggio">,
   number[]
 > = {
   pentatonicMinor: [0, 3, 5, 7, 10],
@@ -117,7 +117,10 @@ function getCAGEDPosition(
  */
 function getOverlayPitchClasses(
   root: NoteName,
-  overlay: Exclude<FretboardOverlay, "none" | "threeNotePerString">,
+  overlay: Exclude<
+    FretboardOverlay,
+    "none" | "threeNotePerString" | "arpeggio"
+  >,
 ): Set<number> {
   const rootPC = getPitchClass(root);
   const intervals = SCALE_INTERVALS[overlay];
@@ -131,7 +134,10 @@ function getOverlayPitchClasses(
  */
 export function getOverlayNotes(
   root: NoteName,
-  overlay: Exclude<FretboardOverlay, "none" | "threeNotePerString">,
+  overlay: Exclude<
+    FretboardOverlay,
+    "none" | "threeNotePerString" | "arpeggio"
+  >,
   options: { numFrets?: number; tuning?: NoteName[]; chord?: Chord } = {},
 ): FretNote[] {
   const { numFrets = 12, tuning = STANDARD_TUNING, chord } = options;

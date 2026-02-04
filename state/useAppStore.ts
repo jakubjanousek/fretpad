@@ -67,6 +67,11 @@ export const useAppStore = create<AppState>()(
         showVoicings: state.showVoicings,
         voicingFilter: state.voicingFilter,
         vSystemFilter: state.vSystemFilter,
+        // Target Notes settings
+        targetNoteMode: state.targetNoteMode,
+        showChromaticApproach: state.showChromaticApproach,
+        showDiatonicApproach: state.showDiatonicApproach,
+        showEnclosures: state.showEnclosures,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

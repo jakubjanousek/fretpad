@@ -23,6 +23,8 @@ interface FretMarkerProps {
   highlightState?: NoteHighlightState;
   labelOverride?: string;
   overlayMode?: OverlayColorMode;
+  className?: string;
+  onClick?: () => void;
 }
 
 export function FretMarker({
@@ -31,6 +33,8 @@ export function FretMarker({
   highlightState = "normal",
   labelOverride,
   overlayMode = "none",
+  className,
+  onClick,
 }: FretMarkerProps) {
   const bgColor =
     overlayMode === "caged"
@@ -60,24 +64,36 @@ export function FretMarker({
   const shapeClasses =
     overlayMode === "none" ? getFretNoteShapeClasses(note) : "rounded-full";
 
+  const markerClasses = cn(
+    "w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center",
+    shapeClasses,
+    "text-xs font-medium cursor-pointer",
+    "transition-all duration-150 hover:scale-110 active:scale-95",
+    "touch-target-expand animate-note-appear",
+    bgColor,
+    textColor,
+    highlightState === "highlighted" &&
+      "scale-110 ring-2 ring-white ring-offset-1 ring-offset-background shadow-lg",
+    highlightState === "dimmed" && "opacity-25 scale-90",
+    className,
+  );
+
+  const content = labelOverride ?? getLabel();
+
+  // Use a button when onClick is provided for proper accessibility
+  if (onClick) {
+    return (
+      <NoteInfoTooltip note={note}>
+        <button type="button" className={markerClasses} onClick={onClick}>
+          {content}
+        </button>
+      </NoteInfoTooltip>
+    );
+  }
+
   return (
     <NoteInfoTooltip note={note}>
-      <div
-        className={cn(
-          "w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center",
-          shapeClasses,
-          "text-xs font-medium cursor-pointer",
-          "transition-all duration-150 hover:scale-110 active:scale-95",
-          "touch-target-expand animate-note-appear",
-          bgColor,
-          textColor,
-          highlightState === "highlighted" &&
-            "scale-110 ring-2 ring-white ring-offset-1 ring-offset-background shadow-lg",
-          highlightState === "dimmed" && "opacity-25 scale-90",
-        )}
-      >
-        {labelOverride ?? getLabel()}
-      </div>
+      <div className={markerClasses}>{content}</div>
     </NoteInfoTooltip>
   );
 }

@@ -7,21 +7,29 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { getTargetStrength } from "@/lib/theory/targetNotes";
 import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
 import type {
+  ApproachNote,
+  ArpeggioConnection,
   CAGEDPosition,
+  EnclosurePattern,
   FretboardOverlay,
   FretNote,
   FretPosition,
   NoteLabelMode,
   NoteName,
+  TargetNoteMode,
 } from "@/lib/types";
 import { CAGED_POSITION_LABELS, STANDARD_TUNING } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import { ArpeggioOverlay } from "./ArpeggioOverlay";
+import { EnclosureOverlay } from "./EnclosureOverlay";
 import { FretboardLegend, type LegendNoteType } from "./FretboardLegend";
 import { FretMarker, type OverlayColorMode } from "./FretMarker";
 import { LegendTooltip } from "./LegendTooltip";
+import { TargetNoteOverlay } from "./TargetNoteOverlay";
 import { VoiceLeadingOverlay } from "./VoiceLeadingOverlay";
 
 interface FretboardProps {
@@ -43,6 +51,23 @@ interface FretboardProps {
   onFocusedPositionChange?: (pos: CAGEDPosition | null) => void;
   quizMode?: boolean;
   quizTargetPosition?: FretPosition | null;
+  // Target Notes props
+  targetNoteMode?: TargetNoteMode;
+  targetNotes?: FretNote[];
+  chromaticApproaches?: ApproachNote[];
+  diatonicApproaches?: ApproachNote[];
+  enclosures?: EnclosurePattern[];
+  showChromaticApproach?: boolean;
+  showDiatonicApproach?: boolean;
+  showEnclosures?: boolean;
+  focusedEnclosureTarget?: FretPosition | null;
+  onTargetNoteModeChange?: (mode: TargetNoteMode) => void;
+  onToggleChromaticApproach?: () => void;
+  onToggleDiatonicApproach?: () => void;
+  onToggleEnclosures?: () => void;
+  onFocusedEnclosureTargetChange?: (target: FretPosition | null) => void;
+  // Arpeggio props
+  arpeggioConnections?: ArpeggioConnection[];
 }
 
 // Fret markers positions (standard dots)
@@ -110,12 +135,20 @@ const OVERLAY_OPTIONS: { value: FretboardOverlay; label: string }[] = [
   { value: "pentatonicMajor", label: "Major Pentatonic" },
   { value: "blues", label: "Blues" },
   { value: "threeNotePerString", label: "3-Note-Per-String" },
+  { value: "arpeggio", label: "Arpeggio" },
 ];
 
 const LABEL_OPTIONS: { value: NoteLabelMode; label: string }[] = [
   { value: "notes", label: "Notes" },
   { value: "degrees", label: "Degrees" },
   { value: "none", label: "None" },
+];
+
+const TARGET_MODE_OPTIONS: { value: TargetNoteMode; label: string }[] = [
+  { value: "none", label: "None" },
+  { value: "chord-tones", label: "Chord Tones" },
+  { value: "guide-tones-only", label: "Guide Tones" },
+  { value: "strong-beats", label: "Strong Beats" },
 ];
 
 function getOverlayDisplayName(overlay: FretboardOverlay): string {
@@ -142,6 +175,23 @@ export function Fretboard({
   onFocusedPositionChange,
   quizMode = false,
   quizTargetPosition = null,
+  // Target Notes props
+  targetNoteMode = "none",
+  targetNotes = [],
+  chromaticApproaches = [],
+  diatonicApproaches = [],
+  enclosures = [],
+  showChromaticApproach = false,
+  showDiatonicApproach = false,
+  showEnclosures = false,
+  focusedEnclosureTarget = null,
+  onTargetNoteModeChange,
+  onToggleChromaticApproach,
+  onToggleDiatonicApproach,
+  onToggleEnclosures,
+  onFocusedEnclosureTargetChange,
+  // Arpeggio props
+  arpeggioConnections = [],
 }: FretboardProps) {
   const responsiveFretCount = useResponsiveFrets(numFrets);
   const { scrollRef, canScroll, checkScroll } = useScrollIndicator();
@@ -180,6 +230,49 @@ export function Fretboard({
 
   const isOverlayActive = fretboardOverlay !== "none";
   const isThreeNPS = fretboardOverlay === "threeNotePerString";
+  const isArpeggio = fretboardOverlay === "arpeggio";
+  const isTargetModeActive = targetNoteMode !== "none";
+
+  // Check if mobile for hiding arrows in overlays
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Helper to get animation class for target notes
+  const getTargetAnimationClass = (note: FretNote): string => {
+    if (!isTargetModeActive) return "";
+    const isTarget = targetNotes.some(
+      (t) => t.string === note.string && t.fret === note.fret,
+    );
+    if (!isTarget) return "";
+
+    const strength = getTargetStrength(note);
+    return strength === "primary"
+      ? "animate-target-primary"
+      : "animate-target-secondary";
+  };
+
+  // Handler for clicking on a target note to show enclosure
+  const handleTargetNoteClick = (note: FretNote) => {
+    if (!showEnclosures || !note.isChordTone) return;
+
+    // Toggle focus: if already focused on this note, unfocus; otherwise focus
+    if (
+      focusedEnclosureTarget?.fret === note.fret &&
+      focusedEnclosureTarget?.string === note.string
+    ) {
+      onFocusedEnclosureTargetChange?.(null);
+    } else {
+      onFocusedEnclosureTargetChange?.({
+        fret: note.fret,
+        string: note.string,
+      });
+    }
+  };
 
   // Determine the overlay color mode for notes
   const getOverlayColorMode = (note: FretNote): OverlayColorMode => {
@@ -250,6 +343,7 @@ export function Fretboard({
   if (showVoiceLeading) activeChips.push("Voice Leading");
   if (showScaleTones) activeChips.push("Fill Scale");
   if (showCAGEDPositions && isOverlayActive) activeChips.push("Positions");
+  if (isTargetModeActive) activeChips.push("Targets");
 
   return (
     <div className="relative">
@@ -285,6 +379,41 @@ export function Fretboard({
                 paths={voiceLeadingPaths}
                 numFrets={responsiveFretCount}
                 numStrings={tuning.length}
+              />
+            )}
+
+            {/* Target note approach overlays */}
+            {(showChromaticApproach || showDiatonicApproach) && (
+              <TargetNoteOverlay
+                chromaticApproaches={
+                  showChromaticApproach ? chromaticApproaches : []
+                }
+                diatonicApproaches={
+                  showDiatonicApproach ? diatonicApproaches : []
+                }
+                numFrets={responsiveFretCount}
+                numStrings={tuning.length}
+                isMobile={isMobile}
+              />
+            )}
+
+            {/* Enclosure overlay */}
+            {showEnclosures && enclosures.length > 0 && (
+              <EnclosureOverlay
+                enclosures={enclosures}
+                focusedTarget={focusedEnclosureTarget}
+                numFrets={responsiveFretCount}
+                numStrings={tuning.length}
+              />
+            )}
+
+            {/* Arpeggio overlay */}
+            {isArpeggio && arpeggioConnections.length > 0 && (
+              <ArpeggioOverlay
+                connections={arpeggioConnections}
+                numFrets={responsiveFretCount}
+                numStrings={tuning.length}
+                focusedPosition={focusedPosition}
               />
             )}
 
@@ -346,6 +475,12 @@ export function Fretboard({
                                 ? "?"
                                 : undefined
                             }
+                            className={getTargetAnimationClass(nutNote)}
+                            onClick={
+                              showEnclosures && nutNote.isChordTone
+                                ? () => handleTargetNoteClick(nutNote)
+                                : undefined
+                            }
                           />
                         ) : (
                           <div className="w-8 h-8 sm:w-7 sm:h-7" />
@@ -381,6 +516,12 @@ export function Fretboard({
                                 labelOverride={
                                   quizMode && isQuizTarget(note)
                                     ? "?"
+                                    : undefined
+                                }
+                                className={getTargetAnimationClass(note)}
+                                onClick={
+                                  showEnclosures && note.isChordTone
+                                    ? () => handleTargetNoteClick(note)
                                     : undefined
                                 }
                               />
@@ -516,18 +657,72 @@ export function Fretboard({
                       </div>
                     </div>
 
+                    {/* Target Notes */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                        Target Notes
+                      </h4>
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {TARGET_MODE_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => onTargetNoteModeChange?.(opt.value)}
+                            className={cn(
+                              "h-9 px-2.5 text-xs font-medium rounded-md transition-colors duration-150",
+                              targetNoteMode === opt.value
+                                ? "bg-foreground text-background"
+                                : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80",
+                            )}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Approach layer toggles - only when target mode is active */}
+                      {isTargetModeActive && (
+                        <div className="space-y-1.5 pl-2 border-l-2 border-muted">
+                          <ToggleRow
+                            label="Chromatic approaches"
+                            description="Show half-step approach notes (amber)"
+                            active={showChromaticApproach}
+                            onToggle={onToggleChromaticApproach}
+                          />
+                          <ToggleRow
+                            label="Diatonic approaches"
+                            description="Show scale-step approach notes (blue)"
+                            active={showDiatonicApproach}
+                            onToggle={onToggleDiatonicApproach}
+                          />
+                          <ToggleRow
+                            label="Enclosures"
+                            description="Click a target to see its enclosure"
+                            active={showEnclosures}
+                            onToggle={onToggleEnclosures}
+                          />
+                        </div>
+                      )}
+                    </div>
+
                     {/* CAGED Positions — only when overlay is active */}
                     {isOverlayActive && (
                       <div>
                         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                          {isThreeNPS ? "3NPS Positions" : "CAGED Positions"}
+                          {isThreeNPS
+                            ? "3NPS Positions"
+                            : isArpeggio
+                              ? "Arpeggio Positions"
+                              : "CAGED Positions"}
                         </h4>
                         <ToggleRow
                           label="Show positions"
                           description={
                             isThreeNPS
                               ? "Color notes by 3NPS position (1-7)"
-                              : "Color notes by CAGED shape position"
+                              : isArpeggio
+                                ? "Color arpeggio notes by CAGED shape"
+                                : "Color notes by CAGED shape position"
                           }
                           active={showCAGEDPositions}
                           onToggle={onToggleCAGEDPositions}
