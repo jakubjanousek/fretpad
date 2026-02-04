@@ -259,13 +259,13 @@ interface VoicingState {
 - [x] Add drop2/drop3 voicing generators
 - [x] Write tests for voicing generation
 
-### Milestone 2: Ted Greene V-System Framework
-- [ ] Create `lib/guitar/v-system.ts` with V-System utilities
-- [ ] Implement V-position categorization for all voicings
-- [ ] Add string group classification
-- [ ] Implement inversion tracking
-- [ ] Create `getVoicingsByVSystem()` and related functions
-- [ ] Write tests for V-System categorization
+### Milestone 2: Ted Greene V-System Framework ✅
+- [x] Create `lib/guitar/v-system.ts` with V-System utilities
+- [x] Implement V-position categorization for all voicings
+- [x] Add string group classification
+- [x] Implement inversion tracking
+- [x] Create `getVoicingsByVSystem()` and related functions
+- [x] Write tests for V-System categorization
 
 ### Milestone 3: State & Integration
 - [ ] Create `voicingSlice.ts` in state store
