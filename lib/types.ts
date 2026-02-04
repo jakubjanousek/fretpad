@@ -220,6 +220,40 @@ export type FretboardOverlay =
 
 export type CAGEDPosition = 1 | 2 | 3 | 4 | 5;
 
+// ============================================
+// Target Notes & Approach Types
+// ============================================
+
+export type TargetNoteMode =
+  | "none"
+  | "chord-tones"
+  | "guide-tones-only"
+  | "strong-beats";
+
+export type TargetStrength = "primary" | "secondary";
+
+export type ApproachDirection = "ascending" | "descending";
+
+export type ApproachType = "chromatic" | "diatonic";
+
+export interface ApproachNote {
+  note: NoteName;
+  fret: number;
+  string: number;
+  targetFret: number;
+  targetString: number;
+  direction: ApproachDirection;
+  type: ApproachType;
+}
+
+export interface EnclosurePattern {
+  target: FretNote;
+  above: FretPosition;
+  below: FretPosition;
+  aboveNote: NoteName;
+  belowNote: NoteName;
+}
+
 export const CAGED_POSITION_LABELS: Record<CAGEDPosition, string> = {
   1: "E",
   2: "D",

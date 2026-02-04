@@ -22,6 +22,13 @@ import { useSessionTimer } from "@/hooks/useSessionTimer";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import { getOverlayNotes } from "@/lib/theory/pentatonic";
+import {
+  filterApproachNotesFromChordTones,
+  getChromaticApproachNotes,
+  getDiatonicApproachNotes,
+  getEnclosurePatterns,
+  getTargetNotes,
+} from "@/lib/theory/targetNotes";
 import { getThreeNPSNotes } from "@/lib/theory/threeNPS";
 import {
   calculateVoiceLeadingPaths,
@@ -59,6 +66,30 @@ export default function Page() {
   );
   const focusedPosition = useAppStore((state) => state.focusedPosition);
   const setFocusedPosition = useAppStore((state) => state.setFocusedPosition);
+
+  // Target Notes state
+  const targetNoteMode = useAppStore((state) => state.targetNoteMode);
+  const setTargetNoteMode = useAppStore((state) => state.setTargetNoteMode);
+  const showChromaticApproach = useAppStore(
+    (state) => state.showChromaticApproach,
+  );
+  const setShowChromaticApproach = useAppStore(
+    (state) => state.setShowChromaticApproach,
+  );
+  const showDiatonicApproach = useAppStore(
+    (state) => state.showDiatonicApproach,
+  );
+  const setShowDiatonicApproach = useAppStore(
+    (state) => state.setShowDiatonicApproach,
+  );
+  const showEnclosures = useAppStore((state) => state.showEnclosures);
+  const setShowEnclosures = useAppStore((state) => state.setShowEnclosures);
+  const focusedEnclosureTarget = useAppStore(
+    (state) => state.focusedEnclosureTarget,
+  );
+  const setFocusedEnclosureTarget = useAppStore(
+    (state) => state.setFocusedEnclosureTarget,
+  );
 
   // Quiz state
   const quizActive = useAppStore((state) => state.quizActive);
@@ -183,6 +214,50 @@ export default function Page() {
     currentChordIndex,
   ]);
 
+  // Calculate target notes and approaches
+  const targetNoteData = useMemo(() => {
+    if (!currentChord || targetNoteMode === "none") {
+      return {
+        targets: [],
+        chromatic: [],
+        diatonic: [],
+        enclosures: [],
+      };
+    }
+
+    const targets = getTargetNotes(targetNoteMode, fretNotes);
+
+    const chromatic = showChromaticApproach
+      ? filterApproachNotesFromChordTones(
+          getChromaticApproachNotes(targets),
+          fretNotes.filter((n) => n.isChordTone),
+        )
+      : [];
+
+    const diatonic = showDiatonicApproach
+      ? filterApproachNotesFromChordTones(
+          getDiatonicApproachNotes(
+            currentChord,
+            targets,
+            activeScale || currentChord.suggestedScales[0],
+          ),
+          fretNotes.filter((n) => n.isChordTone),
+        )
+      : [];
+
+    const enclosures = showEnclosures ? getEnclosurePatterns(targets) : [];
+
+    return { targets, chromatic, diatonic, enclosures };
+  }, [
+    currentChord,
+    targetNoteMode,
+    fretNotes,
+    showChromaticApproach,
+    showDiatonicApproach,
+    showEnclosures,
+    activeScale,
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
@@ -250,6 +325,25 @@ export default function Page() {
                 quizTargetPosition={
                   quizQuestion ? quizQuestion.targetNote : null
                 }
+                // Target Notes props
+                targetNoteMode={targetNoteMode}
+                targetNotes={targetNoteData.targets}
+                chromaticApproaches={targetNoteData.chromatic}
+                diatonicApproaches={targetNoteData.diatonic}
+                enclosures={targetNoteData.enclosures}
+                showChromaticApproach={showChromaticApproach}
+                showDiatonicApproach={showDiatonicApproach}
+                showEnclosures={showEnclosures}
+                focusedEnclosureTarget={focusedEnclosureTarget}
+                onTargetNoteModeChange={setTargetNoteMode}
+                onToggleChromaticApproach={() =>
+                  setShowChromaticApproach(!showChromaticApproach)
+                }
+                onToggleDiatonicApproach={() =>
+                  setShowDiatonicApproach(!showDiatonicApproach)
+                }
+                onToggleEnclosures={() => setShowEnclosures(!showEnclosures)}
+                onFocusedEnclosureTargetChange={setFocusedEnclosureTarget}
               />
 
               {/* Chord Tone Quiz */}

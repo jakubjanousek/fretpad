@@ -6,9 +6,11 @@ Four enhancement areas for FretFlow's music theory capabilities, ordered by prio
 
 ---
 
-## 1. Target Notes & Approach Patterns
+## 1. Target Notes & Approach Patterns ✅ COMPLETED
 
 **Priority:** Highest — most directly useful for improvisation practice.
+
+**Status:** Implemented on 2026-02-04. Includes chord tone targeting, chromatic approaches, diatonic approaches, and enclosure patterns.
 
 Target notes are "landing points" for improvisation — chord tones that provide melodic resolution. Approach patterns are chromatic/diatonic techniques to reach these targets with intentional motion.
 

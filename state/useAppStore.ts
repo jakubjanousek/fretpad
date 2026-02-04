@@ -60,6 +60,11 @@ export const useAppStore = create<AppState>()(
         noteLabelMode: state.noteLabelMode,
         fretboardOverlay: state.fretboardOverlay,
         showCAGEDPositions: state.showCAGEDPositions,
+        // Target Notes settings
+        targetNoteMode: state.targetNoteMode,
+        showChromaticApproach: state.showChromaticApproach,
+        showDiatonicApproach: state.showDiatonicApproach,
+        showEnclosures: state.showEnclosures,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
