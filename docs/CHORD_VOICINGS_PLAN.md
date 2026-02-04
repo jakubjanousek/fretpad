@@ -298,12 +298,12 @@ interface VoicingState {
 - [x] Show voice leading suggestions during playback
 - [x] Visualize voice movement (VoicingTransitionOverlay component)
 
-### Milestone 7: Polish & Extras
-- [ ] Add voicing difficulty indicators
-- [ ] Show voicing name/type label with V-System info
-- [ ] Persist voicing preferences (including V-System filters)
-- [ ] Add chord diagram view (traditional box notation)
-- [ ] Add "chord scale" view (same shape moving up the neck)
+### Milestone 7: Polish & Extras ✅
+- [x] Add voicing difficulty indicators
+- [x] Show voicing name/type label with V-System info
+- [x] Persist voicing preferences (including V-System filters)
+- [x] Add chord diagram view (traditional box notation)
+- [x] Add "chord scale" view (same shape moving up the neck)
 
 ---
 
@@ -320,6 +320,8 @@ interface VoicingState {
 | `components/fretboard/Fretboard.tsx` | Render voicing overlay |
 | `components/voicings/VoicingSelector.tsx` | New component with V-System filters |
 | `components/voicings/VoiceLeadingIndicator.tsx` | New component - shows movement between voicings |
+| `components/voicing/ChordDiagram.tsx` | New component - traditional box notation |
+| `components/voicing/ChordScaleView.tsx` | New component - shape moving up the neck |
 | `app/page.tsx` | Connect voicing state to fretboard |
 
 ---

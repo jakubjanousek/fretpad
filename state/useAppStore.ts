@@ -68,6 +68,7 @@ export const useAppStore = create<AppState>()(
         showVoicingFingers: state.showVoicingFingers,
         voicingFilter: state.voicingFilter,
         vSystemFilter: state.vSystemFilter,
+        voiceLeading: state.voiceLeading,
         // Target Notes settings
         targetNoteMode: state.targetNoteMode,
         showChromaticApproach: state.showChromaticApproach,

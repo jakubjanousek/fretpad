@@ -6,8 +6,9 @@ import {
   ChevronRight,
   Guitar,
   RotateCcw,
+  Star,
 } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,6 +27,8 @@ import type {
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
+import { ChordDiagram } from "./ChordDiagram";
+import { ChordScaleView } from "./ChordScaleView";
 
 // Labels for display
 const VOICING_TYPE_LABELS: Record<GuitarVoicingType, string> = {
@@ -69,6 +72,15 @@ const INVERSION_LABELS: Record<0 | 1 | 2 | 3, string> = {
   3: "3rd",
 };
 
+const DIFFICULTY_CONFIG: Record<
+  "beginner" | "intermediate" | "advanced",
+  { label: string; color: string; stars: number }
+> = {
+  beginner: { label: "Beginner", color: "text-emerald-500", stars: 1 },
+  intermediate: { label: "Intermediate", color: "text-amber-500", stars: 2 },
+  advanced: { label: "Advanced", color: "text-red-500", stars: 3 },
+};
+
 const ALL_VOICING_TYPES: GuitarVoicingType[] = [
   "open",
   "barre",
@@ -106,10 +118,71 @@ const ALL_STRUCTURES: VoicingStructure[] = [
 const ALL_INVERSIONS: (0 | 1 | 2 | 3)[] = [0, 1, 2, 3];
 
 /**
+ * Display component for showing voicing name, type, V-System info, and difficulty
+ */
+function VoicingInfoDisplay({
+  voicing,
+}: {
+  voicing: import("@/lib/types").GuitarVoicing | undefined;
+}) {
+  if (!voicing) return null;
+
+  const diffConfig = DIFFICULTY_CONFIG[voicing.difficulty];
+
+  // Build V-System info string
+  const vSystemInfo = [
+    voicing.vSystem,
+    voicing.stringGroup && STRING_GROUP_LABELS[voicing.stringGroup],
+    voicing.voicingStructure && STRUCTURE_LABELS[voicing.voicingStructure],
+    voicing.inversion !== 0 && INVERSION_LABELS[voicing.inversion],
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  return (
+    <div className="flex flex-col gap-1 p-2 bg-muted/50 rounded-md">
+      {/* Voicing name and type */}
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium truncate flex-1">
+          {voicing.name}
+        </span>
+        <span className="text-xs px-1.5 py-0.5 bg-violet-500/20 text-violet-500 rounded shrink-0 ml-2">
+          {VOICING_TYPE_LABELS[voicing.type]}
+        </span>
+      </div>
+
+      {/* V-System info */}
+      {vSystemInfo && (
+        <span className="text-xs text-muted-foreground">{vSystemInfo}</span>
+      )}
+
+      {/* Difficulty indicator */}
+      <div className="flex items-center gap-1.5">
+        <div className={cn("flex items-center gap-0.5", diffConfig.color)}>
+          {Array.from({ length: diffConfig.stars }).map((_, i) => (
+            <Star key={i} className="h-3 w-3 fill-current" />
+          ))}
+          {Array.from({ length: 3 - diffConfig.stars }).map((_, i) => (
+            <Star key={i} className="h-3 w-3 text-muted-foreground/30" />
+          ))}
+        </div>
+        <span className={cn("text-xs", diffConfig.color)}>
+          {diffConfig.label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Voicing controls panel for filtering and navigating guitar voicings.
  * Includes Ted Greene V-System filters.
  */
 export function VoicingControlsPanel() {
+  // Local state for expanded views
+  const [showChordDiagram, setShowChordDiagram] = useState(false);
+  const [showChordScale, setShowChordScale] = useState(false);
+
   // State
   const showVoicings = useAppStore((state) => state.showVoicings);
   const setShowVoicings = useAppStore((state) => state.setShowVoicings);
@@ -125,6 +198,7 @@ export function VoicingControlsPanel() {
   const selectPreviousVoicing = useAppStore(
     (state) => state.selectPreviousVoicing,
   );
+  const currentChord = useAppStore((state) => state.currentChord);
 
   // Filter state
   const voicingFilter = useAppStore((state) => state.voicingFilter);
@@ -286,6 +360,78 @@ export function VoicingControlsPanel() {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
+
+          {/* Voicing Info Display */}
+          {availableVoicings.length > 0 && (
+            <VoicingInfoDisplay
+              voicing={availableVoicings[selectedVoicingIndex]}
+            />
+          )}
+
+          {/* Chord Diagram Toggle */}
+          <div className="flex items-center justify-between">
+            <Label className="text-sm text-muted-foreground">
+              Chord Diagram
+            </Label>
+            <Button
+              variant={showChordDiagram ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowChordDiagram(!showChordDiagram)}
+              className={cn(
+                "h-8 text-xs",
+                showChordDiagram && "bg-violet-500 hover:bg-violet-600",
+              )}
+            >
+              {showChordDiagram ? "On" : "Off"}
+            </Button>
+          </div>
+
+          {/* Chord Diagram View */}
+          {showChordDiagram &&
+            availableVoicings.length > 0 &&
+            availableVoicings[selectedVoicingIndex] && (
+              <div className="flex justify-center p-2 bg-muted/30 rounded-md">
+                <ChordDiagram
+                  voicing={availableVoicings[selectedVoicingIndex]}
+                  width={120}
+                  showFingers={showVoicingFingers}
+                  showFretNumbers={true}
+                  chordName={currentChord?.symbol}
+                />
+              </div>
+            )}
+
+          {/* Chord Scale Toggle */}
+          <div className="flex items-center justify-between">
+            <Label className="text-sm text-muted-foreground">Chord Scale</Label>
+            <Button
+              variant={showChordScale ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowChordScale(!showChordScale)}
+              className={cn(
+                "h-8 text-xs",
+                showChordScale && "bg-violet-500 hover:bg-violet-600",
+              )}
+            >
+              {showChordScale ? "On" : "Off"}
+            </Button>
+          </div>
+
+          {/* Chord Scale View */}
+          {showChordScale &&
+            availableVoicings.length > 0 &&
+            currentChord &&
+            availableVoicings[selectedVoicingIndex] && (
+              <div className="p-2 bg-muted/30 rounded-md">
+                <ChordScaleView
+                  voicing={availableVoicings[selectedVoicingIndex]}
+                  originalRoot={currentChord.root}
+                  originalQuality={currentChord.quality}
+                  numPositions={6}
+                  compact={true}
+                />
+              </div>
+            )}
 
           {/* Show finger numbers toggle */}
           <div className="flex items-center justify-between">
