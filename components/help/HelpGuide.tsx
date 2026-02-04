@@ -13,6 +13,7 @@ interface HelpGuideProps {
 type TabId =
   | "getting-started"
   | "keyboard-shortcuts"
+  | "features"
   | "chord-symbols"
   | "glossary";
 
@@ -32,6 +33,11 @@ const TABS: Tab[] = [
     id: "keyboard-shortcuts",
     label: "Shortcuts",
     icon: <Keyboard className="h-4 w-4" />,
+  },
+  {
+    id: "features",
+    label: "Features",
+    icon: <Guitar className="h-4 w-4" />,
   },
   {
     id: "chord-symbols",
@@ -129,6 +135,7 @@ export function HelpGuide({ open, onOpenChange }: HelpGuideProps) {
         <div className="flex-1 overflow-y-auto p-4">
           {activeTab === "getting-started" && <GettingStartedContent />}
           {activeTab === "keyboard-shortcuts" && <KeyboardShortcutsContent />}
+          {activeTab === "features" && <FeaturesContent />}
           {activeTab === "chord-symbols" && <ChordSymbolsContent />}
           {activeTab === "glossary" && <GlossaryContent />}
         </div>
@@ -191,13 +198,13 @@ function GettingStartedContent() {
         <h3 className="text-base font-semibold mb-2">Fretboard Colors</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
           <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded-full bg-orange-500 shrink-0" />
+            <span className="w-4 h-4 rounded bg-orange-500 shrink-0" />
             <span>
               <strong>Root</strong> — The chord&apos;s foundation
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded-full bg-blue-500 shrink-0" />
+            <span className="w-4 h-4 rounded-full bg-blue-500 shrink-0 border-2 border-dashed border-blue-300" />
             <span>
               <strong>Guide Tones</strong> — 3rd and 7th
             </span>
@@ -209,62 +216,283 @@ function GettingStartedContent() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded-full bg-slate-400 shrink-0" />
+            <span className="w-4 h-4 rounded-full border-2 border-slate-400 shrink-0" />
             <span>
               <strong>Scale Tones</strong> — Safe passing notes
             </span>
           </div>
         </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          Notes also have distinct shapes: squares for roots, dashed borders for
+          guide tones, rings for scale tones.
+        </p>
       </section>
 
       <section>
         <h3 className="text-base font-semibold mb-2">Tips for Practice</h3>
         <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
           <li>Start slow — reduce tempo to hear chord changes clearly</li>
-          <li>Target guide tones on each chord change</li>
+          <li>Target guide tones (3rd and 7th) on each chord change</li>
           <li>
-            Try voice leading — move to the nearest guide tone on the next chord
+            Use voice leading — move to the nearest guide tone on the next chord
           </li>
           <li>Enable the metronome for better time feel</li>
           <li>
-            Use keyboard shortcuts for faster control — see the{" "}
-            <strong className="text-foreground">Shortcuts</strong> tab above
+            Press <kbd className="px-1 py-0.5 text-xs bg-muted rounded">V</kbd>{" "}
+            to see chord voicings and shapes
           </li>
+          <li>Try the Chord Tone Quiz to test your fretboard knowledge</li>
         </ul>
+      </section>
+
+      <section>
+        <h3 className="text-base font-semibold mb-2">Learn More</h3>
+        <p className="text-sm text-muted-foreground">
+          Check the <strong className="text-foreground">Shortcuts</strong> tab
+          for keyboard controls,{" "}
+          <strong className="text-foreground">Features</strong> for advanced
+          display options, and{" "}
+          <strong className="text-foreground">Glossary</strong> for music theory
+          terms.
+        </p>
       </section>
     </div>
   );
 }
 
-const SHORTCUTS = [
-  { key: "Space", description: "Play / Stop" },
-  { key: "R", description: "Reset to beginning" },
-  { key: "M", description: "Toggle metronome" },
-  { key: "I", description: "Toggle chord info panel" },
-  { key: "H", description: "Open help guide" },
-  { key: "↑", description: "Increase tempo (+5 BPM)" },
-  { key: "↓", description: "Decrease tempo (-5 BPM)" },
-  { key: "1", description: "Load preset: ii-V-I in C" },
-  { key: "2", description: "Load preset: Autumn Leaves" },
-  { key: "3", description: "Load preset: Rhythm Changes" },
+interface ShortcutGroup {
+  title: string;
+  shortcuts: { key: string; description: string }[];
+}
+
+const SHORTCUT_GROUPS: ShortcutGroup[] = [
+  {
+    title: "Playback",
+    shortcuts: [
+      { key: "Space", description: "Play / Stop" },
+      { key: "↑", description: "Increase tempo (+5 BPM)" },
+      { key: "↓", description: "Decrease tempo (-5 BPM)" },
+      { key: "M", description: "Toggle metronome" },
+    ],
+  },
+  {
+    title: "Voicings",
+    shortcuts: [
+      { key: "V", description: "Toggle chord voicings" },
+      { key: "[", description: "Previous voicing" },
+      { key: "]", description: "Next voicing" },
+    ],
+  },
+  {
+    title: "Panels",
+    shortcuts: [
+      { key: "I", description: "Toggle chord info panel" },
+      { key: "H or ?", description: "Open help guide" },
+    ],
+  },
+  {
+    title: "Progression",
+    shortcuts: [
+      { key: "⌘Z", description: "Undo progression change" },
+      { key: "⌘⇧Z", description: "Redo progression change" },
+      { key: "1", description: "Load preset: ii-V-I in C" },
+      { key: "2", description: "Load preset: Autumn Leaves" },
+      { key: "3", description: "Load preset: Rhythm Changes" },
+    ],
+  },
 ];
 
 function KeyboardShortcutsContent() {
   return (
-    <div className="space-y-2">
-      {SHORTCUTS.map((shortcut) => (
-        <div
-          key={shortcut.key}
-          className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0"
-        >
-          <span className="text-sm text-muted-foreground">
-            {shortcut.description}
-          </span>
-          <kbd className="px-2 py-1 text-xs font-mono bg-muted rounded border border-border">
-            {shortcut.key}
-          </kbd>
-        </div>
+    <div className="space-y-5">
+      {SHORTCUT_GROUPS.map((group) => (
+        <section key={group.title}>
+          <h3 className="text-sm font-semibold mb-2 text-foreground">
+            {group.title}
+          </h3>
+          <div className="space-y-1">
+            {group.shortcuts.map((shortcut) => (
+              <div
+                key={shortcut.key}
+                className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0"
+              >
+                <span className="text-sm text-muted-foreground">
+                  {shortcut.description}
+                </span>
+                <kbd className="px-2 py-1 text-xs font-mono bg-muted rounded border border-border">
+                  {shortcut.key}
+                </kbd>
+              </div>
+            ))}
+          </div>
+        </section>
       ))}
+      <p className="text-xs text-muted-foreground mt-4">
+        On Windows/Linux, use Ctrl instead of ⌘
+      </p>
+    </div>
+  );
+}
+
+function FeaturesContent() {
+  return (
+    <div className="space-y-6">
+      <section>
+        <h3 className="text-base font-semibold mb-2">Chord Voicings</h3>
+        <p className="text-sm text-muted-foreground mb-2">
+          See playable guitar chord shapes on the fretboard. Voicings are
+          organized using Ted Greene&apos;s V-System.
+        </p>
+        <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
+          <li>
+            Press <kbd className="px-1 py-0.5 text-xs bg-muted rounded">V</kbd>{" "}
+            to toggle voicings
+          </li>
+          <li>
+            Use <kbd className="px-1 py-0.5 text-xs bg-muted rounded">[</kbd>{" "}
+            and <kbd className="px-1 py-0.5 text-xs bg-muted rounded">]</kbd> to
+            cycle through available voicings
+          </li>
+          <li>Filter by voicing type (shell, barre, open, drop2/3)</li>
+          <li>Enable voice leading to see smooth transitions between chords</li>
+          <li>View chord diagrams and chord scale patterns</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3 className="text-base font-semibold mb-2">Scale Overlays</h3>
+        <p className="text-sm text-muted-foreground mb-2">
+          Display scale patterns across the fretboard via the Display menu:
+        </p>
+        <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
+          <li>
+            <strong className="text-foreground">Pentatonic Minor/Major</strong>{" "}
+            — 5-note scales for melodic improvisation
+          </li>
+          <li>
+            <strong className="text-foreground">Blues</strong> — Pentatonic with
+            added blue notes
+          </li>
+          <li>
+            <strong className="text-foreground">3-Note-Per-String</strong> —
+            Full scale patterns for fluid runs
+          </li>
+          <li>
+            <strong className="text-foreground">Arpeggio</strong> — Chord tones
+            only with position markers
+          </li>
+          <li>
+            <strong className="text-foreground">CAGED Positions</strong> —
+            Color-coded positions across the neck
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3 className="text-base font-semibold mb-2">
+          Target Notes & Approaches
+        </h3>
+        <p className="text-sm text-muted-foreground mb-2">
+          Practice landing on strong notes with approach patterns:
+        </p>
+        <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
+          <li>
+            <strong className="text-foreground">Chord Tones</strong> — Highlight
+            all chord tones (1-3-5-7)
+          </li>
+          <li>
+            <strong className="text-foreground">Guide Tones</strong> — Focus on
+            just the 3rd and 7th
+          </li>
+          <li>
+            <strong className="text-foreground">Chromatic Approaches</strong> —
+            Half-step approaches to targets
+          </li>
+          <li>
+            <strong className="text-foreground">Diatonic Approaches</strong> —
+            Scale-step approaches
+          </li>
+          <li>
+            <strong className="text-foreground">Enclosures</strong> — Surround
+            targets from above and below
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3 className="text-base font-semibold mb-2">Chord Info Panel</h3>
+        <p className="text-sm text-muted-foreground mb-2">
+          Press <kbd className="px-1 py-0.5 text-xs bg-muted rounded">I</kbd> or
+          tap the chord name to open detailed chord analysis:
+        </p>
+        <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
+          <li>
+            <strong className="text-foreground">Chord tones</strong> — Root,
+            guide tones, extensions
+          </li>
+          <li>
+            <strong className="text-foreground">Suggested scales</strong> —
+            Click to preview on fretboard
+          </li>
+          <li>
+            <strong className="text-foreground">Substitutions</strong> —
+            Alternative chords to try
+          </li>
+          <li>
+            <strong className="text-foreground">Key analysis</strong> — Detected
+            key and function
+          </li>
+          <li>
+            <strong className="text-foreground">Harmonic analysis</strong> —
+            Patterns like ii-V-I, tension scores
+          </li>
+          <li>
+            <strong className="text-foreground">Mode comparison</strong> —
+            Compare scales side by side
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3 className="text-base font-semibold mb-2">Practice Tools</h3>
+        <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
+          <li>
+            <strong className="text-foreground">Practice Session</strong> —
+            Structured practice with warmup, technique, improv, and cooldown
+            phases
+          </li>
+          <li>
+            <strong className="text-foreground">Chord Tone Quiz</strong> — Test
+            your fretboard knowledge by identifying highlighted notes
+          </li>
+          <li>
+            <strong className="text-foreground">Practice Stats</strong> — Track
+            your practice time and chord exposure
+          </li>
+          <li>
+            <strong className="text-foreground">Metronome</strong> — Built-in
+            click with count-in option
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3 className="text-base font-semibold mb-2">Progression Editor</h3>
+        <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
+          <li>Click a chord to select it, click the bar to edit</li>
+          <li>
+            Use spaces to enter multiple chords per bar (e.g., &quot;Dm7
+            G7&quot;)
+          </li>
+          <li>Load preset progressions from the dropdown menu</li>
+          <li>
+            Undo/redo changes with{" "}
+            <kbd className="px-1 py-0.5 text-xs bg-muted rounded">⌘Z</kbd> /{" "}
+            <kbd className="px-1 py-0.5 text-xs bg-muted rounded">⌘⇧Z</kbd>
+          </li>
+          <li>Share progressions via URL using the share button</li>
+        </ul>
+      </section>
     </div>
   );
 }
