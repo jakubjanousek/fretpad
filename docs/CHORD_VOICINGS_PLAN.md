@@ -267,12 +267,12 @@ interface VoicingState {
 - [x] Create `getVoicingsByVSystem()` and related functions
 - [x] Write tests for V-System categorization
 
-### Milestone 3: State & Integration
-- [ ] Create `voicingSlice.ts` in state store
-- [ ] Add V-System filter state
-- [ ] Connect voicing generation to current chord changes
-- [ ] Generate voicings when `currentChord` updates
-- [ ] Cache voicings to avoid recalculation
+### Milestone 3: State & Integration ✅
+- [x] Create `voicingSlice.ts` in state store
+- [x] Add V-System filter state
+- [x] Connect voicing generation to current chord changes
+- [x] Generate voicings when `currentChord` updates
+- [x] Cache voicings to avoid recalculation
 
 ### Milestone 4: Fretboard Display
 - [ ] Extend `FretNote` with `isVoicingNote` flag

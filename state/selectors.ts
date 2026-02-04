@@ -26,3 +26,17 @@ export const usePreviewScale = () => useAppStore((s) => s.previewScale);
 
 // Error selectors
 export const useError = () => useAppStore((s) => s.error);
+
+// Voicing selectors
+export const useShowVoicings = () => useAppStore((s) => s.showVoicings);
+export const useAvailableVoicings = () =>
+  useAppStore((s) => s.availableVoicings);
+export const useSelectedVoicingIndex = () =>
+  useAppStore((s) => s.selectedVoicingIndex);
+export const useVoicingFilter = () => useAppStore((s) => s.voicingFilter);
+export const useVSystemFilter = () => useAppStore((s) => s.vSystemFilter);
+export const useSelectedVoicing = () => {
+  const voicings = useAppStore((s) => s.availableVoicings);
+  const index = useAppStore((s) => s.selectedVoicingIndex);
+  return voicings[index] ?? null;
+};

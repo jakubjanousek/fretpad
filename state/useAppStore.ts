@@ -24,6 +24,7 @@ import {
   createSessionPlannerSlice,
   type SessionPlannerSlice,
 } from "./slices/sessionPlannerSlice";
+import { createVoicingSlice, type VoicingSlice } from "./slices/voicingSlice";
 
 export type AppState = ProgressionSlice &
   PlaybackSlice &
@@ -32,7 +33,8 @@ export type AppState = ProgressionSlice &
   DisplaySlice &
   ErrorSlice &
   QuizSlice &
-  SessionPlannerSlice;
+  SessionPlannerSlice &
+  VoicingSlice;
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -45,6 +47,7 @@ export const useAppStore = create<AppState>()(
       ...createErrorSlice(...a),
       ...createQuizSlice(...a),
       ...createSessionPlannerSlice(...a),
+      ...createVoicingSlice(...a),
     }),
     {
       name: "fretflow-state",
@@ -60,6 +63,10 @@ export const useAppStore = create<AppState>()(
         noteLabelMode: state.noteLabelMode,
         fretboardOverlay: state.fretboardOverlay,
         showCAGEDPositions: state.showCAGEDPositions,
+        // Voicing preferences
+        showVoicings: state.showVoicings,
+        voicingFilter: state.voicingFilter,
+        vSystemFilter: state.vSystemFilter,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
@@ -75,6 +82,10 @@ export const useAppStore = create<AppState>()(
           }
           if (state.backingTrack.drumsMuted === undefined) {
             state.backingTrack.drumsMuted = false;
+          }
+          // Initialize voicings if enabled
+          if (state.showVoicings && chord) {
+            state.refreshVoicingsForChord(chord);
           }
         }
       },
