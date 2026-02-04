@@ -548,10 +548,9 @@ export function getStringGroup(
     .map((p) => p.string)
     .sort((a, b) => a - b);
 
-  if (usedStrings.length === 0) return undefined;
-
-  const minString = usedStrings[0]!;
-  const maxString = usedStrings[usedStrings.length - 1]!;
+  const minString = usedStrings.at(0);
+  const maxString = usedStrings.at(-1);
+  if (minString === undefined || maxString === undefined) return undefined;
 
   // Check for spread voicings (gaps in string usage)
   const hasGap = usedStrings.some((s, i) => {
