@@ -25,6 +25,8 @@ interface FretMarkerProps {
   overlayMode?: OverlayColorMode;
   className?: string;
   onClick?: () => void;
+  showVoicingStyle?: boolean;
+  showFingerNumber?: boolean;
 }
 
 export function FretMarker({
@@ -35,9 +37,14 @@ export function FretMarker({
   overlayMode = "none",
   className,
   onClick,
+  showVoicingStyle = false,
+  showFingerNumber = false,
 }: FretMarkerProps) {
-  const bgColor =
-    overlayMode === "caged"
+  const isVoicingNote = note.isVoicingNote && showVoicingStyle;
+
+  const bgColor = isVoicingNote
+    ? "bg-violet-500"
+    : overlayMode === "caged"
       ? note.threeNPSPosition
         ? getThreeNPSNoteColor(note)
         : getOverlayNoteColor(note)
@@ -45,11 +52,15 @@ export function FretMarker({
         ? getOverlayChordRoleColor(note)
         : getFretNoteColor(note);
   const textColor =
-    overlayMode !== "none"
+    isVoicingNote || overlayMode !== "none"
       ? getOverlayNoteTextColor(note)
       : getFretNoteTextColor(note);
 
   const getLabel = (): string => {
+    // Show finger number if voicing mode and finger is set
+    if (showFingerNumber && note.voicingFinger) {
+      return note.voicingFinger === "T" ? "T" : String(note.voicingFinger);
+    }
     switch (labelMode) {
       case "degrees":
         return note.interval.replace(/b/g, "\u266D").replace(/#/g, "\u266F");
@@ -62,7 +73,9 @@ export function FretMarker({
 
   // Use shape indicators for chord-role mode (default) for accessibility
   const shapeClasses =
-    overlayMode === "none" ? getFretNoteShapeClasses(note) : "rounded-full";
+    overlayMode === "none" && !isVoicingNote
+      ? getFretNoteShapeClasses(note)
+      : "rounded-full";
 
   const markerClasses = cn(
     "w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center",
@@ -75,6 +88,11 @@ export function FretMarker({
     highlightState === "highlighted" &&
       "scale-110 ring-2 ring-white ring-offset-1 ring-offset-background shadow-lg",
     highlightState === "dimmed" && "opacity-25 scale-90",
+    // Voicing note special styling - violet ring and glow
+    isVoicingNote &&
+      "ring-2 ring-violet-300 ring-offset-1 ring-offset-background shadow-[0_0_12px_rgba(139,92,246,0.5)]",
+    // Barre note indicator
+    note.isBarreNote && isVoicingNote && "ring-violet-200",
     className,
   );
 

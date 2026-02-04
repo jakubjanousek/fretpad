@@ -26,6 +26,9 @@ export interface DisplaySlice {
   showEnclosures: boolean;
   focusedEnclosureTarget: FretPosition | null;
 
+  // Voicing display state
+  showVoicingFingers: boolean;
+
   // Mode Comparison state
   modeComparison: ModeComparisonState;
   modeComparisonView: ModeComparisonFretboardView;
@@ -44,6 +47,9 @@ export interface DisplaySlice {
   setShowDiatonicApproach: (show: boolean) => void;
   setShowEnclosures: (show: boolean) => void;
   setFocusedEnclosureTarget: (target: FretPosition | null) => void;
+
+  // Voicing display action
+  setShowVoicingFingers: (show: boolean) => void;
 
   // Mode Comparison actions
   setModeComparison: (comparison: ModeComparisonState) => void;
@@ -71,6 +77,9 @@ export const createDisplaySlice: StateCreator<
   showDiatonicApproach: false,
   showEnclosures: false,
   focusedEnclosureTarget: null,
+
+  // Voicing display defaults
+  showVoicingFingers: true,
 
   // Mode Comparison defaults
   modeComparison: { mode1: null, mode2: null },
@@ -133,6 +142,11 @@ export const createDisplaySlice: StateCreator<
 
   setFocusedEnclosureTarget: (target) => {
     set({ focusedEnclosureTarget: target });
+  },
+
+  // Voicing display action
+  setShowVoicingFingers: (show) => {
+    set({ showVoicingFingers: show });
   },
 
   // Mode Comparison actions

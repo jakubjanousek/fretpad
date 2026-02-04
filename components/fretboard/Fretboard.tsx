@@ -17,6 +17,7 @@ import type {
   FretboardOverlay,
   FretNote,
   FretPosition,
+  GuitarVoicing,
   NoteLabelMode,
   NoteName,
   TargetNoteMode,
@@ -31,6 +32,7 @@ import { FretMarker, type OverlayColorMode } from "./FretMarker";
 import { LegendTooltip } from "./LegendTooltip";
 import { TargetNoteOverlay } from "./TargetNoteOverlay";
 import { VoiceLeadingOverlay } from "./VoiceLeadingOverlay";
+import { VoicingOverlay } from "./VoicingOverlay";
 
 interface FretboardProps {
   fretNotes: FretNote[];
@@ -68,6 +70,16 @@ interface FretboardProps {
   onFocusedEnclosureTargetChange?: (target: FretPosition | null) => void;
   // Arpeggio props
   arpeggioConnections?: ArpeggioConnection[];
+  // Voicing props
+  showVoicings?: boolean;
+  selectedVoicing?: GuitarVoicing | null;
+  showVoicingFingers?: boolean;
+  onToggleVoicings?: () => void;
+  onToggleVoicingFingers?: () => void;
+  onNextVoicing?: () => void;
+  onPreviousVoicing?: () => void;
+  availableVoicingsCount?: number;
+  selectedVoicingIndex?: number;
 }
 
 // Fret markers positions (standard dots)
@@ -192,6 +204,16 @@ export function Fretboard({
   onFocusedEnclosureTargetChange,
   // Arpeggio props
   arpeggioConnections = [],
+  // Voicing props
+  showVoicings = false,
+  selectedVoicing = null,
+  showVoicingFingers = true,
+  onToggleVoicings,
+  onToggleVoicingFingers,
+  onNextVoicing,
+  onPreviousVoicing,
+  availableVoicingsCount = 0,
+  selectedVoicingIndex = 0,
 }: FretboardProps) {
   const responsiveFretCount = useResponsiveFrets(numFrets);
   const { scrollRef, canScroll, checkScroll } = useScrollIndicator();
@@ -254,6 +276,37 @@ export function Fretboard({
     return strength === "primary"
       ? "animate-target-primary"
       : "animate-target-secondary";
+  };
+
+  // Helper to check if a note is part of the selected voicing
+  const isVoicingPosition = (
+    stringNum: number,
+    fret: number,
+  ): {
+    isVoicing: boolean;
+    finger?: 1 | 2 | 3 | 4 | "T";
+    isBarre?: boolean;
+  } => {
+    if (!showVoicings || !selectedVoicing) {
+      return { isVoicing: false };
+    }
+    const position = selectedVoicing.positions.find(
+      (p) => p.string === stringNum && p.fret === fret && p.fret >= 0,
+    );
+    if (position) {
+      const isBarre =
+        selectedVoicing.isBarreChord &&
+        selectedVoicing.barreFret === fret &&
+        selectedVoicing.barreStrings !== undefined &&
+        stringNum >= selectedVoicing.barreStrings[0] &&
+        stringNum <= selectedVoicing.barreStrings[1];
+      return {
+        isVoicing: true,
+        finger: position.finger,
+        isBarre,
+      };
+    }
+    return { isVoicing: false };
   };
 
   // Handler for clicking on a target note to show enclosure
@@ -340,6 +393,7 @@ export function Fretboard({
   const activeChips: string[] = [];
   if (isOverlayActive)
     activeChips.push(getOverlayDisplayName(fretboardOverlay));
+  if (showVoicings) activeChips.push("Voicings");
   if (showVoiceLeading) activeChips.push("Voice Leading");
   if (showScaleTones) activeChips.push("Fill Scale");
   if (showCAGEDPositions && isOverlayActive) activeChips.push("Positions");
@@ -417,6 +471,16 @@ export function Fretboard({
               />
             )}
 
+            {/* Voicing overlay */}
+            {showVoicings && selectedVoicing && (
+              <VoicingOverlay
+                voicing={selectedVoicing}
+                numFrets={responsiveFretCount}
+                numStrings={tuning.length}
+                showFingers={showVoicingFingers}
+              />
+            )}
+
             {/* Fret marker dots (behind the grid) */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="flex h-full">
@@ -464,22 +528,38 @@ export function Fretboard({
                     <div className="w-10 shrink-0 flex items-center justify-center border-r-4 border-slate-400 dark:border-slate-500 py-2.5 sm:py-3">
                       {(() => {
                         const nutNote = noteMap.get(`${stringNum}-0`);
-                        return nutNote ? (
+                        const voicingInfo = isVoicingPosition(stringNum, 0);
+                        // Augment note with voicing info
+                        const augmentedNote = nutNote
+                          ? {
+                              ...nutNote,
+                              isVoicingNote: voicingInfo.isVoicing,
+                              voicingFinger: voicingInfo.finger,
+                              isBarreNote: voicingInfo.isBarre,
+                            }
+                          : null;
+                        return augmentedNote ? (
                           <FretMarker
-                            note={nutNote}
+                            note={augmentedNote}
                             labelMode={noteLabelMode}
-                            highlightState={getNoteHighlightState(nutNote)}
-                            overlayMode={getOverlayColorMode(nutNote)}
+                            highlightState={getNoteHighlightState(
+                              augmentedNote,
+                            )}
+                            overlayMode={getOverlayColorMode(augmentedNote)}
                             labelOverride={
-                              quizMode && isQuizTarget(nutNote)
+                              quizMode && isQuizTarget(augmentedNote)
                                 ? "?"
                                 : undefined
                             }
-                            className={getTargetAnimationClass(nutNote)}
+                            className={getTargetAnimationClass(augmentedNote)}
                             onClick={
-                              showEnclosures && nutNote.isChordTone
-                                ? () => handleTargetNoteClick(nutNote)
+                              showEnclosures && augmentedNote.isChordTone
+                                ? () => handleTargetNoteClick(augmentedNote)
                                 : undefined
+                            }
+                            showVoicingStyle={showVoicings}
+                            showFingerNumber={
+                              showVoicings && showVoicingFingers
                             }
                           />
                         ) : (
@@ -492,6 +572,16 @@ export function Fretboard({
                     {frets.slice(1).map((fret) => {
                       const key = `${stringNum}-${fret}`;
                       const note = noteMap.get(key);
+                      const voicingInfo = isVoicingPosition(stringNum, fret);
+                      // Augment note with voicing info
+                      const augmentedNote = note
+                        ? {
+                            ...note,
+                            isVoicingNote: voicingInfo.isVoicing,
+                            voicingFinger: voicingInfo.finger,
+                            isBarreNote: voicingInfo.isBarre,
+                          }
+                        : null;
 
                       return (
                         <div
@@ -506,23 +596,31 @@ export function Fretboard({
                             }}
                           />
                           {/* Note marker */}
-                          {note ? (
+                          {augmentedNote ? (
                             <div className="relative z-10">
                               <FretMarker
-                                note={note}
+                                note={augmentedNote}
                                 labelMode={noteLabelMode}
-                                highlightState={getNoteHighlightState(note)}
-                                overlayMode={getOverlayColorMode(note)}
+                                highlightState={getNoteHighlightState(
+                                  augmentedNote,
+                                )}
+                                overlayMode={getOverlayColorMode(augmentedNote)}
                                 labelOverride={
-                                  quizMode && isQuizTarget(note)
+                                  quizMode && isQuizTarget(augmentedNote)
                                     ? "?"
                                     : undefined
                                 }
-                                className={getTargetAnimationClass(note)}
+                                className={getTargetAnimationClass(
+                                  augmentedNote,
+                                )}
                                 onClick={
-                                  showEnclosures && note.isChordTone
-                                    ? () => handleTargetNoteClick(note)
+                                  showEnclosures && augmentedNote.isChordTone
+                                    ? () => handleTargetNoteClick(augmentedNote)
                                     : undefined
+                                }
+                                showVoicingStyle={showVoicings}
+                                showFingerNumber={
+                                  showVoicings && showVoicingFingers
                                 }
                               />
                             </div>
@@ -633,6 +731,97 @@ export function Fretboard({
                             {opt.label}
                           </button>
                         ))}
+                      </div>
+                    </div>
+
+                    {/* Chord Voicings */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                        Chord Voicings
+                      </h4>
+                      <div className="space-y-1.5">
+                        <ToggleRow
+                          label="Show Voicings"
+                          description="Highlight playable chord shapes"
+                          active={showVoicings}
+                          onToggle={onToggleVoicings}
+                        />
+                        {showVoicings && (
+                          <>
+                            <ToggleRow
+                              label="Finger Numbers"
+                              description="Show suggested fingering (1-4, T=thumb)"
+                              active={showVoicingFingers}
+                              onToggle={onToggleVoicingFingers}
+                            />
+                            {availableVoicingsCount > 1 && (
+                              <div className="flex items-center justify-between px-2.5 py-2">
+                                <div className="text-xs text-muted-foreground">
+                                  Voicing {selectedVoicingIndex + 1} of{" "}
+                                  {availableVoicingsCount}
+                                </div>
+                                <div className="flex gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={onPreviousVoicing}
+                                    className="p-1.5 rounded hover:bg-muted/60 transition-colors"
+                                    aria-label="Previous voicing"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={2}
+                                      stroke="currentColor"
+                                      aria-hidden="true"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M15.75 19.5L8.25 12l7.5-7.5"
+                                      />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={onNextVoicing}
+                                    className="p-1.5 rounded hover:bg-muted/60 transition-colors"
+                                    aria-label="Next voicing"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={2}
+                                      stroke="currentColor"
+                                      aria-hidden="true"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                                      />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                            {selectedVoicing && (
+                              <div className="px-2.5 py-2 bg-muted/30 rounded-md">
+                                <div className="text-xs font-medium">
+                                  {selectedVoicing.name}
+                                </div>
+                                <div className="text-[10px] text-muted-foreground flex flex-wrap gap-x-2">
+                                  <span>{selectedVoicing.type}</span>
+                                  <span>{selectedVoicing.difficulty}</span>
+                                  {selectedVoicing.vSystem && (
+                                    <span>{selectedVoicing.vSystem}</span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
                     </div>
 

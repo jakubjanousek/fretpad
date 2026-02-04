@@ -274,12 +274,12 @@ interface VoicingState {
 - [x] Generate voicings when `currentChord` updates
 - [x] Cache voicings to avoid recalculation
 
-### Milestone 4: Fretboard Display
-- [ ] Extend `FretNote` with `isVoicingNote` flag
-- [ ] Update `Fretboard.tsx` to highlight voicing positions
-- [ ] Add visual distinction (border, glow, or shape outline)
-- [ ] Show finger numbers on voicing notes (optional toggle)
-- [ ] Connect voicing lines between notes (optional)
+### Milestone 4: Fretboard Display ✅
+- [x] Extend `FretNote` with `isVoicingNote` flag
+- [x] Update `Fretboard.tsx` to highlight voicing positions
+- [x] Add visual distinction (border, glow, or shape outline)
+- [x] Show finger numbers on voicing notes (optional toggle)
+- [x] Connect voicing lines between notes (optional)
 
 ### Milestone 5: UI Controls
 - [ ] Create `VoicingSelector` component

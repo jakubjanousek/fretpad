@@ -65,6 +65,7 @@ export const useAppStore = create<AppState>()(
         showCAGEDPositions: state.showCAGEDPositions,
         // Voicing preferences
         showVoicings: state.showVoicings,
+        showVoicingFingers: state.showVoicingFingers,
         voicingFilter: state.voicingFilter,
         vSystemFilter: state.vSystemFilter,
         // Target Notes settings

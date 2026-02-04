@@ -81,6 +81,10 @@ export interface FretNote extends FretPosition {
   isScaleTone: boolean;
   cagedPosition?: CAGEDPosition;
   threeNPSPosition?: ThreeNPSPosition;
+  // Voicing display properties
+  isVoicingNote?: boolean;
+  voicingFinger?: 1 | 2 | 3 | 4 | "T"; // T = thumb
+  isBarreNote?: boolean;
 }
 
 export type ThreeNPSPosition = 1 | 2 | 3 | 4 | 5 | 6 | 7;

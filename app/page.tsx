@@ -100,6 +100,26 @@ export default function Page() {
   const quizQuestion = useAppStore((state) => state.quizQuestion);
   const startQuiz = useAppStore((state) => state.startQuiz);
 
+  // Voicing state
+  const showVoicings = useAppStore((state) => state.showVoicings);
+  const setShowVoicings = useAppStore((state) => state.setShowVoicings);
+  const showVoicingFingers = useAppStore((state) => state.showVoicingFingers);
+  const setShowVoicingFingers = useAppStore(
+    (state) => state.setShowVoicingFingers,
+  );
+  const availableVoicings = useAppStore((state) => state.availableVoicings);
+  const selectedVoicingIndex = useAppStore(
+    (state) => state.selectedVoicingIndex,
+  );
+  const selectNextVoicing = useAppStore((state) => state.selectNextVoicing);
+  const selectPreviousVoicing = useAppStore(
+    (state) => state.selectPreviousVoicing,
+  );
+  const getSelectedVoicing = useAppStore((state) => state.getSelectedVoicing);
+  const refreshVoicingsForChord = useAppStore(
+    (state) => state.refreshVoicingsForChord,
+  );
+
   // Panel states
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [chordInfoOpen, setChordInfoOpen] = useState(false);
@@ -123,6 +143,19 @@ export default function Page() {
       markAsVisited();
     }
   }, [isFirstVisit, markAsVisited]);
+
+  // Refresh voicings when chord changes
+  useEffect(() => {
+    if (showVoicings && currentChord) {
+      refreshVoicingsForChord(currentChord);
+    }
+  }, [currentChord, showVoicings, refreshVoicingsForChord]);
+
+  // Get the currently selected voicing
+  // biome-ignore lint/correctness/useExhaustiveDependencies: availableVoicings and selectedVoicingIndex trigger re-computation when store updates
+  const selectedVoicing = useMemo(() => {
+    return getSelectedVoicing();
+  }, [getSelectedVoicing, availableVoicings, selectedVoicingIndex]);
 
   // Keyboard shortcuts for panels (I and ? keys)
   useEffect(() => {
@@ -360,6 +393,18 @@ export default function Page() {
                 onToggleEnclosures={() => setShowEnclosures(!showEnclosures)}
                 onFocusedEnclosureTargetChange={setFocusedEnclosureTarget}
                 arpeggioConnections={arpeggioConnections}
+                // Voicing props
+                showVoicings={showVoicings}
+                selectedVoicing={selectedVoicing}
+                showVoicingFingers={showVoicingFingers}
+                onToggleVoicings={() => setShowVoicings(!showVoicings)}
+                onToggleVoicingFingers={() =>
+                  setShowVoicingFingers(!showVoicingFingers)
+                }
+                onNextVoicing={selectNextVoicing}
+                onPreviousVoicing={selectPreviousVoicing}
+                availableVoicingsCount={availableVoicings.length}
+                selectedVoicingIndex={selectedVoicingIndex}
               />
 
               {/* Chord Tone Quiz */}
