@@ -109,10 +109,26 @@ export function getGuideTones(
 
 /**
  * Parses a chord symbol string into a Chord object
+ * Supports slash chords (e.g., "C/G", "Cmaj7/B", "F/G")
  * Returns null if the chord cannot be parsed
  */
 export function parseChordSymbol(symbol: ChordSymbol): Chord | null {
-  const parsed = TonalChord.get(symbol);
+  // Detect slash chord notation
+  let bassNote: NoteName | undefined;
+  let upperSymbol = symbol;
+
+  const slashIndex = symbol.indexOf("/");
+  if (slashIndex > 0) {
+    const potentialBass = symbol.slice(slashIndex + 1);
+    const bassPC = Note.pitchClass(potentialBass);
+    if (bassPC) {
+      bassNote = normalizeNoteName(bassPC);
+      upperSymbol = symbol.slice(0, slashIndex);
+    }
+  }
+
+  // Parse the upper structure chord (without the slash)
+  const parsed = TonalChord.get(upperSymbol);
 
   // Check if parsing was successful
   if (!parsed.tonic || parsed.notes.length === 0) {
@@ -137,6 +153,7 @@ export function parseChordSymbol(symbol: ChordSymbol): Chord | null {
     notes,
     guideTones,
     suggestedScales,
+    ...(bassNote && { bassNote }),
   };
 }
 

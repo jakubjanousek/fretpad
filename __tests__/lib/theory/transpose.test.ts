@@ -41,6 +41,28 @@ describe("transposeChordSymbol", () => {
   it("returns original for unparseable input", () => {
     expect(transposeChordSymbol("XYZ", 3)).toBe("XYZ");
   });
+
+  describe("slash chords", () => {
+    it("transposes C/G up 2 semitones to D/A", () => {
+      expect(transposeChordSymbol("C/G", 2)).toBe("D/A");
+    });
+
+    it("transposes Cmaj7/B up 2 semitones to Dmaj7/C#", () => {
+      expect(transposeChordSymbol("Cmaj7/B", 2)).toBe("Dmaj7/C#");
+    });
+
+    it("transposes F/G up 2 semitones to G/A", () => {
+      expect(transposeChordSymbol("F/G", 2)).toBe("G/A");
+    });
+
+    it("transposes D/F# down 2 semitones to C/E", () => {
+      expect(transposeChordSymbol("D/F#", -2)).toBe("C/E");
+    });
+
+    it("transposes by 0 returns same slash chord", () => {
+      expect(transposeChordSymbol("Am/G", 0)).toBe("Am/G");
+    });
+  });
 });
 
 describe("transposeProgression", () => {

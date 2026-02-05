@@ -6,7 +6,16 @@ import type { Chord, NoteName } from "@/lib/types";
  */
 export interface ChordVoicing {
   notes: string[]; // Full note names with octave: ["C3", "E3", "G3", "B3"]
-  bassNote: string; // Root note for bass: "C2"
+  bassNote: string; // Bass note: "C2" (or slash bass like "G2" for C/G)
+}
+
+/**
+ * Returns the effective bass note for a chord.
+ * For slash chords (e.g., C/G), returns the specified bass note.
+ * For regular chords, returns the root.
+ */
+function getEffectiveBass(chord: Chord): NoteName {
+  return chord.bassNote ?? chord.root;
 }
 
 /**
@@ -38,7 +47,7 @@ export function getShellVoicing(chord: Chord, octave: number): ChordVoicing {
 
   return {
     notes,
-    bassNote: `${chord.root}${octave - 1}`,
+    bassNote: `${getEffectiveBass(chord)}${octave - 1}`,
   };
 }
 
@@ -66,7 +75,7 @@ export function getTriadVoicing(chord: Chord, octave: number): ChordVoicing {
 
   return {
     notes,
-    bassNote: `${chord.root}${octave - 1}`,
+    bassNote: `${getEffectiveBass(chord)}${octave - 1}`,
   };
 }
 
@@ -88,7 +97,7 @@ export function getFullVoicing(chord: Chord, octave: number): ChordVoicing {
 
   return {
     notes,
-    bassNote: `${chord.root}${octave - 1}`,
+    bassNote: `${getEffectiveBass(chord)}${octave - 1}`,
   };
 }
 
@@ -109,7 +118,8 @@ function shouldRaiseOctave(
 }
 
 /**
- * Gets a bass note for a given scale degree relative to the chord
+ * Gets a bass note for a given scale degree relative to the chord.
+ * For slash chords, degree 1 plays the specified bass note.
  */
 export function getBassNote(
   chord: Chord,
@@ -117,39 +127,35 @@ export function getBassNote(
   octave: number,
   _nextChord?: Chord,
 ): string {
+  const bass = getEffectiveBass(chord);
   switch (degree) {
     case 1:
-      return `${chord.root}${octave}`;
+      return `${bass}${octave}`;
     case 3:
-      // Get the 3rd from chord notes
-      return chord.notes[1]
-        ? `${chord.notes[1]}${octave}`
-        : `${chord.root}${octave}`;
+      return chord.notes[1] ? `${chord.notes[1]}${octave}` : `${bass}${octave}`;
     case 5:
-      // Get the 5th from chord notes
-      return chord.notes[2]
-        ? `${chord.notes[2]}${octave}`
-        : `${chord.root}${octave}`;
+      return chord.notes[2] ? `${chord.notes[2]}${octave}` : `${bass}${octave}`;
     case 7:
-      // Get the 7th from guide tones (if it exists)
       return chord.guideTones[1]
         ? `${chord.guideTones[1]}${octave}`
-        : `${chord.root}${octave}`;
+        : `${bass}${octave}`;
     default:
-      return `${chord.root}${octave}`;
+      return `${bass}${octave}`;
   }
 }
 
 /**
- * Gets a chromatic approach note to the target note
- * Approaches from a half step below
+ * Gets a chromatic approach note to the target chord's bass note.
+ * Approaches from a half step below.
+ * For slash chords, approaches the specified bass note.
  */
 export function getApproachNote(
   targetChord: Chord,
   octave: number,
   direction: "below" | "above" = "below",
 ): string {
-  const targetNote = `${targetChord.root}${octave}`;
+  const targetBass = getEffectiveBass(targetChord);
+  const targetNote = `${targetBass}${octave}`;
   const semitones = direction === "below" ? -1 : 1;
   const approachNote = Note.transpose(
     targetNote,

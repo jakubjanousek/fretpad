@@ -85,6 +85,7 @@ export function FretboardHeader({
         </div>
         <span className="text-[10px] sm:text-xs text-muted-foreground">
           Root: {chord.root}
+          {chord.bassNote && ` | Bass: ${chord.bassNote}`}
         </span>
       </div>
     </div>

@@ -128,6 +128,11 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
         <span className="text-xs text-muted-foreground">
           Root: {chord.root}
         </span>
+        {chord.bassNote && (
+          <span className="text-xs text-muted-foreground">
+            Bass: {chord.bassNote}
+          </span>
+        )}
         {/* Audio preview buttons */}
         <div className="flex items-center gap-1 ml-auto">
           <Button

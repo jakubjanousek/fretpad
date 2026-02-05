@@ -253,3 +253,37 @@ describe("getProgressionTotalBeats", () => {
     expect(totalBeats).toBe(48); // 12 bars * 4 beats
   });
 });
+
+describe("slash chords in progressions", () => {
+  it("parses a bar with a slash chord", () => {
+    const bar = parseBar("C/G");
+    expect(bar).not.toBeNull();
+    expect(bar?.chords).toHaveLength(1);
+    expect(bar?.chords[0]?.chord).toBe("C/G");
+    expect(bar?.chords[0]?.beats).toBe(4);
+  });
+
+  it("parses a bar with two chords including a slash chord", () => {
+    const bar = parseBar("Dm7 C/G");
+    expect(bar).not.toBeNull();
+    expect(bar?.chords).toHaveLength(2);
+    expect(bar?.chords[0]?.chord).toBe("Dm7");
+    expect(bar?.chords[1]?.chord).toBe("C/G");
+  });
+
+  it("parses a full progression with slash chords using pipes", () => {
+    const prog = parseProgression("| Am7 | F/G | C | C/E |");
+    expect(prog).not.toBeNull();
+    expect(prog?.bars).toHaveLength(4);
+    expect(prog?.bars[1]?.chords[0]?.chord).toBe("F/G");
+    expect(prog?.bars[3]?.chords[0]?.chord).toBe("C/E");
+  });
+
+  it("parses a progression with slash chords using commas", () => {
+    const prog = parseProgression("C/G, Am/G, F, G7");
+    expect(prog).not.toBeNull();
+    expect(prog?.bars).toHaveLength(4);
+    expect(prog?.bars[0]?.chords[0]?.chord).toBe("C/G");
+    expect(prog?.bars[1]?.chords[0]?.chord).toBe("Am/G");
+  });
+});

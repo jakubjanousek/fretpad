@@ -47,6 +47,7 @@ export interface Chord {
   notes: NoteName[];
   guideTones: NoteName[]; // usually 3rd & 7th (or 3rd & 6th for 6 chords)
   suggestedScales: string[]; // ["C Ionian"], etc.
+  bassNote?: NoteName; // Slash chord bass note (e.g., "G" in "C/G")
 }
 
 export interface BarChord {

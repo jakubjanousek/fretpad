@@ -360,3 +360,120 @@ describe("isRoot", () => {
     expect(isRoot(g7, "C")).toBe(false);
   });
 });
+
+describe("slash chords", () => {
+  describe("inversions (bass note is a chord tone)", () => {
+    it("parses C/G (2nd inversion)", () => {
+      const chord = parseChordSymbol("C/G");
+      expect(chord).not.toBeNull();
+      expect(chord?.symbol).toBe("C/G");
+      expect(chord?.root).toBe("C");
+      expect(chord?.quality).toBe("maj");
+      expect(chord?.notes).toEqual(["C", "E", "G"]);
+      expect(chord?.bassNote).toBe("G");
+    });
+
+    it("parses C/E (1st inversion)", () => {
+      const chord = parseChordSymbol("C/E");
+      expect(chord).not.toBeNull();
+      expect(chord?.root).toBe("C");
+      expect(chord?.bassNote).toBe("E");
+      expect(chord?.notes).toContain("E");
+    });
+
+    it("parses Cmaj7/B (3rd inversion)", () => {
+      const chord = parseChordSymbol("Cmaj7/B");
+      expect(chord).not.toBeNull();
+      expect(chord?.root).toBe("C");
+      expect(chord?.quality).toBe("maj7");
+      expect(chord?.bassNote).toBe("B");
+      expect(chord?.notes).toEqual(["C", "E", "G", "B"]);
+    });
+
+    it("parses D/F# (1st inversion with sharp bass)", () => {
+      const chord = parseChordSymbol("D/F#");
+      expect(chord).not.toBeNull();
+      expect(chord?.root).toBe("D");
+      expect(chord?.quality).toBe("maj");
+      expect(chord?.bassNote).toBe("F#");
+    });
+  });
+
+  describe("compound chords (bass note is NOT a chord tone)", () => {
+    it("parses F/G", () => {
+      const chord = parseChordSymbol("F/G");
+      expect(chord).not.toBeNull();
+      expect(chord?.root).toBe("F");
+      expect(chord?.quality).toBe("maj");
+      expect(chord?.notes).toEqual(["F", "A", "C"]);
+      expect(chord?.bassNote).toBe("G");
+    });
+
+    it("parses Am/G", () => {
+      const chord = parseChordSymbol("Am/G");
+      expect(chord).not.toBeNull();
+      expect(chord?.root).toBe("A");
+      expect(chord?.quality).toBe("min");
+      expect(chord?.notes).not.toContain("G");
+      expect(chord?.bassNote).toBe("G");
+    });
+  });
+
+  describe("slash chords with sharps and flats", () => {
+    it("parses F#m7/E", () => {
+      const chord = parseChordSymbol("F#m7/E");
+      expect(chord).not.toBeNull();
+      expect(chord?.root).toBe("F#");
+      expect(chord?.quality).toBe("min7");
+      expect(chord?.bassNote).toBe("E");
+    });
+
+    it("parses Bbmaj7/A", () => {
+      const chord = parseChordSymbol("Bbmaj7/A");
+      expect(chord).not.toBeNull();
+      expect(chord?.root).toBe("Bb");
+      expect(chord?.quality).toBe("maj7");
+      expect(chord?.bassNote).toBe("A");
+    });
+  });
+
+  describe("non-slash chords have no bassNote", () => {
+    it("C has no bassNote", () => {
+      const chord = parseChordSymbol("C");
+      expect(chord).not.toBeNull();
+      expect(chord?.bassNote).toBeUndefined();
+    });
+
+    it("Dm7 has no bassNote", () => {
+      const chord = parseChordSymbol("Dm7");
+      expect(chord).not.toBeNull();
+      expect(chord?.bassNote).toBeUndefined();
+    });
+  });
+
+  describe("scale suggestions based on upper structure", () => {
+    it("F/G suggests F major scales", () => {
+      const chord = parseChordSymbol("F/G");
+      expect(chord?.suggestedScales).toContain("F Major");
+      expect(chord?.suggestedScales).toContain("F Lydian");
+    });
+
+    it("Am/G suggests A minor scales", () => {
+      const chord = parseChordSymbol("Am/G");
+      expect(chord?.suggestedScales).toContain("A Dorian");
+      expect(chord?.suggestedScales).toContain("A Aeolian");
+    });
+  });
+
+  describe("guide tones from upper structure", () => {
+    it("Cmaj7/B has guide tones E and B", () => {
+      const chord = parseChordSymbol("Cmaj7/B");
+      expect(chord?.guideTones).toEqual(["E", "B"]);
+    });
+
+    it("Dm7/C has guide tones F and C", () => {
+      const chord = parseChordSymbol("Dm7/C");
+      expect(chord?.guideTones).toEqual(["F", "C"]);
+    });
+  });
+});
