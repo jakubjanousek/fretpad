@@ -548,6 +548,35 @@ function ChordSymbolsContent() {
       </section>
 
       <section>
+        <h3 className="text-base font-semibold mb-2">
+          Slash Chords (Inversions)
+        </h3>
+        <p className="text-sm text-muted-foreground mb-3">
+          Use a slash to specify a bass note different from the root. The note
+          after the slash is what the bass plays, while the upper chord
+          determines the harmony and scale suggestions.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
+          <ChordExample symbol="C/G" description="C major, G bass (2nd inv)" />
+          <ChordExample symbol="C/E" description="C major, E bass (1st inv)" />
+          <ChordExample
+            symbol="Cmaj7/B"
+            description="Cmaj7, B bass (3rd inv)"
+          />
+          <ChordExample symbol="D/F#" description="D major, F# bass" />
+          <ChordExample symbol="Am/G" description="Am over G bass" />
+          <ChordExample symbol="F/G" description="F over G bass (G11 feel)" />
+        </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          When the bass note is already in the chord (like C/G), it creates an{" "}
+          <strong className="text-foreground">inversion</strong>. When it&apos;s
+          not (like F/G), it creates a{" "}
+          <strong className="text-foreground">compound chord</strong> with a
+          richer harmonic color.
+        </p>
+      </section>
+
+      <section>
         <h3 className="text-base font-semibold mb-2">Root Notes</h3>
         <p className="text-sm text-muted-foreground mb-2">
           Use sharps (#) or flats (b) for accidentals:
