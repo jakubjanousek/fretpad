@@ -96,6 +96,38 @@ export const PRESET_PROGRESSIONS = {
     "iii-vi-ii-V in C",
   ),
 
+  "On the Sunny Side of the Street": assertProgression(
+    parseProgression(
+      "| C E7 | F F#dim7 | C/G A7 | Dm7 G7 | C E7 | F F#dim7 | C/G Am | Dm7 G7 |",
+      { name: "On the Sunny Side of the Street" },
+    ),
+    "On the Sunny Side of the Street",
+  ),
+
+  "Sonnymoon for Two": assertProgression(
+    parseProgression(
+      "| Bb7 | Eb7 | Bb7 | Bb7 | Eb7 | Eb7 | Bb7 | Bb7 | F7 | Eb7 | Bb7 | F7 |",
+      { name: "Sonnymoon for Two" },
+    ),
+    "Sonnymoon for Two",
+  ),
+
+  "Afro Blue": assertProgression(
+    parseProgression(
+      "| Fm7 | Fm7 | Fm7 | Fm7 | Db7 | Db7 | Fm7 | Fm7 | Db7 | Db7 | Fm7 | Fm7 |",
+      { name: "Afro Blue" },
+    ),
+    "Afro Blue",
+  ),
+
+  "Song for Bilbao": assertProgression(
+    parseProgression(
+      "| Gm7 | Gm7 | C7sus4 | C7sus4 | Fmaj7/A | Fmaj7/A | Bbmaj7 | Bbmaj7 |",
+      { name: "Song for Bilbao" },
+    ),
+    "Song for Bilbao",
+  ),
+
   // Pop Progressions
   "I-V-vi-IV in C": assertProgression(
     createProgression(["C", "G", "Am", "F"], {
@@ -375,6 +407,38 @@ export const PRESET_METADATA: Record<
     category: "jazz",
     difficulty: "intermediate",
     barCount: 4,
+  },
+  "On the Sunny Side of the Street": {
+    key: "On the Sunny Side of the Street",
+    label: "Sunny Side of the Street",
+    description: "Classic Jimmy McHugh standard",
+    category: "jazz",
+    difficulty: "intermediate",
+    barCount: 8,
+  },
+  "Sonnymoon for Two": {
+    key: "Sonnymoon for Two",
+    label: "Sonnymoon for Two",
+    description: "Sonny Rollins blues head in Bb",
+    category: "jazz",
+    difficulty: "intermediate",
+    barCount: 12,
+  },
+  "Afro Blue": {
+    key: "Afro Blue",
+    label: "Afro Blue",
+    description: "Mongo Santamaria's Afro-Cuban classic",
+    category: "jazz",
+    difficulty: "intermediate",
+    barCount: 12,
+  },
+  "Song for Bilbao": {
+    key: "Song for Bilbao",
+    label: "Song for Bilbao",
+    description: "Pat Metheny modal composition",
+    category: "jazz",
+    difficulty: "intermediate",
+    barCount: 8,
   },
 
   // Pop
