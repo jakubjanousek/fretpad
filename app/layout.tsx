@@ -17,14 +17,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FretFlow",
+  title: "FretPad",
   description:
     "Practice tool for guitarists to improvise over chord progressions",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "FretFlow",
+    title: "FretPad",
   },
 };
 

@@ -33,14 +33,14 @@ describe("practiceStats", () => {
     });
 
     it("returns default stats for corrupted data", () => {
-      localStorage.setItem("fretflow-practice-stats", "not json");
+      localStorage.setItem("fretpad-practice-stats", "not json");
       const stats = loadPracticeStats();
       expect(stats.sessions).toEqual([]);
     });
 
     it("returns default stats for invalid structure", () => {
       localStorage.setItem(
-        "fretflow-practice-stats",
+        "fretpad-practice-stats",
         JSON.stringify({ not: "valid" }),
       );
       const stats = loadPracticeStats();

@@ -1,13 +1,13 @@
 /**
- * Base error class for FretFlow-specific errors
+ * Base error class for FretPad-specific errors
  */
-export class FretFlowError extends Error {
+export class FretPadError extends Error {
   constructor(
     message: string,
     public readonly code: string,
   ) {
     super(message);
-    this.name = "FretFlowError";
+    this.name = "FretPadError";
     // Maintains proper stack trace in V8 environments
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
@@ -18,7 +18,7 @@ export class FretFlowError extends Error {
 /**
  * Error thrown when a chord symbol cannot be parsed
  */
-export class ChordParseError extends FretFlowError {
+export class ChordParseError extends FretPadError {
   constructor(
     public readonly symbol: string,
     message?: string,
@@ -31,7 +31,7 @@ export class ChordParseError extends FretFlowError {
 /**
  * Error thrown when a progression cannot be parsed
  */
-export class ProgressionParseError extends FretFlowError {
+export class ProgressionParseError extends FretPadError {
   constructor(
     public readonly input: string,
     message?: string,
@@ -47,7 +47,7 @@ export class ProgressionParseError extends FretFlowError {
 /**
  * Error thrown when audio playback fails
  */
-export class AudioPlaybackError extends FretFlowError {
+export class AudioPlaybackError extends FretPadError {
   constructor(
     message: string,
     public readonly originalError?: Error,
@@ -60,7 +60,7 @@ export class AudioPlaybackError extends FretFlowError {
 /**
  * Error thrown when audio context cannot be started
  */
-export class AudioContextError extends FretFlowError {
+export class AudioContextError extends FretPadError {
   constructor(message?: string) {
     super(
       message ||
@@ -121,7 +121,7 @@ export function toErrorInfo(error: unknown): ErrorInfo {
     };
   }
 
-  if (error instanceof FretFlowError) {
+  if (error instanceof FretPadError) {
     return {
       code: error.code,
       message: error.message,

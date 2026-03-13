@@ -1,8 +1,8 @@
 import type { Progression } from "../types";
 import { isValidProgression } from "./localStorage";
 
-const CUSTOM_PRESETS_KEY = "fretflow-custom-presets";
-const RECENT_PRESETS_KEY = "fretflow-recent-presets";
+const CUSTOM_PRESETS_KEY = "fretpad-custom-presets";
+const RECENT_PRESETS_KEY = "fretpad-recent-presets";
 const MAX_RECENT_PRESETS = 5;
 
 export interface CustomPreset {

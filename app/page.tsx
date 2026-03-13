@@ -350,7 +350,7 @@ export default function Page() {
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-30">
         <div className="container mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2">
           <h1 className="text-lg sm:text-xl font-semibold tracking-tight shrink-0">
-            FretFlow
+            FretPad
           </h1>
           <div className="flex items-center gap-1.5 sm:gap-2">
             <ShareExport />

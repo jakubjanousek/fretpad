@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const LEGEND_TOOLTIP_KEY = "fretflow-legend-tooltip-shown";
+const LEGEND_TOOLTIP_KEY = "fretpad-legend-tooltip-shown";
 
 interface LegendStep {
   type: "root" | "guide" | "chord" | "scale";

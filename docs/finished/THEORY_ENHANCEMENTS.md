@@ -1,6 +1,6 @@
 # Music Theory Enhancements Roadmap
 
-Four enhancement areas for FretFlow's music theory capabilities, ordered by priority.
+Four enhancement areas for FretPad's music theory capabilities, ordered by priority.
 
 **Current foundation:** 18 chord qualities, guide tone extraction, key detection with roman numerals, 5 substitution types, voice leading visualization, scale overlays (pentatonic minor/major, blues, 3NPS, CAGED).
 
@@ -317,7 +317,7 @@ Audio preview: play the characteristic interval (e.g., 1–6 for Dorian).
 
 ## UI Design Plan
 
-How each enhancement surfaces in the existing FretFlow UI. The current layout has three zones: **progression editor** (top), **fretboard + theory** (middle), and **transport bar** (bottom). Theory content lives in a right-side Sheet (ChordInfoSheet), fretboard display options live in a Display popover, and overlays render as SVG layers on the fretboard.
+How each enhancement surfaces in the existing FretPad UI. The current layout has three zones: **progression editor** (top), **fretboard + theory** (middle), and **transport bar** (bottom). Theory content lives in a right-side Sheet (ChordInfoSheet), fretboard display options live in a Display popover, and overlays render as SVG layers on the fretboard.
 
 ---
 

@@ -98,7 +98,7 @@ export function HelpGuide({ open, onOpenChange }: HelpGuideProps) {
         <div className="flex items-center justify-between p-4 border-b shrink-0">
           <div className="flex items-center gap-2">
             <Guitar className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">FretFlow Guide</h2>
+            <h2 className="text-lg font-semibold">FretPad Guide</h2>
           </div>
           <Button
             variant="ghost"
@@ -159,9 +159,9 @@ function GettingStartedContent() {
   return (
     <div className="space-y-6">
       <section>
-        <h3 className="text-base font-semibold mb-2">What is FretFlow?</h3>
+        <h3 className="text-base font-semibold mb-2">What is FretPad?</h3>
         <p className="text-sm text-muted-foreground">
-          FretFlow is a guitar practice tool that helps you improvise over chord
+          FretPad is a guitar practice tool that helps you improvise over chord
           progressions. It shows you which notes to target on each chord, plays
           a backing track, and provides music theory context to deepen your
           understanding.
@@ -505,8 +505,8 @@ function ChordSymbolsContent() {
           Supported Chord Formats
         </h3>
         <p className="text-sm text-muted-foreground mb-3">
-          FretFlow understands common chord symbol notation. Enter chords using
-          a root note (A-G, with optional # or b) followed by a quality symbol.
+          FretPad understands common chord symbol notation. Enter chords using a
+          root note (A-G, with optional # or b) followed by a quality symbol.
         </p>
       </section>
 
@@ -669,7 +669,7 @@ function GlossaryContent() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Key music theory terms used in FretFlow:
+        Key music theory terms used in FretPad:
       </p>
 
       <dl className="space-y-3">
@@ -719,7 +719,7 @@ function GlossaryContent() {
         />
         <GlossaryItem
           term="Swing Feel"
-          definition="A rhythmic feel where eighth notes are played unevenly — long-short instead of equal. The 'Jazz Swing' style in FretFlow applies this automatically. It gives music a lilting, bouncy quality."
+          definition="A rhythmic feel where eighth notes are played unevenly — long-short instead of equal. The 'Jazz Swing' style in FretPad applies this automatically. It gives music a lilting, bouncy quality."
         />
       </dl>
     </div>

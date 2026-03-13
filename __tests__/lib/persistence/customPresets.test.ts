@@ -37,7 +37,7 @@ describe("customPresets", () => {
 
     it("filters out invalid entries", () => {
       localStorage.setItem(
-        "fretflow-custom-presets",
+        "fretpad-custom-presets",
         JSON.stringify([
           samplePreset,
           { invalid: true },
@@ -49,13 +49,13 @@ describe("customPresets", () => {
     });
 
     it("returns empty array for corrupted data", () => {
-      localStorage.setItem("fretflow-custom-presets", "not json");
+      localStorage.setItem("fretpad-custom-presets", "not json");
       expect(loadCustomPresets()).toEqual([]);
     });
 
     it("returns empty array for non-array data", () => {
       localStorage.setItem(
-        "fretflow-custom-presets",
+        "fretpad-custom-presets",
         JSON.stringify({ not: "array" }),
       );
       expect(loadCustomPresets()).toEqual([]);

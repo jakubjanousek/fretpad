@@ -4,7 +4,7 @@ import { Share, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
-const INSTALL_DISMISSED_KEY = "fretflow-install-prompt-dismissed";
+const INSTALL_DISMISSED_KEY = "fretpad-install-prompt-dismissed";
 
 function isIOSorIPadOS(): boolean {
   if (typeof navigator === "undefined") return false;

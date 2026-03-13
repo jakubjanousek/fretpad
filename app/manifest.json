@@ -1,6 +1,6 @@
 {
-  "name": "FretFlow - Guitar Practice Tool",
-  "short_name": "FretFlow",
+  "name": "FretPad - Guitar Practice Tool",
+  "short_name": "FretPad",
   "description": "Practice tool for guitarists to improvise over chord progressions",
   "start_url": "/",
   "display": "standalone",

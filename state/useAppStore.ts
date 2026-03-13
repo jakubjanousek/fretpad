@@ -50,7 +50,7 @@ export const useAppStore = create<AppState>()(
       ...createVoicingSlice(...a),
     }),
     {
-      name: "fretflow-state",
+      name: "fretpad-state",
       partialize: (state) => ({
         progression: state.progression,
         tempo: state.tempo,

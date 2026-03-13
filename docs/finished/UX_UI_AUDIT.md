@@ -1,4 +1,4 @@
-# FretFlow UX/UI Audit
+# FretPad UX/UI Audit
 
 **Date:** January 29, 2026
 **Auditor perspective:** Seasoned UX/UI designer
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-FretFlow is a well-structured guitar practice tool with strong music-theory foundations. The visual design is clean and functional, with a clear color-coding system for the fretboard. However, there are meaningful opportunities to improve visual hierarchy, mobile usability, interaction clarity, and overall polish to elevate the product from "functional MVP" to "delightful tool."
+FretPad is a well-structured guitar practice tool with strong music-theory foundations. The visual design is clean and functional, with a clear color-coding system for the fretboard. However, there are meaningful opportunities to improve visual hierarchy, mobile usability, interaction clarity, and overall polish to elevate the product from "functional MVP" to "delightful tool."
 
 ---
 

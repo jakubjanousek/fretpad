@@ -1,6 +1,6 @@
 import type { MetronomeConfig, Progression, StyleId } from "../types";
 
-const STORAGE_KEY = "fretflow-state";
+const STORAGE_KEY = "fretpad-state";
 
 /**
  * Persistable state subset - only what needs to survive reload

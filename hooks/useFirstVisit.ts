@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const FIRST_VISIT_KEY = "fretflow-first-visit-shown";
+const FIRST_VISIT_KEY = "fretpad-first-visit-shown";
 
 /**
  * Hook to detect if this is the user's first visit.

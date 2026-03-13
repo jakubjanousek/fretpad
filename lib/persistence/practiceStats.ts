@@ -1,4 +1,4 @@
-const PRACTICE_STATS_KEY = "fretflow-practice-stats";
+const PRACTICE_STATS_KEY = "fretpad-practice-stats";
 
 /**
  * Practice session entry
