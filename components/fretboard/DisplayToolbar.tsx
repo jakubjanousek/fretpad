@@ -1,5 +1,6 @@
 "use client";
 
+import { PRACTICE_MODES } from "@/lib/modes";
 import type {
   CAGEDPosition,
   FretboardOverlay,
@@ -7,6 +8,7 @@ import type {
   NoteLabelMode,
   TargetNoteMode,
 } from "@/lib/types";
+import { useAppStore } from "@/state/useAppStore";
 
 import { LabelSegmentedControl } from "./DisplayToolbar/LabelSegmentedControl";
 import { LayersDropdown } from "./DisplayToolbar/LayersDropdown";
@@ -95,51 +97,70 @@ export function DisplayToolbar({
   showEnclosures,
   onToggleEnclosures,
 }: DisplayToolbarProps) {
+  const activeMode = useAppStore((state) => state.activeMode);
+  const modeConfig = activeMode ? PRACTICE_MODES[activeMode] : null;
+
+  const showOverlay = modeConfig?.showOverlayDropdown ?? true;
+  const showLabels = modeConfig?.showLabels ?? true;
+  const showVoicingsControl = modeConfig?.showVoicingsButton ?? true;
+  const showLayers = modeConfig?.showLayersDropdown ?? true;
+  const showTargets = modeConfig?.showTargetsDropdown ?? true;
+
   return (
     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-      <OverlayDropdown
-        fretboardOverlay={fretboardOverlay}
-        onOverlayChange={onOverlayChange}
-        showCAGEDPositions={showCAGEDPositions}
-        onToggleCAGEDPositions={onToggleCAGEDPositions}
-        focusedPosition={focusedPosition}
-        onFocusedPositionChange={onFocusedPositionChange}
-      />
+      {showOverlay && (
+        <OverlayDropdown
+          fretboardOverlay={fretboardOverlay}
+          onOverlayChange={onOverlayChange}
+          showCAGEDPositions={showCAGEDPositions}
+          onToggleCAGEDPositions={onToggleCAGEDPositions}
+          focusedPosition={focusedPosition}
+          onFocusedPositionChange={onFocusedPositionChange}
+        />
+      )}
 
-      <LabelSegmentedControl
-        noteLabelMode={noteLabelMode}
-        onNoteLabelModeChange={onNoteLabelModeChange}
-      />
+      {showLabels && (
+        <LabelSegmentedControl
+          noteLabelMode={noteLabelMode}
+          onNoteLabelModeChange={onNoteLabelModeChange}
+        />
+      )}
 
-      <VoicingsButton
-        showVoicings={showVoicings}
-        onToggleVoicings={onToggleVoicings}
-        showVoicingFingers={showVoicingFingers}
-        onToggleVoicingFingers={onToggleVoicingFingers}
-        selectedVoicing={selectedVoicing}
-        availableVoicingsCount={availableVoicingsCount}
-        selectedVoicingIndex={selectedVoicingIndex}
-        onNextVoicing={onNextVoicing}
-        onPreviousVoicing={onPreviousVoicing}
-      />
+      {showVoicingsControl && (
+        <VoicingsButton
+          showVoicings={showVoicings}
+          onToggleVoicings={onToggleVoicings}
+          showVoicingFingers={showVoicingFingers}
+          onToggleVoicingFingers={onToggleVoicingFingers}
+          selectedVoicing={selectedVoicing}
+          availableVoicingsCount={availableVoicingsCount}
+          selectedVoicingIndex={selectedVoicingIndex}
+          onNextVoicing={onNextVoicing}
+          onPreviousVoicing={onPreviousVoicing}
+        />
+      )}
 
-      <LayersDropdown
-        showVoiceLeading={showVoiceLeading}
-        onToggleVoiceLeading={onToggleVoiceLeading}
-        showScaleTones={showScaleTones}
-        onToggleScaleTones={onToggleScaleTones}
-      />
+      {showLayers && (
+        <LayersDropdown
+          showVoiceLeading={showVoiceLeading}
+          onToggleVoiceLeading={onToggleVoiceLeading}
+          showScaleTones={showScaleTones}
+          onToggleScaleTones={onToggleScaleTones}
+        />
+      )}
 
-      <TargetsDropdown
-        targetNoteMode={targetNoteMode}
-        onTargetNoteModeChange={onTargetNoteModeChange}
-        showChromaticApproach={showChromaticApproach}
-        onToggleChromaticApproach={onToggleChromaticApproach}
-        showDiatonicApproach={showDiatonicApproach}
-        onToggleDiatonicApproach={onToggleDiatonicApproach}
-        showEnclosures={showEnclosures}
-        onToggleEnclosures={onToggleEnclosures}
-      />
+      {showTargets && (
+        <TargetsDropdown
+          targetNoteMode={targetNoteMode}
+          onTargetNoteModeChange={onTargetNoteModeChange}
+          showChromaticApproach={showChromaticApproach}
+          onToggleChromaticApproach={onToggleChromaticApproach}
+          showDiatonicApproach={showDiatonicApproach}
+          onToggleDiatonicApproach={onToggleDiatonicApproach}
+          showEnclosures={showEnclosures}
+          onToggleEnclosures={onToggleEnclosures}
+        />
+      )}
     </div>
   );
 }

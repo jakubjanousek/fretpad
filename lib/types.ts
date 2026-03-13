@@ -422,3 +422,32 @@ export interface ModeComparisonResult {
 }
 
 export type ModeComparisonFretboardView = "both" | "mode1" | "mode2";
+
+// ============================================
+// Practice Mode Types
+// ============================================
+
+export type PracticeModeId =
+  | "learn-the-neck"
+  | "outline-chord-changes"
+  | "comp-with-voicings";
+
+export interface PracticeModeConfig {
+  id: PracticeModeId;
+  label: string;
+  description: string;
+  slug: string;
+  defaultPreset: string;
+  defaultTempo: number;
+  defaultStyle: StyleId;
+
+  // Display constraints — which controls are visible
+  showOverlayDropdown: boolean;
+  showLabels: boolean;
+  showVoicingsButton: boolean;
+  showLayersDropdown: boolean;
+  showTargetsDropdown: boolean;
+  showQuiz: boolean;
+  showCAGED: boolean;
+  theoryTabs: string[];
+}

@@ -23,8 +23,8 @@ interface TransportBarProps {
   onSettingsClick: () => void;
   onGuideClick: () => void;
   onStatsClick: () => void;
-  onQuizClick: () => void;
-  onPlannerClick: () => void;
+  onQuizClick?: () => void;
+  onPlannerClick?: () => void;
 }
 
 /**
@@ -108,43 +108,47 @@ export function TransportBar({
 
             {/* Utilities Group */}
             <div className="flex items-center gap-0.5 sm:gap-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    onClick={onPlannerClick}
-                    aria-label="Practice Session"
-                    className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
-                  >
-                    <ListMusic className="h-4 w-4 text-cyan-500" />
-                    <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
-                      Practice
-                    </span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="sm:hidden">
-                  Practice Session
-                </TooltipContent>
-              </Tooltip>
+              {onPlannerClick && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      onClick={onPlannerClick}
+                      aria-label="Practice Session"
+                      className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
+                    >
+                      <ListMusic className="h-4 w-4 text-cyan-500" />
+                      <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
+                        Practice
+                      </span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="sm:hidden">
+                    Practice Session
+                  </TooltipContent>
+                </Tooltip>
+              )}
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    onClick={onQuizClick}
-                    aria-label="Chord Tone Quiz"
-                    className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
-                  >
-                    <BrainCircuit className="h-4 w-4 text-violet-500" />
-                    <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
-                      Quiz
-                    </span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="sm:hidden">
-                  Chord Tone Quiz
-                </TooltipContent>
-              </Tooltip>
+              {onQuizClick && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      onClick={onQuizClick}
+                      aria-label="Chord Tone Quiz"
+                      className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
+                    >
+                      <BrainCircuit className="h-4 w-4 text-violet-500" />
+                      <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
+                        Quiz
+                      </span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="sm:hidden">
+                    Chord Tone Quiz
+                  </TooltipContent>
+                </Tooltip>
+              )}
 
               <Tooltip>
                 <TooltipTrigger asChild>

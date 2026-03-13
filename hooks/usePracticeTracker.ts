@@ -8,6 +8,7 @@ const SAVE_INTERVAL_MS = 10000; // Save every 10 seconds while playing
 interface UsePracticeTrackerOptions {
   isPlaying: boolean;
   progressionName?: string;
+  mode?: string;
 }
 
 interface UsePracticeTrackerResult {

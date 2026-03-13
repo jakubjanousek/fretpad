@@ -7,6 +7,7 @@ export interface PracticeSession {
   date: string; // ISO date string (YYYY-MM-DD)
   durationMs: number; // Total practice time in milliseconds
   progressionNames: string[]; // Progressions practiced
+  mode?: string; // Practice mode ID (e.g., "learn-the-neck")
 }
 
 /**

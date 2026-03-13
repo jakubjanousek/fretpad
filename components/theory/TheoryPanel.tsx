@@ -20,17 +20,27 @@ import { KeyAnalysisPanel } from "./KeyAnalysisPanel";
 import { ModeComparisonPanel } from "./ModeComparisonPanel";
 import { ProgressionAnalysisPanel } from "./ProgressionAnalysisPanel";
 
+const ALL_TABS = ["chord", "modes", "subs", "analysis"] as const;
+
 interface TheoryPanelProps {
   chord: Chord | null;
   progression: Progression;
+  visibleTabs?: string[];
 }
 
 /**
  * Collapsible panel below the fretboard for displaying chord theory information.
  * Shows chord tones, scales, substitutions, mode comparisons, and harmonic analysis.
  */
-export function TheoryPanel({ chord, progression }: TheoryPanelProps) {
+export function TheoryPanel({
+  chord,
+  progression,
+  visibleTabs,
+}: TheoryPanelProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const tabs = visibleTabs
+    ? ALL_TABS.filter((t) => visibleTabs.includes(t))
+    : ALL_TABS;
 
   return (
     <Card className="overflow-hidden">
@@ -74,23 +84,36 @@ export function TheoryPanel({ chord, progression }: TheoryPanelProps) {
         <CollapsibleContent>
           <CardContent className="pt-4 pb-4 max-h-[50vh] overflow-y-auto">
             <Tabs defaultValue="chord">
-              <TabsList className="grid w-full grid-cols-4 h-9 mb-4">
-                <TabsTrigger value="chord" className="text-xs gap-1.5">
-                  <Music className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Chord</span>
-                </TabsTrigger>
-                <TabsTrigger value="modes" className="text-xs gap-1.5">
-                  <Scale className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Modes</span>
-                </TabsTrigger>
-                <TabsTrigger value="subs" className="text-xs gap-1.5">
-                  <Shuffle className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Subs</span>
-                </TabsTrigger>
-                <TabsTrigger value="analysis" className="text-xs gap-1.5">
-                  <BarChart3 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Analysis</span>
-                </TabsTrigger>
+              <TabsList
+                className={`grid w-full h-9 mb-4`}
+                style={{
+                  gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
+                }}
+              >
+                {tabs.includes("chord") && (
+                  <TabsTrigger value="chord" className="text-xs gap-1.5">
+                    <Music className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Chord</span>
+                  </TabsTrigger>
+                )}
+                {tabs.includes("modes") && (
+                  <TabsTrigger value="modes" className="text-xs gap-1.5">
+                    <Scale className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Modes</span>
+                  </TabsTrigger>
+                )}
+                {tabs.includes("subs") && (
+                  <TabsTrigger value="subs" className="text-xs gap-1.5">
+                    <Shuffle className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Subs</span>
+                  </TabsTrigger>
+                )}
+                {tabs.includes("analysis") && (
+                  <TabsTrigger value="analysis" className="text-xs gap-1.5">
+                    <BarChart3 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Analysis</span>
+                  </TabsTrigger>
+                )}
               </TabsList>
 
               <TabsContent value="chord" className="mt-0">
