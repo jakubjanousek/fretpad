@@ -12,7 +12,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Chord, Progression } from "@/lib/types";
+import type { Chord, Progression, TheoryTabId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ChordInfoPanel } from "./ChordInfoPanel";
 import { ChordSubstitutionsPanel } from "./ChordSubstitutionsPanel";
@@ -25,7 +25,7 @@ const ALL_TABS = ["chord", "modes", "subs", "analysis"] as const;
 interface TheoryPanelProps {
   chord: Chord | null;
   progression: Progression;
-  visibleTabs?: string[];
+  visibleTabs?: TheoryTabId[];
 }
 
 /**

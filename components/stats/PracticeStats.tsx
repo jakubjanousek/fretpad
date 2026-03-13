@@ -190,7 +190,7 @@ export function PracticeStats({
                 {stats.sessions
                   .slice(-7)
                   .reverse()
-                  .map((session) => {
+                  .map((session, index) => {
                     const date = new Date(session.date);
                     const isToday =
                       session.date === new Date().toISOString().split("T")[0];
@@ -200,7 +200,7 @@ export function PracticeStats({
 
                     return (
                       <div
-                        key={session.date}
+                        key={`${session.date}-${session.mode ?? "default"}-${index}`}
                         className={cn(
                           "flex items-center justify-between py-2 px-3 rounded-lg",
                           isToday ? "bg-cyan-500/10" : "bg-muted/50",
@@ -221,6 +221,11 @@ export function PracticeStats({
                               day: "numeric",
                             })}
                           </span>
+                          {session.mode && (
+                            <span className="text-xs text-muted-foreground capitalize">
+                              {session.mode.replaceAll("-", " ")}
+                            </span>
+                          )}
                         </div>
                         <span className="text-sm font-medium">
                           {formatDuration(session.durationMs)}

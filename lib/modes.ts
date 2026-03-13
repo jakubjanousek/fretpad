@@ -1,12 +1,21 @@
+import type { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
 import type { PracticeModeConfig, PracticeModeId } from "@/lib/types";
 
-export const PRACTICE_MODES: Record<PracticeModeId, PracticeModeConfig> = {
+type PresetName = keyof typeof PRESET_PROGRESSIONS;
+
+export interface PracticeModeConfigWithPreset extends PracticeModeConfig {
+  defaultPreset: PresetName;
+}
+
+export const PRACTICE_MODES: Record<
+  PracticeModeId,
+  PracticeModeConfigWithPreset
+> = {
   "learn-the-neck": {
     id: "learn-the-neck",
     label: "Learn the Neck",
     description:
       "Build fretboard familiarity — know where notes and intervals are.",
-    slug: "learn-the-neck",
     defaultPreset: "Dorian Vamp (Dm7)",
     defaultTempo: 90,
     defaultStyle: "bossaNova",
@@ -26,7 +35,6 @@ export const PRACTICE_MODES: Record<PracticeModeId, PracticeModeConfig> = {
     label: "Outline Chord Changes",
     description:
       "Practice hearing and visualizing chord tones as changes go by.",
-    slug: "outline-chord-changes",
     defaultPreset: "ii-V-I in C",
     defaultTempo: 120,
     defaultStyle: "jazzSwing",
@@ -46,7 +54,6 @@ export const PRACTICE_MODES: Record<PracticeModeId, PracticeModeConfig> = {
     label: "Comp with Voicings",
     description:
       "Practice comping with good voice leading through a progression.",
-    slug: "comp-with-voicings",
     defaultPreset: "ii-V-I in C",
     defaultTempo: 120,
     defaultStyle: "jazzSwing",

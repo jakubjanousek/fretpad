@@ -111,6 +111,30 @@ describe("practiceStats", () => {
       const stats = recordPracticeTime(30000);
       expect(stats.sessions[0]?.progressionNames).toEqual([]);
     });
+
+    it("stores separate sessions for different modes on the same day", () => {
+      recordPracticeTime(30000, "ii-V-I in C", "learn-the-neck");
+      const stats = recordPracticeTime(
+        20000,
+        "12-Bar Blues",
+        "comp-with-voicings",
+      );
+
+      expect(stats.sessions).toHaveLength(2);
+      expect(stats.sessions[0]?.mode).toBe("learn-the-neck");
+      expect(stats.sessions[1]?.mode).toBe("comp-with-voicings");
+      expect(stats.totalTimeMs).toBe(50000);
+    });
+
+    it("accumulates duration within the same mode session", () => {
+      recordPracticeTime(30000, "ii-V-I in C", "learn-the-neck");
+      const stats = recordPracticeTime(20000, "12-Bar Blues", "learn-the-neck");
+
+      expect(stats.sessions).toHaveLength(1);
+      expect(stats.sessions[0]?.durationMs).toBe(50000);
+      expect(stats.sessions[0]?.progressionNames).toContain("ii-V-I in C");
+      expect(stats.sessions[0]?.progressionNames).toContain("12-Bar Blues");
+    });
   });
 
   describe("getTodayPracticeTime", () => {
@@ -120,6 +144,13 @@ describe("practiceStats", () => {
 
     it("returns today's practice duration", () => {
       recordPracticeTime(45000);
+      expect(getTodayPracticeTime()).toBe(45000);
+    });
+
+    it("sums today's practice across multiple mode sessions", () => {
+      recordPracticeTime(30000, "ii-V-I in C", "learn-the-neck");
+      recordPracticeTime(15000, "12-Bar Blues", "comp-with-voicings");
+
       expect(getTodayPracticeTime()).toBe(45000);
     });
   });
@@ -184,6 +215,40 @@ describe("practiceStats", () => {
       const loaded = loadPracticeStats();
       expect(loaded.currentStreak).toBe(0);
       expect(loaded.longestStreak).toBe(5); // preserves previously achieved longest
+    });
+
+    it("ignores multiple same-day sessions when calculating streaks", () => {
+      const baseStats: PracticeStats = {
+        sessions: [
+          {
+            date: todayISO(),
+            durationMs: 30000,
+            progressionNames: [],
+            mode: "learn-the-neck",
+          },
+          {
+            date: todayISO(),
+            durationMs: 20000,
+            progressionNames: [],
+            mode: "comp-with-voicings",
+          },
+          {
+            date: daysAgoISO(1),
+            durationMs: 30000,
+            progressionNames: [],
+            mode: "outline-chord-changes",
+          },
+        ],
+        totalTimeMs: 80000,
+        currentStreak: 0,
+        longestStreak: 0,
+        lastPracticeDate: todayISO(),
+      };
+
+      savePracticeStats(baseStats);
+      const loaded = loadPracticeStats();
+      expect(loaded.currentStreak).toBe(2);
+      expect(loaded.longestStreak).toBe(2);
     });
   });
 });

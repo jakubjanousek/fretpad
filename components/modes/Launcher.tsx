@@ -37,7 +37,7 @@ export function Launcher() {
             return (
               <Link
                 key={modeId}
-                href={`/practice/${config.slug}`}
+                href={`/practice/${config.id}`}
                 className="block group"
               >
                 <Card className="h-full transition-all hover:shadow-md hover:border-foreground/20 group-focus-visible:ring-2 group-focus-visible:ring-ring">

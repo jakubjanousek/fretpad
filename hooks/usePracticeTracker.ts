@@ -17,18 +17,41 @@ interface UsePracticeTrackerResult {
 }
 
 /**
+ * Compute today's total from a stats object without re-reading localStorage.
+ */
+function todayTotalFromStats(stats: {
+  sessions: { date: string; durationMs: number }[];
+}): number {
+  const today = new Date().toISOString().split("T")[0] ?? "";
+  return stats.sessions
+    .filter((s) => s.date === today)
+    .reduce((total, s) => total + s.durationMs, 0);
+}
+
+/**
  * Hook to track practice time while the user is playing.
  * Automatically saves progress to localStorage periodically.
  */
 export function usePracticeTracker({
   isPlaying,
   progressionName,
+  mode,
 }: UsePracticeTrackerOptions): UsePracticeTrackerResult {
   const [todayTimeMs, setTodayTimeMs] = useState(0);
   const [sessionTimeMs, setSessionTimeMs] = useState(0);
   const sessionStartRef = useRef<number | null>(null);
   const lastSaveRef = useRef<number>(0);
   const accumulatedTimeRef = useRef<number>(0);
+
+  // Use refs for values that shouldn't restart intervals
+  const progressionNameRef = useRef(progressionName);
+  const modeRef = useRef(mode);
+  useEffect(() => {
+    progressionNameRef.current = progressionName;
+  }, [progressionName]);
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   // Load initial today time
   useEffect(() => {
@@ -47,13 +70,17 @@ export function usePracticeTracker({
       const elapsed = Date.now() - lastSaveRef.current;
       if (elapsed > 1000) {
         // Only save if more than 1 second
-        recordPracticeTime(elapsed, progressionName);
-        setTodayTimeMs(getTodayPracticeTime());
+        const stats = recordPracticeTime(
+          elapsed,
+          progressionNameRef.current,
+          modeRef.current,
+        );
+        setTodayTimeMs(todayTotalFromStats(stats));
       }
       sessionStartRef.current = null;
       setSessionTimeMs(0);
     }
-  }, [isPlaying, progressionName]);
+  }, [isPlaying]);
 
   // Periodically save and update while playing
   useEffect(() => {
@@ -65,18 +92,22 @@ export function usePracticeTracker({
       const now = Date.now();
       const elapsed = now - lastSaveRef.current;
 
-      // Save progress
-      recordPracticeTime(elapsed, progressionName);
+      // Save progress and use the return value directly
+      const stats = recordPracticeTime(
+        elapsed,
+        progressionNameRef.current,
+        modeRef.current,
+      );
       lastSaveRef.current = now;
       accumulatedTimeRef.current += elapsed;
 
-      // Update state
-      setTodayTimeMs(getTodayPracticeTime());
+      // Update state from return value — no redundant localStorage read
+      setTodayTimeMs(todayTotalFromStats(stats));
       setSessionTimeMs(accumulatedTimeRef.current);
     }, SAVE_INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [isPlaying, progressionName]);
+  }, [isPlaying]);
 
   // Update session time more frequently for UI
   useEffect(() => {

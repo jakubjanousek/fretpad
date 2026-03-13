@@ -3,6 +3,7 @@
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { PracticeModeConfig } from "@/lib/types";
+import { useAppStore } from "@/state/useAppStore";
 
 interface ModeHeaderProps {
   modeConfig: PracticeModeConfig;
@@ -10,20 +11,14 @@ interface ModeHeaderProps {
 
 export function ModeHeader({ modeConfig }: ModeHeaderProps) {
   const router = useRouter();
+  const exitMode = useAppStore((state) => state.exitMode);
 
   return (
     <div className="flex items-center gap-2">
       <button
         type="button"
         onClick={() => {
-          // Clear auto-resume before navigating — don't call exitMode()
-          // because it sets activeMode=null, which triggers the practice
-          // page's useEffect to re-enter the mode (race condition).
-          try {
-            localStorage.removeItem("fretpad-last-mode");
-          } catch {
-            // Ignore
-          }
+          exitMode();
           router.push("/");
         }}
         className="text-muted-foreground hover:text-foreground transition-colors"

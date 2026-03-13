@@ -432,12 +432,12 @@ export type PracticeModeId =
   | "outline-chord-changes"
   | "comp-with-voicings";
 
+export type TheoryTabId = "chord" | "modes" | "subs" | "analysis";
+
 export interface PracticeModeConfig {
   id: PracticeModeId;
   label: string;
   description: string;
-  slug: string;
-  defaultPreset: string;
   defaultTempo: number;
   defaultStyle: StyleId;
 
@@ -449,5 +449,5 @@ export interface PracticeModeConfig {
   showTargetsDropdown: boolean;
   showQuiz: boolean;
   showCAGED: boolean;
-  theoryTabs: string[];
+  theoryTabs: TheoryTabId[];
 }

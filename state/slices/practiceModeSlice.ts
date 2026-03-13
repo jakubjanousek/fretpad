@@ -1,12 +1,14 @@
 import type { StateCreator } from "zustand";
 import { PRACTICE_MODES } from "@/lib/modes";
-import type { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
 import type { PracticeModeId } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
 export interface PracticeModeSlice {
   activeMode: PracticeModeId | null;
-  enterMode: (id: PracticeModeId) => void;
+  enterMode: (
+    id: PracticeModeId,
+    options?: { applyDefaults?: boolean },
+  ) => void;
   exitMode: () => void;
 }
 
@@ -18,9 +20,10 @@ export const createPracticeModeSlice: StateCreator<
 > = (set, get) => ({
   activeMode: null,
 
-  enterMode: (id: PracticeModeId) => {
+  enterMode: (id: PracticeModeId, options) => {
     const config = PRACTICE_MODES[id];
     const state = get();
+    const applyDefaults = options?.applyDefaults ?? true;
 
     // Stop playback if playing
     if (state.isPlaying) {
@@ -37,10 +40,12 @@ export const createPracticeModeSlice: StateCreator<
       state.endSession();
     }
 
-    // Apply mode defaults
-    state.loadPreset(config.defaultPreset as keyof typeof PRESET_PROGRESSIONS);
-    state.setTempo(config.defaultTempo);
-    state.setSelectedStyle(config.defaultStyle);
+    // Apply mode defaults unless the caller is restoring a shared URL state.
+    if (applyDefaults) {
+      state.loadPreset(config.defaultPreset);
+      state.setTempo(config.defaultTempo);
+      state.setSelectedStyle(config.defaultStyle);
+    }
 
     // Apply display constraints based on mode
     if (!config.showVoicingsButton && state.showVoicings) {

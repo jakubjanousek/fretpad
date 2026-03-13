@@ -37,10 +37,10 @@ function calculateStreak(sessions: PracticeSession[]): {
 } {
   if (sessions.length === 0) return { current: 0, longest: 0 };
 
-  // Sort sessions by date descending
-  const sortedSessions = [...sessions].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  );
+  // Streaks are day-based, so collapse multiple sessions on the same day.
+  const uniqueSessionDates = [
+    ...new Set(sessions.map((session) => session.date)),
+  ].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
   const today = getTodayDate();
   const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
@@ -50,12 +50,13 @@ function calculateStreak(sessions: PracticeSession[]): {
   let tempStreak = 0;
   let prevDate: Date | null = null;
 
-  for (const session of sortedSessions) {
-    const sessionDate = new Date(session.date);
+  for (const sessionDateString of uniqueSessionDates) {
+    const sessionDate = new Date(sessionDateString);
 
     if (prevDate === null) {
       // First session
-      const isRecent = session.date === today || session.date === yesterday;
+      const isRecent =
+        sessionDateString === today || sessionDateString === yesterday;
       if (isRecent) {
         currentStreak = 1;
       }
@@ -147,12 +148,15 @@ export function savePracticeStats(stats: PracticeStats): void {
 export function recordPracticeTime(
   durationMs: number,
   progressionName?: string,
+  mode?: string,
 ): PracticeStats {
   const stats = loadPracticeStats();
   const today = getTodayDate();
 
-  // Find or create today's session
-  let todaySession = stats.sessions.find((s) => s.date === today);
+  // Track each mode separately so mode analytics aren't lost when users switch.
+  let todaySession = stats.sessions.find(
+    (s) => s.date === today && s.mode === mode,
+  );
 
   if (todaySession) {
     todaySession.durationMs += durationMs;
@@ -167,6 +171,7 @@ export function recordPracticeTime(
       date: today,
       durationMs,
       progressionNames: progressionName ? [progressionName] : [],
+      mode,
     };
     stats.sessions.push(todaySession);
   }
@@ -196,8 +201,9 @@ export function recordPracticeTime(
 export function getTodayPracticeTime(): number {
   const stats = loadPracticeStats();
   const today = getTodayDate();
-  const todaySession = stats.sessions.find((s) => s.date === today);
-  return todaySession?.durationMs ?? 0;
+  return stats.sessions
+    .filter((session) => session.date === today)
+    .reduce((total, session) => total + session.durationMs, 0);
 }
 
 /**
