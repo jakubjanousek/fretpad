@@ -18,16 +18,11 @@ import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { Card, CardContent } from "@/components/ui/card";
 import { useFirstVisit } from "@/hooks/useFirstVisit";
+import { usePracticeModeSetup } from "@/hooks/usePracticeModeSetup";
 import { usePracticeTracker } from "@/hooks/usePracticeTracker";
 import { useRollingAccuracy } from "@/hooks/useRollingAccuracy";
-import { useSessionTimer } from "@/hooks/useSessionTimer";
-import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import { MODE_STEPS, PRACTICE_MODES } from "@/lib/modes";
-import {
-  clearLegacyChallengeProgress,
-  getUnlockedStep,
-} from "@/lib/persistence/stepProgress";
 import {
   getArpeggioConnections,
   getArpeggioNotes,
@@ -64,33 +59,7 @@ interface SharedPracticePageProps {
 
 export function SharedPracticePage({ modeId }: SharedPracticePageProps) {
   const modeConfig = PRACTICE_MODES[modeId];
-  const [unlockedStepIndex, setUnlockedStepIndex] = useState(() =>
-    getUnlockedStep(modeId),
-  );
-  const hasInitialUrlStateRef = useRef(
-    typeof window !== "undefined" &&
-      new URL(window.location.href).searchParams.has("p"),
-  );
-
-  useUrlState();
-  useSessionTimer();
-
-  const enterMode = useAppStore((state) => state.enterMode);
-  const prevModeRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (prevModeRef.current !== modeId) {
-      prevModeRef.current = modeId;
-      enterMode(modeId, {
-        applyDefaults: !hasInitialUrlStateRef.current,
-      });
-    }
-  }, [enterMode, modeId]);
-
-  useEffect(() => {
-    clearLegacyChallengeProgress();
-    setUnlockedStepIndex(getUnlockedStep(modeId));
-  }, [modeId]);
+  const { unlockedStepIndex } = usePracticeModeSetup(modeId);
 
   const currentChord = useAppStore((state) => state.currentChord);
   const progression = useAppStore((state) => state.progression);
