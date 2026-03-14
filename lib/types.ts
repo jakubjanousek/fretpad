@@ -115,7 +115,7 @@ export interface PatternEvent {
   velocity?: number; // 0-1, defaults to 0.8
   offsetBeats?: number; // Explicit beat offset for swing feel or laid-back placement
   degree?: number; // Scale degree for bass (1, 3, 5, 7)
-  type?: "root" | "fifth" | "chord" | "approach";
+  type?: "root" | "fifth" | "chord" | "approach" | "walk";
 }
 
 export interface ChordPatternEvent {
@@ -123,7 +123,7 @@ export interface ChordPatternEvent {
   duration: string;
   velocity?: number;
   offsetBeats?: number;
-  voicingType: "shell" | "full" | "triad";
+  voicingType: "shell" | "full" | "triad" | "rootless";
 }
 
 export interface BassPattern {
@@ -134,6 +134,7 @@ export interface BassPattern {
 export interface ChordPattern {
   name: string;
   events: ChordPatternEvent[];
+  variants?: ChordPatternEvent[][];
 }
 
 export type DrumSound = "kick" | "snare" | "hihat" | "hihatOpen";

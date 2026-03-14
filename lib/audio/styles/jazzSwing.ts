@@ -3,8 +3,8 @@ import type { StyleDefinition } from "@/lib/types";
 /**
  * Jazz Swing style with walking bass and syncopated piano comping
  *
- * Bass pattern: Root (1) - 3rd (2) - 5th (3) - Approach to next root (4)
- * Chord pattern: Off-beat hits on beat 2-and and beat 4
+ * Bass pattern: Root-led walking line with deterministic connectors
+ * Chord pattern: Rotating comping cells with shell/rootless contrast
  */
 export const jazzSwingStyle: StyleDefinition = {
   id: "jazzSwing",
@@ -47,19 +47,17 @@ export const jazzSwingStyle: StyleDefinition = {
     bass: {
       name: "walking",
       events: [
-        { time: "0:0", duration: "4n", degree: 1, type: "root", velocity: 0.9 },
+        { time: "0:0", duration: "4n", type: "walk", velocity: 0.92 },
         {
           time: "0:1",
           duration: "4n",
-          degree: 3,
-          type: "chord",
-          velocity: 0.74,
+          type: "walk",
+          velocity: 0.76,
         },
         {
           time: "0:2",
           duration: "4n",
-          degree: 5,
-          type: "chord",
+          type: "walk",
           velocity: 0.7,
         },
         {
@@ -95,6 +93,86 @@ export const jazzSwingStyle: StyleDefinition = {
           velocity: 0.42,
           offsetBeats: -0.08,
         },
+      ],
+      variants: [
+        [
+          {
+            time: "0:0",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.36,
+            offsetBeats: 2 / 3,
+          },
+          {
+            time: "0:1",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.5,
+            offsetBeats: 0.56,
+          },
+          {
+            time: "0:3",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.42,
+            offsetBeats: -0.08,
+          },
+        ],
+        [
+          {
+            time: "0:1",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.38,
+            offsetBeats: 0.62,
+          },
+          {
+            time: "0:2",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.34,
+            offsetBeats: 2 / 3,
+          },
+        ],
+        [
+          {
+            time: "0:0",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.32,
+            offsetBeats: 2 / 3,
+          },
+          {
+            time: "0:2",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.44,
+            offsetBeats: 2 / 3,
+          },
+          {
+            time: "0:3",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.28,
+            offsetBeats: 0.12,
+          },
+        ],
+        [
+          {
+            time: "0:1",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.46,
+            offsetBeats: 0.58,
+          },
+          {
+            time: "0:3",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.4,
+            offsetBeats: 0.05,
+          },
+        ],
       ],
     },
     drums: {

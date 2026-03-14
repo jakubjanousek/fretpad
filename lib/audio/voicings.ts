@@ -144,6 +144,107 @@ export function getBassNote(
   }
 }
 
+interface WalkingBassOptions {
+  octave: number;
+  steps: number;
+  variationIndex?: number;
+  nextChord?: Chord | null;
+}
+
+function uniqueNotes(notes: Array<NoteName | undefined>): NoteName[] {
+  return notes.filter((note, index, list): note is NoteName => {
+    if (!note) return false;
+    return list.indexOf(note) === index;
+  });
+}
+
+function getNearestMidiForPitchClass(
+  note: NoteName,
+  targetMidi: number,
+): number {
+  const baseMidi = Note.midi(`${note}3`) ?? 48;
+  let bestMidi = baseMidi;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  for (let octaveShift = -24; octaveShift <= 24; octaveShift += 12) {
+    const candidateMidi = baseMidi + octaveShift;
+    const distance = Math.abs(candidateMidi - targetMidi);
+    if (distance < bestDistance) {
+      bestMidi = candidateMidi;
+      bestDistance = distance;
+    }
+  }
+
+  return bestMidi;
+}
+
+function midiToNoteName(midi: number): string {
+  return Note.fromMidi(midi) ?? `C${Math.max(1, Math.floor(midi / 12) - 1)}`;
+}
+
+export function getWalkingBassLine(
+  chord: Chord,
+  { octave, steps, variationIndex = 0, nextChord }: WalkingBassOptions,
+): string[] {
+  if (steps <= 0) return [];
+
+  const startMidi = Note.midi(`${getEffectiveBass(chord)}${octave}`) ?? 36;
+  const targetBass = nextChord
+    ? getEffectiveBass(nextChord)
+    : getEffectiveBass(chord);
+  const targetMidi = Note.midi(`${targetBass}${octave}`) ?? startMidi;
+  const isAscending = targetMidi >= startMidi;
+  const primaryChordTones = isAscending
+    ? uniqueNotes([
+        chord.notes[1],
+        chord.notes[2],
+        chord.guideTones[1],
+        chord.notes[3],
+      ])
+    : uniqueNotes([
+        chord.guideTones[1],
+        chord.notes[2],
+        chord.notes[1],
+        chord.root,
+      ]);
+  const alternateChordTones = uniqueNotes([
+    chord.notes[2],
+    chord.notes[1],
+    chord.guideTones[1],
+    chord.notes[3],
+    chord.root,
+  ]);
+  const notePool =
+    steps <= 3 || variationIndex % 2 === 0
+      ? primaryChordTones
+      : alternateChordTones;
+  const poolOffset = steps > 3 ? variationIndex % notePool.length : 0;
+  const line: number[] = [startMidi];
+
+  for (let stepIndex = 1; stepIndex < steps; stepIndex++) {
+    const previousMidi = line[line.length - 1] ?? startMidi;
+    const pitchClass =
+      notePool[(stepIndex - 1 + poolOffset) % notePool.length] ?? chord.root;
+    let candidateMidi = getNearestMidiForPitchClass(pitchClass, previousMidi);
+
+    if (isAscending && candidateMidi <= previousMidi) {
+      candidateMidi += 12;
+    }
+    if (!isAscending && candidateMidi >= previousMidi) {
+      candidateMidi -= 12;
+    }
+
+    const maxStep = stepIndex === steps - 1 ? 7 : 5;
+    if (Math.abs(candidateMidi - previousMidi) > maxStep) {
+      candidateMidi += isAscending ? -12 : 12;
+    }
+
+    line.push(candidateMidi);
+  }
+
+  return line.map(midiToNoteName);
+}
+
 /**
  * Gets a chromatic approach note to the target chord's bass note.
  * Approaches from a half step below.
@@ -164,12 +265,40 @@ export function getApproachNote(
   return approachNote || targetNote;
 }
 
+export function getRootlessVoicing(chord: Chord, octave: number): ChordVoicing {
+  const preferredNotes = uniqueNotes([
+    chord.guideTones[0],
+    chord.guideTones[1],
+    chord.notes[2],
+    chord.notes[3],
+    chord.notes[1],
+  ]).filter((note) => note !== chord.root);
+
+  const notes: string[] = [];
+  let currentOctave = octave;
+  let previousNote: NoteName | null = null;
+
+  for (const note of preferredNotes) {
+    if (notes.length >= 4) break;
+    if (previousNote && shouldRaiseOctave(previousNote, note)) {
+      currentOctave++;
+    }
+    notes.push(`${note}${currentOctave}`);
+    previousNote = note;
+  }
+
+  return {
+    notes,
+    bassNote: `${getEffectiveBass(chord)}${octave - 2}`,
+  };
+}
+
 /**
  * Gets a voicing based on the voicing type
  */
 export function getVoicing(
   chord: Chord,
-  voicingType: "shell" | "full" | "triad",
+  voicingType: "shell" | "full" | "triad" | "rootless",
   octave: number,
 ): ChordVoicing {
   switch (voicingType) {
@@ -179,6 +308,8 @@ export function getVoicing(
       return getTriadVoicing(chord, octave);
     case "full":
       return getFullVoicing(chord, octave);
+    case "rootless":
+      return getRootlessVoicing(chord, octave);
     default:
       return getShellVoicing(chord, octave);
   }
