@@ -39,6 +39,7 @@ interface ScheduleResult {
 interface ScheduleOptions {
   metronomeConfig?: MetronomeConfig;
   countInBars?: number;
+  loopIteration?: number;
 }
 
 type HumanizationProfile = NonNullable<
@@ -46,6 +47,7 @@ type HumanizationProfile = NonNullable<
 >[keyof NonNullable<NonNullable<StyleDefinition["timing"]>["humanization"]>];
 
 interface HumanizationContext {
+  loopIteration: number;
   barIndex: number;
   chordIndex: number;
   eventIndex: number;
@@ -143,7 +145,7 @@ export function getHumanization(
     };
   }
 
-  const baseSeed = `${instrument}:${context.barIndex}:${context.chordIndex}:${context.eventIndex}`;
+  const baseSeed = `${instrument}:${context.barIndex}:${context.chordIndex}:${context.eventIndex}:loop:${context.loopIteration}`;
 
   return {
     timingOffsetBeats:
@@ -201,6 +203,7 @@ function scheduleBassPattern(
   variationIndex = 0,
   humanizationProfile?: HumanizationProfile,
   scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
+  loopIteration = 0,
 ): number[] {
   const eventIds: number[] = [];
   const activePattern = pattern.filter((event) => {
@@ -222,6 +225,7 @@ function scheduleBassPattern(
 
   for (const [eventIndex, event] of activePattern.entries()) {
     const humanization = getHumanization(humanizationProfile, "bass", {
+      loopIteration,
       barIndex: scheduleContext?.barIndex ?? 0,
       chordIndex: scheduleContext?.chordIndex ?? 0,
       eventIndex,
@@ -298,11 +302,13 @@ function scheduleChordPattern(
   instrumentOffsetBeats = 0,
   humanizationProfile?: HumanizationProfile,
   scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
+  loopIteration = 0,
 ): number[] {
   const eventIds: number[] = [];
 
   for (const [eventIndex, event] of pattern.entries()) {
     const humanization = getHumanization(humanizationProfile, "chord", {
+      loopIteration,
       barIndex: scheduleContext?.barIndex ?? 0,
       chordIndex: scheduleContext?.chordIndex ?? 0,
       eventIndex,
@@ -350,9 +356,10 @@ export function getPatternVariantIndex(
   barIndex: number,
   chordIndex: number,
   variantCount: number,
+  loopIteration = 0,
 ): number {
   if (variantCount <= 1) return 0;
-  return (barIndex * 3 + chordIndex) % variantCount;
+  return (barIndex * 3 + chordIndex + loopIteration) % variantCount;
 }
 
 /**
@@ -367,11 +374,13 @@ function scheduleDrumPattern(
   instrumentOffsetBeats = 0,
   humanizationProfile?: HumanizationProfile,
   scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
+  loopIteration = 0,
 ): number[] {
   const eventIds: number[] = [];
 
   for (const [eventIndex, event] of pattern.entries()) {
     const humanization = getHumanization(humanizationProfile, "drums", {
+      loopIteration,
       barIndex: scheduleContext?.barIndex ?? 0,
       chordIndex: scheduleContext?.chordIndex ?? 0,
       eventIndex,
@@ -484,6 +493,7 @@ export function scheduleProgression(
   const beatsPerBar = progression.timeSignature.numerator;
   const instrumentOffsets = style.timing?.instrumentOffsets;
   const humanization = style.timing?.humanization;
+  const loopIteration = options?.loopIteration ?? 0;
 
   // Offset all events by count-in bars if specified
   const countInOffset = (options?.countInBars ?? 0) * beatsPerBar;
@@ -526,9 +536,10 @@ export function scheduleProgression(
         instruments.bass,
         style.instruments.bass.octave,
         instrumentOffsets?.bass ?? 0,
-        getPatternVariantIndex(barIndex, chordIndex, 4),
+        getPatternVariantIndex(barIndex, chordIndex, 4, loopIteration),
         humanization?.bass,
         { barIndex, chordIndex },
+        loopIteration,
       );
       eventIds.push(...bassEventIds);
 
@@ -539,6 +550,7 @@ export function scheduleProgression(
             barIndex,
             chordIndex,
             style.patterns.chord.variants.length,
+            loopIteration,
           )
         ] ?? style.patterns.chord.events;
       const chordEventIds = scheduleChordPattern(
@@ -552,6 +564,7 @@ export function scheduleProgression(
         instrumentOffsets?.chord ?? 0,
         humanization?.chord,
         { barIndex, chordIndex },
+        loopIteration,
       );
       eventIds.push(...chordEventIds);
 
@@ -566,6 +579,7 @@ export function scheduleProgression(
           instrumentOffsets?.drums ?? 0,
           humanization?.drums,
           { barIndex, chordIndex },
+          loopIteration,
         );
         eventIds.push(...drumEventIds);
       }

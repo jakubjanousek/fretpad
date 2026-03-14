@@ -64,7 +64,6 @@ export function useAudioEngine({
   style,
   metronome,
   backingTrack,
-  tempoRamp,
   onChordChange,
   onLoop,
   onStop,
@@ -73,9 +72,11 @@ export function useAudioEngine({
   const chordRef = useRef<ChordInstrument | null>(null);
   const drumsRef = useRef<DrumInstrument | null>(null);
   const metronomeRef = useRef<MetronomeInstrument | null>(null);
+  const countInEventIdsRef = useRef<number[]>([]);
   const scheduledEventsRef = useRef<number[]>([]);
   const isReadyRef = useRef(false);
   const isPlayingRef = useRef(false);
+  const loopIterationRef = useRef(0);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const [audioContextState, setAudioContextState] =
     useState<AudioContextState>("suspended");
@@ -172,6 +173,36 @@ export function useAudioEngine({
   }, [style, metronome.volume, backingTrack.drumsVolume]);
 
   // Handle style/metronome change during playback - reschedule events
+  const rescheduleProgression = useCallback(
+    (loopIteration: number) => {
+      if (!bassRef.current || !chordRef.current) return null;
+
+      clearScheduledEvents(scheduledEventsRef.current);
+      scheduledEventsRef.current = [];
+
+      const { eventIds, totalBars } = scheduleProgression(
+        progression,
+        style,
+        {
+          bass: bassRef.current,
+          chord: chordRef.current,
+          metronome: metronomeRef.current ?? undefined,
+          drums: drumsRef.current ?? undefined,
+        },
+        onChordChange,
+        {
+          metronomeConfig: metronome,
+          countInBars: metronome.countIn,
+          loopIteration,
+        },
+      );
+
+      scheduledEventsRef.current = eventIds;
+      return totalBars;
+    },
+    [progression, style, onChordChange, metronome],
+  );
+
   useEffect(() => {
     if (!isPlayingRef.current || !bassRef.current || !chordRef.current) return;
 
@@ -180,35 +211,15 @@ export function useAudioEngine({
     // Save current position before rescheduling
     const currentPosition = transport.position;
 
-    // Clear old events and reschedule with new style
-    clearScheduledEvents(scheduledEventsRef.current);
-    scheduledEventsRef.current = [];
-
-    // Cancel all transport events
-    transport.cancel();
-
-    // Reschedule with new style
-    const { eventIds, totalBars } = scheduleProgression(
-      progression,
-      style,
-      {
-        bass: bassRef.current,
-        chord: chordRef.current,
-        metronome: metronomeRef.current ?? undefined,
-        drums: drumsRef.current ?? undefined,
-      },
-      onChordChange,
-      { metronomeConfig: metronome },
-    );
-
-    scheduledEventsRef.current = eventIds;
+    const totalBars = rescheduleProgression(loopIterationRef.current);
+    if (totalBars === null) return;
 
     // Update loop end if needed
-    transport.loopEnd = `${totalBars}:0:0`;
+    transport.loopEnd = `${metronome.countIn + totalBars}:0:0`;
 
     // Restore position
     transport.position = currentPosition;
-  }, [style, progression, onChordChange, metronome]);
+  }, [metronome.countIn, rescheduleProgression]);
 
   // Update tempo when it changes (no reschedule needed - Tone.js handles this)
   useEffect(() => {
@@ -220,10 +231,11 @@ export function useAudioEngine({
   onLoopRef.current = onLoop;
 
   useEffect(() => {
-    if (!tempoRamp.enabled) return;
-
     const transport = Tone.getTransport();
     const handler = () => {
+      if (!isPlayingRef.current) return;
+      loopIterationRef.current += 1;
+      rescheduleProgression(loopIterationRef.current);
       onLoopRef.current();
     };
     transport.on("loop", handler);
@@ -231,7 +243,7 @@ export function useAudioEngine({
     return () => {
       transport.off("loop", handler);
     };
-  }, [tempoRamp.enabled]);
+  }, [rescheduleProgression]);
 
   // Update swing setting when style changes
   useEffect(() => {
@@ -283,8 +295,11 @@ export function useAudioEngine({
     transport.stop();
     transport.cancel();
     transport.position = 0;
+    loopIterationRef.current = 0;
 
     // Clear previously scheduled events
+    clearScheduledEvents(countInEventIdsRef.current);
+    countInEventIdsRef.current = [];
     clearScheduledEvents(scheduledEventsRef.current);
     scheduledEventsRef.current = [];
 
@@ -300,28 +315,11 @@ export function useAudioEngine({
         metronomeRef.current,
         metronome.accentDownbeat,
       );
-      scheduledEventsRef.current.push(...countInEventIds);
+      countInEventIdsRef.current = countInEventIds;
     }
 
-    // Schedule the progression with backing track patterns
-    // Offset by count-in duration
-    const { eventIds, totalBars } = scheduleProgression(
-      progression,
-      style,
-      {
-        bass: bassRef.current,
-        chord: chordRef.current,
-        metronome: metronomeRef.current ?? undefined,
-        drums: drumsRef.current ?? undefined,
-      },
-      onChordChange,
-      {
-        metronomeConfig: metronome,
-        countInBars,
-      },
-    );
-
-    scheduledEventsRef.current.push(...eventIds);
+    const totalBars = rescheduleProgression(0);
+    if (totalBars === null) return;
 
     // Set up looping - loop only covers the progression, not count-in
     transport.loop = true;
@@ -355,7 +353,7 @@ export function useAudioEngine({
 
     // Start playback
     transport.start();
-  }, [progression, style, onChordChange, metronome]);
+  }, [progression, onChordChange, metronome, rescheduleProgression]);
 
   const resume = useCallback(async () => {
     // Resume the AudioContext after iOS interruption
@@ -387,6 +385,7 @@ export function useAudioEngine({
     transport.stop();
     transport.cancel();
     transport.position = 0;
+    loopIterationRef.current = 0;
 
     // Mark as not playing
     isPlayingRef.current = false;
@@ -399,6 +398,8 @@ export function useAudioEngine({
     wakeLockRef.current = null;
 
     // Clear scheduled events
+    clearScheduledEvents(countInEventIdsRef.current);
+    countInEventIdsRef.current = [];
     clearScheduledEvents(scheduledEventsRef.current);
     scheduledEventsRef.current = [];
 
