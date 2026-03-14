@@ -539,7 +539,7 @@ if (prev.barIndex !== barIndex || prev.chordIndex !== chordIndex) {
 - Update `animate-target-primary` and `animate-target-secondary` CSS to use static highlight when motion is reduced
 - This is prerequisite since target note pulsing becomes a hero feature
 
-**0h. Security hardening**
+**0h. Security hardening** `[Completed 2026-03-14]`
 
 - Add `encoded.length > 10000` early return in `decodeStateFromUrl` (`lib/persistence/urlState.ts`)
 - Add `bars.length <= 64` check in `isValidProgression` (`lib/persistence/localStorage.ts`)

@@ -101,7 +101,8 @@ export function isValidProgression(value: unknown): value is Progression {
     typeof obj.timeSignature === "object" &&
     obj.timeSignature !== null &&
     Array.isArray(obj.bars) &&
-    obj.bars.length > 0
+    obj.bars.length > 0 &&
+    obj.bars.length <= 64
   );
 }
 

@@ -29,6 +29,11 @@ export function encodeStateToUrl(state: ShareableState): string {
  * Decode shareable state from URL-safe base64
  */
 export function decodeStateFromUrl(encoded: string): ShareableState | null {
+  if (encoded.length > 10000) {
+    console.warn("URL state exceeds maximum supported size, ignoring");
+    return null;
+  }
+
   try {
     // Restore standard base64 padding
     let base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
