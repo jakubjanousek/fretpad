@@ -12,6 +12,17 @@ export interface DrumInstrument {
  * Uses noise + oscillator combinations to approximate kick, snare, and hihat.
  */
 export function createDrumInstrument(volume: number): DrumInstrument {
+  const drumBus = new Tone.Gain();
+  const highCut = new Tone.Filter(7200, "lowpass");
+  const room = new Tone.Reverb({
+    decay: 0.9,
+    wet: 0.12,
+    preDelay: 0.01,
+  });
+  const compressor = new Tone.Compressor(-20, 3);
+
+  drumBus.chain(highCut, compressor, room, Tone.Destination);
+
   // Kick drum: low sine wave with fast pitch envelope
   const kick = new Tone.MembraneSynth({
     pitchDecay: 0.05,
@@ -23,7 +34,7 @@ export function createDrumInstrument(volume: number): DrumInstrument {
       sustain: 0,
       release: 0.1,
     },
-  }).toDestination();
+  }).connect(drumBus);
 
   // Snare drum: noise + triangle oscillator
   const snareNoise = new Tone.NoiseSynth({
@@ -34,7 +45,7 @@ export function createDrumInstrument(volume: number): DrumInstrument {
       sustain: 0,
       release: 0.05,
     },
-  }).toDestination();
+  }).connect(drumBus);
 
   const snareBody = new Tone.Synth({
     oscillator: { type: "triangle" },
@@ -44,33 +55,33 @@ export function createDrumInstrument(volume: number): DrumInstrument {
       sustain: 0,
       release: 0.05,
     },
-  }).toDestination();
+  }).connect(drumBus);
 
   // Closed hihat: filtered noise, very short
   const hihat = new Tone.MetalSynth({
     envelope: {
       attack: 0.001,
-      decay: 0.05,
-      release: 0.01,
+      decay: 0.12,
+      release: 0.04,
     },
-    harmonicity: 5.1,
-    modulationIndex: 32,
-    resonance: 4000,
-    octaves: 1.5,
-  }).toDestination();
+    harmonicity: 3.6,
+    modulationIndex: 18,
+    resonance: 2200,
+    octaves: 1.2,
+  }).connect(drumBus);
 
   // Open hihat: filtered noise, longer decay
   const hihatOpen = new Tone.MetalSynth({
     envelope: {
       attack: 0.001,
-      decay: 0.2,
-      release: 0.05,
+      decay: 0.28,
+      release: 0.08,
     },
-    harmonicity: 5.1,
-    modulationIndex: 32,
-    resonance: 4000,
-    octaves: 1.5,
-  }).toDestination();
+    harmonicity: 4.2,
+    modulationIndex: 22,
+    resonance: 2800,
+    octaves: 1.3,
+  }).connect(drumBus);
 
   // Set initial volumes
   kick.volume.value = volume;
@@ -112,6 +123,10 @@ export function createDrumInstrument(volume: number): DrumInstrument {
       snareBody.dispose();
       hihat.dispose();
       hihatOpen.dispose();
+      drumBus.dispose();
+      highCut.dispose();
+      room.dispose();
+      compressor.dispose();
     },
   };
 }

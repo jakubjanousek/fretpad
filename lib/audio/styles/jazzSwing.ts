@@ -10,28 +10,36 @@ export const jazzSwingStyle: StyleDefinition = {
   id: "jazzSwing",
   name: "Jazz Swing",
   description: "Walking bass with piano comping",
-  swing: 0.5, // Medium swing feel
+  swing: 0,
+  timing: {
+    useTransportSwing: false,
+    instrumentOffsets: {
+      bass: 0.01,
+      chord: 0.03,
+      drums: 0,
+    },
+  },
   instruments: {
     bass: {
       octave: 2,
-      volume: -6,
+      volume: -7,
       oscillatorType: "triangle",
       envelope: {
-        attack: 0.02,
-        decay: 0.1,
-        sustain: 0.4,
-        release: 0.3,
+        attack: 0.015,
+        decay: 0.16,
+        sustain: 0.35,
+        release: 0.24,
       },
     },
     chord: {
       octave: 4,
-      volume: -14,
+      volume: -16,
       oscillatorType: "triangle",
       envelope: {
-        attack: 0.01,
-        decay: 0.2,
-        sustain: 0.1,
-        release: 0.4,
+        attack: 0.02,
+        decay: 0.28,
+        sustain: 0.08,
+        release: 0.6,
       },
     },
   },
@@ -39,17 +47,14 @@ export const jazzSwingStyle: StyleDefinition = {
     bass: {
       name: "walking",
       events: [
-        // Beat 1: Root
         { time: "0:0", duration: "4n", degree: 1, type: "root", velocity: 0.9 },
-        // Beat 2: 3rd
         {
           time: "0:1",
           duration: "4n",
           degree: 3,
           type: "chord",
-          velocity: 0.7,
+          velocity: 0.74,
         },
-        // Beat 3: 5th
         {
           time: "0:2",
           duration: "4n",
@@ -57,37 +62,54 @@ export const jazzSwingStyle: StyleDefinition = {
           type: "chord",
           velocity: 0.7,
         },
-        // Beat 4: Approach note to next chord
-        { time: "0:3", duration: "4n", type: "approach", velocity: 0.8 },
+        {
+          time: "0:3",
+          duration: "4n",
+          type: "approach",
+          velocity: 0.82,
+          offsetBeats: -0.03,
+        },
       ],
     },
     chord: {
       name: "comping",
       events: [
-        // Beat 2-and: Shell voicing
-        { time: "0:1:2", duration: "8n", voicingType: "shell", velocity: 0.5 },
-        // Beat 4: Shell voicing
-        { time: "0:3", duration: "8n", voicingType: "shell", velocity: 0.45 },
+        {
+          time: "0:0",
+          duration: "8n",
+          voicingType: "shell",
+          velocity: 0.36,
+          offsetBeats: 2 / 3,
+        },
+        {
+          time: "0:1",
+          duration: "8n",
+          voicingType: "shell",
+          velocity: 0.48,
+          offsetBeats: 0.56,
+        },
+        {
+          time: "0:3",
+          duration: "8n",
+          voicingType: "shell",
+          velocity: 0.42,
+          offsetBeats: -0.08,
+        },
       ],
     },
     drums: {
       name: "swing-ride",
       events: [
-        // Ride cymbal pattern (swung) - hihat on every beat with swing feel
-        { time: "0:0", sound: "hihat", velocity: 0.6 },
-        { time: "0:0:2", sound: "hihat", velocity: 0.35 },
-        { time: "0:1", sound: "hihat", velocity: 0.5 },
-        { time: "0:1:2", sound: "hihat", velocity: 0.35 },
-        { time: "0:2", sound: "hihat", velocity: 0.55 },
-        { time: "0:2:2", sound: "hihat", velocity: 0.35 },
-        { time: "0:3", sound: "hihat", velocity: 0.5 },
-        { time: "0:3:2", sound: "hihat", velocity: 0.35 },
-        // Kick on 1
-        { time: "0:0", sound: "kick", velocity: 0.6 },
-        // Light kick on 3
-        { time: "0:2", sound: "kick", velocity: 0.35 },
-        // Snare cross-stick on 4 (ghost)
-        { time: "0:3", sound: "snare", velocity: 0.25 },
+        { time: "0:0", sound: "hihat", velocity: 0.62 },
+        { time: "0:0", sound: "hihat", velocity: 0.34, offsetBeats: 2 / 3 },
+        { time: "0:1", sound: "hihat", velocity: 0.48 },
+        { time: "0:2", sound: "hihat", velocity: 0.56 },
+        { time: "0:2", sound: "hihat", velocity: 0.32, offsetBeats: 2 / 3 },
+        { time: "0:3", sound: "hihat", velocity: 0.46 },
+        { time: "0:0", sound: "kick", velocity: 0.58 },
+        { time: "0:2", sound: "kick", velocity: 0.28, offsetBeats: 0.08 },
+        { time: "0:1", sound: "snare", velocity: 0.16, offsetBeats: 0.58 },
+        { time: "0:3", sound: "snare", velocity: 0.22, offsetBeats: 0.05 },
       ],
     },
   },

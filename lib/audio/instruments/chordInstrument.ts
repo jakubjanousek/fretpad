@@ -1,12 +1,23 @@
 import * as Tone from "tone";
 import type { ChordInstrumentConfig } from "@/lib/types";
 
+export interface ChordInstrument {
+  volume: { value: number };
+  triggerAttackRelease: (
+    notes: string[],
+    duration: Tone.Unit.Time,
+    time?: Tone.Unit.Time,
+    velocity?: number,
+  ) => void;
+  dispose: () => void;
+}
+
 /**
  * Creates a polyphonic synth for chord playback
  */
 export function createChordInstrument(
   config: ChordInstrumentConfig,
-): Tone.PolySynth {
+): ChordInstrument {
   const polySynth = new Tone.PolySynth(Tone.Synth, {
     oscillator: {
       type: config.oscillatorType,
@@ -17,11 +28,38 @@ export function createChordInstrument(
       sustain: config.envelope.sustain,
       release: config.envelope.release,
     },
-  }).toDestination();
+  });
+  const tone = new Tone.Filter(2400, "lowpass");
+  const compressor = new Tone.Compressor(-28, 2);
+  const reverb = new Tone.Reverb({
+    decay: 1.2,
+    wet: 0.16,
+    preDelay: 0.01,
+  });
+  const chorus = new Tone.Chorus({
+    frequency: 0.8,
+    delayTime: 2.5,
+    depth: 0.15,
+    wet: 0.08,
+  }).start();
+
+  polySynth.chain(tone, chorus, compressor, reverb, Tone.Destination);
 
   polySynth.volume.value = config.volume;
 
-  return polySynth;
+  return {
+    volume: polySynth.volume,
+    triggerAttackRelease: (notes, duration, time, velocity) => {
+      polySynth.triggerAttackRelease(notes, duration, time, velocity);
+    },
+    dispose: () => {
+      polySynth.dispose();
+      tone.dispose();
+      compressor.dispose();
+      reverb.dispose();
+      chorus.dispose();
+    },
+  };
 }
 
 /**
