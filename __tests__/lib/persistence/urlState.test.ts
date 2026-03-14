@@ -50,6 +50,10 @@ describe("urlState", () => {
       expect(decodeStateFromUrl("not-valid-base64!!!")).toBeNull();
     });
 
+    it("returns null for oversized encoded payloads", () => {
+      expect(decodeStateFromUrl("a".repeat(10001))).toBeNull();
+    });
+
     it("returns null for valid base64 but invalid JSON", () => {
       const encoded = btoa("not json")
         .replace(/\+/g, "-")
