@@ -1,7 +1,17 @@
-import { describe, expect, it } from "vitest";
 import { Note } from "tonal";
+import { describe, expect, it } from "vitest";
 import { getRootlessVoicing, getWalkingBassLine } from "@/lib/audio/voicings";
 import { parseChordSymbol } from "@/lib/theory/chords";
+
+function getLineMidi(line: string[], index: number): number {
+  const note = line[index];
+
+  if (!note) {
+    throw new Error(`Expected walking line note at index ${index}`);
+  }
+
+  return Note.midi(note) ?? 0;
+}
 
 describe("audio voicings", () => {
   it("builds a deterministic walking line with diatonic and chromatic connectors", () => {
@@ -42,11 +52,11 @@ describe("audio voicings", () => {
       nextChord: chord,
     });
 
-    expect(Note.midi(ascendingLine[1]!) ?? 0).toBeGreaterThan(
-      Note.midi(ascendingLine[0]!) ?? 0,
+    expect(getLineMidi(ascendingLine, 1)).toBeGreaterThan(
+      getLineMidi(ascendingLine, 0),
     );
-    expect(Note.midi(descendingLine[1]!) ?? 0).toBeLessThan(
-      Note.midi(descendingLine[0]!) ?? 0,
+    expect(getLineMidi(descendingLine, 1)).toBeLessThan(
+      getLineMidi(descendingLine, 0),
     );
   });
 
@@ -67,9 +77,7 @@ describe("audio voicings", () => {
 
     expect(line).toEqual(["G2", "Gb2", "D2", "Db2"]);
     expect(
-      Math.abs(
-        (Note.midi(`${nextChord.root}2`) ?? 0) - (Note.midi(line[3]!) ?? 0),
-      ),
+      Math.abs((Note.midi(`${nextChord.root}2`) ?? 0) - getLineMidi(line, 3)),
     ).toBe(1);
   });
 
