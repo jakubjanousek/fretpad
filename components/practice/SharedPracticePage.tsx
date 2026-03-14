@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
 import { HelpGuide } from "@/components/help/HelpGuide";
