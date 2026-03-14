@@ -1,18 +1,10 @@
 import type { ChallengeId, PracticeModeId } from "@/lib/types";
 
-// ============================================
-// Challenge Criterion Types
-// ============================================
-
 export type ChallengeCriterion =
   | { type: "practice-time" }
   | { type: "quiz-accuracy"; threshold: number }
   | { type: "voicings-explored" }
   | { type: "keys"; preset: string };
-
-// ============================================
-// Challenge Definition
-// ============================================
 
 export interface Challenge {
   id: ChallengeId;
@@ -23,10 +15,6 @@ export interface Challenge {
   criterion: ChallengeCriterion;
 }
 
-// ============================================
-// Challenge Progress
-// ============================================
-
 export interface ChallengeProgress {
   startedAt: string; // ISO date
   current: number;
@@ -34,10 +22,6 @@ export interface ChallengeProgress {
 }
 
 export type ChallengeState = Partial<Record<ChallengeId, ChallengeProgress>>;
-
-// ============================================
-// Challenge Definitions (9 total, 3 per mode)
-// ============================================
 
 export const CHALLENGES: Challenge[] = [
   // Learn the Neck
@@ -121,10 +105,6 @@ export const CHALLENGES: Challenge[] = [
   },
 ];
 
-// ============================================
-// Pure Helper Functions
-// ============================================
-
 /** Get challenges for a specific mode, in order */
 export function getChallengesForMode(mode: PracticeModeId): Challenge[] {
   return CHALLENGES.filter((c) => c.mode === mode);
@@ -146,7 +126,7 @@ export function getActiveChallenge(
       return challenge;
     }
   }
-  return null; // All complete
+  return null;
 }
 
 /** Get the next challenge after the active one (for "up next" preview) */
@@ -154,15 +134,11 @@ export function getNextChallenge(
   state: ChallengeState,
   mode: PracticeModeId,
 ): Challenge | null {
-  const modeChallenges = getChallengesForMode(mode);
-  let foundActive = false;
-  for (const challenge of modeChallenges) {
-    if (foundActive) return challenge;
-    if (!isComplete(state[challenge.id])) {
-      foundActive = true;
-    }
-  }
-  return null;
+  const challenges = getChallengesForMode(mode);
+  const activeIdx = challenges.findIndex((c) => !isComplete(state[c.id]));
+  return activeIdx >= 0 && activeIdx + 1 < challenges.length
+    ? (challenges[activeIdx + 1] ?? null)
+    : null;
 }
 
 /** Get progress fraction (0-1) for a challenge */

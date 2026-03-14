@@ -1,10 +1,5 @@
 export type { ChallengeState } from "../challenges/challenges";
-export {
-  clearChallengeState,
-  filterKnownChallenges,
-  loadChallengeState,
-  saveChallengeState,
-} from "./challengeStorage";
+export { loadChallengeState, saveChallengeState } from "./challengeStorage";
 export type { CustomPreset, RecentPreset } from "./customPresets";
 export {
   addRecentPreset,
