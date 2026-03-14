@@ -1,5 +1,3 @@
-"use client";
-
 import { Eye, Guitar, Music } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,8 +24,11 @@ export function Launcher() {
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">
             FretPad
           </h1>
-          <p className="text-muted-foreground text-base sm:text-lg max-w-md mx-auto">
-            What do you want to practice today?
+          <p className="text-muted-foreground text-base sm:text-lg max-w-md mx-auto mb-1">
+            See the right notes while hearing the chords
+          </p>
+          <p className="text-muted-foreground text-sm max-w-md mx-auto">
+            Choose how you want to practice
           </p>
         </div>
 

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { InstallPromptBanner } from "@/components/InstallPromptBanner";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { SITE_URL } from "@/lib/config";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -17,9 +18,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FretPad",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "FretPad — Guitar Practice Tool for Improvisation",
+    template: "%s | FretPad",
+  },
   description:
-    "Practice tool for guitarists to improvise over chord progressions",
+    "Practice guitar improvisation over chord progressions with a visual fretboard, backing tracks, and on-demand music theory.",
+  openGraph: {
+    type: "website",
+    siteName: "FretPad",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

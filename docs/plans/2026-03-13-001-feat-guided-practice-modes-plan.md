@@ -259,12 +259,12 @@ No significant performance concerns — this is a routing and UI restructure, no
 - `components/modes/FeatureShowcase.tsx` (visual selling points)
 
 **Acceptance criteria:**
-- [ ] Landing page has clear value prop: "See the right notes while hearing the chords"
-- [ ] 3 mode cards serve as both launcher and feature showcase
-- [ ] Proper `<title>`, `<meta description>`, Open Graph tags
-- [ ] Mobile layout: stacked mode cards, no horizontal scroll
-- [ ] Page loads fast (no heavy JS on the launcher — defer Tone.js to practice pages)
-- [ ] `pnpm validate` passes
+- [x] Landing page has clear value prop: "See the right notes while hearing the chords"
+- [x] 3 mode cards serve as both launcher and feature showcase
+- [x] Proper `<title>`, `<meta description>`, Open Graph tags
+- [x] Mobile layout: stacked mode cards, no horizontal scroll
+- [x] Page loads fast (no heavy JS on the launcher — defer Tone.js to practice pages)
+- [x] `pnpm validate` passes
 
 ### Phase 3: Structured Challenges
 

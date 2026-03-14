@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
   // Empty turbopack config tells Next.js we intentionally have webpack config
   // (from Serwist) but want to use Turbopack for dev
   turbopack: {},
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
 };
 
 export default withSerwist(nextConfig);
