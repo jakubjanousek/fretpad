@@ -34,6 +34,8 @@ import { useAppStore } from "@/state/useAppStore";
 
 type AudioContextState = "suspended" | "running" | "closed";
 
+let activeAudioEngineGeneration = 0;
+
 interface UseAudioEngineOptions {
   progression: Progression;
   tempo: number;
@@ -78,12 +80,17 @@ export function useAudioEngine({
   const isPlayingRef = useRef(false);
   const loopIterationRef = useRef(0);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const engineGenerationRef = useRef(0);
   const [audioContextState, setAudioContextState] =
     useState<AudioContextState>("suspended");
   // Counter that increments when instruments are recreated, triggering volume effect
   const [instrumentVersion, setInstrumentVersion] = useState(0);
 
   const setIsInterrupted = useAppStore((state) => state.setIsInterrupted);
+
+  if (engineGenerationRef.current === 0) {
+    engineGenerationRef.current = ++activeAudioEngineGeneration;
+  }
 
   // Track audio context state and detect interruptions
   useEffect(() => {
@@ -157,9 +164,8 @@ export function useAudioEngine({
     setInstrumentVersion((v) => v + 1);
 
     return () => {
-      // Cleanup on unmount or style change
-      Tone.getTransport().stop();
-      Tone.getTransport().cancel();
+      // Style and volume changes recreate instruments in place; transport control
+      // is handled separately so we do not kill active playback during resync.
       bassRef.current?.dispose();
       chordRef.current?.dispose();
       drumsRef.current?.dispose();
@@ -171,6 +177,18 @@ export function useAudioEngine({
       isReadyRef.current = false;
     };
   }, [style, metronome.volume, backingTrack.drumsVolume]);
+
+  useEffect(() => {
+    const engineGeneration = engineGenerationRef.current;
+
+    return () => {
+      if (engineGeneration === activeAudioEngineGeneration) {
+        const transport = Tone.getTransport();
+        transport.stop();
+        transport.cancel();
+      }
+    };
+  }, []);
 
   // Handle style/metronome change during playback - reschedule events
   const rescheduleProgression = useCallback(
