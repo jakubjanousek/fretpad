@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import type { Progression } from "@/lib/types";
 
-interface PlaybackPosition {
+export interface PlaybackPosition {
   /** Current bar index (0-based) */
   barIndex: number;
   /** Current chord index within the bar (0-based) */
@@ -26,6 +26,198 @@ interface UsePlaybackPositionOptions {
   countInBars?: number;
 }
 
+interface UsePlaybackPositionObserverOptions
+  extends UsePlaybackPositionOptions {
+  onPositionChange: (position: PlaybackPosition) => void;
+}
+
+interface BeatMapEntry {
+  barIndex: number;
+  chordIndex: number;
+  startBeat: number;
+}
+
+interface PlaybackTimeline {
+  beatMap: BeatMapEntry[];
+  barStartBeats: number[];
+  totalBeats: number;
+}
+
+const RESET_PLAYBACK_POSITION: PlaybackPosition = {
+  barIndex: 0,
+  chordIndex: 0,
+  barProgress: 0,
+  isActive: false,
+  isCountingIn: false,
+  countInProgress: 0,
+};
+
+function buildPlaybackTimeline(progression: Progression): PlaybackTimeline {
+  const beatMap: BeatMapEntry[] = [];
+  const barStartBeats: number[] = [];
+  let currentBeat = 0;
+
+  for (let barIndex = 0; barIndex < progression.bars.length; barIndex++) {
+    const bar = progression.bars[barIndex];
+    if (!bar) continue;
+
+    barStartBeats[barIndex] = currentBeat;
+
+    for (let chordIndex = 0; chordIndex < bar.chords.length; chordIndex++) {
+      const chord = bar.chords[chordIndex];
+      if (!chord) continue;
+      beatMap.push({ barIndex, chordIndex, startBeat: currentBeat });
+      currentBeat += chord.beats;
+    }
+  }
+
+  return {
+    beatMap,
+    barStartBeats,
+    totalBeats: currentBeat,
+  };
+}
+
+function parsePositionToBeats(
+  positionStr: string,
+  beatsPerBar: number,
+): number {
+  const parts = positionStr.split(":").map(Number);
+  if (parts.length >= 2) {
+    const bars = parts[0] ?? 0;
+    const beats = parts[1] ?? 0;
+    const sixteenths = parts[2] ?? 0;
+    return bars * beatsPerBar + beats + sixteenths / 4;
+  }
+  return 0;
+}
+
+function findPositionAtBeat(
+  beat: number,
+  progression: Progression,
+  timeline: PlaybackTimeline,
+  beatsPerBar: number,
+): Pick<PlaybackPosition, "barIndex" | "chordIndex" | "barProgress"> {
+  const { beatMap, barStartBeats, totalBeats } = timeline;
+
+  if (totalBeats <= 0) {
+    return {
+      barIndex: 0,
+      chordIndex: 0,
+      barProgress: 0,
+    };
+  }
+
+  const normalizedBeat = beat % totalBeats;
+  let currentBarIndex = 0;
+  let currentChordIndex = 0;
+
+  for (let i = 0; i < beatMap.length; i++) {
+    const entry = beatMap[i];
+    if (!entry) continue;
+
+    const nextEntry = beatMap[i + 1];
+    const entryEndBeat = nextEntry ? nextEntry.startBeat : totalBeats;
+
+    if (normalizedBeat >= entry.startBeat && normalizedBeat < entryEndBeat) {
+      currentBarIndex = entry.barIndex;
+      currentChordIndex = entry.chordIndex;
+      break;
+    }
+  }
+
+  const bar = progression.bars[currentBarIndex];
+  const barTotalBeats = bar?.totalBeats ?? beatsPerBar;
+  const barStartBeat = barStartBeats[currentBarIndex] ?? 0;
+  const beatInBar = normalizedBeat - barStartBeat;
+
+  return {
+    barIndex: currentBarIndex,
+    chordIndex: currentChordIndex,
+    barProgress: Math.min(1, Math.max(0, beatInBar / barTotalBeats)),
+  };
+}
+
+function getPlaybackPositionSnapshot(
+  transportPosition: string,
+  progression: Progression,
+  timeline: PlaybackTimeline,
+  beatsPerBar: number,
+  countInBars: number,
+): PlaybackPosition {
+  const beat = parsePositionToBeats(transportPosition, beatsPerBar);
+  const countInBeats = countInBars * beatsPerBar;
+
+  if (countInBeats > 0 && beat < countInBeats) {
+    return {
+      ...RESET_PLAYBACK_POSITION,
+      isActive: true,
+      isCountingIn: true,
+      countInProgress: beat / countInBeats,
+    };
+  }
+
+  const progressionBeat = beat - countInBeats;
+  const { barIndex, chordIndex, barProgress } = findPositionAtBeat(
+    progressionBeat,
+    progression,
+    timeline,
+    beatsPerBar,
+  );
+
+  return {
+    barIndex,
+    chordIndex,
+    barProgress,
+    isActive: true,
+    isCountingIn: false,
+    countInProgress: 0,
+  };
+}
+
+function observePlaybackPosition(
+  options: UsePlaybackPositionObserverOptions,
+): () => void {
+  const { progression, isPlaying, countInBars = 0, onPositionChange } = options;
+
+  if (!isPlaying) {
+    onPositionChange(RESET_PLAYBACK_POSITION);
+    return () => {};
+  }
+
+  const beatsPerBar = progression.timeSignature.numerator;
+  const timeline = buildPlaybackTimeline(progression);
+  let animationFrameId: number | null = null;
+
+  const updatePosition = () => {
+    const transport = Tone.getTransport();
+
+    if (transport.state !== "started") {
+      onPositionChange(RESET_PLAYBACK_POSITION);
+      return;
+    }
+
+    const nextPosition = getPlaybackPositionSnapshot(
+      transport.position as string,
+      progression,
+      timeline,
+      beatsPerBar,
+      countInBars,
+    );
+
+    onPositionChange(nextPosition);
+    animationFrameId = requestAnimationFrame(updatePosition);
+  };
+
+  animationFrameId = requestAnimationFrame(updatePosition);
+
+  return () => {
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+    }
+  };
+}
+
 /**
  * Hook that tracks the current playback position in real-time.
  * Uses requestAnimationFrame to poll Tone.js transport position during playback.
@@ -35,191 +227,36 @@ export function usePlaybackPosition({
   isPlaying,
   countInBars = 0,
 }: UsePlaybackPositionOptions): PlaybackPosition {
-  const [position, setPosition] = useState<PlaybackPosition>({
-    barIndex: 0,
-    chordIndex: 0,
-    barProgress: 0,
-    isActive: false,
-    isCountingIn: false,
-    countInProgress: 0,
-  });
-
-  const animationFrameRef = useRef<number | null>(null);
-  const beatsPerBar = progression.timeSignature.numerator;
-  const countInBeats = countInBars * beatsPerBar;
-
-  // Build a lookup table for beat -> bar/chord mapping
-  const beatMapRef = useRef<
-    Array<{ barIndex: number; chordIndex: number; startBeat: number }>
-  >([]);
-
-  // Rebuild beat map when progression changes
-  useEffect(() => {
-    const map: Array<{
-      barIndex: number;
-      chordIndex: number;
-      startBeat: number;
-    }> = [];
-    let currentBeat = 0;
-
-    for (let barIndex = 0; barIndex < progression.bars.length; barIndex++) {
-      const bar = progression.bars[barIndex];
-      if (!bar) continue;
-      for (let chordIndex = 0; chordIndex < bar.chords.length; chordIndex++) {
-        const chord = bar.chords[chordIndex];
-        if (!chord) continue;
-        map.push({ barIndex, chordIndex, startBeat: currentBeat });
-        currentBeat += chord.beats;
-      }
-    }
-
-    beatMapRef.current = map;
-  }, [progression]);
-
-  // Calculate total beats in the progression
-  const getTotalBeats = useCallback(() => {
-    return progression.bars.reduce((total, bar) => total + bar.totalBeats, 0);
-  }, [progression]);
-
-  // Convert transport position string to beat number
-  const parsePositionToBeats = useCallback(
-    (positionStr: string): number => {
-      const parts = positionStr.split(":").map(Number);
-      if (parts.length >= 2) {
-        const bars = parts[0] ?? 0;
-        const beats = parts[1] ?? 0;
-        const sixteenths = parts[2] ?? 0;
-        return bars * beatsPerBar + beats + sixteenths / 4;
-      }
-      return 0;
-    },
-    [beatsPerBar],
+  const [position, setPosition] = useState<PlaybackPosition>(
+    RESET_PLAYBACK_POSITION,
   );
 
-  // Find the current bar and chord for a given beat position
-  const findPositionAtBeat = useCallback(
-    (
-      beat: number,
-    ): { barIndex: number; chordIndex: number; barProgress: number } => {
-      const totalBeats = getTotalBeats();
-      // Handle looping
-      const normalizedBeat = beat % totalBeats;
-
-      const map = beatMapRef.current;
-      let currentBarIndex = 0;
-      let currentChordIndex = 0;
-
-      // Find which chord we're in
-      for (let i = 0; i < map.length; i++) {
-        const entry = map[i];
-        if (!entry) continue;
-        const nextEntry = map[i + 1];
-        const entryEndBeat = nextEntry ? nextEntry.startBeat : totalBeats;
-
-        if (
-          normalizedBeat >= entry.startBeat &&
-          normalizedBeat < entryEndBeat
-        ) {
-          currentBarIndex = entry.barIndex;
-          currentChordIndex = entry.chordIndex;
-          break;
-        }
-      }
-
-      // Calculate bar progress
-      const bar = progression.bars[currentBarIndex];
-      const barTotalBeats = bar?.totalBeats ?? beatsPerBar;
-      const barStartBeat = progression.bars
-        .slice(0, currentBarIndex)
-        .reduce((sum, b) => sum + b.totalBeats, 0);
-      const beatInBar = normalizedBeat - barStartBeat;
-      const barProgress = Math.min(1, Math.max(0, beatInBar / barTotalBeats));
-
-      return {
-        barIndex: currentBarIndex,
-        chordIndex: currentChordIndex,
-        barProgress,
-      };
-    },
-    [progression, getTotalBeats, beatsPerBar],
-  );
-
-  // Animation frame callback for polling position
-  const updatePosition = useCallback(() => {
-    const transport = Tone.getTransport();
-
-    if (transport.state === "started") {
-      const positionStr = transport.position as string;
-      const beat = parsePositionToBeats(positionStr);
-
-      // Check if we're in the count-in phase
-      if (countInBeats > 0 && beat < countInBeats) {
-        // During count-in, don't update progression position
-        const countInProgress = beat / countInBeats;
-        setPosition({
-          barIndex: 0,
-          chordIndex: 0,
-          barProgress: 0,
-          isActive: true,
-          isCountingIn: true,
-          countInProgress,
-        });
-      } else {
-        // After count-in (or no count-in), track progression normally
-        // Offset by count-in beats to get the actual progression beat
-        const progressionBeat = beat - countInBeats;
-        const { barIndex, chordIndex, barProgress } =
-          findPositionAtBeat(progressionBeat);
-
-        setPosition({
-          barIndex,
-          chordIndex,
-          barProgress,
-          isActive: true,
-          isCountingIn: false,
-          countInProgress: 0,
-        });
-      }
-
-      animationFrameRef.current = requestAnimationFrame(updatePosition);
-    } else {
-      setPosition((prev) => ({
-        ...prev,
-        isActive: false,
-        isCountingIn: false,
-        countInProgress: 0,
-      }));
-    }
-  }, [parsePositionToBeats, findPositionAtBeat, countInBeats]);
-
-  // Start/stop polling based on isPlaying
   useEffect(() => {
-    if (isPlaying) {
-      // Start polling
-      animationFrameRef.current = requestAnimationFrame(updatePosition);
-    } else {
-      // Stop polling and reset
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-      setPosition({
-        barIndex: 0,
-        chordIndex: 0,
-        barProgress: 0,
-        isActive: false,
-        isCountingIn: false,
-        countInProgress: 0,
-      });
-    }
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-    };
-  }, [isPlaying, updatePosition]);
+    return observePlaybackPosition({
+      progression,
+      isPlaying,
+      countInBars,
+      onPositionChange: setPosition,
+    });
+  }, [progression, isPlaying, countInBars]);
 
   return position;
+}
+
+export function usePlaybackPositionObserver(
+  options: UsePlaybackPositionObserverOptions,
+): void {
+  const callbackRef = useRef(options.onPositionChange);
+  const { progression, isPlaying, countInBars } = options;
+
+  callbackRef.current = options.onPositionChange;
+
+  useEffect(() => {
+    return observePlaybackPosition({
+      progression,
+      isPlaying,
+      countInBars,
+      onPositionChange: (position) => callbackRef.current(position),
+    });
+  }, [progression, isPlaying, countInBars]);
 }
