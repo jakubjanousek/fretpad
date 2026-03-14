@@ -386,7 +386,7 @@ Fretboard reads from hooks directly instead of receiving props. Each mode page b
 
 ### Phase 0: Foundation (Shared — Prerequisite)
 
-**0a. Fix `enterMode` render cascade**
+**0a. Fix `enterMode` render cascade** `[Completed 2026-03-14]`
 
 - File: `state/slices/practiceModeSlice.ts`
 - Problem: `enterMode` calls 8-10 individual `set()` calls. Zustand v5 does NOT batch imperative `set()` inside actions — each fires a synchronous notification to all subscribers.

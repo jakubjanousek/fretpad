@@ -6,6 +6,8 @@ import type { PracticeModeId } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 import { getChordAtPosition } from "./progressionSlice";
 
+const MAX_MODE_SWITCH_HISTORY = 10;
+
 export interface PracticeModeSlice {
   activeMode: PracticeModeId | null;
   enterMode: (
@@ -40,6 +42,10 @@ export const createPracticeModeSlice: StateCreator<
       Object.assign(delta, {
         quizActive: false,
         quizQuestion: null,
+        quizScore: 0,
+        quizTotal: 0,
+        quizStreak: 0,
+        quizBestStreak: 0,
         quizLastResult: null,
         quizFinished: false,
       });
@@ -67,6 +73,9 @@ export const createPracticeModeSlice: StateCreator<
       delta.currentChord = getChordAtPosition(progression, 0, 0);
       delta.tempo = Math.max(40, Math.min(200, config.defaultTempo));
       delta.selectedStyle = config.defaultStyle;
+      delta.progressionHistory = [...state.progressionHistory, state.progression]
+        .slice(-MAX_MODE_SWITCH_HISTORY);
+      delta.progressionFuture = [];
     }
 
     if (!config.showVoicingsButton && state.showVoicings) {

@@ -22,6 +22,10 @@ function resetStore() {
     micActive: false,
     quizActive: false,
     quizQuestion: null,
+    quizScore: 0,
+    quizTotal: 0,
+    quizStreak: 0,
+    quizBestStreak: 0,
     quizLastResult: null,
     quizFinished: false,
     sessionActive: false,
@@ -35,6 +39,8 @@ function resetStore() {
     currentChord: getChordAtPosition(progression, 0, 0),
     tempo: 120,
     selectedStyle: "jazzSwing",
+    progressionHistory: [],
+    progressionFuture: [],
     showVoicings: false,
     targetNoteMode: "none",
     showChromaticApproach: false,
@@ -67,6 +73,8 @@ describe("practiceModeSlice", () => {
       currentChordIndex: 0,
       tempo: 40,
       selectedStyle: "ballad",
+      progressionHistory: [PRESET_PROGRESSIONS["Minor ii-V-i in Dm"]],
+      progressionFuture: [PRESET_PROGRESSIONS["Rhythm Changes Bridge"]],
     });
 
     useAppStore.getState().enterMode("learn-the-neck");
@@ -79,6 +87,11 @@ describe("practiceModeSlice", () => {
     expect(state.currentChord?.root).toBe("D");
     expect(state.tempo).toBe(90);
     expect(state.selectedStyle).toBe("bossaNova");
+    expect(state.progressionHistory).toEqual([
+      PRESET_PROGRESSIONS["Minor ii-V-i in Dm"],
+      PRESET_PROGRESSIONS["12-bar blues in A"],
+    ]);
+    expect(state.progressionFuture).toEqual([]);
     expect(localStorage.getItem("fretpad-last-mode")).toBe("learn-the-neck");
   });
 
@@ -87,6 +100,10 @@ describe("practiceModeSlice", () => {
       isPlaying: true,
       micActive: true,
       quizActive: true,
+      quizScore: 3,
+      quizTotal: 4,
+      quizStreak: 2,
+      quizBestStreak: 3,
       quizFinished: true,
       quizLastResult: "correct",
       sessionActive: true,
@@ -113,6 +130,10 @@ describe("practiceModeSlice", () => {
     expect(state.isPlaying).toBe(false);
     expect(state.micActive).toBe(false);
     expect(state.quizActive).toBe(false);
+    expect(state.quizScore).toBe(0);
+    expect(state.quizTotal).toBe(0);
+    expect(state.quizStreak).toBe(0);
+    expect(state.quizBestStreak).toBe(0);
     expect(state.quizFinished).toBe(false);
     expect(state.quizLastResult).toBeNull();
     expect(state.sessionActive).toBe(false);
@@ -170,5 +191,34 @@ describe("practiceModeSlice", () => {
     expect(state.currentChordIndex).toBe(0);
     expect(state.tempo).toBe(150);
     expect(state.selectedStyle).toBe("funk");
+  });
+
+  it("caps mode-switch history at 10 entries", () => {
+    const history = Array.from({ length: 10 }, (_, index) => ({
+      ...PRESET_PROGRESSIONS["ii-V-I in C"],
+      name: `History ${index}`,
+    }));
+
+    useAppStore.setState({
+      progression: PRESET_PROGRESSIONS["12-bar blues in A"],
+      progressionHistory: history,
+    });
+
+    useAppStore.getState().enterMode("comp-with-voicings");
+
+    const { progressionHistory } = useAppStore.getState();
+    expect(progressionHistory).toHaveLength(10);
+    expect(progressionHistory.at(0)?.name).toBe("History 1");
+    expect(progressionHistory.at(-1)?.name).toBe("12-bar blues in A");
+  });
+
+  it("notifies subscribers once for a mode switch", () => {
+    const listener = vi.fn();
+    const unsubscribe = useAppStore.subscribe(listener);
+
+    useAppStore.getState().enterMode("learn-the-neck");
+
+    unsubscribe();
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
