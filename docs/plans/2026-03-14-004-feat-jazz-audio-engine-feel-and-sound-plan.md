@@ -63,7 +63,7 @@ This plan focuses on the jazz mode first, while keeping the architecture extensi
 - [x] Phase 0 partial: added scheduler coverage for explicit timing helpers.
 - [x] Phase 1 complete: explicit jazz timing replaced transport-wide swing as the core groove mechanism.
 - [x] Phase 2 partial: shipped the fallback synth/mix-chain improvements for bass, chords, and drums.
-- [x] Phase 3 partial: walking bass and comping now rotate through deterministic musical variations.
+- [x] Phase 3 complete: walking bass now alternates direction deterministically and mixes chord-tone, diatonic, and chromatic connectors; comping variation remains in place.
 - [x] Phase 4 partial: deterministic per-instrument timing, velocity, and duration humanization is now wired into jazz scheduling.
 
 ### Phase 0: Baseline and guardrails
@@ -137,8 +137,8 @@ The current arrangement logic is too repetitive to feel musical over repeated lo
 
 - Expand walking bass generation in [lib/audio/voicings.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/voicings.ts):
   - [x] prefer stepwise motion
-  - [ ] choose between chord tones, diatonic connectors, and chromatic approaches
-  - [ ] vary direction across bars
+  - [x] choose between chord tones, diatonic connectors, and chromatic approaches
+  - [x] vary direction across bars
   - [x] treat resolution targets differently from static harmony
 - Expand comping behavior in [lib/audio/styles/jazzSwing.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/styles/jazzSwing.ts) and related scheduling logic:
   - [x] rotate between multiple rhythmic cells
