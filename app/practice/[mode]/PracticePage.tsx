@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
@@ -42,6 +43,14 @@ import {
 import type { PracticeModeId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
+
+const AudioInputScorecard = dynamic(
+  () =>
+    import("@/components/transport/AudioInputScorecard").then(
+      (m) => m.AudioInputScorecard,
+    ),
+  { ssr: false },
+);
 
 interface PracticePageProps {
   modeId: PracticeModeId;
@@ -493,6 +502,11 @@ export function PracticePage({ modeId }: PracticePageProps) {
         onStatsClick={() => setStatsOpen(true)}
         onQuizClick={modeConfig.showQuiz ? startQuiz : undefined}
         onPlannerClick={undefined}
+        micSlot={
+          modeConfig.showMicToggle ? (
+            <AudioInputScorecard enabled={modeConfig.showMicToggle} />
+          ) : undefined
+        }
       />
 
       {/* Settings Drawer */}

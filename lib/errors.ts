@@ -72,6 +72,19 @@ export class AudioContextError extends FretPadError {
 }
 
 /**
+ * Error thrown when microphone access fails
+ */
+export class MicPermissionError extends FretPadError {
+  constructor(
+    public readonly reason: "denied" | "not-found" | "unavailable",
+    message: string,
+  ) {
+    super(message, `MIC_${reason.toUpperCase().replace("-", "_")}`);
+    this.name = "MicPermissionError";
+  }
+}
+
+/**
  * Error information for display in UI
  */
 export interface ErrorInfo {
@@ -109,6 +122,34 @@ export function toErrorInfo(error: unknown): ErrorInfo {
       message: error.message,
       recoverable: true,
       action: "Click anywhere on the page and try again",
+    };
+  }
+
+  if (error instanceof MicPermissionError) {
+    const messages: Record<
+      MicPermissionError["reason"],
+      { message: string; action: string }
+    > = {
+      denied: {
+        message: "Microphone access was denied",
+        action:
+          "Allow microphone access in your browser settings and try again",
+      },
+      "not-found": {
+        message: "No microphone found",
+        action: "Connect a microphone and try again",
+      },
+      unavailable: {
+        message: "Microphone is not available in this browser",
+        action: "Try using a modern browser like Chrome or Safari",
+      },
+    };
+    const info = messages[error.reason];
+    return {
+      code: error.code,
+      message: info.message,
+      recoverable: error.reason !== "unavailable",
+      action: info.action,
     };
   }
 

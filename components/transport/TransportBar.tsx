@@ -9,6 +9,7 @@ import {
   Square,
   Trophy,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -25,6 +26,7 @@ interface TransportBarProps {
   onStatsClick: () => void;
   onQuizClick?: () => void;
   onPlannerClick?: () => void;
+  micSlot?: ReactNode;
 }
 
 /**
@@ -37,6 +39,7 @@ export function TransportBar({
   onStatsClick,
   onQuizClick,
   onPlannerClick,
+  micSlot,
 }: TransportBarProps) {
   const {
     isPlaying,
@@ -108,6 +111,8 @@ export function TransportBar({
 
             {/* Utilities Group */}
             <div className="flex items-center gap-0.5 sm:gap-1">
+              {micSlot}
+
               {onPlannerClick && (
                 <Tooltip>
                   <TooltipTrigger asChild>

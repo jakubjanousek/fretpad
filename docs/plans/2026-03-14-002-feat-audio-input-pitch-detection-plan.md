@@ -316,21 +316,21 @@ const detector = pitchyModule.PitchDetector.forFloat32Array(2048);
 
 ## Acceptance Criteria
 
-- [ ] Mic toggle button appears in Outline Chord Changes mode only
-- [ ] Clicking mic toggle requests microphone permission (first time) or activates mic (returning)
-- [ ] Double-clicking during permission dialog does not create orphaned streams
-- [ ] Headphones recommendation shown on first mic activation (dismissable)
-- [ ] Signal indicator shows when mic detects audio input (ref-driven, not store-driven)
-- [ ] During playback, pitch detection runs and notes are classified against current chord's targets
-- [ ] After each loop completes, inline scorecard shows "X/Y" (hits/chord changes)
-- [ ] Scorecard resets on first chord change of new loop
-- [ ] Detection buffer retained across loop boundaries
-- [ ] Mic stream is released on mode exit, stop, unmount, and iOS interruption
-- [ ] Permission denied state shows instructional error via existing error system
-- [ ] Feature degrades gracefully (hidden toggle) if getUserMedia is unavailable
+- [x] Mic toggle button appears in Outline Chord Changes mode only
+- [x] Clicking mic toggle requests microphone permission (first time) or activates mic (returning)
+- [x] Double-clicking during permission dialog does not create orphaned streams
+- [x] Headphones recommendation shown on first mic activation (dismissable)
+- [x] Signal indicator shows when mic detects audio input (ref-driven, not store-driven)
+- [x] During playback, pitch detection runs and notes are classified against current chord's targets
+- [x] After each loop completes, inline scorecard shows "X/Y" (hits/chord changes)
+- [x] Scorecard resets on first chord change of new loop
+- [x] Detection buffer retained across loop boundaries
+- [x] Mic stream is released on mode exit, stop, unmount, and iOS interruption
+- [x] Permission denied state shows instructional error via existing error system
+- [x] Feature degrades gracefully (hidden toggle) if getUserMedia is unavailable
 - [ ] Works on Chrome, Safari (macOS), Safari (iOS), Firefox
 - [ ] No impact on backing track playback performance
-- [ ] Pitchy loaded via dynamic import (not in main bundle)
+- [x] Pitchy loaded via dynamic import (not in main bundle)
 
 ## Implementation
 
