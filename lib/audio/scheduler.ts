@@ -344,10 +344,13 @@ function scheduleBassPatternForBar(
 
   for (const slot of barChords) {
     const slotEvents = activePattern.filter(
-      ({ eventBeat }) => eventBeat >= slot.startBeat && eventBeat < slot.endBeat,
+      ({ eventBeat }) =>
+        eventBeat >= slot.startBeat && eventBeat < slot.endBeat,
     );
     const nextChordInfo = getNextChord(progression, barIndex, slot.chordIndex);
-    const nextChord = nextChordInfo ? parseChordSymbol(nextChordInfo.chord) : null;
+    const nextChord = nextChordInfo
+      ? parseChordSymbol(nextChordInfo.chord)
+      : null;
     const walkEvents = slotEvents.filter(({ event }) => event.type === "walk");
     const walkingLine = getWalkingBassLine(slot.chord, {
       octave: bassOctave,
@@ -357,7 +360,11 @@ function scheduleBassPatternForBar(
     });
     let walkingLineIndex = 0;
 
-    for (const { event, eventBeat: baseEventBeat, patternEventIndex } of slotEvents) {
+    for (const {
+      event,
+      eventBeat: baseEventBeat,
+      patternEventIndex,
+    } of slotEvents) {
       const humanization = getHumanization(humanizationProfile, "bass", {
         loopIteration,
         barIndex,
