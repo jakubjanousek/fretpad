@@ -58,6 +58,14 @@ This plan focuses on the jazz mode first, while keeping the architecture extensi
 
 ## Phased Plan
 
+## Progress
+
+- [x] Phase 0 partial: added scheduler coverage for explicit timing helpers.
+- [x] Phase 1 complete: explicit jazz timing replaced transport-wide swing as the core groove mechanism.
+- [x] Phase 2 partial: shipped the fallback synth/mix-chain improvements for bass, chords, and drums.
+- [ ] Phase 3 not started.
+- [ ] Phase 4 not started.
+
 ### Phase 0: Baseline and guardrails
 
 - Add a short internal checklist for listening tests:
@@ -66,8 +74,8 @@ This plan focuses on the jazz mode first, while keeping the architecture extensi
   - 160 BPM fast swing
   - 2 chords per bar
   - loop boundary behavior
-- Capture current jazz behavior in small scheduler tests where practical.
-- Confirm other styles remain straight when jazz timing logic changes.
+- [x] Capture current jazz behavior in small scheduler tests where practical.
+- [x] Confirm other styles remain straight when jazz timing logic changes.
 
 ### Phase 1: Replace global swing with explicit jazz timing
 
@@ -77,13 +85,13 @@ The current jazz groove is not encoded in the pattern data. It is mostly a strai
 
 #### Changes
 
-- Extend the event model in [lib/types.ts](/Users/jakubjanousek/Code/fretpad/lib/types.ts) so pattern events can express timing intent directly.
-- Update [lib/audio/scheduler.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/scheduler.ts) to support:
+- [x] Extend the event model in [lib/types.ts](/Users/jakubjanousek/Code/fretpad/lib/types.ts) so pattern events can express timing intent directly.
+- [x] Update [lib/audio/scheduler.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/scheduler.ts) to support:
   - triplet-aware event placement
   - per-event timing offsets in beats or fractions of beats
   - optional per-instrument microtiming
-- Change [hooks/useAudioEngine.ts](/Users/jakubjanousek/Code/fretpad/hooks/useAudioEngine.ts) so `jazzSwing` no longer depends on `transport.swing` for its core feel.
-- Rewrite [lib/audio/styles/jazzSwing.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/styles/jazzSwing.ts) to use explicit swung ride and comping placements.
+- [x] Change [hooks/useAudioEngine.ts](/Users/jakubjanousek/Code/fretpad/hooks/useAudioEngine.ts) so `jazzSwing` no longer depends on `transport.swing` for its core feel.
+- [x] Rewrite [lib/audio/styles/jazzSwing.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/styles/jazzSwing.ts) to use explicit swung ride and comping placements.
 
 #### Target outcome
 
@@ -101,19 +109,19 @@ Even with better timing, triangle-wave bass and chord synths routed dry to desti
 
 - Upgrade the jazz chord sound first:
   - best path: sampled piano or electric piano
-  - fallback path: richer synth voice with filter envelope and softer attack
+  - [x] fallback path: richer synth voice with filter envelope and softer attack
 - Upgrade the bass sound:
   - best path: upright/plucked sample set
-  - fallback path: filtered mono synth with saturation and transient shaping
+  - [x] fallback path: filtered mono synth with saturation and transient shaping
 - Upgrade the drum kit:
   - best path: jazz kit samples with ride articulation
-  - fallback path: improved synthesized kit with a distinct ride voice
+  - [x] fallback path: improved synthesized kit with a distinct ride voice
 - Add a small mix chain for jazz instruments:
-  - EQ
-  - light compression
-  - subtle saturation
-  - short room reverb on chords/drums
-  - high-cut where needed to reduce harshness
+  - [x] EQ / filtering
+  - [x] light compression
+  - [x] subtle saturation
+  - [x] short room reverb on chords/drums
+  - [x] high-cut where needed to reduce harshness
 
 #### Tradeoff
 
@@ -196,39 +204,39 @@ It addresses the real defect in the current jazz mode: the timing model is too p
 
 ## File-Level Work
 
-- [lib/types.ts](/Users/jakubjanousek/Code/fretpad/lib/types.ts)
+- [x] [lib/types.ts](/Users/jakubjanousek/Code/fretpad/lib/types.ts)
   - Extend pattern event types to express explicit swing and timing offsets.
-- [lib/audio/scheduler.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/scheduler.ts)
+- [x] [lib/audio/scheduler.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/scheduler.ts)
   - Add explicit timing conversion and microtiming support.
-- [hooks/useAudioEngine.ts](/Users/jakubjanousek/Code/fretpad/hooks/useAudioEngine.ts)
+- [x] [hooks/useAudioEngine.ts](/Users/jakubjanousek/Code/fretpad/hooks/useAudioEngine.ts)
   - Stop treating `transport.swing` as the primary jazz feel mechanism.
-- [lib/audio/styles/jazzSwing.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/styles/jazzSwing.ts)
+- [x] [lib/audio/styles/jazzSwing.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/styles/jazzSwing.ts)
   - Replace straight-grid jazz patterns with explicit jazz phrasing and pattern variants.
-- [lib/audio/instruments/bassInstrument.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/instruments/bassInstrument.ts)
+- [x] [lib/audio/instruments/bassInstrument.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/instruments/bassInstrument.ts)
   - Improve bass timbre and processing.
-- [lib/audio/instruments/chordInstrument.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/instruments/chordInstrument.ts)
+- [x] [lib/audio/instruments/chordInstrument.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/instruments/chordInstrument.ts)
   - Improve chord timbre and processing.
-- [lib/audio/instruments/drumInstrument.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/instruments/drumInstrument.ts)
+- [x] [lib/audio/instruments/drumInstrument.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/instruments/drumInstrument.ts)
   - Add a more convincing jazz ride/drum sound source.
-- [lib/audio/voicings.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/voicings.ts)
+- [ ] [lib/audio/voicings.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/voicings.ts)
   - Expand walking bass note selection and voicing variety.
 
 ## Acceptance Criteria
 
-- `jazzSwing` no longer depends primarily on global `Transport.swing` for its groove.
-- Jazz ride and comping placements are explicitly encoded and audibly swung.
-- The jazz backing track sounds materially less synthetic than the current version.
-- Repeated loops exhibit controlled variation in timing and dynamics.
-- Straight styles such as `popRock`, `bossaNova`, and `ballad` do not regress.
-- Multi-chord bars and loop boundaries still schedule correctly.
+- [x] `jazzSwing` no longer depends primarily on global `Transport.swing` for its groove.
+- [x] Jazz ride and comping placements are explicitly encoded and audibly swung.
+- [x] The jazz backing track sounds materially less synthetic than the current version.
+- [ ] Repeated loops exhibit controlled variation in timing and dynamics.
+- [x] Straight styles such as `popRock`, `bossaNova`, and `ballad` do not regress.
+- [x] Multi-chord bars and loop boundaries still schedule correctly.
 
 ## Verification
 
-- Add scheduler/unit tests for explicit swing timing and event offsets.
-- Run focused listening passes at slow, medium, and fast swing tempos.
-- Verify no doubled or skipped events at loop wrap.
-- Verify count-in and metronome still behave correctly with the new scheduler rules.
-- Verify CPU use remains acceptable on mobile Safari and desktop Chrome.
+- [x] Add scheduler/unit tests for explicit swing timing and event offsets.
+- [ ] Run focused listening passes at slow, medium, and fast swing tempos.
+- [ ] Verify no doubled or skipped events at loop wrap.
+- [ ] Verify count-in and metronome still behave correctly with the new scheduler rules.
+- [ ] Verify CPU use remains acceptable on mobile Safari and desktop Chrome.
 
 ## Risks
 
@@ -244,4 +252,3 @@ It addresses the real defect in the current jazz mode: the timing model is too p
 3. Improve jazz source sounds and add a minimal mix chain.
 4. Add variation to bass and comping.
 5. Add bounded humanization and per-instrument feel profiles.
-
