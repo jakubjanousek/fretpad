@@ -46,7 +46,7 @@ export function ChallengeTracker({ modeId }: ChallengeTrackerProps) {
   const justCompleted = isComplete(progress);
 
   if (justCompleted) {
-    return <JustCompletedCard title={activeChallenge.title} modeId={modeId} />;
+    return <JustCompletedCard title={activeChallenge.title} />;
   }
 
   const nextChallenge = getNextChallenge(challengeProgress, modeId);
@@ -106,30 +106,14 @@ function ChallengeCard({
   );
 }
 
-function JustCompletedCard({
-  title,
-  modeId,
-}: {
-  title: string;
-  modeId: PracticeModeId;
-}) {
-  const advanceChallenge = useAppStore((s) => s.advanceChallenge);
+function JustCompletedCard({ title }: { title: string }) {
   const [visible, setVisible] = useState(true);
 
-  // Auto-transition after 3s with cancellation
+  // Auto-dismiss after 3s
   useEffect(() => {
-    const token = { canceled: false };
-    const tid = setTimeout(() => {
-      if (!token.canceled) {
-        setVisible(false);
-        advanceChallenge(modeId);
-      }
-    }, 3000);
-    return () => {
-      token.canceled = true;
-      clearTimeout(tid);
-    };
-  }, [modeId, advanceChallenge]);
+    const tid = setTimeout(() => setVisible(false), 3000);
+    return () => clearTimeout(tid);
+  }, []);
 
   if (!visible) return null;
 
@@ -144,10 +128,7 @@ function JustCompletedCard({
       </div>
       <button
         type="button"
-        onClick={() => {
-          setVisible(false);
-          advanceChallenge(modeId);
-        }}
+        onClick={() => setVisible(false)}
         className="text-xs text-muted-foreground hover:text-foreground transition-colors"
       >
         Dismiss

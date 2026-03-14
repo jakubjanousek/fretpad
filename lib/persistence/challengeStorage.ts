@@ -1,22 +1,13 @@
 import type { ChallengeState } from "@/lib/challenges/challenges";
+import { CHALLENGES } from "@/lib/challenges/challenges";
 import type { ChallengeId } from "@/lib/types";
 
 const CHALLENGE_STATE_KEY = "fretpad-challenges";
 
-const VALID_CHALLENGE_IDS: Set<string> = new Set<string>([
-  "ltn-practice-10",
-  "ltn-quiz-accuracy",
-  "ltn-keys-4",
-  "occ-practice-10",
-  "occ-keys-4",
-  "occ-practice-30",
-  "cwv-practice-10",
-  "cwv-voicings-10",
-  "cwv-keys-3",
-]);
+const VALID_CHALLENGE_IDS: Set<string> = new Set(CHALLENGES.map((c) => c.id));
 
 /**
- * Load challenge state from localStorage
+ * Load challenge state from localStorage, filtering to known IDs only.
  */
 export function loadChallengeState(): ChallengeState {
   try {
@@ -24,12 +15,19 @@ export function loadChallengeState(): ChallengeState {
     if (!stored) return {};
 
     const parsed = JSON.parse(stored) as unknown;
-    if (!isValidChallengeState(parsed)) {
-      console.warn("Invalid challenge state in localStorage, resetting");
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))
       return {};
+
+    const obj = parsed as Record<string, unknown>;
+    const result: ChallengeState = {};
+
+    for (const [key, entry] of Object.entries(obj)) {
+      if (!VALID_CHALLENGE_IDS.has(key)) continue;
+      if (!isValidProgress(entry)) continue;
+      result[key as ChallengeId] = entry;
     }
 
-    return parsed;
+    return result;
   } catch (error) {
     console.warn("Failed to load challenge state:", error);
     return {};
@@ -48,54 +46,16 @@ export function saveChallengeState(state: ChallengeState): void {
 }
 
 /**
- * Clear challenge state from localStorage
+ * Type guard for a single ChallengeProgress entry
  */
-export function clearChallengeState(): void {
-  try {
-    localStorage.removeItem(CHALLENGE_STATE_KEY);
-  } catch {
-    // Ignore
-  }
-}
-
-/**
- * Type guard for ChallengeState
- */
-function isValidChallengeState(value: unknown): value is ChallengeState {
-  if (typeof value !== "object" || value === null || Array.isArray(value))
-    return false;
-
+function isValidProgress(
+  value: unknown,
+): value is { startedAt: string; current: number; completedAt?: string } {
+  if (typeof value !== "object" || value === null) return false;
   const obj = value as Record<string, unknown>;
-
-  for (const [key, entry] of Object.entries(obj)) {
-    // Skip unknown challenge IDs (future-proofing)
-    if (!VALID_CHALLENGE_IDS.has(key)) continue;
-
-    if (typeof entry !== "object" || entry === null) return false;
-
-    const progress = entry as Record<string, unknown>;
-    if (typeof progress.startedAt !== "string") return false;
-    if (typeof progress.current !== "number") return false;
-    if (
-      progress.completedAt !== undefined &&
-      typeof progress.completedAt !== "string"
-    )
-      return false;
-  }
-
-  // Filter to only known IDs
-  return true;
-}
-
-/**
- * Filter loaded state to only known challenge IDs
- */
-export function filterKnownChallenges(state: ChallengeState): ChallengeState {
-  const filtered: ChallengeState = {};
-  for (const [key, value] of Object.entries(state)) {
-    if (VALID_CHALLENGE_IDS.has(key)) {
-      filtered[key as ChallengeId] = value;
-    }
-  }
-  return filtered;
+  return (
+    typeof obj.startedAt === "string" &&
+    typeof obj.current === "number" &&
+    (obj.completedAt === undefined || typeof obj.completedAt === "string")
+  );
 }
