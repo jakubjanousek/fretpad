@@ -824,9 +824,9 @@ Mobile (< 640px):
 
 ### Foundation (Phase 0)
 
-- [ ] `enterMode` uses single batched `set()` call (1 re-render, not 8-10)
-- [ ] `enterMode` calls `Tone.getTransport().stop(); .cancel()` **imperatively** before `set(delta)` (race #2)
-- [ ] `enterMode` always resets `micActive = false` on mode switch (race #6)
+- [x] `enterMode` uses single batched `set()` call (1 re-render, not 8-10)
+- [x] `enterMode` calls `Tone.getTransport().stop(); .cancel()` **imperatively** before `set(delta)` (race #2)
+- [x] `enterMode` always resets `micActive = false` on mode switch (race #6)
 - [ ] Fretboard reads store directly via `useFretboardDisplay()` (mode-agnostic)
 - [ ] `useFretboardData` hook encapsulates derived state computation (`fretNotes`, `voiceLeadingPaths`, etc.)
 - [ ] `usePracticeModeSetup` hook centralizes shared behavioral wiring (`useUrlState`, `useSessionTimer`, etc.)

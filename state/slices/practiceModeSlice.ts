@@ -1,7 +1,10 @@
+import * as Tone from "tone";
 import type { StateCreator } from "zustand";
 import { PRACTICE_MODES } from "@/lib/modes";
+import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
 import type { PracticeModeId } from "@/lib/types";
 import type { AppState } from "../useAppStore";
+import { getChordAtPosition } from "./progressionSlice";
 
 export interface PracticeModeSlice {
   activeMode: PracticeModeId | null;
@@ -24,56 +27,77 @@ export const createPracticeModeSlice: StateCreator<
     const config = PRACTICE_MODES[id];
     const state = get();
     const applyDefaults = options?.applyDefaults ?? true;
+    const delta: Partial<AppState> = { activeMode: id };
 
-    // Stop playback if playing
     if (state.isPlaying) {
-      state.setIsPlaying(false);
+      const transport = Tone.getTransport();
+      transport.stop();
+      transport.cancel();
+      delta.isPlaying = false;
     }
 
-    // End quiz if active
     if (state.quizActive) {
-      state.endQuiz();
+      Object.assign(delta, {
+        quizActive: false,
+        quizQuestion: null,
+        quizLastResult: null,
+        quizFinished: false,
+      });
     }
 
-    // End session planner if active
     if (state.sessionActive) {
-      state.endSession();
+      Object.assign(delta, {
+        sessionActive: false,
+        sessionPhaseIndex: 0,
+        sessionPhaseElapsedMs: 0,
+        sessionTotalElapsedMs: 0,
+        sessionPaused: false,
+      });
     }
 
-    // Apply mode defaults unless the caller is restoring a shared URL state.
+    if (state.micActive) {
+      delta.micActive = false;
+    }
+
     if (applyDefaults) {
-      state.loadPreset(config.defaultPreset);
-      state.setTempo(config.defaultTempo);
-      state.setSelectedStyle(config.defaultStyle);
+      const progression = PRESET_PROGRESSIONS[config.defaultPreset];
+      delta.progression = progression;
+      delta.currentBarIndex = 0;
+      delta.currentChordIndex = 0;
+      delta.currentChord = getChordAtPosition(progression, 0, 0);
+      delta.tempo = Math.max(40, Math.min(200, config.defaultTempo));
+      delta.selectedStyle = config.defaultStyle;
     }
 
-    // Deactivate mic when switching to a mode without mic support
-    if (!config.showMicToggle && state.micActive) {
-      state.setMicActive(false);
-    }
-
-    // Apply display constraints based on mode
     if (!config.showVoicingsButton && state.showVoicings) {
-      state.setShowVoicings(false);
+      delta.showVoicings = false;
     }
     if (!config.showTargetsDropdown && state.targetNoteMode !== "none") {
-      state.setTargetNoteMode("none");
+      Object.assign(delta, {
+        targetNoteMode: "none",
+        showChromaticApproach: false,
+        showDiatonicApproach: false,
+        showEnclosures: false,
+        focusedEnclosureTarget: null,
+      });
     }
     if (!config.showOverlayDropdown && state.fretboardOverlay !== "none") {
-      state.setFretboardOverlay("none");
+      delta.fretboardOverlay = "none";
+    }
+    if (!config.showOverlayDropdown || !config.showCAGED) {
+      delta.focusedPosition = null;
     }
     if (!config.showCAGED && state.showCAGEDPositions) {
-      state.setShowCAGEDPositions(false);
+      delta.showCAGEDPositions = false;
     }
 
-    // Persist last mode for auto-resume
     try {
       localStorage.setItem("fretpad-last-mode", id);
     } catch {
       // Ignore localStorage errors
     }
 
-    set({ activeMode: id });
+    set(delta);
   },
 
   exitMode: () => {
