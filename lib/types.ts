@@ -213,16 +213,19 @@ export interface StyleDefinition {
     humanization?: {
       bass?: {
         timingBeats?: number;
+        timingDirection?: "centered" | "late" | "early";
         velocityDelta?: number;
         durationBeats?: number;
       };
       chord?: {
         timingBeats?: number;
+        timingDirection?: "centered" | "late" | "early";
         velocityDelta?: number;
         durationBeats?: number;
       };
       drums?: {
         timingBeats?: number;
+        timingDirection?: "centered" | "late" | "early";
         velocityDelta?: number;
         durationBeats?: number;
       };
