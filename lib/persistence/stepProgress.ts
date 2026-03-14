@@ -9,12 +9,13 @@ type PersistedStepProgress = Partial<Record<PracticeModeId, number>>;
 const VALID_MODES = new Set<PracticeModeId>(PRACTICE_MODE_IDS);
 
 export function getUnlockedStep(mode: PracticeModeId): number {
-  if (typeof localStorage === "undefined") {
+  const storage = getStorage();
+  if (!storage) {
     return 0;
   }
 
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = storage.getItem(STORAGE_KEY);
     if (!stored) {
       return 0;
     }
@@ -37,7 +38,8 @@ export function getUnlockedStep(mode: PracticeModeId): number {
 }
 
 export function unlockStep(mode: PracticeModeId, step: number): number {
-  if (typeof localStorage === "undefined") {
+  const storage = getStorage();
+  if (!storage) {
     return 0;
   }
 
@@ -48,7 +50,7 @@ export function unlockStep(mode: PracticeModeId, step: number): number {
   const nextStep = clampStep(mode, step);
 
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = storage.getItem(STORAGE_KEY);
     const parsed = stored ? (JSON.parse(stored) as unknown) : {};
     const currentData =
       typeof parsed === "object" && parsed !== null
@@ -57,7 +59,7 @@ export function unlockStep(mode: PracticeModeId, step: number): number {
     const currentStep = currentData[mode] ?? 0;
 
     currentData[mode] = Math.max(currentStep, nextStep);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
+    storage.setItem(STORAGE_KEY, JSON.stringify(currentData));
 
     return currentData[mode] ?? 0;
   } catch (error) {
@@ -67,12 +69,13 @@ export function unlockStep(mode: PracticeModeId, step: number): number {
 }
 
 export function clearLegacyChallengeProgress(): void {
-  if (typeof localStorage === "undefined") {
+  const storage = getStorage();
+  if (!storage) {
     return;
   }
 
   try {
-    localStorage.removeItem(LEGACY_CHALLENGE_KEY);
+    storage.removeItem(LEGACY_CHALLENGE_KEY);
   } catch (error) {
     console.warn("Failed to clear legacy challenge progress:", error);
   }
@@ -81,4 +84,16 @@ export function clearLegacyChallengeProgress(): void {
 function clampStep(mode: PracticeModeId, step: number): number {
   const maxStep = MODE_STEPS[mode].length - 1;
   return Math.max(0, Math.min(step, maxStep));
+}
+
+function getStorage(): Storage | null {
+  if (typeof localStorage === "undefined") {
+    return null;
+  }
+
+  return typeof localStorage.getItem === "function" &&
+    typeof localStorage.setItem === "function" &&
+    typeof localStorage.removeItem === "function"
+    ? localStorage
+    : null;
 }

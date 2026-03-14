@@ -48,4 +48,14 @@ describe("stepProgress", () => {
 
     vi.stubGlobal("window", originalWindow);
   });
+
+  it("returns 0 when localStorage exists without the Storage API", () => {
+    const originalLocalStorage = globalThis.localStorage;
+
+    vi.stubGlobal("localStorage", {} as Storage);
+    expect(getUnlockedStep("learn-the-neck")).toBe(0);
+    clearLegacyChallengeProgress();
+
+    vi.stubGlobal("localStorage", originalLocalStorage);
+  });
 });
