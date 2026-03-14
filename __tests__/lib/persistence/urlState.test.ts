@@ -3,6 +3,7 @@ import {
   decodeStateFromUrl,
   encodeStateToUrl,
   exportProgressionToText,
+  generateShareUrl,
   type ShareableState,
 } from "@/lib/persistence/urlState";
 import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
@@ -63,6 +64,38 @@ describe("urlState", () => {
         .replace(/\//g, "_")
         .replace(/=+$/, "");
       expect(decodeStateFromUrl(encoded)).toBeNull();
+    });
+  });
+
+  describe("generateShareUrl", () => {
+    it("builds URL with explicit mode in path", () => {
+      const url = generateShareUrl(
+        sampleState,
+        "learn-the-neck",
+        "https://fretpad.app",
+      );
+      expect(url).toMatch(
+        /^https:\/\/fretpad\.app\/practice\/learn-the-neck\?p=/,
+      );
+    });
+
+    it("falls back to default mode when mode is null", () => {
+      const url = generateShareUrl(sampleState, null, "https://fretpad.app");
+      expect(url).toContain("/practice/outline-chord-changes");
+    });
+
+    it("preserves encoded state in query param", () => {
+      const url = generateShareUrl(
+        sampleState,
+        "comp-with-voicings",
+        "https://fretpad.app",
+      );
+      const parsed = new URL(url);
+      const encoded = parsed.searchParams.get("p");
+      expect(encoded).toBeTruthy();
+      // biome-ignore lint/style/noNonNullAssertion: asserted truthy above
+      const decoded = decodeStateFromUrl(encoded!);
+      expect(decoded?.tempo).toBe(sampleState.tempo);
     });
   });
 

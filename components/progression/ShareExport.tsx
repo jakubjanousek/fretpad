@@ -16,9 +16,10 @@ export function ShareExport() {
   const [copied, setCopied] = useState<"url" | "text" | null>(null);
   const progression = useAppStore((state) => state.progression);
   const tempo = useAppStore((state) => state.tempo);
+  const activeMode = useAppStore((state) => state.activeMode);
 
   const handleCopyUrl = async () => {
-    const url = generateShareUrl({ progression, tempo });
+    const url = generateShareUrl({ progression, tempo }, activeMode);
     try {
       await navigator.clipboard.writeText(url);
       setCopied("url");
