@@ -73,8 +73,10 @@ export const createPracticeModeSlice: StateCreator<
       delta.currentChord = getChordAtPosition(progression, 0, 0);
       delta.tempo = Math.max(40, Math.min(200, config.defaultTempo));
       delta.selectedStyle = config.defaultStyle;
-      delta.progressionHistory = [...state.progressionHistory, state.progression]
-        .slice(-MAX_MODE_SWITCH_HISTORY);
+      delta.progressionHistory = [
+        ...state.progressionHistory,
+        state.progression,
+      ].slice(-MAX_MODE_SWITCH_HISTORY);
       delta.progressionFuture = [];
     }
 
