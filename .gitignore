@@ -49,6 +49,9 @@ next-env.d.ts
 # Playwright MCP screenshots
 page-*.png
 page-*.jpeg
+home-page*.png
+home-page-snapshot.md
+launcher-redesign-*.png
 
 # Serwist generated service worker
 public/sw.js
