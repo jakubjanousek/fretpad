@@ -482,13 +482,14 @@ enterMode: (id, options) => {
 - Cleanup: `localStorage.removeItem('fretpad-challenges')` on first load (one line, not migration)
 - UI: `StepStepper.tsx` — horizontal step indicator (shared across modes)
 
-**0d. Create mode-specific page components**
+**0d. Create mode-specific page components** `[Completed 2026-03-14]`
 
 - Keep `app/practice/[mode]/page.tsx` as thin Server Component (preserves `generateStaticParams`, metadata, validation)
 - Simplify `PracticePage.tsx` to component map with `next/dynamic` imports
 - Create: `components/practice/learn/LearnTheNeckPage.tsx`, `components/practice/outline/OutlineChangesPage.tsx`, `components/practice/comp/CompWithVoicingsPage.tsx`
 - Each mode page imports shared components directly (ModeHeader, TransportBar, drawers) — no PracticeLayout wrapper
 - Wrap mode content in `<Suspense fallback={<FretboardSkeleton />}>`
+- Implementation note: this completion covers the route split and lazy-loaded mode entry points while preserving the existing shared practice body for behavior parity; Phase 1 still introduces mode-specific layouts and interactions.
 
 **0e. Performance prerequisites (scoped to actual prerequisites)**
 
