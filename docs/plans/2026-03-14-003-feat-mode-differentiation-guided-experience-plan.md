@@ -557,7 +557,7 @@ if (prev.barIndex !== barIndex || prev.chordIndex !== chordIndex) {
 **Implementation:**
 
 - `components/practice/learn/LearnTheNeckPage.tsx` — mode-specific layout
-- Extend `QuizSlice` with `quizQuestionFilter: QuizQuestionFilter` to restrict question pool per step (aligned naming per TypeScript review)
+- Extend quiz question generation to respect each Learn step's `targetMode` filter, reusing `TargetNoteMode` instead of adding a separate `quizQuestionFilter` type
 - Use existing `onNoteClick` pattern on FretMarker for tap-to-answer (not a new `onFretTap` prop — pattern recognition recommendation)
 - Add mic detection as alternative input (reuse `usePitchDetection` with `"root"` target mode)
 - User toggle between tap and mic input modes: `[🎤 Mic] [👆 Tap]` segmented control
@@ -840,7 +840,7 @@ Mobile (< 640px):
 - [x] `TargetNoteMode` extended with `"root"` and `"root-and-guides"` (not `"guide-tones"`) in `lib/types.ts`
 - [x] `TargetNoteMode` migration in `loadFromLocalStorage` (not Zustand persist.migrate — app uses custom persistence)
 - [x] `assertNever` helper used in exhaustive switches (not `satisfies never`)
-- [ ] 3 mode-specific page components created via `next/dynamic` component map
+- [x] 3 mode-specific page components created via `next/dynamic` component map
 - [x] `StepStepper.tsx` shows current step + progress toward 80% unlock (text/bar, not circular SVG ring — simplicity)
 - [ ] Step unlock moment: inline toast + manual advancement (no auto-advance)
 - [ ] `prefers-reduced-motion` handled for target note animations
@@ -932,14 +932,15 @@ Mobile (< 640px):
 ## Sources & References
 
 - **Origin brainstorm:** [docs/brainstorms/2026-03-14-mode-differentiation-brainstorm.md](docs/brainstorms/2026-03-14-mode-differentiation-brainstorm.md) — Key decisions: distinct layouts per mode, step-by-step progression, quiz-first Learn mode, target notes as hero in Outline, 3-stage Comp workshop
-- **Known issue (render cascade):** [docs/solutions/performance-issues/zustand-mode-switching-render-cascade.md](docs/solutions/performance-issues/zustand-mode-switching-render-cascade.md) — enterMode batching fix still pending
+- **Known issue (render cascade):** [docs/solutions/performance-issues/zustand-mode-switching-render-cascade.md](docs/solutions/performance-issues/zustand-mode-switching-render-cascade.md) — background and verification details for the now-completed batching fix
 - **Known issue (client/server boundary):** [docs/solutions/logic-errors/nextjs-zustand-guided-practice-code-review.md](docs/solutions/logic-errors/nextjs-zustand-guided-practice-code-review.md) — route validation must stay in Server Component
-- **Current PracticePage:** `app/practice/[mode]/PracticePage.tsx` (530 lines, ~40 selectors)
+- **Current route shell:** `app/practice/[mode]/PracticePage.tsx` (dynamic component map + Suspense fallback)
+- **Current shared implementation body:** `components/practice/SharedPracticePage.tsx` (current shared UI pending per-mode divergence)
 - **Mode configs:** `lib/modes.ts` (visibility flags)
 - **Fretboard component:** `components/fretboard/Fretboard.tsx` (47 props → self-serve from store)
-- **Quiz system:** `state/slices/quizSlice.ts` (needs `quizQuestionFilter` extension)
+- **Quiz system:** `state/slices/quizSlice.ts` (needs step-aware question filtering and unlock flow wiring)
 - **Pitch detection:** `hooks/usePitchDetection.ts` (needs root-only mode + bug fix)
-- **Challenge system (to remove):** `state/slices/challengeSlice.ts`, `lib/challenges/challenges.ts`
+- **Step progression persistence:** `lib/persistence/stepProgress.ts`
 - **Zustand v5 batching:** [Discussion #1648](https://github.com/pmndrs/zustand/discussions/1648), [useShallow migration](https://github.com/pmndrs/zustand/blob/HEAD/docs/guides/prevent-rerenders-with-use-shallow.md)
 - **Tone.js scheduling:** [Tone.Draw docs](https://tonejs.github.io/docs/r13/Draw), [Performance wiki](https://github.com/Tonejs/Tone.js/wiki/Performance)
 - **Touch targets:** Apple HIG (44x44pt), Material Design 3 (48x48dp), WCAG 2.2 SC 2.5.8 (24x24 CSS px minimum)
