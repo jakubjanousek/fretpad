@@ -81,11 +81,9 @@ export function useFretboardData() {
         });
       }
 
-      return getOverlayNotes(
-        currentChord.root,
-        fretboardOverlay,
-        { chord: currentChord },
-      );
+      return getOverlayNotes(currentChord.root, fretboardOverlay, {
+        chord: currentChord,
+      });
     }
 
     return getFretNotesForChord(currentChord, {
