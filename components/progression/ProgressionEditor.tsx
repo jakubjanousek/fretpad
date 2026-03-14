@@ -1,11 +1,14 @@
 "use client";
 
 import { ChevronDown, ChevronUp, Pencil, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PresetDropdown } from "@/components/progression/PresetDropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { usePlaybackPosition } from "@/hooks/usePlaybackPosition";
+import {
+  type PlaybackPosition,
+  usePlaybackPositionObserver,
+} from "@/hooks/usePlaybackPosition";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
@@ -18,8 +21,8 @@ interface BarInputProps {
   onUpdate: (barIndex: number, value: string) => boolean;
   onRemove: (barIndex: number) => void;
   canRemove: boolean;
-  isPlaying: boolean;
-  playheadProgress: number;
+  barRef: (node: HTMLDivElement | null) => void;
+  playheadRef: (node: HTMLDivElement | null) => void;
 }
 
 function BarInput({
@@ -31,8 +34,8 @@ function BarInput({
   onUpdate,
   onRemove,
   canRemove,
-  isPlaying,
-  playheadProgress,
+  barRef,
+  playheadRef,
 }: BarInputProps) {
   const [inputValue, setInputValue] = useState(chordString);
   const [error, setError] = useState<string | null>(null);
@@ -92,15 +95,15 @@ function BarInput({
           />
         ) : (
           <div
+            ref={barRef}
             role="button"
             tabIndex={0}
             className={cn(
-              "relative flex flex-wrap items-center gap-y-0.5 border rounded px-1.5 py-0.5 transition-all overflow-hidden",
+              "relative flex flex-wrap items-center gap-y-0.5 border rounded px-1.5 py-0.5 transition-all overflow-hidden data-[playing=true]:border-orange-400 data-[playing=true]:bg-orange-500/10 data-[playing=true]:ring-1 data-[playing=true]:ring-orange-400/50 data-[playing=true]:border-l-4 data-[playing=true]:border-l-orange-500",
               isSelected &&
                 "border-primary ring-1 ring-primary/30 border-l-4 border-l-primary bg-primary/5",
-              isPlaying &&
-                "border-orange-400 bg-orange-500/10 ring-1 ring-orange-400/50 border-l-4 border-l-orange-500",
             )}
+            data-playing="false"
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
@@ -109,12 +112,11 @@ function BarInput({
             }}
           >
             {/* Playhead indicator */}
-            {isPlaying && (
-              <div
-                className="absolute top-0 bottom-0 w-0.5 bg-orange-500 z-10 transition-none shadow-[0_0_8px_rgba(249,115,22,0.6)]"
-                style={{ left: `${playheadProgress * 100}%` }}
-              />
-            )}
+            <div
+              ref={playheadRef}
+              aria-hidden="true"
+              className="pointer-events-none absolute top-0 bottom-0 left-0 w-0.5 bg-orange-500 z-10 transition-none shadow-[0_0_8px_rgba(249,115,22,0.6)] opacity-0"
+            />
             {/* Bar number */}
             <span className="text-[10px] text-muted-foreground mr-1.5 font-medium">
               {barIndex + 1}.
@@ -193,16 +195,91 @@ export function ProgressionEditor() {
   const transposeProgression = useAppStore(
     (state) => state.transposeProgression,
   );
-
-  const playbackPosition = usePlaybackPosition({
-    progression,
-    isPlaying,
-    countInBars: metronome.countIn,
+  const barRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const playheadRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const overlayStateRef = useRef<PlaybackPosition>({
+    barIndex: 0,
+    chordIndex: 0,
+    barProgress: 0,
+    isActive: false,
+    isCountingIn: false,
+    countInProgress: 0,
   });
 
   const handleSelect = (barIndex: number, chordIndex: number) => {
     setCurrentPosition(barIndex, chordIndex);
   };
+
+  useEffect(() => {
+    barRefs.current.length = progression.bars.length;
+    playheadRefs.current.length = progression.bars.length;
+  }, [progression.bars.length]);
+
+  usePlaybackPositionObserver({
+    progression,
+    isPlaying,
+    countInBars: metronome.countIn,
+    onPositionChange: (position) => {
+      const previous = overlayStateRef.current;
+      const previousBar =
+        previous.isActive && !previous.isCountingIn
+          ? barRefs.current[previous.barIndex]
+          : null;
+      const previousPlayhead =
+        previous.isActive && !previous.isCountingIn
+          ? playheadRefs.current[previous.barIndex]
+          : null;
+
+      if (
+        previousBar &&
+        (!position.isActive ||
+          position.isCountingIn ||
+          previous.barIndex !== position.barIndex)
+      ) {
+        previousBar.dataset.playing = "false";
+      }
+
+      if (
+        previousPlayhead &&
+        (!position.isActive ||
+          position.isCountingIn ||
+          previous.barIndex !== position.barIndex)
+      ) {
+        previousPlayhead.style.opacity = "0";
+      }
+
+      if (position.isActive && !position.isCountingIn) {
+        const currentBar = barRefs.current[position.barIndex];
+        const currentPlayhead = playheadRefs.current[position.barIndex];
+
+        if (currentBar) {
+          currentBar.dataset.playing = "true";
+        }
+
+        if (currentPlayhead) {
+          currentPlayhead.style.opacity = "1";
+          currentPlayhead.style.left = `${position.barProgress * 100}%`;
+        }
+      }
+
+      overlayStateRef.current = position;
+    },
+  });
+
+  useEffect(() => {
+    return () => {
+      for (const bar of barRefs.current) {
+        if (bar) {
+          bar.dataset.playing = "false";
+        }
+      }
+      for (const playhead of playheadRefs.current) {
+        if (playhead) {
+          playhead.style.opacity = "0";
+        }
+      }
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-1">
@@ -226,17 +303,12 @@ export function ProgressionEditor() {
                 onUpdate={updateBar}
                 onRemove={removeBar}
                 canRemove={progression.bars.length > 1}
-                isPlaying={
-                  playbackPosition.isActive &&
-                  !playbackPosition.isCountingIn &&
-                  playbackPosition.barIndex === barIndex
-                }
-                playheadProgress={
-                  !playbackPosition.isCountingIn &&
-                  playbackPosition.barIndex === barIndex
-                    ? playbackPosition.barProgress
-                    : 0
-                }
+                barRef={(node) => {
+                  barRefs.current[barIndex] = node;
+                }}
+                playheadRef={(node) => {
+                  playheadRefs.current[barIndex] = node;
+                }}
               />
             );
           })}
