@@ -390,7 +390,6 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
         micStateRef.current !== "active" ||
         !state.currentChord
       ) {
-        prevPositionRef.current = { barIndex, chordIndex };
         lastEvalPositionRef.current = null;
         return;
       }

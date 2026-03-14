@@ -846,8 +846,8 @@ Mobile (< 640px):
 - [ ] `prefers-reduced-motion` handled for target note animations
 - [x] `localStorage.removeItem('fretpad-challenges')` cleanup on first load
 - [x] `recordQuizResult` call removed from `quizSlice.submitQuizAnswer` (ChallengeSlice removal)
-- [ ] **Bug fix**: Instrument cleanup in `useAudioEngine` uses generation nonce — cleanup only stops transport if its generation is current (race #7)
-- [ ] **Bug fix**: `prevPositionRef` in `usePitchDetection` not updated on non-playing bail-out
+- [x] **Bug fix**: Instrument cleanup in `useAudioEngine` uses generation nonce — cleanup only stops transport if its generation is current (race #7)
+- [x] **Bug fix**: `prevPositionRef` in `usePitchDetection` not updated on non-playing bail-out
 - [ ] **Bug fix**: ProgressionEditor playback highlight extracted to ref-based overlay
 - [x] `learn-the-neck` config updated: `showMicToggle: true` (or new `showQuizMicToggle` field)
 
