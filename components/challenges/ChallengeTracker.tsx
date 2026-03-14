@@ -7,7 +7,6 @@ import {
   getActiveChallenge,
   getNextChallenge,
   getProgressFraction,
-  isComplete,
 } from "@/lib/challenges/challenges";
 import type { PracticeModeId } from "@/lib/types";
 import { useAppStore } from "@/state/useAppStore";
@@ -20,35 +19,38 @@ export function ChallengeTracker({ modeId }: ChallengeTrackerProps) {
   const challengeProgress = useAppStore((s) => s.challengeProgress);
   const syncPracticeTime = useAppStore((s) => s.syncPracticeTime);
   const initChallenges = useAppStore((s) => s.initChallenges);
+  const justCompletedChallenge = useAppStore((s) => s.justCompletedChallenge);
+  const dismissCompleted = useAppStore((s) => s.dismissCompleted);
 
-  // Initialize challenges on mount
   useEffect(() => {
     initChallenges();
   }, [initChallenges]);
 
-  // Sync practice time periodically
   useEffect(() => {
     syncPracticeTime();
     const interval = setInterval(syncPracticeTime, 10_000);
     return () => clearInterval(interval);
   }, [syncPracticeTime]);
 
-  const activeChallenge = getActiveChallenge(challengeProgress, modeId);
-  const allComplete = allChallengesComplete(challengeProgress, modeId);
+  // Show completion card if a challenge in this mode just completed
+  if (justCompletedChallenge && justCompletedChallenge.mode === modeId) {
+    return (
+      <JustCompletedCard
+        title={justCompletedChallenge.title}
+        onDismiss={dismissCompleted}
+      />
+    );
+  }
 
+  const allComplete = allChallengesComplete(challengeProgress, modeId);
   if (allComplete) {
     return <CompletedBadge />;
   }
 
+  const activeChallenge = getActiveChallenge(challengeProgress, modeId);
   if (!activeChallenge) return null;
 
   const progress = challengeProgress[activeChallenge.id];
-  const justCompleted = isComplete(progress);
-
-  if (justCompleted) {
-    return <JustCompletedCard title={activeChallenge.title} />;
-  }
-
   const nextChallenge = getNextChallenge(challengeProgress, modeId);
 
   return (
@@ -106,16 +108,17 @@ function ChallengeCard({
   );
 }
 
-function JustCompletedCard({ title }: { title: string }) {
-  const [visible, setVisible] = useState(true);
-
-  // Auto-dismiss after 3s
+function JustCompletedCard({
+  title,
+  onDismiss,
+}: {
+  title: string;
+  onDismiss: () => void;
+}) {
   useEffect(() => {
-    const tid = setTimeout(() => setVisible(false), 3000);
+    const tid = setTimeout(onDismiss, 3000);
     return () => clearTimeout(tid);
-  }, []);
-
-  if (!visible) return null;
+  }, [onDismiss]);
 
   return (
     <div className="min-h-[72px] rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 flex items-center gap-3">
@@ -128,7 +131,7 @@ function JustCompletedCard({ title }: { title: string }) {
       </div>
       <button
         type="button"
-        onClick={() => setVisible(false)}
+        onClick={onDismiss}
         className="text-xs text-muted-foreground hover:text-foreground transition-colors"
       >
         Dismiss

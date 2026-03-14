@@ -48,14 +48,18 @@ export function saveChallengeState(state: ChallengeState): void {
 /**
  * Type guard for a single ChallengeProgress entry
  */
-function isValidProgress(
-  value: unknown,
-): value is { startedAt: string; current: number; completedAt?: string } {
+function isValidProgress(value: unknown): value is {
+  startedAt: string;
+  current: number;
+  completedAt?: string;
+  trackedKeys?: string[];
+} {
   if (typeof value !== "object" || value === null) return false;
   const obj = value as Record<string, unknown>;
   return (
     typeof obj.startedAt === "string" &&
     typeof obj.current === "number" &&
-    (obj.completedAt === undefined || typeof obj.completedAt === "string")
+    (obj.completedAt === undefined || typeof obj.completedAt === "string") &&
+    (obj.trackedKeys === undefined || Array.isArray(obj.trackedKeys))
   );
 }

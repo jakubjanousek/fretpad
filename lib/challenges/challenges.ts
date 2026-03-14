@@ -16,9 +16,10 @@ export interface Challenge {
 }
 
 export interface ChallengeProgress {
-  startedAt: string; // ISO date
+  startedAt: string; // ISO timestamp
   current: number;
-  completedAt?: string; // ISO date
+  completedAt?: string; // ISO timestamp
+  trackedKeys?: string[]; // Persisted dedup keys for voicings-explored and keys criteria
 }
 
 export type ChallengeState = Partial<Record<ChallengeId, ChallengeProgress>>;

@@ -1,5 +1,6 @@
 import type { StateCreator } from "zustand";
 import {
+  type Challenge,
   type ChallengeProgress,
   type ChallengeState,
   getActiveChallenge,
@@ -15,14 +16,14 @@ import type { AppState } from "../useAppStore";
 
 export interface ChallengeSlice {
   challengeProgress: ChallengeState;
-  exploredVoicings: Set<string>;
-  practicedKeys: Record<ChallengeId, Set<string>>;
+  justCompletedChallenge: Challenge | null;
 
   initChallenges: () => void;
   recordQuizResult: (score: number, total: number) => void;
   recordVoicingExplored: (chordSymbol: string, voicingIndex: number) => void;
   recordKeyPracticed: (rootNote: string) => void;
   syncPracticeTime: () => void;
+  dismissCompleted: () => void;
 }
 
 /** Ensure a challenge has progress initialized */
@@ -53,13 +54,11 @@ export const createChallengeSlice: StateCreator<
   ChallengeSlice
 > = (set, get) => ({
   challengeProgress: {},
-  exploredVoicings: new Set(),
-  practicedKeys: {} as Record<ChallengeId, Set<string>>,
+  justCompletedChallenge: null,
 
   initChallenges: () => {
     const loaded = loadChallengeState();
 
-    // Ensure the first challenge of each mode has progress initialized
     const modes: PracticeModeId[] = [
       "learn-the-neck",
       "outline-chord-changes",
@@ -86,11 +85,11 @@ export const createChallengeSlice: StateCreator<
     const active = getActiveChallenge(challengeProgress, activeMode);
     if (!active || active.criterion.type !== "quiz-accuracy") return;
 
-    const percentage = (score / total) * 100;
-    if (percentage < active.criterion.threshold) return;
-
     const progress = ensureProgress(challengeProgress, active.id);
     if (isComplete(progress)) return;
+
+    const percentage = (score / total) * 100;
+    if (percentage < active.criterion.threshold) return;
 
     const newCurrent = progress.current + 1;
     const updated: ChallengeProgress = {
@@ -101,14 +100,15 @@ export const createChallengeSlice: StateCreator<
     };
 
     const newState = { ...challengeProgress, [active.id]: updated };
+    const justCompleted = updated.completedAt ? active : null;
     if (updated.completedAt) maybeInitNextChallenge(newState, activeMode);
 
-    set({ challengeProgress: newState });
+    set({ challengeProgress: newState, justCompletedChallenge: justCompleted });
     saveChallengeState(newState);
   },
 
   recordVoicingExplored: (chordSymbol: string, voicingIndex: number) => {
-    const { activeMode, challengeProgress, exploredVoicings } = get();
+    const { activeMode, challengeProgress } = get();
     if (!activeMode) return;
 
     const active = getActiveChallenge(challengeProgress, activeMode);
@@ -117,28 +117,34 @@ export const createChallengeSlice: StateCreator<
     const progress = ensureProgress(challengeProgress, active.id);
     if (isComplete(progress)) return;
 
+    // Rebuild dedup set from persisted keys
+    const existingKeys = new Set(progress.trackedKeys ?? []);
     const key = `${chordSymbol}|${voicingIndex}`;
-    const newSet = new Set(exploredVoicings);
-    newSet.add(key);
+    if (existingKeys.has(key)) return; // Already counted
 
-    // Never regress: Sets reset on reload, but persisted current may be higher
-    const newCurrent = Math.max(progress.current, newSet.size);
+    existingKeys.add(key);
+    const trackedKeys = [...existingKeys];
+
     const updated: ChallengeProgress = {
       ...progress,
-      current: newCurrent,
+      current: trackedKeys.length,
+      trackedKeys,
       completedAt:
-        newCurrent >= active.target ? new Date().toISOString() : undefined,
+        trackedKeys.length >= active.target
+          ? new Date().toISOString()
+          : undefined,
     };
 
     const newState = { ...challengeProgress, [active.id]: updated };
+    const justCompleted = updated.completedAt ? active : null;
     if (updated.completedAt) maybeInitNextChallenge(newState, activeMode);
 
-    set({ challengeProgress: newState, exploredVoicings: newSet });
+    set({ challengeProgress: newState, justCompletedChallenge: justCompleted });
     saveChallengeState(newState);
   },
 
   recordKeyPracticed: (rootNote: string) => {
-    const { activeMode, challengeProgress, practicedKeys } = get();
+    const { activeMode, challengeProgress } = get();
     if (!activeMode) return;
 
     const active = getActiveChallenge(challengeProgress, activeMode);
@@ -147,29 +153,28 @@ export const createChallengeSlice: StateCreator<
     const progress = ensureProgress(challengeProgress, active.id);
     if (isComplete(progress)) return;
 
-    const challengeKeys = practicedKeys[active.id] ?? new Set<string>();
-    const newSet = new Set(challengeKeys);
-    newSet.add(rootNote);
+    // Rebuild dedup set from persisted keys
+    const existingKeys = new Set(progress.trackedKeys ?? []);
+    if (existingKeys.has(rootNote)) return; // Already counted
 
-    // Never regress: Sets reset on reload, but persisted current may be higher
-    const newCurrent = Math.max(progress.current, newSet.size);
+    existingKeys.add(rootNote);
+    const trackedKeys = [...existingKeys];
+
     const updated: ChallengeProgress = {
       ...progress,
-      current: newCurrent,
+      current: trackedKeys.length,
+      trackedKeys,
       completedAt:
-        newCurrent >= active.target ? new Date().toISOString() : undefined,
+        trackedKeys.length >= active.target
+          ? new Date().toISOString()
+          : undefined,
     };
 
     const newState = { ...challengeProgress, [active.id]: updated };
+    const justCompleted = updated.completedAt ? active : null;
     if (updated.completedAt) maybeInitNextChallenge(newState, activeMode);
 
-    set({
-      challengeProgress: newState,
-      practicedKeys: {
-        ...practicedKeys,
-        [active.id]: newSet,
-      } as Record<ChallengeId, Set<string>>,
-    });
+    set({ challengeProgress: newState, justCompletedChallenge: justCompleted });
     saveChallengeState(newState);
   },
 
@@ -184,13 +189,19 @@ export const createChallengeSlice: StateCreator<
     if (isComplete(progress)) return;
 
     const stats = loadPracticeStats();
+
+    // Filter sessions by mode and startedAt date
     const relevantMs = stats.sessions
-      .filter(
-        (s) =>
-          s.mode === activeMode &&
-          new Date(s.date).getTime() >=
-            new Date(progress.startedAt.split("T")[0] ?? "").getTime(),
-      )
+      .filter((s) => {
+        if (s.mode !== activeMode) return false;
+        // Session date is YYYY-MM-DD; convert to end-of-day for comparison
+        // A session on the same day as startedAt is included (conservative)
+        const sessionDayMs = new Date(s.date).getTime();
+        const startedAtDayMs = new Date(
+          progress.startedAt.split("T")[0] ?? "",
+        ).getTime();
+        return sessionDayMs >= startedAtDayMs;
+      })
       .reduce((sum, s) => sum + s.durationMs, 0);
 
     const minutes = Math.floor(relevantMs / 60000);
@@ -204,9 +215,14 @@ export const createChallengeSlice: StateCreator<
     };
 
     const newState = { ...challengeProgress, [active.id]: updated };
+    const justCompleted = updated.completedAt ? active : null;
     if (updated.completedAt) maybeInitNextChallenge(newState, activeMode);
 
-    set({ challengeProgress: newState });
+    set({ challengeProgress: newState, justCompletedChallenge: justCompleted });
     saveChallengeState(newState);
+  },
+
+  dismissCompleted: () => {
+    set({ justCompletedChallenge: null });
   },
 });
