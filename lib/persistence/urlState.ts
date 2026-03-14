@@ -1,4 +1,5 @@
-import type { Progression } from "../types";
+import { DEFAULT_SHARE_MODE } from "../modes";
+import type { PracticeModeId, Progression } from "../types";
 import { isValidProgression } from "./localStorage";
 
 const URL_PARAM = "p";
@@ -54,9 +55,14 @@ export function decodeStateFromUrl(encoded: string): ShareableState | null {
 /**
  * Generate a shareable URL with encoded progression
  */
-export function generateShareUrl(state: ShareableState): string {
+export function generateShareUrl(
+  state: ShareableState,
+  mode: PracticeModeId | null,
+  origin?: string,
+): string {
   const encoded = encodeStateToUrl(state);
-  const url = new URL(window.location.href);
+  const url = new URL(origin ?? window.location.origin);
+  url.pathname = `/practice/${mode ?? DEFAULT_SHARE_MODE}`;
   url.searchParams.set(URL_PARAM, encoded);
   return url.toString();
 }

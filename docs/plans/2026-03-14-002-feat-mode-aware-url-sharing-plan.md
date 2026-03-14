@@ -1,7 +1,7 @@
 ---
 title: "feat: Mode-Aware URL Sharing"
 type: feat
-status: active
+status: completed
 date: 2026-03-14
 origin: docs/plans/2026-03-13-001-feat-guided-practice-modes-plan.md
 deepened: 2026-03-14
@@ -130,14 +130,14 @@ export default async function Page({
 
 ## Acceptance Criteria
 
-- [ ] `DEFAULT_SHARE_MODE` constant exported from `lib/modes.ts`
-- [ ] `generateShareUrl` accepts `mode: PracticeModeId | null` and optional `origin`, builds `/practice/[mode]` URLs (`lib/persistence/urlState.ts`)
-- [ ] `ShareExport` passes `activeMode` to `generateShareUrl` (`components/progression/ShareExport.tsx`)
-- [ ] Old URLs at `/?p=...` redirect server-side to `/practice/${DEFAULT_SHARE_MODE}?p=...` (`app/page.tsx`)
-- [ ] Old encoded `?p=` blobs (without mode) still decode correctly (no changes to `ShareableState`)
-- [ ] Recipients land in correct mode with correct progression and tempo
-- [ ] Tests cover: mode in URL path, null mode fallback, origin parameter, roundtrip with mode (`__tests__/lib/persistence/urlState.test.ts`)
-- [ ] `pnpm validate` passes
+- [x] `DEFAULT_SHARE_MODE` constant exported from `lib/modes.ts`
+- [x] `generateShareUrl` accepts `mode: PracticeModeId | null` and optional `origin`, builds `/practice/[mode]` URLs (`lib/persistence/urlState.ts`)
+- [x] `ShareExport` passes `activeMode` to `generateShareUrl` (`components/progression/ShareExport.tsx`)
+- [x] Old URLs at `/?p=...` redirect server-side to `/practice/${DEFAULT_SHARE_MODE}?p=...` (`app/page.tsx`)
+- [x] Old encoded `?p=` blobs (without mode) still decode correctly (no changes to `ShareableState`)
+- [x] Recipients land in correct mode with correct progression and tempo
+- [x] Tests cover: mode in URL path, null mode fallback, origin parameter, roundtrip with mode (`__tests__/lib/persistence/urlState.test.ts`)
+- [x] `pnpm validate` passes
 
 ## Test Plan
 
