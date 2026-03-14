@@ -232,8 +232,10 @@ export type CAGEDPosition = 1 | 2 | 3 | 4 | 5;
 
 export type TargetNoteMode =
   | "none"
+  | "root"
+  | "root-and-guides"
   | "chord-tones"
-  | "guide-tones-only"
+  | "all"
   | "strong-beats";
 
 export type TargetStrength = "primary" | "secondary";
@@ -433,21 +435,6 @@ export type PracticeModeId =
   | "comp-with-voicings";
 
 export type TheoryTabId = "chord" | "modes" | "subs" | "analysis";
-
-// ============================================
-// Challenge Types
-// ============================================
-
-export type ChallengeId =
-  | "ltn-practice-10"
-  | "ltn-quiz-accuracy"
-  | "ltn-keys-4"
-  | "occ-practice-10"
-  | "occ-keys-4"
-  | "occ-practice-30"
-  | "cwv-practice-10"
-  | "cwv-voicings-10"
-  | "cwv-keys-3";
 
 export interface PracticeModeConfig {
   id: PracticeModeId;

@@ -1,4 +1,9 @@
-import type { MetronomeConfig, Progression, StyleId } from "../types";
+import type {
+  MetronomeConfig,
+  Progression,
+  StyleId,
+  TargetNoteMode,
+} from "../types";
 
 const STORAGE_KEY = "fretpad-state";
 
@@ -11,6 +16,7 @@ export interface PersistedState {
   selectedStyle: StyleId;
   metronome: MetronomeConfig;
   showScaleTones: boolean;
+  targetNoteMode?: TargetNoteMode;
 }
 
 /**
@@ -36,6 +42,13 @@ export function loadFromLocalStorage(): PersistedState | null {
     if (!isValidPersistedState(parsed)) {
       console.warn("Invalid state in localStorage, ignoring");
       return null;
+    }
+
+    if (
+      (parsed as { targetNoteMode?: unknown }).targetNoteMode ===
+      "guide-tones-only"
+    ) {
+      (parsed as PersistedState).targetNoteMode = "root-and-guides";
     }
 
     return parsed;

@@ -17,8 +17,9 @@ import { cn } from "@/lib/utils";
 
 const TARGET_MODE_OPTIONS: { value: TargetNoteMode; label: string }[] = [
   { value: "none", label: "None" },
+  { value: "root", label: "Root" },
+  { value: "root-and-guides", label: "Root + Guide Tones" },
   { value: "chord-tones", label: "Chord Tones" },
-  { value: "guide-tones-only", label: "Guide Tones" },
   { value: "strong-beats", label: "Strong Beats" },
 ];
 

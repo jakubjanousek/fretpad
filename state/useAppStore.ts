@@ -8,10 +8,6 @@ import {
   type BackingTrackSlice,
   createBackingTrackSlice,
 } from "./slices/backingTrackSlice";
-import {
-  type ChallengeSlice,
-  createChallengeSlice,
-} from "./slices/challengeSlice";
 import { createDisplaySlice, type DisplaySlice } from "./slices/displaySlice";
 import { createErrorSlice, type ErrorSlice } from "./slices/errorSlice";
 import {
@@ -48,8 +44,7 @@ export type AppState = ProgressionSlice &
   SessionPlannerSlice &
   VoicingSlice &
   PracticeModeSlice &
-  AudioInputSlice &
-  ChallengeSlice;
+  AudioInputSlice;
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -65,7 +60,6 @@ export const useAppStore = create<AppState>()(
       ...createVoicingSlice(...a),
       ...createPracticeModeSlice(...a),
       ...createAudioInputSlice(...a),
-      ...createChallengeSlice(...a),
     }),
     {
       name: "fretpad-state",
@@ -101,6 +95,10 @@ export const useAppStore = create<AppState>()(
           // Migrate legacy "intervals" label mode to "degrees"
           if ((state.noteLabelMode as string) === "intervals") {
             state.noteLabelMode = "degrees";
+          }
+          // Migrate legacy target note mode naming
+          if ((state.targetNoteMode as string) === "guide-tones-only") {
+            state.targetNoteMode = "root-and-guides";
           }
           // Migrate legacy backingTrack state missing drums fields
           if (state.backingTrack.drumsVolume === undefined) {

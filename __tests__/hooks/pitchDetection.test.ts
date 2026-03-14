@@ -30,6 +30,12 @@ const Cmaj7 = makeChord("C", ["C", "E", "G", "B"], ["E", "B"]);
 const Dm7 = makeChord("D", ["D", "F", "A", "C"], ["F", "C"]);
 
 describe("getTargetChromas", () => {
+  it("returns only the root chroma for root mode", () => {
+    const chromas = getTargetChromas(Cmaj7, "root");
+    expect(chromas.size).toBe(1);
+    expect(chromas.has(chroma("C"))).toBe(true);
+  });
+
   it("returns all chord tone chromas for chord-tones mode", () => {
     const chromas = getTargetChromas(Cmaj7, "chord-tones");
     expect(chromas.size).toBe(4);
@@ -39,8 +45,8 @@ describe("getTargetChromas", () => {
     expect(chromas.has(chroma("B"))).toBe(true);
   });
 
-  it("returns root + guide tones for guide-tones-only mode", () => {
-    const chromas = getTargetChromas(Cmaj7, "guide-tones-only");
+  it("returns root + guide tones for root-and-guides mode", () => {
+    const chromas = getTargetChromas(Cmaj7, "root-and-guides");
     expect(chromas.size).toBe(3);
     expect(chromas.has(chroma("C"))).toBe(true);
     expect(chromas.has(chroma("E"))).toBe(true);
@@ -51,6 +57,11 @@ describe("getTargetChromas", () => {
 
   it("falls back to all chord tones for 'none' mode", () => {
     const result = getTargetChromas(Cmaj7, "none");
+    expect(result.size).toBe(4);
+  });
+
+  it("falls back to all chord tones for 'all' mode", () => {
+    const result = getTargetChromas(Cmaj7, "all");
     expect(result.size).toBe(4);
   });
 

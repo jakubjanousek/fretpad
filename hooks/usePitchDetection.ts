@@ -5,6 +5,7 @@ import { Note } from "tonal";
 import * as Tone from "tone";
 import { MicPermissionError } from "@/lib/errors";
 import type { Chord, TargetNoteMode } from "@/lib/types";
+import { assertNever } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
 // --- Constants ---
@@ -38,20 +39,32 @@ export function getTargetChromas(
 ): Set<number> {
   const chromas = new Set<number>();
 
-  if (targetNoteMode === "guide-tones-only") {
-    // Root + guide tones (3rd, 7th)
-    const rootChroma = Note.chroma(chord.root);
-    if (rootChroma !== undefined) chromas.add(rootChroma);
-    for (const gt of chord.guideTones) {
-      const c = Note.chroma(gt);
-      if (c !== undefined) chromas.add(c);
+  switch (targetNoteMode) {
+    case "root": {
+      const rootChroma = Note.chroma(chord.root);
+      if (rootChroma !== undefined) chromas.add(rootChroma);
+      break;
     }
-  } else {
-    // "chord-tones", "strong-beats", or "none" — all chord tones
-    for (const n of chord.notes) {
-      const c = Note.chroma(n);
-      if (c !== undefined) chromas.add(c);
+    case "root-and-guides": {
+      const rootChroma = Note.chroma(chord.root);
+      if (rootChroma !== undefined) chromas.add(rootChroma);
+      for (const guideTone of chord.guideTones) {
+        const chroma = Note.chroma(guideTone);
+        if (chroma !== undefined) chromas.add(chroma);
+      }
+      break;
     }
+    case "none":
+    case "all":
+    case "chord-tones":
+    case "strong-beats":
+      for (const note of chord.notes) {
+        const chroma = Note.chroma(note);
+        if (chroma !== undefined) chromas.add(chroma);
+      }
+      break;
+    default:
+      assertNever(targetNoteMode);
   }
 
   return chromas;

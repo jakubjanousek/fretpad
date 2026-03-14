@@ -833,22 +833,22 @@ Mobile (< 640px):
 - [ ] `useShallow` grouped selectors replace ~40 individual selectors in mode pages
 - [ ] `FretMarker` wrapped in `React.memo` with custom comparator — with stable `augmentedNote` and `onClick` refs
 - [ ] `Tone.Draw.schedule` used for chord change callbacks (syncs visual updates with audio timing)
-- [ ] `lib/persistence/stepProgress.ts` provides `getUnlockedStep`/`unlockStep` with SSR guard, mode allowlist, step clamping
-- [ ] `hooks/useRollingAccuracy.ts` tracks 10-attempt window with 80% threshold; auto-resets via `stepIndex` parameter
-- [ ] `MODE_STEPS` defined with discriminated unions (`LearnStep`, `OutlineStep`, `CompStep`) and `as const satisfies`
-- [ ] `TargetNoteMode` extended with `"root"` and `"root-and-guides"` (not `"guide-tones"`) in `lib/types.ts`
-- [ ] `TargetNoteMode` migration in `loadFromLocalStorage` (not Zustand persist.migrate — app uses custom persistence)
-- [ ] `assertNever` helper used in exhaustive switches (not `satisfies never`)
+- [x] `lib/persistence/stepProgress.ts` provides `getUnlockedStep`/`unlockStep` with SSR guard, mode allowlist, step clamping
+- [x] `hooks/useRollingAccuracy.ts` tracks 10-attempt window with 80% threshold; auto-resets via `stepIndex` parameter
+- [x] `MODE_STEPS` defined with discriminated unions (`LearnStep`, `OutlineStep`, `CompStep`) and `as const satisfies`
+- [x] `TargetNoteMode` extended with `"root"` and `"root-and-guides"` (not `"guide-tones"`) in `lib/types.ts`
+- [x] `TargetNoteMode` migration in `loadFromLocalStorage` (not Zustand persist.migrate — app uses custom persistence)
+- [x] `assertNever` helper used in exhaustive switches (not `satisfies never`)
 - [ ] 3 mode-specific page components created via `next/dynamic` component map
-- [ ] `StepStepper.tsx` shows current step + progress toward 80% unlock (text/bar, not circular SVG ring — simplicity)
+- [x] `StepStepper.tsx` shows current step + progress toward 80% unlock (text/bar, not circular SVG ring — simplicity)
 - [ ] Step unlock moment: inline toast + manual advancement (no auto-advance)
 - [ ] `prefers-reduced-motion` handled for target note animations
-- [ ] `localStorage.removeItem('fretpad-challenges')` cleanup on first load
-- [ ] `recordQuizResult` call removed from `quizSlice.submitQuizAnswer` (ChallengeSlice removal)
+- [x] `localStorage.removeItem('fretpad-challenges')` cleanup on first load
+- [x] `recordQuizResult` call removed from `quizSlice.submitQuizAnswer` (ChallengeSlice removal)
 - [ ] **Bug fix**: Instrument cleanup in `useAudioEngine` uses generation nonce — cleanup only stops transport if its generation is current (race #7)
 - [ ] **Bug fix**: `prevPositionRef` in `usePitchDetection` not updated on non-playing bail-out
 - [ ] **Bug fix**: ProgressionEditor playback highlight extracted to ref-based overlay
-- [ ] `learn-the-neck` config updated: `showMicToggle: true` (or new `showQuizMicToggle` field)
+- [x] `learn-the-neck` config updated: `showMicToggle: true` (or new `showQuizMicToggle` field)
 
 ### Learn the Neck (Track A)
 

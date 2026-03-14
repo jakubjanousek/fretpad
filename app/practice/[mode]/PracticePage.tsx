@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChallengeTracker } from "@/components/challenges/ChallengeTracker";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
 import { HelpGuide } from "@/components/help/HelpGuide";
@@ -11,6 +10,7 @@ import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ShareExport } from "@/components/progression/ShareExport";
 import { ChordToneQuiz } from "@/components/quiz/ChordToneQuiz";
 import { PracticeStats } from "@/components/stats/PracticeStats";
+import { StepStepper } from "@/components/steps/StepStepper";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TheoryPanel } from "@/components/theory/TheoryPanel";
 import { ProgressBar } from "@/components/transport/ProgressBar";
@@ -19,10 +19,15 @@ import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { Card, CardContent } from "@/components/ui/card";
 import { useFirstVisit } from "@/hooks/useFirstVisit";
 import { usePracticeTracker } from "@/hooks/usePracticeTracker";
+import { useRollingAccuracy } from "@/hooks/useRollingAccuracy";
 import { useSessionTimer } from "@/hooks/useSessionTimer";
 import { useUrlState } from "@/hooks/useUrlState";
 import { getFretNotesForChord } from "@/lib/fretboard";
-import { PRACTICE_MODES } from "@/lib/modes";
+import { MODE_STEPS, PRACTICE_MODES } from "@/lib/modes";
+import {
+  clearLegacyChallengeProgress,
+  getUnlockedStep,
+} from "@/lib/persistence/stepProgress";
 import {
   getArpeggioConnections,
   getArpeggioNotes,
@@ -59,6 +64,9 @@ interface PracticePageProps {
 
 export function PracticePage({ modeId }: PracticePageProps) {
   const modeConfig = PRACTICE_MODES[modeId];
+  const [unlockedStepIndex, setUnlockedStepIndex] = useState(() =>
+    getUnlockedStep(modeId),
+  );
   const hasInitialUrlStateRef = useRef(
     typeof window !== "undefined" &&
       new URL(window.location.href).searchParams.has("p"),
@@ -82,6 +90,11 @@ export function PracticePage({ modeId }: PracticePageProps) {
       });
     }
   }, [enterMode, modeId]);
+
+  useEffect(() => {
+    clearLegacyChallengeProgress();
+    setUnlockedStepIndex(getUnlockedStep(modeId));
+  }, [modeId]);
 
   const currentChord = useAppStore((state) => state.currentChord);
   const progression = useAppStore((state) => state.progression);
@@ -165,6 +178,11 @@ export function PracticePage({ modeId }: PracticePageProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpGuideOpen, setHelpGuideOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
+  const currentStepIndex = Math.min(
+    unlockedStepIndex,
+    MODE_STEPS[modeId].length - 1,
+  );
+  const { accuracy, attemptCount } = useRollingAccuracy(currentStepIndex);
 
   // Practice time tracking
   const { todayTimeMs } = usePracticeTracker({
@@ -413,8 +431,13 @@ export function PracticePage({ modeId }: PracticePageProps) {
           <ProgressionEditor />
         </section>
 
-        {/* Challenge Tracker */}
-        <ChallengeTracker modeId={modeId} />
+        <StepStepper
+          modeId={modeId}
+          currentStepIndex={currentStepIndex}
+          unlockedStepIndex={unlockedStepIndex}
+          accuracy={accuracy}
+          attemptCount={attemptCount}
+        />
 
         {/* Fretboard */}
         <section>

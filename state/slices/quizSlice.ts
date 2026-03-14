@@ -3,8 +3,6 @@ import { getFretNotesForChord } from "@/lib/fretboard";
 import type { QuizQuestion } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
-const QUIZ_LENGTH = 10;
-
 export interface QuizSlice {
   quizActive: boolean;
   quizQuestion: QuizQuestion | null;
@@ -59,7 +57,7 @@ export const createQuizSlice: StateCreator<AppState, [], [], QuizSlice> = (
     const newTotal = quizTotal + 1;
 
     const newScore = isCorrect ? quizScore + 1 : quizScore;
-    const finished = newTotal >= QUIZ_LENGTH;
+    const finished = newTotal >= 10;
 
     set({
       quizScore: newScore,
@@ -69,11 +67,6 @@ export const createQuizSlice: StateCreator<AppState, [], [], QuizSlice> = (
       quizLastResult: isCorrect ? "correct" : "incorrect",
       quizFinished: finished,
     });
-
-    // Record to challenge slice SYNCHRONOUSLY — before any re-render
-    if (finished) {
-      get().recordQuizResult(newScore, newTotal);
-    }
   },
 
   nextQuizQuestion: () => {

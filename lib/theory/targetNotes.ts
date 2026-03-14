@@ -10,6 +10,7 @@ import type {
   TargetStrength,
 } from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
+import { assertNever } from "@/lib/utils";
 import { getScaleNotes } from "./scales";
 
 /**
@@ -33,11 +34,19 @@ export function getTargetNotes(
   if (mode === "none") return [];
 
   return fretNotes.filter((note) => {
-    if (mode === "guide-tones-only") {
-      return note.isGuideTone || note.isRoot;
+    switch (mode) {
+      case "root":
+        return note.isRoot;
+      case "root-and-guides":
+        return note.isGuideTone || note.isRoot;
+      case "chord-tones":
+      case "strong-beats":
+        return note.isChordTone;
+      case "all":
+        return true;
+      default:
+        return assertNever(mode);
     }
-    // "chord-tones" and "strong-beats" show all chord tones
-    return note.isChordTone;
   });
 }
 
