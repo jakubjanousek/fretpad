@@ -17,7 +17,12 @@ import type {
   Progression,
   StyleDefinition,
 } from "@/lib/types";
-import { getApproachNote, getBassNote, getVoicing } from "./voicings";
+import {
+  getApproachNote,
+  getBassNote,
+  getVoicing,
+  getWalkingBassLine,
+} from "./voicings";
 
 interface SchedulerInstruments {
   bass: BassInstrument;
@@ -102,10 +107,27 @@ function scheduleBassPattern(
   bassInstrument: BassInstrument,
   bassOctave: number,
   instrumentOffsetBeats = 0,
+  variationIndex = 0,
 ): number[] {
   const eventIds: number[] = [];
+  const activePattern = pattern.filter((event) => {
+    const eventBeat = resolveEventBeat(
+      event,
+      chordBeats,
+      instrumentOffsetBeats,
+    );
+    return eventBeat < chordBeats;
+  });
+  const walkEvents = activePattern.filter((event) => event.type === "walk");
+  const walkingLine = getWalkingBassLine(chord, {
+    octave: bassOctave,
+    steps: walkEvents.length,
+    variationIndex,
+    nextChord,
+  });
+  let walkingLineIndex = 0;
 
-  for (const event of pattern) {
+  for (const event of activePattern) {
     const eventBeat = resolveEventBeat(
       event,
       chordBeats,
@@ -125,6 +147,10 @@ function scheduleBassPattern(
       if (event.type === "approach" && nextChord) {
         // Approach note to next chord
         noteToPlay = getApproachNote(nextChord, bassOctave);
+      } else if (event.type === "walk") {
+        noteToPlay =
+          walkingLine[walkingLineIndex] ?? getBassNote(chord, 1, bassOctave);
+        walkingLineIndex += 1;
       } else {
         // Regular bass note based on degree
         const degree = event.degree ?? 1;
@@ -195,6 +221,15 @@ function scheduleChordPattern(
   }
 
   return eventIds;
+}
+
+export function getPatternVariantIndex(
+  barIndex: number,
+  chordIndex: number,
+  variantCount: number,
+): number {
+  if (variantCount <= 1) return 0;
+  return (barIndex * 3 + chordIndex) % variantCount;
 }
 
 /**
@@ -355,13 +390,22 @@ export function scheduleProgression(
         instruments.bass,
         style.instruments.bass.octave,
         instrumentOffsets?.bass ?? 0,
+        getPatternVariantIndex(barIndex, chordIndex, 4),
       );
       eventIds.push(...bassEventIds);
 
       // Schedule chord pattern
+      const chordPatternEvents =
+        style.patterns.chord.variants?.[
+          getPatternVariantIndex(
+            barIndex,
+            chordIndex,
+            style.patterns.chord.variants.length,
+          )
+        ] ?? style.patterns.chord.events;
       const chordEventIds = scheduleChordPattern(
         transport,
-        style.patterns.chord.events,
+        chordPatternEvents,
         chord,
         currentBeat,
         barChord.beats,

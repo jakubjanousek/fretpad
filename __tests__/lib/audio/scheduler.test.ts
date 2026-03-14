@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   beatsToTime,
+  getPatternVariantIndex,
   parseTimeToBeats,
   resolveEventBeat,
 } from "@/lib/audio/scheduler";
@@ -44,5 +45,12 @@ describe("audio scheduler timing helpers", () => {
     );
 
     expect(laidBackComping).toBeCloseTo(1.59);
+  });
+
+  it("selects deterministic pattern variants per chord slot", () => {
+    expect(getPatternVariantIndex(0, 0, 4)).toBe(0);
+    expect(getPatternVariantIndex(0, 1, 4)).toBe(1);
+    expect(getPatternVariantIndex(1, 0, 4)).toBe(3);
+    expect(getPatternVariantIndex(1, 1, 4)).toBe(0);
   });
 });

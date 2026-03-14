@@ -63,7 +63,7 @@ This plan focuses on the jazz mode first, while keeping the architecture extensi
 - [x] Phase 0 partial: added scheduler coverage for explicit timing helpers.
 - [x] Phase 1 complete: explicit jazz timing replaced transport-wide swing as the core groove mechanism.
 - [x] Phase 2 partial: shipped the fallback synth/mix-chain improvements for bass, chords, and drums.
-- [ ] Phase 3 not started.
+- [x] Phase 3 partial: walking bass and comping now rotate through deterministic musical variations.
 - [ ] Phase 4 not started.
 
 ### Phase 0: Baseline and guardrails
@@ -136,15 +136,15 @@ The current arrangement logic is too repetitive to feel musical over repeated lo
 #### Changes
 
 - Expand walking bass generation in [lib/audio/voicings.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/voicings.ts):
-  - prefer stepwise motion
-  - choose between chord tones, diatonic connectors, and chromatic approaches
-  - vary direction across bars
-  - treat resolution targets differently from static harmony
+  - [x] prefer stepwise motion
+  - [ ] choose between chord tones, diatonic connectors, and chromatic approaches
+  - [ ] vary direction across bars
+  - [x] treat resolution targets differently from static harmony
 - Expand comping behavior in [lib/audio/styles/jazzSwing.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/styles/jazzSwing.ts) and related scheduling logic:
-  - rotate between multiple rhythmic cells
-  - vary voicing density
-  - allow occasional rests
-  - support shell and rootless voicings for contrast
+  - [x] rotate between multiple rhythmic cells
+  - [x] vary voicing density
+  - [x] allow occasional rests
+  - [x] support shell and rootless voicings for contrast
 
 #### Guardrail
 
@@ -218,8 +218,8 @@ It addresses the real defect in the current jazz mode: the timing model is too p
   - Improve chord timbre and processing.
 - [x] [lib/audio/instruments/drumInstrument.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/instruments/drumInstrument.ts)
   - Add a more convincing jazz ride/drum sound source.
-- [ ] [lib/audio/voicings.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/voicings.ts)
-  - Expand walking bass note selection and voicing variety.
+- [x] [lib/audio/voicings.ts](/Users/jakubjanousek/Code/fretpad/lib/audio/voicings.ts)
+  - Expanded walking bass note selection, added rootless comping voicings, and made resolution-aware movement deterministic.
 
 ## Acceptance Criteria
 
@@ -227,6 +227,7 @@ It addresses the real defect in the current jazz mode: the timing model is too p
 - [x] Jazz ride and comping placements are explicitly encoded and audibly swung.
 - [x] The jazz backing track sounds materially less synthetic than the current version.
 - [ ] Repeated loops exhibit controlled variation in timing and dynamics.
+  - Deterministic bass-path and comping-cell variation is now in place; bounded timing/dynamic humanization still remains.
 - [x] Straight styles such as `popRock`, `bossaNova`, and `ballad` do not regress.
 - [x] Multi-chord bars and loop boundaries still schedule correctly.
 
