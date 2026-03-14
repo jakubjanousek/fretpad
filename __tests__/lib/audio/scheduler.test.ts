@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   beatsToTime,
+  getDeterministicCenteredValue,
+  getHumanization,
   getPatternVariantIndex,
   parseTimeToBeats,
   resolveEventBeat,
+  resolveHumanizedDuration,
 } from "@/lib/audio/scheduler";
 
 describe("audio scheduler timing helpers", () => {
@@ -45,6 +48,43 @@ describe("audio scheduler timing helpers", () => {
     );
 
     expect(laidBackComping).toBeCloseTo(1.59);
+  });
+
+  it("produces deterministic bounded humanization offsets", () => {
+    const profile = {
+      timingBeats: 0.04,
+      velocityDelta: 0.08,
+      durationBeats: 0.1,
+    };
+    const first = getHumanization(profile, "chord", {
+      barIndex: 2,
+      chordIndex: 1,
+      eventIndex: 0,
+    });
+    const second = getHumanization(profile, "chord", {
+      barIndex: 2,
+      chordIndex: 1,
+      eventIndex: 0,
+    });
+
+    expect(first).toEqual(second);
+    expect(Math.abs(first.timingOffsetBeats)).toBeLessThanOrEqual(0.04);
+    expect(Math.abs(first.velocityOffset)).toBeLessThanOrEqual(0.08);
+    expect(Math.abs(first.durationOffsetBeats)).toBeLessThanOrEqual(0.1);
+  });
+
+  it("changes deterministic values across different event seeds", () => {
+    const first = getDeterministicCenteredValue("chord:0:0:0:timing");
+    const second = getDeterministicCenteredValue("chord:0:0:1:timing");
+
+    expect(first).not.toBe(second);
+    expect(first).toBeGreaterThanOrEqual(-1);
+    expect(first).toBeLessThanOrEqual(1);
+  });
+
+  it("resolves humanized durations to transport time strings", () => {
+    expect(resolveHumanizedDuration("8n", 0.25)).toBe("0:0:3");
+    expect(resolveHumanizedDuration("16n", -0.5)).toBe("0:0:1");
   });
 
   it("selects deterministic pattern variants per chord slot", () => {

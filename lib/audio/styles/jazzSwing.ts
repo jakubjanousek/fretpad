@@ -18,6 +18,22 @@ export const jazzSwingStyle: StyleDefinition = {
       chord: 0.03,
       drums: 0,
     },
+    humanization: {
+      bass: {
+        timingBeats: 0.015,
+        velocityDelta: 0.05,
+        durationBeats: 0.04,
+      },
+      chord: {
+        timingBeats: 0.04,
+        velocityDelta: 0.08,
+        durationBeats: 0.08,
+      },
+      drums: {
+        timingBeats: 0.008,
+        velocityDelta: 0.05,
+      },
+    },
   },
   instruments: {
     bass: {

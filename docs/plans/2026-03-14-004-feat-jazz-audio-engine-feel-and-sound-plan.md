@@ -64,7 +64,7 @@ This plan focuses on the jazz mode first, while keeping the architecture extensi
 - [x] Phase 1 complete: explicit jazz timing replaced transport-wide swing as the core groove mechanism.
 - [x] Phase 2 partial: shipped the fallback synth/mix-chain improvements for bass, chords, and drums.
 - [x] Phase 3 partial: walking bass and comping now rotate through deterministic musical variations.
-- [ ] Phase 4 not started.
+- [x] Phase 4 partial: deterministic per-instrument timing, velocity, and duration humanization is now wired into jazz scheduling.
 
 ### Phase 0: Baseline and guardrails
 
@@ -159,12 +159,12 @@ Jazz needs controlled imperfection. The exact same velocity and note length on e
 #### Changes
 
 - Add bounded timing randomization per instrument:
-  - ride: very tight
-  - bass: tight but not rigid
-  - comping: loosest
-- Add bounded velocity and duration variation.
-- Keep humanization deterministic per loop or seeded, so behavior is stable and testable.
-- Support separate swing ratios or timing profiles per instrument instead of one transport-wide value.
+  - [x] ride: very tight
+  - [x] bass: tight but not rigid
+  - [x] comping: loosest
+- [x] Add bounded velocity and duration variation.
+- [x] Keep humanization deterministic per loop or seeded, so behavior is stable and testable.
+- [x] Support separate swing ratios or timing profiles per instrument instead of one transport-wide value.
 
 ## Implementation Options
 
@@ -227,7 +227,7 @@ It addresses the real defect in the current jazz mode: the timing model is too p
 - [x] Jazz ride and comping placements are explicitly encoded and audibly swung.
 - [x] The jazz backing track sounds materially less synthetic than the current version.
 - [ ] Repeated loops exhibit controlled variation in timing and dynamics.
-  - Deterministic bass-path and comping-cell variation is now in place; bounded timing/dynamic humanization still remains.
+  - Deterministic per-event timing/dynamic humanization is now in place; loop-to-loop regeneration is still not implemented.
 - [x] Straight styles such as `popRock`, `bossaNova`, and `ballad` do not regress.
 - [x] Multi-chord bars and loop boundaries still schedule correctly.
 

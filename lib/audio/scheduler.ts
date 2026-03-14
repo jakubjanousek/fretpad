@@ -41,6 +41,22 @@ interface ScheduleOptions {
   countInBars?: number;
 }
 
+type HumanizationProfile = NonNullable<
+  NonNullable<StyleDefinition["timing"]>["humanization"]
+>[keyof NonNullable<NonNullable<StyleDefinition["timing"]>["humanization"]>];
+
+interface HumanizationContext {
+  barIndex: number;
+  chordIndex: number;
+  eventIndex: number;
+}
+
+interface HumanizationResult {
+  timingOffsetBeats: number;
+  velocityOffset: number;
+  durationOffsetBeats: number;
+}
+
 /**
  * Parses a Tone.js time string like "0:2" or "0:1:2" into total beats
  */
@@ -94,6 +110,81 @@ export function resolveEventBeat(
   return baseBeat + explicitOffset + instrumentOffsetBeats;
 }
 
+function hashHumanizationSeed(seed: string): number {
+  let hash = 2166136261;
+
+  for (let index = 0; index < seed.length; index++) {
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
+
+export function getDeterministicCenteredValue(seed: string): number {
+  const hash = hashHumanizationSeed(seed);
+  return (hash / 0xffffffff) * 2 - 1;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+export function getHumanization(
+  profile: HumanizationProfile | undefined,
+  instrument: "bass" | "chord" | "drums",
+  context: HumanizationContext,
+): HumanizationResult {
+  if (!profile) {
+    return {
+      timingOffsetBeats: 0,
+      velocityOffset: 0,
+      durationOffsetBeats: 0,
+    };
+  }
+
+  const baseSeed = `${instrument}:${context.barIndex}:${context.chordIndex}:${context.eventIndex}`;
+
+  return {
+    timingOffsetBeats:
+      getDeterministicCenteredValue(`${baseSeed}:timing`) *
+      (profile.timingBeats ?? 0),
+    velocityOffset:
+      getDeterministicCenteredValue(`${baseSeed}:velocity`) *
+      (profile.velocityDelta ?? 0),
+    durationOffsetBeats:
+      getDeterministicCenteredValue(`${baseSeed}:duration`) *
+      (profile.durationBeats ?? 0),
+  };
+}
+
+function getDurationInBeats(duration: string): number {
+  if (duration.includes(":")) {
+    return parseTimeToBeats(duration);
+  }
+
+  const noteMatch = duration.match(/^(\d+)n$/);
+  if (noteMatch) {
+    const denominator = Number(noteMatch[1]);
+    return 4 / denominator;
+  }
+
+  return 1;
+}
+
+export function resolveHumanizedDuration(
+  duration: string,
+  durationOffsetBeats = 0,
+): string {
+  if (durationOffsetBeats === 0) return duration;
+
+  const baseBeats = getDurationInBeats(duration);
+  const minBeats = Math.min(baseBeats, 0.125);
+  const resolvedBeats = Math.max(minBeats, baseBeats + durationOffsetBeats);
+
+  return beatsToTime(resolvedBeats);
+}
+
 /**
  * Schedules bass pattern events for a single chord
  */
@@ -108,6 +199,8 @@ function scheduleBassPattern(
   bassOctave: number,
   instrumentOffsetBeats = 0,
   variationIndex = 0,
+  humanizationProfile?: HumanizationProfile,
+  scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
 ): number[] {
   const eventIds: number[] = [];
   const activePattern = pattern.filter((event) => {
@@ -127,11 +220,21 @@ function scheduleBassPattern(
   });
   let walkingLineIndex = 0;
 
-  for (const event of activePattern) {
-    const eventBeat = resolveEventBeat(
-      event,
-      chordBeats,
-      instrumentOffsetBeats,
+  for (const [eventIndex, event] of activePattern.entries()) {
+    const humanization = getHumanization(humanizationProfile, "bass", {
+      barIndex: scheduleContext?.barIndex ?? 0,
+      chordIndex: scheduleContext?.chordIndex ?? 0,
+      eventIndex,
+    });
+    const eventBeat = clamp(
+      resolveEventBeat(event, chordBeats, instrumentOffsetBeats) +
+        humanization.timingOffsetBeats,
+      0,
+      Math.max(chordBeats - 0.01, 0),
+    );
+    const duration = resolveHumanizedDuration(
+      event.duration,
+      humanization.durationOffsetBeats,
     );
     const absoluteBeat = startBeat + eventBeat;
 
@@ -162,10 +265,14 @@ function scheduleBassPattern(
         );
       }
 
-      const velocity = event.velocity ?? 0.8;
+      const velocity = clamp(
+        (event.velocity ?? 0.8) + humanization.velocityOffset,
+        0.05,
+        1,
+      );
       bassInstrument.triggerAttackRelease(
         noteToPlay,
-        event.duration,
+        duration,
         safeTime,
         velocity,
       );
@@ -189,29 +296,45 @@ function scheduleChordPattern(
   chordInstrument: ChordInstrument,
   chordOctave: number,
   instrumentOffsetBeats = 0,
+  humanizationProfile?: HumanizationProfile,
+  scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
 ): number[] {
   const eventIds: number[] = [];
 
-  for (const event of pattern) {
-    const eventBeat = resolveEventBeat(
-      event,
-      chordBeats,
-      instrumentOffsetBeats,
+  for (const [eventIndex, event] of pattern.entries()) {
+    const humanization = getHumanization(humanizationProfile, "chord", {
+      barIndex: scheduleContext?.barIndex ?? 0,
+      chordIndex: scheduleContext?.chordIndex ?? 0,
+      eventIndex,
+    });
+    const eventBeat = clamp(
+      resolveEventBeat(event, chordBeats, instrumentOffsetBeats) +
+        humanization.timingOffsetBeats,
+      0,
+      Math.max(chordBeats - 0.01, 0),
     );
     const absoluteBeat = startBeat + eventBeat;
 
     if (eventBeat >= chordBeats) continue;
 
     const time = beatsToTime(absoluteBeat);
+    const duration = resolveHumanizedDuration(
+      event.duration,
+      humanization.durationOffsetBeats,
+    );
 
     const eventId = transport.schedule((audioTime) => {
       const safeTime = Math.max(audioTime, Tone.now());
       const voicing = getVoicing(chord, event.voicingType, chordOctave);
-      const velocity = event.velocity ?? 0.6;
+      const velocity = clamp(
+        (event.velocity ?? 0.6) + humanization.velocityOffset,
+        0.05,
+        1,
+      );
 
       chordInstrument.triggerAttackRelease(
         voicing.notes,
-        event.duration,
+        duration,
         safeTime,
         velocity,
       );
@@ -242,14 +365,22 @@ function scheduleDrumPattern(
   chordBeats: number,
   drumInstrument: DrumInstrument,
   instrumentOffsetBeats = 0,
+  humanizationProfile?: HumanizationProfile,
+  scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
 ): number[] {
   const eventIds: number[] = [];
 
-  for (const event of pattern) {
-    const eventBeat = resolveEventBeat(
-      event,
-      chordBeats,
-      instrumentOffsetBeats,
+  for (const [eventIndex, event] of pattern.entries()) {
+    const humanization = getHumanization(humanizationProfile, "drums", {
+      barIndex: scheduleContext?.barIndex ?? 0,
+      chordIndex: scheduleContext?.chordIndex ?? 0,
+      eventIndex,
+    });
+    const eventBeat = clamp(
+      resolveEventBeat(event, chordBeats, instrumentOffsetBeats) +
+        humanization.timingOffsetBeats,
+      0,
+      Math.max(chordBeats - 0.01, 0),
     );
     const absoluteBeat = startBeat + eventBeat;
 
@@ -258,7 +389,11 @@ function scheduleDrumPattern(
     const time = beatsToTime(absoluteBeat);
 
     const eventId = transport.schedule((audioTime) => {
-      const velocity = event.velocity ?? 0.7;
+      const velocity = clamp(
+        (event.velocity ?? 0.7) + humanization.velocityOffset,
+        0.05,
+        1,
+      );
       drumInstrument.trigger(event.sound, audioTime, velocity);
     }, time);
 
@@ -348,6 +483,7 @@ export function scheduleProgression(
   const eventIds: number[] = [];
   const beatsPerBar = progression.timeSignature.numerator;
   const instrumentOffsets = style.timing?.instrumentOffsets;
+  const humanization = style.timing?.humanization;
 
   // Offset all events by count-in bars if specified
   const countInOffset = (options?.countInBars ?? 0) * beatsPerBar;
@@ -391,6 +527,8 @@ export function scheduleProgression(
         style.instruments.bass.octave,
         instrumentOffsets?.bass ?? 0,
         getPatternVariantIndex(barIndex, chordIndex, 4),
+        humanization?.bass,
+        { barIndex, chordIndex },
       );
       eventIds.push(...bassEventIds);
 
@@ -412,6 +550,8 @@ export function scheduleProgression(
         instruments.chord,
         style.instruments.chord.octave,
         instrumentOffsets?.chord ?? 0,
+        humanization?.chord,
+        { barIndex, chordIndex },
       );
       eventIds.push(...chordEventIds);
 
@@ -424,6 +564,8 @@ export function scheduleProgression(
           barChord.beats,
           instruments.drums,
           instrumentOffsets?.drums ?? 0,
+          humanization?.drums,
+          { barIndex, chordIndex },
         );
         eventIds.push(...drumEventIds);
       }
