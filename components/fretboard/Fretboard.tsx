@@ -11,6 +11,7 @@ import type {
   FretNote,
   FretPosition,
   GuitarVoicing,
+  NoteLabelMode,
   NoteName,
 } from "@/lib/types";
 import { CAGED_POSITION_LABELS, STANDARD_TUNING } from "@/lib/types";
@@ -46,6 +47,9 @@ interface FretboardProps {
   onPreviousVoicing?: () => void;
   availableVoicingsCount?: number;
   selectedVoicingIndex?: number;
+  noteLabelModeOverride?: NoteLabelMode;
+  onNoteClick?: (note: FretNote) => void;
+  showControls?: boolean;
 }
 
 // Fret markers positions (standard dots)
@@ -128,6 +132,9 @@ export function Fretboard({
   onPreviousVoicing,
   availableVoicingsCount = 0,
   selectedVoicingIndex = 0,
+  noteLabelModeOverride,
+  onNoteClick,
+  showControls = true,
 }: FretboardProps) {
   const {
     showScaleTones,
@@ -173,6 +180,15 @@ export function Fretboard({
   const [hoveredLegendType, setHoveredLegendType] =
     useState<LegendNoteType>(null);
   const [showLegendTooltip, setShowLegendTooltip] = useState(true);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setPrefersReducedMotion(mediaQuery.matches);
+    update();
+    mediaQuery.addEventListener("change", update);
+    return () => mediaQuery.removeEventListener("change", update);
+  }, []);
 
   const handleLegendTooltipComplete = () => {
     setShowLegendTooltip(false);
@@ -204,7 +220,7 @@ export function Fretboard({
 
   // Helper to get animation class for target notes
   const getTargetAnimationClass = (note: FretNote): string => {
-    if (!isTargetModeActive) return "";
+    if (!isTargetModeActive || prefersReducedMotion) return "";
     const isTarget = targetNotes.some(
       (t) => t.string === note.string && t.fret === note.fret,
     );
@@ -248,22 +264,36 @@ export function Fretboard({
   };
 
   // Handler for clicking on a target note to show enclosure
-  const handleTargetNoteClick = (note: FretNote) => {
-    if (!showEnclosures || !note.isChordTone) return;
+  const handleTargetNoteClick = useCallback(
+    (note: FretNote) => {
+      if (!showEnclosures || !note.isChordTone) return;
 
-    // Toggle focus: if already focused on this note, unfocus; otherwise focus
-    if (
-      focusedEnclosureTarget?.fret === note.fret &&
-      focusedEnclosureTarget?.string === note.string
-    ) {
-      setFocusedEnclosureTarget(null);
-    } else {
-      setFocusedEnclosureTarget({
-        fret: note.fret,
-        string: note.string,
-      });
-    }
-  };
+      // Toggle focus: if already focused on this note, unfocus; otherwise focus
+      if (
+        focusedEnclosureTarget?.fret === note.fret &&
+        focusedEnclosureTarget?.string === note.string
+      ) {
+        setFocusedEnclosureTarget(null);
+      } else {
+        setFocusedEnclosureTarget({
+          fret: note.fret,
+          string: note.string,
+        });
+      }
+    },
+    [focusedEnclosureTarget, setFocusedEnclosureTarget, showEnclosures],
+  );
+
+  const handleMarkerClick = useCallback(
+    (note: FretNote) => {
+      onNoteClick?.(note);
+
+      if (showEnclosures && note.isChordTone) {
+        handleTargetNoteClick(note);
+      }
+    },
+    [handleTargetNoteClick, onNoteClick, showEnclosures],
+  );
 
   // Determine the overlay color mode for notes
   const getOverlayColorMode = (note: FretNote): OverlayColorMode => {
@@ -469,7 +499,7 @@ export function Fretboard({
                         return augmentedNote ? (
                           <FretMarker
                             note={augmentedNote}
-                            labelMode={noteLabelMode}
+                            labelMode={noteLabelModeOverride ?? noteLabelMode}
                             highlightState={getNoteHighlightState(
                               augmentedNote,
                             )}
@@ -480,9 +510,10 @@ export function Fretboard({
                                 : undefined
                             }
                             className={getTargetAnimationClass(augmentedNote)}
-                            onClick={
-                              showEnclosures && augmentedNote.isChordTone
-                                ? () => handleTargetNoteClick(augmentedNote)
+                            onClickNote={
+                              onNoteClick ||
+                              (showEnclosures && augmentedNote.isChordTone)
+                                ? handleMarkerClick
                                 : undefined
                             }
                             showVoicingStyle={showVoicings}
@@ -528,7 +559,9 @@ export function Fretboard({
                             <div className="relative z-10">
                               <FretMarker
                                 note={augmentedNote}
-                                labelMode={noteLabelMode}
+                                labelMode={
+                                  noteLabelModeOverride ?? noteLabelMode
+                                }
                                 highlightState={getNoteHighlightState(
                                   augmentedNote,
                                 )}
@@ -541,9 +574,10 @@ export function Fretboard({
                                 className={getTargetAnimationClass(
                                   augmentedNote,
                                 )}
-                                onClick={
-                                  showEnclosures && augmentedNote.isChordTone
-                                    ? () => handleTargetNoteClick(augmentedNote)
+                                onClickNote={
+                                  onNoteClick ||
+                                  (showEnclosures && augmentedNote.isChordTone)
+                                    ? handleMarkerClick
                                     : undefined
                                 }
                                 showVoicingStyle={showVoicings}
@@ -565,7 +599,7 @@ export function Fretboard({
           </div>
 
           {/* Legend and controls (hidden in quiz mode) */}
-          {!quizMode && (
+          {!quizMode && showControls && (
             <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               {/* Interactive Legend */}
               <FretboardLegend

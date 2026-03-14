@@ -541,3 +541,12 @@
 .animate-target-secondary {
   animation: target-pulse-secondary 2s ease-in-out infinite;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-note-appear,
+  .animate-fretboard-crossfade,
+  .animate-target-primary,
+  .animate-target-secondary {
+    animation: none;
+  }
+}

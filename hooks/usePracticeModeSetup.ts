@@ -12,6 +12,7 @@ import { useUrlState } from "./useUrlState";
 
 interface UsePracticeModeSetupResult {
   unlockedStepIndex: number;
+  refreshUnlockedStep: () => void;
 }
 
 export function usePracticeModeSetup(
@@ -50,5 +51,6 @@ export function usePracticeModeSetup(
 
   return {
     unlockedStepIndex,
+    refreshUnlockedStep,
   };
 }
