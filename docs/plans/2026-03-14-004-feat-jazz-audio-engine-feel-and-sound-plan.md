@@ -64,7 +64,7 @@ This plan focuses on the jazz mode first, while keeping the architecture extensi
 - [x] Phase 1 complete: explicit jazz timing replaced transport-wide swing as the core groove mechanism.
 - [x] Phase 2 partial: shipped the fallback synth/mix-chain improvements for bass, chords, and drums.
 - [x] Phase 3 complete: walking bass now alternates direction deterministically and mixes chord-tone, diatonic, and chromatic connectors; comping variation remains in place.
-- [x] Phase 4 partial: deterministic per-instrument timing, velocity, and duration humanization is now wired into jazz scheduling.
+- [x] Phase 4 complete: deterministic per-instrument timing, velocity, and duration humanization now reseeds across loop iterations for controlled repeated-pass variation.
 
 ### Phase 0: Baseline and guardrails
 
@@ -226,8 +226,8 @@ It addresses the real defect in the current jazz mode: the timing model is too p
 - [x] `jazzSwing` no longer depends primarily on global `Transport.swing` for its groove.
 - [x] Jazz ride and comping placements are explicitly encoded and audibly swung.
 - [x] The jazz backing track sounds materially less synthetic than the current version.
-- [ ] Repeated loops exhibit controlled variation in timing and dynamics.
-  - Deterministic per-event timing/dynamic humanization is now in place; loop-to-loop regeneration is still not implemented.
+- [x] Repeated loops exhibit controlled variation in timing and dynamics.
+  - Deterministic per-event timing/dynamic humanization now reseeds per loop, and pattern variants advance predictably across repeated passes.
 - [x] Straight styles such as `popRock`, `bossaNova`, and `ballad` do not regress.
 - [x] Multi-chord bars and loop boundaries still schedule correctly.
 

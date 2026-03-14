@@ -57,11 +57,13 @@ describe("audio scheduler timing helpers", () => {
       durationBeats: 0.1,
     };
     const first = getHumanization(profile, "chord", {
+      loopIteration: 0,
       barIndex: 2,
       chordIndex: 1,
       eventIndex: 0,
     });
     const second = getHumanization(profile, "chord", {
+      loopIteration: 0,
       barIndex: 2,
       chordIndex: 1,
       eventIndex: 0,
@@ -82,6 +84,31 @@ describe("audio scheduler timing helpers", () => {
     expect(first).toBeLessThanOrEqual(1);
   });
 
+  it("changes humanization across loop iterations while staying deterministic", () => {
+    const profile = {
+      timingBeats: 0.04,
+      velocityDelta: 0.08,
+      durationBeats: 0.1,
+    };
+    const firstLoop = getHumanization(profile, "bass", {
+      loopIteration: 0,
+      barIndex: 0,
+      chordIndex: 0,
+      eventIndex: 1,
+    });
+    const secondLoop = getHumanization(profile, "bass", {
+      loopIteration: 1,
+      barIndex: 0,
+      chordIndex: 0,
+      eventIndex: 1,
+    });
+
+    expect(firstLoop).not.toEqual(secondLoop);
+    expect(Math.abs(secondLoop.timingOffsetBeats)).toBeLessThanOrEqual(0.04);
+    expect(Math.abs(secondLoop.velocityOffset)).toBeLessThanOrEqual(0.08);
+    expect(Math.abs(secondLoop.durationOffsetBeats)).toBeLessThanOrEqual(0.1);
+  });
+
   it("resolves humanized durations to transport time strings", () => {
     expect(resolveHumanizedDuration("8n", 0.25)).toBe("0:0:3");
     expect(resolveHumanizedDuration("16n", -0.5)).toBe("0:0:1");
@@ -92,5 +119,10 @@ describe("audio scheduler timing helpers", () => {
     expect(getPatternVariantIndex(0, 1, 4)).toBe(1);
     expect(getPatternVariantIndex(1, 0, 4)).toBe(3);
     expect(getPatternVariantIndex(1, 1, 4)).toBe(0);
+  });
+
+  it("advances pattern variants across loop iterations", () => {
+    expect(getPatternVariantIndex(0, 0, 4, 1)).toBe(1);
+    expect(getPatternVariantIndex(1, 1, 4, 2)).toBe(2);
   });
 });
