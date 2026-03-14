@@ -190,12 +190,6 @@ function getScaleSemitonesForChord(chord: Chord): number[] {
       return [0, 2, 4, 6, 8, 10];
     case "sus2":
       return [0, 2, 5, 7, 9, 10];
-    case "maj":
-    case "maj7":
-    case "6":
-    case "maj9":
-    case "add9":
-    case "other":
     default:
       return [0, 2, 4, 5, 7, 9, 11];
   }
