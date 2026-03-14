@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
 import { HelpGuide } from "@/components/help/HelpGuide";
@@ -17,8 +18,8 @@ import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { Card, CardContent } from "@/components/ui/card";
-import { useFretboardData } from "@/hooks/useFretboardData";
 import { useFirstVisit } from "@/hooks/useFirstVisit";
+import { useFretboardData } from "@/hooks/useFretboardData";
 import { usePracticeModeSetup } from "@/hooks/usePracticeModeSetup";
 import { usePracticeTracker } from "@/hooks/usePracticeTracker";
 import { useRollingAccuracy } from "@/hooks/useRollingAccuracy";
@@ -27,7 +28,6 @@ import { getNextChord } from "@/lib/theory/voiceLeading";
 import type { PracticeModeId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
-import { useShallow } from "zustand/react/shallow";
 
 const AudioInputScorecard = dynamic(
   () =>
@@ -90,12 +90,8 @@ export function SharedPracticePage({ modeId }: SharedPracticePageProps) {
       updateVoiceLeadingSuggestions: state.updateVoiceLeadingSuggestions,
     })),
   );
-  const {
-    fretNotes,
-    voiceLeadingPaths,
-    targetNoteData,
-    arpeggioConnections,
-  } = useFretboardData();
+  const { fretNotes, voiceLeadingPaths, targetNoteData, arpeggioConnections } =
+    useFretboardData();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpGuideOpen, setHelpGuideOpen] = useState(false);
