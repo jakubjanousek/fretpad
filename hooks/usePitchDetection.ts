@@ -141,8 +141,19 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
   const signalActiveRef = useRef(false);
   const signalElementRef = useRef<HTMLElement | null>(null);
 
+  // Track the current transport position to avoid double-evaluation
+  const prevPositionRef = useRef({ barIndex: 0, chordIndex: 0 });
   // Track last evaluated position to avoid double-evaluation
   const lastEvalPositionRef = useRef<string | null>(null);
+
+  const resetEvaluationTracking = useCallback(() => {
+    const { currentBarIndex, currentChordIndex } = useAppStore.getState();
+    prevPositionRef.current = {
+      barIndex: currentBarIndex,
+      chordIndex: currentChordIndex,
+    };
+    lastEvalPositionRef.current = null;
+  }, []);
 
   const stopMicStream = useCallback(() => {
     cancelTokenRef.current.canceled = true;
@@ -236,6 +247,7 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
       micStateRef.current = "stopping";
       stopMicStream();
       micStateRef.current = "idle";
+      resetEvaluationTracking();
       setMicActive(false);
       return;
     }
@@ -323,7 +335,10 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
       startDetectionLoop(analyser, audioContext.sampleRate);
     } catch (err) {
       if (nonce !== activationNonceRef.current) return;
+      stopMicStream();
       micStateRef.current = "idle";
+      resetEvaluationTracking();
+      setMicActive(false);
 
       if (err instanceof DOMException) {
         if (err.name === "NotAllowedError") {
@@ -339,6 +354,7 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
     }
   }, [
     enabled,
+    resetEvaluationTracking,
     stopMicStream,
     startDetectionLoop,
     setMicActive,
@@ -347,8 +363,6 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
   ]);
 
   // Evaluate hits on chord changes by subscribing to position changes
-  const prevPositionRef = useRef({ barIndex: 0, chordIndex: 0 });
-
   useEffect(() => {
     if (!enabled) return;
 
@@ -364,6 +378,7 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
         !state.currentChord
       ) {
         prevPositionRef.current = { barIndex, chordIndex };
+        lastEvalPositionRef.current = null;
         return;
       }
 
@@ -421,6 +436,7 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
       micStateRef.current = "stopping";
       stopMicStream();
       micStateRef.current = "idle";
+      resetEvaluationTracking();
       setMicActive(false);
     }
 
@@ -432,10 +448,11 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
       ) {
         stopMicStream();
         micStateRef.current = "idle";
+        resetEvaluationTracking();
         setMicActive(false);
       }
     };
-  }, [enabled, stopMicStream, setMicActive]);
+  }, [enabled, resetEvaluationTracking, stopMicStream, setMicActive]);
 
   return {
     toggleMic,
@@ -445,8 +462,9 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
         micStateRef.current = "stopping";
         stopMicStream();
         micStateRef.current = "idle";
+        resetEvaluationTracking();
         setMicActive(false);
       }
-    }, [stopMicStream, setMicActive]),
+    }, [resetEvaluationTracking, stopMicStream, setMicActive]),
   };
 }
