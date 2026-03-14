@@ -1,20 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useFretboardDisplay } from "@/hooks/useFretboardDisplay";
 import { getTargetStrength } from "@/lib/theory/targetNotes";
 import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
 import type {
   ApproachNote,
   ArpeggioConnection,
-  CAGEDPosition,
   EnclosurePattern,
-  FretboardOverlay,
   FretNote,
   FretPosition,
   GuitarVoicing,
-  NoteLabelMode,
   NoteName,
-  TargetNoteMode,
 } from "@/lib/types";
 import { CAGED_POSITION_LABELS, STANDARD_TUNING } from "@/lib/types";
 
@@ -33,38 +30,13 @@ interface FretboardProps {
   numFrets?: number;
   tuning?: NoteName[];
   voiceLeadingPaths?: VoiceLeadingPath[];
-  showVoiceLeading?: boolean;
-  showScaleTones?: boolean;
-  noteLabelMode?: NoteLabelMode;
-  fretboardOverlay?: FretboardOverlay;
-  showCAGEDPositions?: boolean;
-  focusedPosition?: CAGEDPosition | null;
-  onToggleVoiceLeading?: () => void;
-  onToggleScaleTones?: () => void;
-  onNoteLabelModeChange?: (mode: NoteLabelMode) => void;
-  onOverlayChange?: (overlay: FretboardOverlay) => void;
-  onToggleCAGEDPositions?: () => void;
-  onFocusedPositionChange?: (pos: CAGEDPosition | null) => void;
   quizMode?: boolean;
   quizTargetPosition?: FretPosition | null;
-  // Target Notes props
-  targetNoteMode?: TargetNoteMode;
   targetNotes?: FretNote[];
   chromaticApproaches?: ApproachNote[];
   diatonicApproaches?: ApproachNote[];
   enclosures?: EnclosurePattern[];
-  showChromaticApproach?: boolean;
-  showDiatonicApproach?: boolean;
-  showEnclosures?: boolean;
-  focusedEnclosureTarget?: FretPosition | null;
-  onTargetNoteModeChange?: (mode: TargetNoteMode) => void;
-  onToggleChromaticApproach?: () => void;
-  onToggleDiatonicApproach?: () => void;
-  onToggleEnclosures?: () => void;
-  onFocusedEnclosureTargetChange?: (target: FretPosition | null) => void;
-  // Arpeggio props
   arpeggioConnections?: ArpeggioConnection[];
-  // Voicing props
   showVoicings?: boolean;
   selectedVoicing?: GuitarVoicing | null;
   showVoicingFingers?: boolean;
@@ -140,38 +112,13 @@ export function Fretboard({
   numFrets = DESKTOP_FRETS,
   tuning = STANDARD_TUNING,
   voiceLeadingPaths = [],
-  showVoiceLeading = false,
-  showScaleTones = false,
-  noteLabelMode = "notes",
-  fretboardOverlay = "none",
-  showCAGEDPositions = false,
-  focusedPosition = null,
-  onToggleVoiceLeading,
-  onToggleScaleTones,
-  onNoteLabelModeChange,
-  onOverlayChange,
-  onToggleCAGEDPositions,
-  onFocusedPositionChange,
   quizMode = false,
   quizTargetPosition = null,
-  // Target Notes props
-  targetNoteMode = "none",
   targetNotes = [],
   chromaticApproaches = [],
   diatonicApproaches = [],
   enclosures = [],
-  showChromaticApproach = false,
-  showDiatonicApproach = false,
-  showEnclosures = false,
-  focusedEnclosureTarget = null,
-  onTargetNoteModeChange,
-  onToggleChromaticApproach,
-  onToggleDiatonicApproach,
-  onToggleEnclosures,
-  onFocusedEnclosureTargetChange,
-  // Arpeggio props
   arpeggioConnections = [],
-  // Voicing props
   showVoicings = false,
   selectedVoicing = null,
   showVoicingFingers = true,
@@ -182,6 +129,30 @@ export function Fretboard({
   availableVoicingsCount = 0,
   selectedVoicingIndex = 0,
 }: FretboardProps) {
+  const {
+    showScaleTones,
+    setShowScaleTones,
+    showVoiceLeading,
+    setShowVoiceLeading,
+    noteLabelMode,
+    setNoteLabelMode,
+    fretboardOverlay,
+    setFretboardOverlay,
+    showCAGEDPositions,
+    setShowCAGEDPositions,
+    focusedPosition,
+    setFocusedPosition,
+    targetNoteMode,
+    setTargetNoteMode,
+    showChromaticApproach,
+    setShowChromaticApproach,
+    showDiatonicApproach,
+    setShowDiatonicApproach,
+    showEnclosures,
+    setShowEnclosures,
+    focusedEnclosureTarget,
+    setFocusedEnclosureTarget,
+  } = useFretboardDisplay();
   const responsiveFretCount = useResponsiveFrets(numFrets);
   const { scrollRef, canScroll, checkScroll } = useScrollIndicator();
 
@@ -285,9 +256,9 @@ export function Fretboard({
       focusedEnclosureTarget?.fret === note.fret &&
       focusedEnclosureTarget?.string === note.string
     ) {
-      onFocusedEnclosureTargetChange?.(null);
+      setFocusedEnclosureTarget(null);
     } else {
-      onFocusedEnclosureTargetChange?.({
+      setFocusedEnclosureTarget({
         fret: note.fret,
         string: note.string,
       });
@@ -604,19 +575,21 @@ export function Fretboard({
                 showCAGEDPositions={showCAGEDPositions}
                 isThreeNPS={isThreeNPS}
                 focusedPosition={focusedPosition}
-                onFocusPosition={onFocusedPositionChange}
+                onFocusPosition={setFocusedPosition}
               />
 
               {/* Display Toolbar */}
               <DisplayToolbar
                 fretboardOverlay={fretboardOverlay}
-                onOverlayChange={onOverlayChange}
+                onOverlayChange={setFretboardOverlay}
                 showCAGEDPositions={showCAGEDPositions}
-                onToggleCAGEDPositions={onToggleCAGEDPositions}
+                onToggleCAGEDPositions={() =>
+                  setShowCAGEDPositions(!showCAGEDPositions)
+                }
                 focusedPosition={focusedPosition}
-                onFocusedPositionChange={onFocusedPositionChange}
+                onFocusedPositionChange={setFocusedPosition}
                 noteLabelMode={noteLabelMode}
-                onNoteLabelModeChange={onNoteLabelModeChange}
+                onNoteLabelModeChange={setNoteLabelMode}
                 showVoicings={showVoicings}
                 onToggleVoicings={onToggleVoicings}
                 showVoicingFingers={showVoicingFingers}
@@ -627,17 +600,23 @@ export function Fretboard({
                 onNextVoicing={onNextVoicing}
                 onPreviousVoicing={onPreviousVoicing}
                 showVoiceLeading={showVoiceLeading}
-                onToggleVoiceLeading={onToggleVoiceLeading}
+                onToggleVoiceLeading={() =>
+                  setShowVoiceLeading(!showVoiceLeading)
+                }
                 showScaleTones={showScaleTones}
-                onToggleScaleTones={onToggleScaleTones}
+                onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
                 targetNoteMode={targetNoteMode}
-                onTargetNoteModeChange={onTargetNoteModeChange}
+                onTargetNoteModeChange={setTargetNoteMode}
                 showChromaticApproach={showChromaticApproach}
-                onToggleChromaticApproach={onToggleChromaticApproach}
+                onToggleChromaticApproach={() =>
+                  setShowChromaticApproach(!showChromaticApproach)
+                }
                 showDiatonicApproach={showDiatonicApproach}
-                onToggleDiatonicApproach={onToggleDiatonicApproach}
+                onToggleDiatonicApproach={() =>
+                  setShowDiatonicApproach(!showDiatonicApproach)
+                }
                 showEnclosures={showEnclosures}
-                onToggleEnclosures={onToggleEnclosures}
+                onToggleEnclosures={() => setShowEnclosures(!showEnclosures)}
               />
             </div>
           )}

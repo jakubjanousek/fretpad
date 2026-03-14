@@ -17,33 +17,17 @@ import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { Card, CardContent } from "@/components/ui/card";
+import { useFretboardData } from "@/hooks/useFretboardData";
 import { useFirstVisit } from "@/hooks/useFirstVisit";
 import { usePracticeModeSetup } from "@/hooks/usePracticeModeSetup";
 import { usePracticeTracker } from "@/hooks/usePracticeTracker";
 import { useRollingAccuracy } from "@/hooks/useRollingAccuracy";
-import { getFretNotesForChord } from "@/lib/fretboard";
 import { MODE_STEPS, PRACTICE_MODES } from "@/lib/modes";
-import {
-  getArpeggioConnections,
-  getArpeggioNotes,
-} from "@/lib/theory/arpeggios";
-import { getOverlayNotes } from "@/lib/theory/pentatonic";
-import {
-  filterApproachNotesFromChordTones,
-  getChromaticApproachNotes,
-  getDiatonicApproachNotes,
-  getEnclosurePatterns,
-  getTargetNotes,
-} from "@/lib/theory/targetNotes";
-import { getThreeNPSNotes } from "@/lib/theory/threeNPS";
-import {
-  calculateVoiceLeadingPaths,
-  filterBestPaths,
-  getNextChord,
-} from "@/lib/theory/voiceLeading";
+import { getNextChord } from "@/lib/theory/voiceLeading";
 import type { PracticeModeId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
+import { useShallow } from "zustand/react/shallow";
 
 const AudioInputScorecard = dynamic(
   () =>
@@ -61,79 +45,57 @@ export function SharedPracticePage({ modeId }: SharedPracticePageProps) {
   const modeConfig = PRACTICE_MODES[modeId];
   const { unlockedStepIndex } = usePracticeModeSetup(modeId);
 
-  const currentChord = useAppStore((state) => state.currentChord);
-  const progression = useAppStore((state) => state.progression);
-  const currentBarIndex = useAppStore((state) => state.currentBarIndex);
-  const currentChordIndex = useAppStore((state) => state.currentChordIndex);
-  const isPlaying = useAppStore((state) => state.isPlaying);
-  const showScaleTones = useAppStore((state) => state.showScaleTones);
-  const setShowScaleTones = useAppStore((state) => state.setShowScaleTones);
-  const showVoiceLeading = useAppStore((state) => state.showVoiceLeading);
-  const setShowVoiceLeading = useAppStore((state) => state.setShowVoiceLeading);
-  const noteLabelMode = useAppStore((state) => state.noteLabelMode);
-  const setNoteLabelMode = useAppStore((state) => state.setNoteLabelMode);
-  const previewScale = useAppStore((state) => state.previewScale);
-  const fretboardOverlay = useAppStore((state) => state.fretboardOverlay);
-  const setFretboardOverlay = useAppStore((state) => state.setFretboardOverlay);
-  const showCAGEDPositions = useAppStore((state) => state.showCAGEDPositions);
-  const setShowCAGEDPositions = useAppStore(
-    (state) => state.setShowCAGEDPositions,
+  const {
+    currentChord,
+    progression,
+    currentBarIndex,
+    currentChordIndex,
+    isPlaying,
+    quizActive,
+    quizQuestion,
+    startQuiz,
+    showVoicings,
+    setShowVoicings,
+    showVoicingFingers,
+    setShowVoicingFingers,
+    availableVoicings,
+    selectedVoicingIndex,
+    selectNextVoicing,
+    selectPreviousVoicing,
+    getSelectedVoicing,
+    refreshVoicingsForChord,
+    voiceLeadingEnabled,
+    updateVoiceLeadingSuggestions,
+  } = useAppStore(
+    useShallow((state) => ({
+      currentChord: state.currentChord,
+      progression: state.progression,
+      currentBarIndex: state.currentBarIndex,
+      currentChordIndex: state.currentChordIndex,
+      isPlaying: state.isPlaying,
+      quizActive: state.quizActive,
+      quizQuestion: state.quizQuestion,
+      startQuiz: state.startQuiz,
+      showVoicings: state.showVoicings,
+      setShowVoicings: state.setShowVoicings,
+      showVoicingFingers: state.showVoicingFingers,
+      setShowVoicingFingers: state.setShowVoicingFingers,
+      availableVoicings: state.availableVoicings,
+      selectedVoicingIndex: state.selectedVoicingIndex,
+      selectNextVoicing: state.selectNextVoicing,
+      selectPreviousVoicing: state.selectPreviousVoicing,
+      getSelectedVoicing: state.getSelectedVoicing,
+      refreshVoicingsForChord: state.refreshVoicingsForChord,
+      voiceLeadingEnabled: state.voiceLeading.enabled,
+      updateVoiceLeadingSuggestions: state.updateVoiceLeadingSuggestions,
+    })),
   );
-  const focusedPosition = useAppStore((state) => state.focusedPosition);
-  const setFocusedPosition = useAppStore((state) => state.setFocusedPosition);
-
-  const targetNoteMode = useAppStore((state) => state.targetNoteMode);
-  const setTargetNoteMode = useAppStore((state) => state.setTargetNoteMode);
-  const showChromaticApproach = useAppStore(
-    (state) => state.showChromaticApproach,
-  );
-  const setShowChromaticApproach = useAppStore(
-    (state) => state.setShowChromaticApproach,
-  );
-  const showDiatonicApproach = useAppStore(
-    (state) => state.showDiatonicApproach,
-  );
-  const setShowDiatonicApproach = useAppStore(
-    (state) => state.setShowDiatonicApproach,
-  );
-  const showEnclosures = useAppStore((state) => state.showEnclosures);
-  const setShowEnclosures = useAppStore((state) => state.setShowEnclosures);
-  const focusedEnclosureTarget = useAppStore(
-    (state) => state.focusedEnclosureTarget,
-  );
-  const setFocusedEnclosureTarget = useAppStore(
-    (state) => state.setFocusedEnclosureTarget,
-  );
-
-  const quizActive = useAppStore((state) => state.quizActive);
-  const quizQuestion = useAppStore((state) => state.quizQuestion);
-  const startQuiz = useAppStore((state) => state.startQuiz);
-
-  const showVoicings = useAppStore((state) => state.showVoicings);
-  const setShowVoicings = useAppStore((state) => state.setShowVoicings);
-  const showVoicingFingers = useAppStore((state) => state.showVoicingFingers);
-  const setShowVoicingFingers = useAppStore(
-    (state) => state.setShowVoicingFingers,
-  );
-  const availableVoicings = useAppStore((state) => state.availableVoicings);
-  const selectedVoicingIndex = useAppStore(
-    (state) => state.selectedVoicingIndex,
-  );
-  const selectNextVoicing = useAppStore((state) => state.selectNextVoicing);
-  const selectPreviousVoicing = useAppStore(
-    (state) => state.selectPreviousVoicing,
-  );
-  const getSelectedVoicing = useAppStore((state) => state.getSelectedVoicing);
-  const refreshVoicingsForChord = useAppStore(
-    (state) => state.refreshVoicingsForChord,
-  );
-
-  const voiceLeadingEnabled = useAppStore(
-    (state) => state.voiceLeading.enabled,
-  );
-  const updateVoiceLeadingSuggestions = useAppStore(
-    (state) => state.updateVoiceLeadingSuggestions,
-  );
+  const {
+    fretNotes,
+    voiceLeadingPaths,
+    targetNoteData,
+    arpeggioConnections,
+  } = useFretboardData();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpGuideOpen, setHelpGuideOpen] = useState(false);
@@ -237,120 +199,6 @@ export function SharedPracticePage({ modeId }: SharedPracticePageProps) {
     modeConfig.showVoicingsButton,
   ]);
 
-  const activeScale =
-    previewScale || (showScaleTones ? currentChord?.suggestedScales[0] : null);
-
-  const isOverlayActive = fretboardOverlay !== "none";
-
-  const fretNotes = useMemo(() => {
-    if (!currentChord) return [];
-
-    if (isOverlayActive) {
-      if (fretboardOverlay === "threeNotePerString") {
-        const scaleName =
-          currentChord.suggestedScales[0]?.split(" ").slice(1).join(" ") ||
-          "major";
-        return getThreeNPSNotes(currentChord.root, {
-          chord: currentChord,
-          scaleName,
-        });
-      }
-      if (fretboardOverlay === "arpeggio") {
-        return getArpeggioNotes(currentChord.root, {
-          chord: currentChord,
-        });
-      }
-      return getOverlayNotes(
-        currentChord.root,
-        fretboardOverlay as Exclude<
-          typeof fretboardOverlay,
-          "none" | "threeNotePerString" | "arpeggio"
-        >,
-        { chord: currentChord },
-      );
-    }
-
-    return getFretNotesForChord(currentChord, {
-      includeScale: showScaleTones || !!previewScale,
-      scaleName: activeScale || undefined,
-    });
-  }, [
-    currentChord,
-    isOverlayActive,
-    fretboardOverlay,
-    showScaleTones,
-    previewScale,
-    activeScale,
-  ]);
-
-  const arpeggioConnections = useMemo(() => {
-    if (fretboardOverlay !== "arpeggio") return [];
-    return getArpeggioConnections(fretNotes);
-  }, [fretboardOverlay, fretNotes]);
-
-  const voiceLeadingPaths = useMemo(() => {
-    if (!showVoiceLeading || !currentChord) return [];
-
-    const nextChord = getNextChord(
-      progression,
-      currentBarIndex,
-      currentChordIndex,
-    );
-    if (!nextChord) return [];
-
-    const allPaths = calculateVoiceLeadingPaths(currentChord, nextChord);
-    return filterBestPaths(allPaths);
-  }, [
-    showVoiceLeading,
-    currentChord,
-    progression,
-    currentBarIndex,
-    currentChordIndex,
-  ]);
-
-  const targetNoteData = useMemo(() => {
-    if (!currentChord || targetNoteMode === "none") {
-      return {
-        targets: [],
-        chromatic: [],
-        diatonic: [],
-        enclosures: [],
-      };
-    }
-
-    const targets = getTargetNotes(targetNoteMode, fretNotes);
-
-    const chromatic = showChromaticApproach
-      ? filterApproachNotesFromChordTones(
-          getChromaticApproachNotes(targets),
-          fretNotes.filter((n) => n.isChordTone),
-        )
-      : [];
-
-    const diatonic = showDiatonicApproach
-      ? filterApproachNotesFromChordTones(
-          getDiatonicApproachNotes(
-            currentChord,
-            targets,
-            activeScale || currentChord.suggestedScales[0],
-          ),
-          fretNotes.filter((n) => n.isChordTone),
-        )
-      : [];
-
-    const enclosures = showEnclosures ? getEnclosurePatterns(targets) : [];
-
-    return { targets, chromatic, diatonic, enclosures };
-  }, [
-    currentChord,
-    targetNoteMode,
-    fretNotes,
-    showChromaticApproach,
-    showDiatonicApproach,
-    showEnclosures,
-    activeScale,
-  ]);
-
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-30">
@@ -393,44 +241,14 @@ export function SharedPracticePage({ modeId }: SharedPracticePageProps) {
               <Fretboard
                 fretNotes={fretNotes}
                 voiceLeadingPaths={voiceLeadingPaths}
-                showVoiceLeading={showVoiceLeading}
-                showScaleTones={showScaleTones}
-                noteLabelMode={noteLabelMode}
-                fretboardOverlay={fretboardOverlay}
-                showCAGEDPositions={showCAGEDPositions}
-                focusedPosition={focusedPosition}
-                onToggleVoiceLeading={() =>
-                  setShowVoiceLeading(!showVoiceLeading)
-                }
-                onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
-                onNoteLabelModeChange={setNoteLabelMode}
-                onOverlayChange={setFretboardOverlay}
-                onToggleCAGEDPositions={() =>
-                  setShowCAGEDPositions(!showCAGEDPositions)
-                }
-                onFocusedPositionChange={setFocusedPosition}
                 quizMode={quizActive}
                 quizTargetPosition={
                   quizQuestion ? quizQuestion.targetNote : null
                 }
-                targetNoteMode={targetNoteMode}
                 targetNotes={targetNoteData.targets}
                 chromaticApproaches={targetNoteData.chromatic}
                 diatonicApproaches={targetNoteData.diatonic}
                 enclosures={targetNoteData.enclosures}
-                showChromaticApproach={showChromaticApproach}
-                showDiatonicApproach={showDiatonicApproach}
-                showEnclosures={showEnclosures}
-                focusedEnclosureTarget={focusedEnclosureTarget}
-                onTargetNoteModeChange={setTargetNoteMode}
-                onToggleChromaticApproach={() =>
-                  setShowChromaticApproach(!showChromaticApproach)
-                }
-                onToggleDiatonicApproach={() =>
-                  setShowDiatonicApproach(!showDiatonicApproach)
-                }
-                onToggleEnclosures={() => setShowEnclosures(!showEnclosures)}
-                onFocusedEnclosureTargetChange={setFocusedEnclosureTarget}
                 arpeggioConnections={arpeggioConnections}
                 showVoicings={showVoicings}
                 selectedVoicing={selectedVoicing}
