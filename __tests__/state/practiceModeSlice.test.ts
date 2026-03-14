@@ -73,8 +73,8 @@ describe("practiceModeSlice", () => {
       currentChordIndex: 0,
       tempo: 40,
       selectedStyle: "ballad",
-      progressionHistory: [PRESET_PROGRESSIONS["Minor ii-V-i in Dm"]],
-      progressionFuture: [PRESET_PROGRESSIONS["Rhythm Changes Bridge"]],
+      progressionHistory: [PRESET_PROGRESSIONS["Minor Blues in Am"]],
+      progressionFuture: [PRESET_PROGRESSIONS["Rhythm Changes (A)"]],
     });
 
     useAppStore.getState().enterMode("learn-the-neck");
@@ -88,7 +88,7 @@ describe("practiceModeSlice", () => {
     expect(state.tempo).toBe(90);
     expect(state.selectedStyle).toBe("bossaNova");
     expect(state.progressionHistory).toEqual([
-      PRESET_PROGRESSIONS["Minor ii-V-i in Dm"],
+      PRESET_PROGRESSIONS["Minor Blues in Am"],
       PRESET_PROGRESSIONS["12-bar blues in A"],
     ]);
     expect(state.progressionFuture).toEqual([]);
