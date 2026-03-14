@@ -86,7 +86,8 @@ export function beatsToTime(beats: number): string {
   const wholeBars = Math.floor(beats / 4);
   const remainingBeats = beats % 4;
   const wholeBeats = Math.floor(remainingBeats);
-  const sixteenths = Math.round((remainingBeats - wholeBeats) * 4);
+  const fractionalSixteenths = (remainingBeats - wholeBeats) * 4;
+  const sixteenths = Number(fractionalSixteenths.toFixed(6));
 
   if (sixteenths > 0) {
     return `${wholeBars}:${wholeBeats}:${sixteenths}`;
