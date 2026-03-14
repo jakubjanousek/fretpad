@@ -39,12 +39,12 @@ describe("audio scheduler timing helpers", () => {
   });
 
   it("preserves bar-level jazz timing without compressing it to chord length", () => {
-    expect(resolveBarEventBeat({ time: "0:0", offsetBeats: 2 / 3 })).toBeCloseTo(
-      2 / 3,
-    );
-    expect(resolveBarEventBeat({ time: "0:2", offsetBeats: 2 / 3 })).toBeCloseTo(
-      8 / 3,
-    );
+    expect(
+      resolveBarEventBeat({ time: "0:0", offsetBeats: 2 / 3 }),
+    ).toBeCloseTo(2 / 3);
+    expect(
+      resolveBarEventBeat({ time: "0:2", offsetBeats: 2 / 3 }),
+    ).toBeCloseTo(8 / 3);
   });
 
   it("scales event offsets with multi-chord bars", () => {
@@ -69,11 +69,12 @@ describe("audio scheduler timing helpers", () => {
   it("keeps jazz ride events on the full bar grid", () => {
     const rideSkip = jazzSwingStyle.patterns.drums.events[1];
     const secondHalfSkip = jazzSwingStyle.patterns.drums.events[4];
-    expect(rideSkip).toBeDefined();
-    expect(secondHalfSkip).toBeDefined();
+    if (!rideSkip || !secondHalfSkip) {
+      throw new Error("Expected jazz ride skip events to exist");
+    }
 
-    expect(resolveBarEventBeat(rideSkip!)).toBeCloseTo(2 / 3);
-    expect(resolveBarEventBeat(secondHalfSkip!)).toBeCloseTo(8 / 3);
+    expect(resolveBarEventBeat(rideSkip)).toBeCloseTo(2 / 3);
+    expect(resolveBarEventBeat(secondHalfSkip)).toBeCloseTo(8 / 3);
   });
 
   it("produces deterministic bounded humanization offsets", () => {
