@@ -2,8 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
-import { createBassInstrument } from "@/lib/audio/instruments/bassInstrument";
-import { createChordInstrument } from "@/lib/audio/instruments/chordInstrument";
+import {
+  type BassInstrument,
+  createBassInstrument,
+} from "@/lib/audio/instruments/bassInstrument";
+import {
+  type ChordInstrument,
+  createChordInstrument,
+} from "@/lib/audio/instruments/chordInstrument";
 import {
   createDrumInstrument,
   type DrumInstrument,
@@ -63,8 +69,8 @@ export function useAudioEngine({
   onLoop,
   onStop,
 }: UseAudioEngineOptions): AudioEngineReturn {
-  const bassRef = useRef<Tone.Synth | null>(null);
-  const chordRef = useRef<Tone.PolySynth | null>(null);
+  const bassRef = useRef<BassInstrument | null>(null);
+  const chordRef = useRef<ChordInstrument | null>(null);
   const drumsRef = useRef<DrumInstrument | null>(null);
   const metronomeRef = useRef<MetronomeInstrument | null>(null);
   const scheduledEventsRef = useRef<number[]>([]);
@@ -230,9 +236,11 @@ export function useAudioEngine({
   // Update swing setting when style changes
   useEffect(() => {
     const transport = Tone.getTransport();
-    transport.swing = style.swing;
+    const useTransportSwing =
+      style.timing?.useTransportSwing ?? style.swing > 0;
+    transport.swing = useTransportSwing ? style.swing : 0;
     transport.swingSubdivision = "8n";
-  }, [style.swing]);
+  }, [style.swing, style.timing?.useTransportSwing]);
 
   // Update backing track volume and mute state dynamically
   // Also runs when instrumentVersion changes (after instrument recreation)

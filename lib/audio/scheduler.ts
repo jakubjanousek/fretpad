@@ -1,4 +1,6 @@
 import * as Tone from "tone";
+import type { BassInstrument } from "@/lib/audio/instruments/bassInstrument";
+import type { ChordInstrument } from "@/lib/audio/instruments/chordInstrument";
 import type { DrumInstrument } from "@/lib/audio/instruments/drumInstrument";
 import {
   METRONOME_ACCENT_NOTE,
@@ -18,8 +20,8 @@ import type {
 import { getApproachNote, getBassNote, getVoicing } from "./voicings";
 
 interface SchedulerInstruments {
-  bass: Tone.Synth;
-  chord: Tone.PolySynth;
+  bass: BassInstrument;
+  chord: ChordInstrument;
   metronome?: MetronomeInstrument;
   drums?: DrumInstrument;
 }
@@ -37,7 +39,7 @@ interface ScheduleOptions {
 /**
  * Parses a Tone.js time string like "0:2" or "0:1:2" into total beats
  */
-function parseTimeToBeats(time: string): number {
+export function parseTimeToBeats(time: string): number {
   const parts = time.split(":").map(Number);
   if (parts.length === 2) {
     // "bars:beats" format
@@ -57,7 +59,7 @@ function parseTimeToBeats(time: string): number {
 /**
  * Converts beats to Tone.js time format
  */
-function beatsToTime(beats: number): string {
+export function beatsToTime(beats: number): string {
   const wholeBars = Math.floor(beats / 4);
   const remainingBeats = beats % 4;
   const wholeBeats = Math.floor(remainingBeats);
@@ -67,6 +69,24 @@ function beatsToTime(beats: number): string {
     return `${wholeBars}:${wholeBeats}:${sixteenths}`;
   }
   return `${wholeBars}:${wholeBeats}`;
+}
+
+interface EventTimingInput {
+  time: string;
+  offsetBeats?: number;
+}
+
+export function resolveEventBeat(
+  event: EventTimingInput,
+  chordBeats: number,
+  instrumentOffsetBeats = 0,
+): number {
+  const patternBeats = 4;
+  const scale = chordBeats / patternBeats;
+  const baseBeat = parseTimeToBeats(event.time) * scale;
+  const explicitOffset = (event.offsetBeats ?? 0) * scale;
+
+  return baseBeat + explicitOffset + instrumentOffsetBeats;
 }
 
 /**
@@ -79,17 +99,18 @@ function scheduleBassPattern(
   nextChord: Chord | null,
   startBeat: number,
   chordBeats: number,
-  bassInstrument: Tone.Synth,
+  bassInstrument: BassInstrument,
   bassOctave: number,
+  instrumentOffsetBeats = 0,
 ): number[] {
   const eventIds: number[] = [];
-  const patternBeats = 4; // Patterns are defined for 4 beats
-
-  // Scale factor for multi-chord bars (e.g., 2 chords = 0.5 scale)
-  const scale = chordBeats / patternBeats;
 
   for (const event of pattern) {
-    const eventBeat = parseTimeToBeats(event.time) * scale;
+    const eventBeat = resolveEventBeat(
+      event,
+      chordBeats,
+      instrumentOffsetBeats,
+    );
     const absoluteBeat = startBeat + eventBeat;
 
     // Skip if event falls outside this chord's duration
@@ -139,16 +160,18 @@ function scheduleChordPattern(
   chord: Chord,
   startBeat: number,
   chordBeats: number,
-  chordInstrument: Tone.PolySynth,
+  chordInstrument: ChordInstrument,
   chordOctave: number,
+  instrumentOffsetBeats = 0,
 ): number[] {
   const eventIds: number[] = [];
-  const patternBeats = 4;
-
-  const scale = chordBeats / patternBeats;
 
   for (const event of pattern) {
-    const eventBeat = parseTimeToBeats(event.time) * scale;
+    const eventBeat = resolveEventBeat(
+      event,
+      chordBeats,
+      instrumentOffsetBeats,
+    );
     const absoluteBeat = startBeat + eventBeat;
 
     if (eventBeat >= chordBeats) continue;
@@ -183,14 +206,16 @@ function scheduleDrumPattern(
   startBeat: number,
   chordBeats: number,
   drumInstrument: DrumInstrument,
+  instrumentOffsetBeats = 0,
 ): number[] {
   const eventIds: number[] = [];
-  const patternBeats = 4;
-
-  const scale = chordBeats / patternBeats;
 
   for (const event of pattern) {
-    const eventBeat = parseTimeToBeats(event.time) * scale;
+    const eventBeat = resolveEventBeat(
+      event,
+      chordBeats,
+      instrumentOffsetBeats,
+    );
     const absoluteBeat = startBeat + eventBeat;
 
     if (eventBeat >= chordBeats) continue;
@@ -287,6 +312,7 @@ export function scheduleProgression(
   const transport = Tone.getTransport();
   const eventIds: number[] = [];
   const beatsPerBar = progression.timeSignature.numerator;
+  const instrumentOffsets = style.timing?.instrumentOffsets;
 
   // Offset all events by count-in bars if specified
   const countInOffset = (options?.countInBars ?? 0) * beatsPerBar;
@@ -328,6 +354,7 @@ export function scheduleProgression(
         barChord.beats,
         instruments.bass,
         style.instruments.bass.octave,
+        instrumentOffsets?.bass ?? 0,
       );
       eventIds.push(...bassEventIds);
 
@@ -340,6 +367,7 @@ export function scheduleProgression(
         barChord.beats,
         instruments.chord,
         style.instruments.chord.octave,
+        instrumentOffsets?.chord ?? 0,
       );
       eventIds.push(...chordEventIds);
 
@@ -351,6 +379,7 @@ export function scheduleProgression(
           currentBeat,
           barChord.beats,
           instruments.drums,
+          instrumentOffsets?.drums ?? 0,
         );
         eventIds.push(...drumEventIds);
       }
