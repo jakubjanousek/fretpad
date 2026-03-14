@@ -47,6 +47,11 @@ export const createPracticeModeSlice: StateCreator<
       state.setSelectedStyle(config.defaultStyle);
     }
 
+    // Deactivate mic when switching to a mode without mic support
+    if (!config.showMicToggle && state.micActive) {
+      state.setMicActive(false);
+    }
+
     // Apply display constraints based on mode
     if (!config.showVoicingsButton && state.showVoicings) {
       state.setShowVoicings(false);

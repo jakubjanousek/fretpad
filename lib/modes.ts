@@ -27,6 +27,7 @@ export const PRACTICE_MODES: Record<
     showTargetsDropdown: false,
     showQuiz: true,
     showCAGED: true,
+    showMicToggle: false,
     theoryTabs: ["chord"],
   },
 
@@ -46,6 +47,7 @@ export const PRACTICE_MODES: Record<
     showTargetsDropdown: true,
     showQuiz: false,
     showCAGED: false,
+    showMicToggle: true,
     theoryTabs: ["chord", "analysis"],
   },
 
@@ -65,6 +67,7 @@ export const PRACTICE_MODES: Record<
     showTargetsDropdown: false,
     showQuiz: false,
     showCAGED: false,
+    showMicToggle: false,
     theoryTabs: ["chord", "subs"],
   },
 };

@@ -449,5 +449,6 @@ export interface PracticeModeConfig {
   showTargetsDropdown: boolean;
   showQuiz: boolean;
   showCAGED: boolean;
+  showMicToggle: boolean;
   theoryTabs: TheoryTabId[];
 }

@@ -1,6 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
+  type AudioInputSlice,
+  createAudioInputSlice,
+} from "./slices/audioInputSlice";
+import {
   type BackingTrackSlice,
   createBackingTrackSlice,
 } from "./slices/backingTrackSlice";
@@ -39,7 +43,8 @@ export type AppState = ProgressionSlice &
   QuizSlice &
   SessionPlannerSlice &
   VoicingSlice &
-  PracticeModeSlice;
+  PracticeModeSlice &
+  AudioInputSlice;
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -54,9 +59,11 @@ export const useAppStore = create<AppState>()(
       ...createSessionPlannerSlice(...a),
       ...createVoicingSlice(...a),
       ...createPracticeModeSlice(...a),
+      ...createAudioInputSlice(...a),
     }),
     {
       name: "fretpad-state",
+      // micActive and score are intentionally excluded — mic should not auto-activate on reload
       partialize: (state) => ({
         progression: state.progression,
         tempo: state.tempo,
