@@ -59,6 +59,13 @@ interface HumanizationResult {
   durationOffsetBeats: number;
 }
 
+interface ParsedBarChordSlot {
+  chord: Chord;
+  chordIndex: number;
+  startBeat: number;
+  endBeat: number;
+}
+
 /**
  * Parses a Tone.js time string like "0:2" or "0:1:2" into total beats
  */
@@ -98,6 +105,17 @@ export function beatsToTime(beats: number): string {
 interface EventTimingInput {
   time: string;
   offsetBeats?: number;
+}
+
+export function resolveBarEventBeat(
+  event: EventTimingInput,
+  instrumentOffsetBeats = 0,
+): number {
+  return (
+    parseTimeToBeats(event.time) +
+    (event.offsetBeats ?? 0) +
+    instrumentOffsetBeats
+  );
 }
 
 export function resolveEventBeat(
@@ -147,11 +165,22 @@ export function getHumanization(
   }
 
   const baseSeed = `${instrument}:${context.barIndex}:${context.chordIndex}:${context.eventIndex}:loop:${context.loopIteration}`;
+  const timingSeed = getDeterministicCenteredValue(`${baseSeed}:timing`);
+  const timingOffsetBeats = (() => {
+    const timingBeats = profile.timingBeats ?? 0;
+
+    switch (profile.timingDirection) {
+      case "late":
+        return ((timingSeed + 1) / 2) * timingBeats;
+      case "early":
+        return ((timingSeed - 1) / 2) * timingBeats;
+      default:
+        return timingSeed * timingBeats;
+    }
+  })();
 
   return {
-    timingOffsetBeats:
-      getDeterministicCenteredValue(`${baseSeed}:timing`) *
-      (profile.timingBeats ?? 0),
+    timingOffsetBeats,
     velocityOffset:
       getDeterministicCenteredValue(`${baseSeed}:velocity`) *
       (profile.velocityDelta ?? 0),
@@ -289,6 +318,105 @@ function scheduleBassPattern(
   return eventIds;
 }
 
+function scheduleBassPatternForBar(
+  transport: typeof Tone.Transport,
+  pattern: PatternEvent[],
+  progression: Progression,
+  barIndex: number,
+  barChords: ParsedBarChordSlot[],
+  startBeat: number,
+  beatsPerBar: number,
+  bassInstrument: BassInstrument,
+  bassOctave: number,
+  instrumentOffsetBeats = 0,
+  variationIndex = 0,
+  humanizationProfile?: HumanizationProfile,
+  loopIteration = 0,
+): number[] {
+  const eventIds: number[] = [];
+  const activePattern = pattern
+    .map((event, patternEventIndex) => ({
+      event,
+      patternEventIndex,
+      eventBeat: resolveBarEventBeat(event, instrumentOffsetBeats),
+    }))
+    .filter(({ eventBeat }) => eventBeat < beatsPerBar);
+
+  for (const slot of barChords) {
+    const slotEvents = activePattern.filter(
+      ({ eventBeat }) => eventBeat >= slot.startBeat && eventBeat < slot.endBeat,
+    );
+    const nextChordInfo = getNextChord(progression, barIndex, slot.chordIndex);
+    const nextChord = nextChordInfo ? parseChordSymbol(nextChordInfo.chord) : null;
+    const walkEvents = slotEvents.filter(({ event }) => event.type === "walk");
+    const walkingLine = getWalkingBassLine(slot.chord, {
+      octave: bassOctave,
+      steps: walkEvents.length,
+      variationIndex: variationIndex + slot.chordIndex,
+      nextChord,
+    });
+    let walkingLineIndex = 0;
+
+    for (const { event, eventBeat: baseEventBeat, patternEventIndex } of slotEvents) {
+      const humanization = getHumanization(humanizationProfile, "bass", {
+        loopIteration,
+        barIndex,
+        chordIndex: slot.chordIndex,
+        eventIndex: patternEventIndex,
+      });
+      const eventBeat = clamp(
+        baseEventBeat + humanization.timingOffsetBeats,
+        0,
+        Math.max(beatsPerBar - 0.01, 0),
+      );
+      const duration = resolveHumanizedDuration(
+        event.duration,
+        humanization.durationOffsetBeats,
+      );
+      const absoluteBeat = startBeat + eventBeat;
+      const time = beatsToTime(absoluteBeat);
+
+      const eventId = transport.schedule((audioTime) => {
+        const safeTime = Math.max(audioTime, Tone.now());
+        let noteToPlay: string;
+
+        if (event.type === "approach" && nextChord) {
+          noteToPlay = getApproachNote(nextChord, bassOctave);
+        } else if (event.type === "walk") {
+          noteToPlay =
+            walkingLine[walkingLineIndex] ??
+            getBassNote(slot.chord, 1, bassOctave, nextChord ?? undefined);
+          walkingLineIndex += 1;
+        } else {
+          const degree = event.degree ?? 1;
+          noteToPlay = getBassNote(
+            slot.chord,
+            degree,
+            bassOctave,
+            nextChord ?? undefined,
+          );
+        }
+
+        const velocity = clamp(
+          (event.velocity ?? 0.8) + humanization.velocityOffset,
+          0.05,
+          1,
+        );
+        bassInstrument.triggerAttackRelease(
+          noteToPlay,
+          duration,
+          safeTime,
+          velocity,
+        );
+      }, time);
+
+      eventIds.push(eventId);
+    }
+  }
+
+  return eventIds;
+}
+
 /**
  * Schedules chord pattern events for a single chord
  */
@@ -413,6 +541,56 @@ function scheduleDrumPattern(
   return eventIds;
 }
 
+function scheduleDrumPatternForBar(
+  transport: typeof Tone.Transport,
+  pattern: DrumPatternEvent[],
+  startBeat: number,
+  beatsPerBar: number,
+  drumInstrument: DrumInstrument,
+  instrumentOffsetBeats = 0,
+  humanizationProfile?: HumanizationProfile,
+  scheduleContext?: Pick<HumanizationContext, "barIndex">,
+  loopIteration = 0,
+): number[] {
+  const eventIds: number[] = [];
+  const activePattern = pattern
+    .map((event, eventIndex) => ({
+      event,
+      eventIndex,
+      eventBeat: resolveBarEventBeat(event, instrumentOffsetBeats),
+    }))
+    .filter(({ eventBeat }) => eventBeat < beatsPerBar);
+
+  for (const { event, eventBeat: baseEventBeat, eventIndex } of activePattern) {
+    const humanization = getHumanization(humanizationProfile, "drums", {
+      loopIteration,
+      barIndex: scheduleContext?.barIndex ?? 0,
+      chordIndex: 0,
+      eventIndex,
+    });
+    const eventBeat = clamp(
+      baseEventBeat + humanization.timingOffsetBeats,
+      0,
+      Math.max(beatsPerBar - 0.01, 0),
+    );
+    const absoluteBeat = startBeat + eventBeat;
+    const time = beatsToTime(absoluteBeat);
+
+    const eventId = transport.schedule((audioTime) => {
+      const velocity = clamp(
+        (event.velocity ?? 0.7) + humanization.velocityOffset,
+        0.05,
+        1,
+      );
+      drumInstrument.trigger(event.sound, audioTime, velocity);
+    }, time);
+
+    eventIds.push(eventId);
+  }
+
+  return eventIds;
+}
+
 /**
  * Schedules metronome clicks for the entire progression
  */
@@ -505,6 +683,9 @@ export function scheduleProgression(
   for (let barIndex = 0; barIndex < progression.bars.length; barIndex++) {
     const bar = progression.bars[barIndex];
     if (!bar) continue;
+    const barStartBeat = currentBeat;
+    const parsedBarChords: ParsedBarChordSlot[] = [];
+    let barBeatCursor = 0;
 
     // Iterate through each chord in the bar
     for (let chordIndex = 0; chordIndex < bar.chords.length; chordIndex++) {
@@ -513,6 +694,12 @@ export function scheduleProgression(
       const chord = parseChordSymbol(barChord.chord);
 
       if (!chord) continue;
+      parsedBarChords.push({
+        chord,
+        chordIndex,
+        startBeat: barBeatCursor,
+        endBeat: barBeatCursor + barChord.beats,
+      });
 
       // Get the next chord for approach notes
       const nextChordInfo = getNextChord(progression, barIndex, chordIndex);
@@ -527,22 +714,24 @@ export function scheduleProgression(
       eventIds.push(changeEventId);
 
       // Schedule bass pattern
-      const bassEventIds = scheduleBassPattern(
-        transport,
-        style.patterns.bass.events,
-        chord,
-        nextChord,
-        currentBeat,
-        barChord.beats,
-        instruments.bass,
-        style.instruments.bass.octave,
-        instrumentOffsets?.bass ?? 0,
-        getPatternVariantIndex(barIndex, chordIndex, 4, loopIteration),
-        humanization?.bass,
-        { barIndex, chordIndex },
-        loopIteration,
-      );
-      eventIds.push(...bassEventIds);
+      if (style.id !== "jazzSwing") {
+        const bassEventIds = scheduleBassPattern(
+          transport,
+          style.patterns.bass.events,
+          chord,
+          nextChord,
+          currentBeat,
+          barChord.beats,
+          instruments.bass,
+          style.instruments.bass.octave,
+          instrumentOffsets?.bass ?? 0,
+          getPatternVariantIndex(barIndex, chordIndex, 4, loopIteration),
+          humanization?.bass,
+          { barIndex, chordIndex },
+          loopIteration,
+        );
+        eventIds.push(...bassEventIds);
+      }
 
       // Schedule chord pattern
       const chordPatternEvents =
@@ -570,7 +759,7 @@ export function scheduleProgression(
       eventIds.push(...chordEventIds);
 
       // Schedule drum pattern
-      if (instruments.drums) {
+      if (instruments.drums && style.id !== "jazzSwing") {
         const drumEventIds = scheduleDrumPattern(
           transport,
           style.patterns.drums.events,
@@ -586,6 +775,41 @@ export function scheduleProgression(
       }
 
       currentBeat += barChord.beats;
+      barBeatCursor += barChord.beats;
+    }
+
+    if (style.id === "jazzSwing" && parsedBarChords.length > 0) {
+      const bassEventIds = scheduleBassPatternForBar(
+        transport,
+        style.patterns.bass.events,
+        progression,
+        barIndex,
+        parsedBarChords,
+        barStartBeat,
+        beatsPerBar,
+        instruments.bass,
+        style.instruments.bass.octave,
+        instrumentOffsets?.bass ?? 0,
+        getPatternVariantIndex(barIndex, 0, 4, loopIteration),
+        humanization?.bass,
+        loopIteration,
+      );
+      eventIds.push(...bassEventIds);
+
+      if (instruments.drums) {
+        const drumEventIds = scheduleDrumPatternForBar(
+          transport,
+          style.patterns.drums.events,
+          barStartBeat,
+          beatsPerBar,
+          instruments.drums,
+          instrumentOffsets?.drums ?? 0,
+          humanization?.drums,
+          { barIndex },
+          loopIteration,
+        );
+        eventIds.push(...drumEventIds);
+      }
     }
   }
 

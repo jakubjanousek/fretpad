@@ -20,17 +20,20 @@ export const jazzSwingStyle: StyleDefinition = {
     },
     humanization: {
       bass: {
-        timingBeats: 0.015,
+        timingBeats: 0.006,
+        timingDirection: "late",
         velocityDelta: 0.05,
         durationBeats: 0.04,
       },
       chord: {
-        timingBeats: 0.04,
+        timingBeats: 0.012,
+        timingDirection: "late",
         velocityDelta: 0.08,
         durationBeats: 0.08,
       },
       drums: {
-        timingBeats: 0.008,
+        timingBeats: 0.002,
+        timingDirection: "late",
         velocityDelta: 0.05,
       },
     },

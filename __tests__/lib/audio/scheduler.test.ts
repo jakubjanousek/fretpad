@@ -5,9 +5,11 @@ import {
   getHumanization,
   getPatternVariantIndex,
   parseTimeToBeats,
+  resolveBarEventBeat,
   resolveEventBeat,
   resolveHumanizedDuration,
 } from "@/lib/audio/scheduler";
+import { jazzSwingStyle } from "@/lib/audio/styles/jazzSwing";
 
 describe("audio scheduler timing helpers", () => {
   it("parses bar-beat-sixteenth time strings into beats", () => {
@@ -36,6 +38,15 @@ describe("audio scheduler timing helpers", () => {
     expect(swungOffbeat).toBeCloseTo(2 / 3);
   });
 
+  it("preserves bar-level jazz timing without compressing it to chord length", () => {
+    expect(resolveBarEventBeat({ time: "0:0", offsetBeats: 2 / 3 })).toBeCloseTo(
+      2 / 3,
+    );
+    expect(resolveBarEventBeat({ time: "0:2", offsetBeats: 2 / 3 })).toBeCloseTo(
+      8 / 3,
+    );
+  });
+
   it("scales event offsets with multi-chord bars", () => {
     const compressedSwing = resolveEventBeat(
       { time: "0:1", offsetBeats: 2 / 3 },
@@ -53,6 +64,16 @@ describe("audio scheduler timing helpers", () => {
     );
 
     expect(laidBackComping).toBeCloseTo(1.59);
+  });
+
+  it("keeps jazz ride events on the full bar grid", () => {
+    const rideSkip = jazzSwingStyle.patterns.drums.events[1];
+    const secondHalfSkip = jazzSwingStyle.patterns.drums.events[4];
+    expect(rideSkip).toBeDefined();
+    expect(secondHalfSkip).toBeDefined();
+
+    expect(resolveBarEventBeat(rideSkip!)).toBeCloseTo(2 / 3);
+    expect(resolveBarEventBeat(secondHalfSkip!)).toBeCloseTo(8 / 3);
   });
 
   it("produces deterministic bounded humanization offsets", () => {
@@ -78,6 +99,24 @@ describe("audio scheduler timing helpers", () => {
     expect(Math.abs(first.timingOffsetBeats)).toBeLessThanOrEqual(0.04);
     expect(Math.abs(first.velocityOffset)).toBeLessThanOrEqual(0.08);
     expect(Math.abs(first.durationOffsetBeats)).toBeLessThanOrEqual(0.1);
+  });
+
+  it("supports late-only timing humanization", () => {
+    const profile = {
+      timingBeats: 0.04,
+      timingDirection: "late" as const,
+      velocityDelta: 0.08,
+      durationBeats: 0.1,
+    };
+    const result = getHumanization(profile, "chord", {
+      loopIteration: 0,
+      barIndex: 2,
+      chordIndex: 1,
+      eventIndex: 0,
+    });
+
+    expect(result.timingOffsetBeats).toBeGreaterThanOrEqual(0);
+    expect(result.timingOffsetBeats).toBeLessThanOrEqual(0.04);
   });
 
   it("changes deterministic values across different event seeds", () => {
