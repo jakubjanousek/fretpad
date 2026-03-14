@@ -151,6 +151,10 @@ interface WalkingBassOptions {
   nextChord?: Chord | null;
 }
 
+type WalkingDirection = -1 | 1;
+
+type WalkingStrategy = "chordTone" | "diatonic" | "chromatic";
+
 function uniqueNotes(notes: Array<NoteName | undefined>): NoteName[] {
   return notes.filter((note, index, list): note is NoteName => {
     if (!note) return false;
@@ -158,17 +162,96 @@ function uniqueNotes(notes: Array<NoteName | undefined>): NoteName[] {
   });
 }
 
-function getNearestMidiForPitchClass(
-  note: NoteName,
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+function midiToNoteName(midi: number): string {
+  return Note.fromMidi(midi) ?? `C${Math.max(1, Math.floor(midi / 12) - 1)}`;
+}
+
+function getScaleSemitonesForChord(chord: Chord): number[] {
+  switch (chord.quality) {
+    case "min":
+    case "min7":
+    case "min6":
+    case "min9":
+      return [0, 2, 3, 5, 7, 9, 10];
+    case "7":
+    case "9":
+    case "sus4":
+      return [0, 2, 4, 5, 7, 9, 10];
+    case "min7b5":
+      return [0, 1, 3, 5, 6, 8, 10];
+    case "dim":
+    case "dim7":
+      return [0, 2, 3, 5, 6, 8, 9];
+    case "aug":
+      return [0, 2, 4, 6, 8, 10];
+    case "sus2":
+      return [0, 2, 5, 7, 9, 10];
+    case "maj":
+    case "maj7":
+    case "6":
+    case "maj9":
+    case "add9":
+    case "other":
+    default:
+      return [0, 2, 4, 5, 7, 9, 11];
+  }
+}
+
+function getScalePitchClasses(chord: Chord): NoteName[] {
+  return getScaleSemitonesForChord(chord)
+    .map((semitones) =>
+      Note.pitchClass(
+        Note.transpose(chord.root, Interval.fromSemitones(semitones)),
+      ),
+    )
+    .filter((note, index, list): note is NoteName => {
+      if (!note) return false;
+      return list.indexOf(note) === index;
+    });
+}
+
+function getWalkingDirection(
+  startMidi: number,
   targetMidi: number,
-): number {
+  variationIndex: number,
+  hasNextChord: boolean,
+): WalkingDirection {
+  const intervalToTarget = targetMidi - startMidi;
+
+  if (!hasNextChord || intervalToTarget === 0) {
+    return variationIndex % 2 === 0 ? 1 : -1;
+  }
+
+  if (Math.abs(intervalToTarget) <= 2 && variationIndex % 2 === 1) {
+    return intervalToTarget >= 0 ? -1 : 1;
+  }
+
+  return intervalToTarget >= 0 ? 1 : -1;
+}
+
+function getNearestMidiInDirection(
+  note: NoteName,
+  previousMidi: number,
+  direction: WalkingDirection,
+  maxDistance = 5,
+): number | null {
   const baseMidi = Note.midi(`${note}3`) ?? 48;
-  let bestMidi = baseMidi;
+  let bestMidi: number | null = null;
   let bestDistance = Number.POSITIVE_INFINITY;
 
   for (let octaveShift = -24; octaveShift <= 24; octaveShift += 12) {
     const candidateMidi = baseMidi + octaveShift;
-    const distance = Math.abs(candidateMidi - targetMidi);
+    const delta = candidateMidi - previousMidi;
+
+    if (direction > 0 && delta <= 0) continue;
+    if (direction < 0 && delta >= 0) continue;
+    if (Math.abs(delta) > maxDistance) continue;
+
+    const distance = Math.abs(delta);
     if (distance < bestDistance) {
       bestMidi = candidateMidi;
       bestDistance = distance;
@@ -178,8 +261,99 @@ function getNearestMidiForPitchClass(
   return bestMidi;
 }
 
-function midiToNoteName(midi: number): string {
-  return Note.fromMidi(midi) ?? `C${Math.max(1, Math.floor(midi / 12) - 1)}`;
+function getStepwiseMidiCandidates(
+  previousMidi: number,
+  direction: WalkingDirection,
+  scalePitchClasses: NoteName[],
+): number[] {
+  const candidates: number[] = [];
+
+  for (let distance = 1; distance <= 3; distance++) {
+    const candidateMidi = previousMidi + direction * distance;
+    const pitchClass = Note.pitchClass(midiToNoteName(candidateMidi));
+
+    if (pitchClass && scalePitchClasses.includes(pitchClass as NoteName)) {
+      candidates.push(candidateMidi);
+    }
+  }
+
+  return candidates;
+}
+
+function getChromaticApproachMidi(
+  targetMidi: number,
+  direction: WalkingDirection,
+): number {
+  return targetMidi - direction;
+}
+
+function getPreferredWalkingStrategies(
+  variationIndex: number,
+  isLastStep: boolean,
+): WalkingStrategy[] {
+  const strategySets: WalkingStrategy[][] = [
+    ["chordTone", "diatonic", "chromatic"],
+    ["diatonic", "chordTone", "chromatic"],
+    ["chromatic", "diatonic", "chordTone"],
+  ];
+  const preferredIndex = variationIndex % strategySets.length;
+  const preferred = strategySets[preferredIndex] ?? strategySets[0] ?? [];
+
+  if (!isLastStep) {
+    return preferred;
+  }
+
+  return [
+    "chromatic",
+    ...preferred.filter((strategy) => strategy !== "chromatic"),
+  ];
+}
+
+function getWalkingCandidatePool(
+  chord: Chord,
+  previousMidi: number,
+  targetMidi: number,
+  direction: WalkingDirection,
+  strategy: WalkingStrategy,
+  isLastStep: boolean,
+): number[] {
+  switch (strategy) {
+    case "chordTone":
+      return uniqueNotes([
+        chord.notes[1],
+        chord.notes[2],
+        chord.guideTones[1],
+        chord.notes[3],
+        chord.root,
+      ])
+        .map((note) => getNearestMidiInDirection(note, previousMidi, direction))
+        .filter((candidate): candidate is number => candidate !== null);
+    case "diatonic":
+      return getStepwiseMidiCandidates(
+        previousMidi,
+        direction,
+        getScalePitchClasses(chord),
+      );
+    case "chromatic":
+      return isLastStep
+        ? [getChromaticApproachMidi(targetMidi, direction)]
+        : [previousMidi + direction, previousMidi + direction * 2];
+    default:
+      return [];
+  }
+}
+
+function canReachTarget(
+  candidateMidi: number,
+  targetMidi: number,
+  remainingSteps: number,
+): boolean {
+  if (remainingSteps <= 0) {
+    return true;
+  }
+
+  const maxTravel = remainingSteps * 5 + 1;
+  return Math.abs(targetMidi - candidateMidi) <= maxTravel;
 }
 
 export function getWalkingBassLine(
@@ -193,50 +367,51 @@ export function getWalkingBassLine(
     ? getEffectiveBass(nextChord)
     : getEffectiveBass(chord);
   const targetMidi = Note.midi(`${targetBass}${octave}`) ?? startMidi;
-  const isAscending = targetMidi >= startMidi;
-  const primaryChordTones = isAscending
-    ? uniqueNotes([
-        chord.notes[1],
-        chord.notes[2],
-        chord.guideTones[1],
-        chord.notes[3],
-      ])
-    : uniqueNotes([
-        chord.guideTones[1],
-        chord.notes[2],
-        chord.notes[1],
-        chord.root,
-      ]);
-  const alternateChordTones = uniqueNotes([
-    chord.notes[2],
-    chord.notes[1],
-    chord.guideTones[1],
-    chord.notes[3],
-    chord.root,
-  ]);
-  const notePool =
-    steps <= 3 || variationIndex % 2 === 0
-      ? primaryChordTones
-      : alternateChordTones;
-  const poolOffset = steps > 3 ? variationIndex % notePool.length : 0;
+  const direction = getWalkingDirection(
+    startMidi,
+    targetMidi,
+    variationIndex,
+    Boolean(nextChord),
+  );
   const line: number[] = [startMidi];
 
   for (let stepIndex = 1; stepIndex < steps; stepIndex++) {
     const previousMidi = line[line.length - 1] ?? startMidi;
-    const pitchClass =
-      notePool[(stepIndex - 1 + poolOffset) % notePool.length] ?? chord.root;
-    let candidateMidi = getNearestMidiForPitchClass(pitchClass, previousMidi);
+    const isLastStep = stepIndex === steps - 1;
+    const remainingSteps = steps - stepIndex - 1;
+    const strategies = getPreferredWalkingStrategies(
+      variationIndex + stepIndex - 1,
+      isLastStep,
+    );
+    let candidateMidi: number | null = null;
 
-    if (isAscending && candidateMidi <= previousMidi) {
-      candidateMidi += 12;
-    }
-    if (!isAscending && candidateMidi >= previousMidi) {
-      candidateMidi -= 12;
+    for (const strategy of strategies) {
+      const pool = getWalkingCandidatePool(
+        chord,
+        previousMidi,
+        targetMidi,
+        direction,
+        strategy,
+        isLastStep && Boolean(nextChord),
+      );
+      candidateMidi =
+        pool.find(
+          (candidate) =>
+            candidate !== previousMidi &&
+            canReachTarget(candidate, targetMidi, remainingSteps),
+        ) ?? null;
+
+      if (candidateMidi !== null) {
+        break;
+      }
     }
 
-    const maxStep = stepIndex === steps - 1 ? 7 : 5;
-    if (Math.abs(candidateMidi - previousMidi) > maxStep) {
-      candidateMidi += isAscending ? -12 : 12;
+    if (candidateMidi === null) {
+      candidateMidi = clamp(
+        previousMidi + direction * 2,
+        startMidi - 12,
+        startMidi + 12,
+      );
     }
 
     line.push(candidateMidi);
