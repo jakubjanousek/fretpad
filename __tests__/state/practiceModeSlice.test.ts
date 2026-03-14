@@ -27,7 +27,6 @@ function resetStore() {
     quizStreak: 0,
     quizBestStreak: 0,
     quizLastResult: null,
-    quizFinished: false,
     sessionActive: false,
     sessionPhaseIndex: 0,
     sessionPhaseElapsedMs: 0,
@@ -104,7 +103,6 @@ describe("practiceModeSlice", () => {
       quizTotal: 4,
       quizStreak: 2,
       quizBestStreak: 3,
-      quizFinished: true,
       quizLastResult: "correct",
       sessionActive: true,
       sessionPhaseIndex: 2,
@@ -134,7 +132,6 @@ describe("practiceModeSlice", () => {
     expect(state.quizTotal).toBe(0);
     expect(state.quizStreak).toBe(0);
     expect(state.quizBestStreak).toBe(0);
-    expect(state.quizFinished).toBe(false);
     expect(state.quizLastResult).toBeNull();
     expect(state.sessionActive).toBe(false);
     expect(state.sessionPhaseIndex).toBe(0);
