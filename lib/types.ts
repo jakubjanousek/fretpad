@@ -434,6 +434,21 @@ export type PracticeModeId =
 
 export type TheoryTabId = "chord" | "modes" | "subs" | "analysis";
 
+// ============================================
+// Challenge Types
+// ============================================
+
+export type ChallengeId =
+  | "ltn-practice-10"
+  | "ltn-quiz-accuracy"
+  | "ltn-keys-4"
+  | "occ-practice-10"
+  | "occ-keys-4"
+  | "occ-practice-30"
+  | "cwv-practice-10"
+  | "cwv-voicings-10"
+  | "cwv-keys-3";
+
 export interface PracticeModeConfig {
   id: PracticeModeId;
   label: string;

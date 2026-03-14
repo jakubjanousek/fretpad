@@ -1,7 +1,7 @@
 ---
 title: "feat: Structured Challenges for Guided Practice Modes"
 type: feat
-status: active
+status: completed
 date: 2026-03-14
 origin: docs/brainstorms/2026-03-13-guided-practice-modes-brainstorm.md
 ---
@@ -298,24 +298,24 @@ useEffect(() => {
 
 ## Acceptance Criteria
 
-- [ ] `ChallengeId` string literal union type defined in `lib/types.ts`
-- [ ] Challenge types, definitions, and pure progress functions in `lib/challenges/challenges.ts`
-- [ ] Challenge storage in `lib/persistence/challengeStorage.ts` with type guard, re-exported from index
-- [ ] `challengeSlice` added to Zustand store with progress state and tracking actions
-- [ ] `quizSlice.submitQuizAnswer` calls `recordQuizResult` synchronously on quiz completion
-- [ ] `voicingSlice.selectVoicing/Next/Previous` calls `recordVoicingExplored` when `showVoicings` is true
-- [ ] `progressionSlice.transposeProgression` calls `recordKeyPracticed` with new root note
-- [ ] `ChallengeTracker` component renders below progression editor, isolates re-renders
-- [ ] `practice-time` criterion reads from existing practiceStats, filters by mode and `startedAt`
-- [ ] `quiz-accuracy` criterion records completed quizzes (10/10) and checks threshold
-- [ ] `voicings-explored` criterion counts unique `chord|index` pairs
-- [ ] `keys` criterion counts unique root notes after transposition
-- [ ] Challenge completion shows inline congratulations with cancellation-safe auto-transition
-- [ ] Progress persists in localStorage via debounced writes
-- [ ] `clearLocalStorage` includes `fretpad-challenges`
-- [ ] All challenges complete state renders properly
-- [ ] No regression in existing features (quiz, voicings, transport, modes)
-- [ ] `pnpm validate` passes
+- [x] `ChallengeId` string literal union type defined in `lib/types.ts`
+- [x] Challenge types, definitions, and pure progress functions in `lib/challenges/challenges.ts`
+- [x] Challenge storage in `lib/persistence/challengeStorage.ts` with type guard, re-exported from index
+- [x] `challengeSlice` added to Zustand store with progress state and tracking actions
+- [x] `quizSlice.submitQuizAnswer` calls `recordQuizResult` synchronously on quiz completion
+- [x] `voicingSlice.selectVoicing/Next/Previous` calls `recordVoicingExplored` when `showVoicings` is true
+- [x] `progressionSlice.transposeProgression` calls `recordKeyPracticed` with new root note
+- [x] `ChallengeTracker` component renders below progression editor, isolates re-renders
+- [x] `practice-time` criterion reads from existing practiceStats, filters by mode and `startedAt`
+- [x] `quiz-accuracy` criterion records completed quizzes (10/10) and checks threshold
+- [x] `voicings-explored` criterion counts unique `chord|index` pairs
+- [x] `keys` criterion counts unique root notes after transposition
+- [x] Challenge completion shows inline congratulations with cancellation-safe auto-transition
+- [x] Progress persists in localStorage via debounced writes
+- [x] `clearLocalStorage` includes `fretpad-challenges`
+- [x] All challenges complete state renders properly
+- [x] No regression in existing features (quiz, voicings, transport, modes)
+- [x] `pnpm validate` passes
 
 ## Sources & References
 

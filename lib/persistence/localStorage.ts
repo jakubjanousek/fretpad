@@ -51,6 +51,7 @@ export function loadFromLocalStorage(): PersistedState | null {
 export function clearLocalStorage(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("fretpad-challenges");
   } catch (error) {
     console.warn("Failed to clear localStorage:", error);
   }

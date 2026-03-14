@@ -58,14 +58,22 @@ export const createQuizSlice: StateCreator<AppState, [], [], QuizSlice> = (
     const newBestStreak = Math.max(quizBestStreak, newStreak);
     const newTotal = quizTotal + 1;
 
+    const newScore = isCorrect ? quizScore + 1 : quizScore;
+    const finished = newTotal >= QUIZ_LENGTH;
+
     set({
-      quizScore: isCorrect ? quizScore + 1 : quizScore,
+      quizScore: newScore,
       quizTotal: newTotal,
       quizStreak: newStreak,
       quizBestStreak: newBestStreak,
       quizLastResult: isCorrect ? "correct" : "incorrect",
-      quizFinished: newTotal >= QUIZ_LENGTH,
+      quizFinished: finished,
     });
+
+    // Record to challenge slice SYNCHRONOUSLY — before any re-render
+    if (finished) {
+      get().recordQuizResult(newScore, newTotal);
+    }
   },
 
   nextQuizQuestion: () => {

@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ChallengeTracker } from "@/components/challenges/ChallengeTracker";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
 import { HelpGuide } from "@/components/help/HelpGuide";
@@ -411,6 +412,9 @@ export function PracticePage({ modeId }: PracticePageProps) {
         <section>
           <ProgressionEditor />
         </section>
+
+        {/* Challenge Tracker */}
+        <ChallengeTracker modeId={modeId} />
 
         {/* Fretboard */}
         <section>
