@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { NoteInfoTooltip } from "@/components/theory/NoteInfoTooltip";
 import {
   getFretNoteColor,
@@ -24,19 +25,19 @@ interface FretMarkerProps {
   labelOverride?: string;
   overlayMode?: OverlayColorMode;
   className?: string;
-  onClick?: () => void;
+  onClickNote?: (note: FretNote) => void;
   showVoicingStyle?: boolean;
   showFingerNumber?: boolean;
 }
 
-export function FretMarker({
+function FretMarkerComponent({
   note,
   labelMode = "notes",
   highlightState = "normal",
   labelOverride,
   overlayMode = "none",
   className,
-  onClick,
+  onClickNote,
   showVoicingStyle = false,
   showFingerNumber = false,
 }: FretMarkerProps) {
@@ -99,10 +100,14 @@ export function FretMarker({
   const content = labelOverride ?? getLabel();
 
   // Use a button when onClick is provided for proper accessibility
-  if (onClick) {
+  if (onClickNote) {
     return (
       <NoteInfoTooltip note={note}>
-        <button type="button" className={markerClasses} onClick={onClick}>
+        <button
+          type="button"
+          className={markerClasses}
+          onClick={() => onClickNote(note)}
+        >
           {content}
         </button>
       </NoteInfoTooltip>
@@ -115,3 +120,31 @@ export function FretMarker({
     </NoteInfoTooltip>
   );
 }
+
+function areEqual(prev: FretMarkerProps, next: FretMarkerProps) {
+  return (
+    prev.labelMode === next.labelMode &&
+    prev.highlightState === next.highlightState &&
+    prev.labelOverride === next.labelOverride &&
+    prev.overlayMode === next.overlayMode &&
+    prev.className === next.className &&
+    prev.onClickNote === next.onClickNote &&
+    prev.showVoicingStyle === next.showVoicingStyle &&
+    prev.showFingerNumber === next.showFingerNumber &&
+    prev.note.note === next.note.note &&
+    prev.note.interval === next.note.interval &&
+    prev.note.string === next.note.string &&
+    prev.note.fret === next.note.fret &&
+    prev.note.isRoot === next.note.isRoot &&
+    prev.note.isChordTone === next.note.isChordTone &&
+    prev.note.isGuideTone === next.note.isGuideTone &&
+    prev.note.isScaleTone === next.note.isScaleTone &&
+    prev.note.cagedPosition === next.note.cagedPosition &&
+    prev.note.threeNPSPosition === next.note.threeNPSPosition &&
+    prev.note.isVoicingNote === next.note.isVoicingNote &&
+    prev.note.voicingFinger === next.note.voicingFinger &&
+    prev.note.isBarreNote === next.note.isBarreNote
+  );
+}
+
+export const FretMarker = memo(FretMarkerComponent, areEqual);

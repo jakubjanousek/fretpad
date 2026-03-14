@@ -349,8 +349,10 @@ export function useAudioEngine({
       onChordChange(0, 0);
     } else {
       // Schedule first chord change after count-in
-      transport.schedule(() => {
-        onChordChange(0, 0);
+      transport.schedule((time) => {
+        Tone.Draw.schedule(() => {
+          onChordChange(0, 0);
+        }, time);
       }, `${countInBars}:0:0`);
     }
 

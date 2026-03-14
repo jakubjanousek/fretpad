@@ -832,8 +832,8 @@ Mobile (< 640px):
 - [x] `useFretboardData` hook encapsulates derived state computation (`fretNotes`, `voiceLeadingPaths`, etc.) `[Completed 2026-03-14]`
 - [x] `usePracticeModeSetup` hook centralizes shared behavioral wiring (`useUrlState`, `useSessionTimer`, etc.)
 - [x] `useShallow` grouped selectors replace ~40 individual selectors in mode pages `[Completed 2026-03-14]`
-- [ ] `FretMarker` wrapped in `React.memo` with custom comparator — with stable `augmentedNote` and `onClick` refs
-- [ ] `Tone.Draw.schedule` used for chord change callbacks (syncs visual updates with audio timing)
+- [x] `FretMarker` wrapped in `React.memo` with custom comparator `[Completed 2026-03-14]`
+- [x] `Tone.Draw.schedule` used for chord change callbacks (syncs visual updates with audio timing) `[Completed 2026-03-14]`
 - [x] `lib/persistence/stepProgress.ts` provides `getUnlockedStep`/`unlockStep` with SSR guard, mode allowlist, step clamping
 - [x] `hooks/useRollingAccuracy.ts` tracks 10-attempt window with 80% threshold; auto-resets via `stepIndex` parameter
 - [x] `MODE_STEPS` defined with discriminated unions (`LearnStep`, `OutlineStep`, `CompStep`) and `as const satisfies`
@@ -842,8 +842,8 @@ Mobile (< 640px):
 - [x] `assertNever` helper used in exhaustive switches (not `satisfies never`)
 - [x] 3 mode-specific page components created via `next/dynamic` component map
 - [x] `StepStepper.tsx` shows current step + progress toward 80% unlock (text/bar, not circular SVG ring — simplicity)
-- [ ] Step unlock moment: inline toast + manual advancement (no auto-advance)
-- [ ] `prefers-reduced-motion` handled for target note animations
+- [x] Step unlock moment: inline toast + manual advancement (no auto-advance) `[Completed 2026-03-14 in Learn mode]`
+- [x] `prefers-reduced-motion` handled for target note animations `[Completed 2026-03-14]`
 - [x] `localStorage.removeItem('fretpad-challenges')` cleanup on first load
 - [x] `recordQuizResult` call removed from `quizSlice.submitQuizAnswer` (ChallengeSlice removal)
 - [x] **Bug fix**: Instrument cleanup in `useAudioEngine` uses generation nonce — cleanup only stops transport if its generation is current (race #7)
@@ -853,18 +853,18 @@ Mobile (< 640px):
 
 ### Learn the Neck (Track A)
 
-- [ ] Quiz is primary interface with fretboard as answer surface (tap to identify via existing `onNoteClick` pattern)
+- [x] Quiz is primary interface with fretboard as answer surface (tap to identify via existing `onNoteClick` pattern) `[Completed 2026-03-14]`
 - [ ] Mic detection as alternative input mode (segmented control toggle); chroma-based (any correct pitch = correct)
 - [ ] UI labels: "Play any D" (mic) vs "Tap the D here" (tap) — clarify difficulty difference
-- [ ] 3 steps with filtered question pools (roots → guide tones → chord tones)
-- [ ] ~80% accuracy (10-attempt rolling window) unlocks next step; step unlock = toast + manual advance
-- [ ] 44px minimum touch targets for fretboard quiz interaction (WCAG 2.5.5 AAA)
-- [ ] Progression editor hidden; curated presets drive chord selection
-- [ ] Score/stats panel replaces theory panel
-- [ ] Completed steps remain accessible for replay
-- [ ] Quiz questions limited to frets 0-12
-- [ ] `aria-live="polite"` for quiz questions; `aria-live="assertive"` for step unlocks
-- [ ] Quiz answer validates chord context — discard if chord changed since question generated (race #4)
+- [x] 3 steps with filtered question pools (roots → guide tones → chord tones) `[Completed 2026-03-14]`
+- [x] ~80% accuracy (10-attempt rolling window) unlocks next step; step unlock = toast + manual advance `[Completed 2026-03-14]`
+- [x] 44px minimum touch targets for fretboard quiz interaction (WCAG 2.5.5 AAA) `[Completed 2026-03-14 via existing expanded fret marker touch targets]`
+- [x] Progression editor hidden; curated presets drive chord selection `[Completed 2026-03-14]`
+- [x] Score/stats panel replaces theory panel `[Completed 2026-03-14]`
+- [x] Completed steps remain accessible for replay `[Completed 2026-03-14]`
+- [x] Quiz questions limited to frets 0-12 `[Completed 2026-03-14]`
+- [x] `aria-live="polite"` for quiz questions; `aria-live="assertive"` for step unlocks `[Completed 2026-03-14]`
+- [x] Quiz answer validates chord context — discard if chord changed since question generated (race #4) `[Completed 2026-03-14]`
 
 ### Outline Chord Changes (Track B)
 

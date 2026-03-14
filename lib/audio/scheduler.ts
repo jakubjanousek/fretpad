@@ -715,8 +715,10 @@ export function scheduleProgression(
         : null;
 
       // Schedule chord change callback
-      const changeEventId = transport.schedule(() => {
-        onChordChange(barIndex, chordIndex);
+      const changeEventId = transport.schedule((time) => {
+        Tone.Draw.schedule(() => {
+          onChordChange(barIndex, chordIndex);
+        }, time);
       }, beatsToTime(currentBeat));
       eventIds.push(changeEventId);
 
