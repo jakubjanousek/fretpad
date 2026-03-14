@@ -11,7 +11,6 @@ export interface QuizSlice {
   quizStreak: number;
   quizBestStreak: number;
   quizLastResult: "correct" | "incorrect" | null;
-  quizFinished: boolean;
 
   startQuiz: () => void;
   submitQuizAnswer: (interval: string) => void;
@@ -30,7 +29,6 @@ export const createQuizSlice: StateCreator<AppState, [], [], QuizSlice> = (
   quizStreak: 0,
   quizBestStreak: 0,
   quizLastResult: null,
-  quizFinished: false,
 
   startQuiz: () => {
     set({
@@ -40,7 +38,6 @@ export const createQuizSlice: StateCreator<AppState, [], [], QuizSlice> = (
       quizStreak: 0,
       quizBestStreak: 0,
       quizLastResult: null,
-      quizFinished: false,
     });
     // Generate first question
     get().nextQuizQuestion();
@@ -55,9 +52,7 @@ export const createQuizSlice: StateCreator<AppState, [], [], QuizSlice> = (
     const newStreak = isCorrect ? quizStreak + 1 : 0;
     const newBestStreak = Math.max(quizBestStreak, newStreak);
     const newTotal = quizTotal + 1;
-
     const newScore = isCorrect ? quizScore + 1 : quizScore;
-    const finished = newTotal >= 10;
 
     set({
       quizScore: newScore,
@@ -65,7 +60,6 @@ export const createQuizSlice: StateCreator<AppState, [], [], QuizSlice> = (
       quizStreak: newStreak,
       quizBestStreak: newBestStreak,
       quizLastResult: isCorrect ? "correct" : "incorrect",
-      quizFinished: finished,
     });
   },
 
@@ -124,7 +118,6 @@ export const createQuizSlice: StateCreator<AppState, [], [], QuizSlice> = (
       quizActive: false,
       quizQuestion: null,
       quizLastResult: null,
-      quizFinished: false,
     });
   },
 });

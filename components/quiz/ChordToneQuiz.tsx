@@ -1,12 +1,10 @@
 "use client";
 
-import { BrainCircuit, RotateCcw, Trophy, X, Zap } from "lucide-react";
+import { BrainCircuit, RotateCcw, X, Zap } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
-
-const QUIZ_LENGTH = 10;
 
 /**
  * Format interval for display with musical symbols
@@ -23,7 +21,6 @@ export function ChordToneQuiz() {
   const quizStreak = useAppStore((s) => s.quizStreak);
   const quizBestStreak = useAppStore((s) => s.quizBestStreak);
   const quizLastResult = useAppStore((s) => s.quizLastResult);
-  const quizFinished = useAppStore((s) => s.quizFinished);
   const currentChord = useAppStore((s) => s.currentChord);
 
   const startQuiz = useAppStore((s) => s.startQuiz);
@@ -33,13 +30,13 @@ export function ChordToneQuiz() {
 
   // Auto-advance to next question after feedback
   useEffect(() => {
-    if (quizLastResult && !quizFinished) {
+    if (quizLastResult) {
       const timer = setTimeout(() => {
         nextQuizQuestion();
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [quizLastResult, quizFinished, nextQuizQuestion]);
+  }, [quizLastResult, nextQuizQuestion]);
 
   const handleAnswer = useCallback(
     (interval: string) => {
@@ -52,16 +49,44 @@ export function ChordToneQuiz() {
   if (!quizActive) return null;
   if (!currentChord) return null;
 
-  // Quiz finished — show summary
-  if (quizFinished) {
-    const accuracy = Math.round((quizScore / QUIZ_LENGTH) * 100);
-    return (
-      <div className="border-t bg-muted/30 rounded-b-lg px-4 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-amber-500" />
-            Quiz Complete
-          </h3>
+  // Active quiz — show question
+  if (!quizQuestion) return null;
+
+  const accuracy =
+    quizTotal === 0 ? null : Math.round((quizScore / quizTotal) * 100);
+
+  return (
+    <div className="border-t bg-muted/30 rounded-b-lg px-4 py-3">
+      {/* Header: score + stats + close */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium text-muted-foreground">
+            <BrainCircuit className="w-3.5 h-3.5 inline mr-1" />
+            {quizTotal} attempts
+          </span>
+          <span className="text-xs font-medium">Score: {quizScore}</span>
+          {accuracy !== null && (
+            <span className="text-xs font-medium text-muted-foreground">
+              Accuracy: {accuracy}%
+            </span>
+          )}
+          {quizStreak > 1 && (
+            <span className="text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center gap-0.5">
+              <Zap className="w-3 h-3" />
+              {quizStreak}
+            </span>
+          )}
+          {quizBestStreak > 1 && (
+            <span className="hidden sm:inline text-xs text-muted-foreground">
+              Best {quizBestStreak}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="sm" onClick={startQuiz}>
+            <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+            Reset
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -72,74 +97,6 @@ export function ChordToneQuiz() {
             <X className="w-3.5 h-3.5" />
           </Button>
         </div>
-
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold">
-              {quizScore}/{QUIZ_LENGTH}
-            </div>
-            <div className="text-xs text-muted-foreground">Correct</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold">{accuracy}%</div>
-            <div className="text-xs text-muted-foreground">Accuracy</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold flex items-center justify-center gap-1">
-              {quizBestStreak}
-              <Zap className="w-4 h-4 text-amber-500" />
-            </div>
-            <div className="text-xs text-muted-foreground">Best Streak</div>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={startQuiz}
-            className="flex-1"
-          >
-            <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
-            Play Again
-          </Button>
-          <Button variant="ghost" size="sm" onClick={endQuiz}>
-            Done
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Active quiz — show question
-  if (!quizQuestion) return null;
-
-  return (
-    <div className="border-t bg-muted/30 rounded-b-lg px-4 py-3">
-      {/* Header: score + progress + close */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-medium text-muted-foreground">
-            <BrainCircuit className="w-3.5 h-3.5 inline mr-1" />
-            {quizTotal + (quizLastResult ? 0 : 0)}/{QUIZ_LENGTH}
-          </span>
-          <span className="text-xs font-medium">Score: {quizScore}</span>
-          {quizStreak > 1 && (
-            <span className="text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center gap-0.5">
-              <Zap className="w-3 h-3" />
-              {quizStreak}
-            </span>
-          )}
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={endQuiz}
-          className="h-7 w-7 rounded-full"
-          aria-label="Close quiz"
-        >
-          <X className="w-3.5 h-3.5" />
-        </Button>
       </div>
 
       {/* Question prompt */}

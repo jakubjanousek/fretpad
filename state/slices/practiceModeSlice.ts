@@ -47,7 +47,6 @@ export const createPracticeModeSlice: StateCreator<
         quizStreak: 0,
         quizBestStreak: 0,
         quizLastResult: null,
-        quizFinished: false,
       });
     }
 
