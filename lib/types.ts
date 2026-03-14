@@ -210,6 +210,23 @@ export interface StyleDefinition {
       chord?: number;
       drums?: number;
     };
+    humanization?: {
+      bass?: {
+        timingBeats?: number;
+        velocityDelta?: number;
+        durationBeats?: number;
+      };
+      chord?: {
+        timingBeats?: number;
+        velocityDelta?: number;
+        durationBeats?: number;
+      };
+      drums?: {
+        timingBeats?: number;
+        velocityDelta?: number;
+        durationBeats?: number;
+      };
+    };
   };
   instruments: {
     bass: BassInstrumentConfig;
