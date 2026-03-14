@@ -179,27 +179,46 @@ export const createVoicingSlice: StateCreator<
 
   // Selection
   selectVoicing: (index) => {
-    const { availableVoicings } = get();
+    const { availableVoicings, showVoicings, currentChord } = get();
     if (index >= 0 && index < availableVoicings.length) {
       set({ selectedVoicingIndex: index });
+      if (showVoicings && currentChord) {
+        get().recordVoicingExplored(currentChord.symbol, index);
+      }
     }
   },
 
   selectNextVoicing: () => {
-    const { availableVoicings, selectedVoicingIndex } = get();
+    const {
+      availableVoicings,
+      selectedVoicingIndex,
+      showVoicings,
+      currentChord,
+    } = get();
     if (availableVoicings.length === 0) return;
     const nextIndex = (selectedVoicingIndex + 1) % availableVoicings.length;
     set({ selectedVoicingIndex: nextIndex });
+    if (showVoicings && currentChord) {
+      get().recordVoicingExplored(currentChord.symbol, nextIndex);
+    }
   },
 
   selectPreviousVoicing: () => {
-    const { availableVoicings, selectedVoicingIndex } = get();
+    const {
+      availableVoicings,
+      selectedVoicingIndex,
+      showVoicings,
+      currentChord,
+    } = get();
     if (availableVoicings.length === 0) return;
     const prevIndex =
       selectedVoicingIndex === 0
         ? availableVoicings.length - 1
         : selectedVoicingIndex - 1;
     set({ selectedVoicingIndex: prevIndex });
+    if (showVoicings && currentChord) {
+      get().recordVoicingExplored(currentChord.symbol, prevIndex);
+    }
   },
 
   // Basic filter setters

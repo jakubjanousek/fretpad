@@ -8,6 +8,10 @@ import {
   type BackingTrackSlice,
   createBackingTrackSlice,
 } from "./slices/backingTrackSlice";
+import {
+  type ChallengeSlice,
+  createChallengeSlice,
+} from "./slices/challengeSlice";
 import { createDisplaySlice, type DisplaySlice } from "./slices/displaySlice";
 import { createErrorSlice, type ErrorSlice } from "./slices/errorSlice";
 import {
@@ -44,7 +48,8 @@ export type AppState = ProgressionSlice &
   SessionPlannerSlice &
   VoicingSlice &
   PracticeModeSlice &
-  AudioInputSlice;
+  AudioInputSlice &
+  ChallengeSlice;
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -60,6 +65,7 @@ export const useAppStore = create<AppState>()(
       ...createVoicingSlice(...a),
       ...createPracticeModeSlice(...a),
       ...createAudioInputSlice(...a),
+      ...createChallengeSlice(...a),
     }),
     {
       name: "fretpad-state",

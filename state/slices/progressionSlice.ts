@@ -272,6 +272,11 @@ export const createProgressionSlice: StateCreator<
       progression: newProgression,
       currentChord: chord,
     });
+
+    // Record key change for challenge tracking
+    if (chord) {
+      get().recordKeyPracticed(chord.root);
+    }
   },
 
   undo: () => {
