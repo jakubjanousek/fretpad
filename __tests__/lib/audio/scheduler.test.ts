@@ -22,6 +22,11 @@ describe("audio scheduler timing helpers", () => {
     expect(beatsToTime(4.75)).toBe("1:0:3");
   });
 
+  it("preserves triplet and laid-back microtiming in transport time", () => {
+    expect(beatsToTime(2 / 3)).toBe("0:0:2.666667");
+    expect(beatsToTime(1.59)).toBe("0:1:2.36");
+  });
+
   it("applies explicit event offsets for swung placements", () => {
     const swungOffbeat = resolveEventBeat(
       { time: "0:0", offsetBeats: 2 / 3 },
@@ -111,7 +116,7 @@ describe("audio scheduler timing helpers", () => {
 
   it("resolves humanized durations to transport time strings", () => {
     expect(resolveHumanizedDuration("8n", 0.25)).toBe("0:0:3");
-    expect(resolveHumanizedDuration("16n", -0.5)).toBe("0:0:1");
+    expect(resolveHumanizedDuration("16n", -0.5)).toBe("0:0:0.5");
   });
 
   it("selects deterministic pattern variants per chord slot", () => {
