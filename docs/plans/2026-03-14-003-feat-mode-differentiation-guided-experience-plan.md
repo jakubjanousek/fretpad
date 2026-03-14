@@ -830,7 +830,7 @@ Mobile (< 640px):
 - [x] `enterMode` always resets `micActive = false` on mode switch (race #6)
 - [ ] Fretboard reads store directly via `useFretboardDisplay()` (mode-agnostic)
 - [ ] `useFretboardData` hook encapsulates derived state computation (`fretNotes`, `voiceLeadingPaths`, etc.)
-- [ ] `usePracticeModeSetup` hook centralizes shared behavioral wiring (`useUrlState`, `useSessionTimer`, etc.)
+- [x] `usePracticeModeSetup` hook centralizes shared behavioral wiring (`useUrlState`, `useSessionTimer`, etc.)
 - [ ] `useShallow` grouped selectors replace ~40 individual selectors in mode pages
 - [ ] `FretMarker` wrapped in `React.memo` with custom comparator — with stable `augmentedNote` and `onClick` refs
 - [ ] `Tone.Draw.schedule` used for chord change callbacks (syncs visual updates with audio timing)
