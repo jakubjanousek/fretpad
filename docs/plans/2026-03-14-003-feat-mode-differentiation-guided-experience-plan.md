@@ -880,11 +880,11 @@ Mobile (< 640px):
 
 ### Comp with Voicings (Track C)
 
-- [ ] 2-stage progression (Learn Shapes → Practice Transitions)
-- [ ] Voice leading arrows prominent and functional between specific voicing shapes
-- [ ] "Play voicing" button in Stage 1 triggers chord strum (reuse existing chord synth instrument)
-- [ ] Stage 2 shows current + next voicing simultaneously with voice leading paths
-- [ ] Stage gating: explore 5+ **unique** voicings via `Set<string>` (not raw click counter)
+- [x] 2-stage progression (Learn Shapes → Practice Transitions) `[Completed 2026-03-15]`
+- [x] Voice leading arrows prominent and functional between specific voicing shapes `[Completed 2026-03-15]`
+- [x] "Play voicing" button in Stage 1 triggers chord strum (reuse existing chord synth instrument) `[Completed 2026-03-15]`
+- [x] Stage 2 shows current + next voicing simultaneously with voice leading paths `[Completed 2026-03-15]`
+- [x] Stage gating: explore 5+ **unique** voicings via `Set<string>` (not raw click counter) `[Completed 2026-03-15]`
 
 ## Success Metrics
 
