@@ -45,6 +45,38 @@ import { useAppStore } from "@/state/useAppStore";
 const COMP_MODE_ID = "comp-with-voicings" as const;
 const EXPLORE_THRESHOLD = 5;
 
+// Open string MIDI note numbers: string 1 (high E4)=64, 2 (B3)=59, 3 (G3)=55, 4 (D3)=50, 5 (A2)=45, 6 (E2)=40
+const OPEN_STRING_MIDI = [64, 59, 55, 50, 45, 40];
+const NOTE_NAMES = [
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+  "A",
+  "A#",
+  "B",
+];
+
+/** Convert a guitar voicing's fret positions to octaved note names for synth playback */
+function getNotesFromVoicing(voicing: GuitarVoicing): string[] {
+  const notes: string[] = [];
+  for (const pos of voicing.positions) {
+    if (pos.fret < 0) continue; // muted string
+    const midi = OPEN_STRING_MIDI[pos.string - 1];
+    if (midi === undefined) continue;
+    const noteNum = midi + pos.fret;
+    const noteName = NOTE_NAMES[noteNum % 12];
+    const octave = Math.floor(noteNum / 12) - 1;
+    notes.push(`${noteName}${octave}`);
+  }
+  return notes;
+}
+
 export function CompWithVoicingsPage() {
   const modeConfig = PRACTICE_MODES[COMP_MODE_ID];
   const { unlockedStepIndex, refreshUnlockedStep } =
@@ -68,6 +100,7 @@ export function CompWithVoicingsPage() {
     refreshVoicingsForChord,
     voiceLeadingEnabled,
     setVoiceLeadingEnabled,
+    setShowVoiceLeading,
     setShowMovementIndicators,
     updateVoiceLeadingSuggestions,
     voiceLeadingSuggestions,
@@ -91,6 +124,7 @@ export function CompWithVoicingsPage() {
       refreshVoicingsForChord: state.refreshVoicingsForChord,
       voiceLeadingEnabled: state.voiceLeading.enabled,
       setVoiceLeadingEnabled: state.setVoiceLeadingEnabled,
+      setShowVoiceLeading: state.setShowVoiceLeading,
       setShowMovementIndicators: state.setShowMovementIndicators,
       updateVoiceLeadingSuggestions: state.updateVoiceLeadingSuggestions,
       voiceLeadingSuggestions: state.voiceLeadingSuggestions,
@@ -147,9 +181,15 @@ export function CompWithVoicingsPage() {
     if (isStage2 && !hasAutoEnabledVoiceLeading.current) {
       hasAutoEnabledVoiceLeading.current = true;
       setVoiceLeadingEnabled(true);
+      setShowVoiceLeading(true);
       setShowMovementIndicators(true);
     }
-  }, [isStage2, setVoiceLeadingEnabled, setShowMovementIndicators]);
+  }, [
+    isStage2,
+    setVoiceLeadingEnabled,
+    setShowVoiceLeading,
+    setShowMovementIndicators,
+  ]);
 
   // Update voice leading suggestions when relevant state changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: selectedVoicingIndex triggers recalculation when user changes voicing
@@ -238,10 +278,14 @@ export function CompWithVoicingsPage() {
 
     if (!synthRef.current) return;
 
-    // Play the chord's full voicing through the synth
-    const voicing = getFullVoicing(currentChord, 4);
-    synthRef.current.triggerAttackRelease(voicing.notes, "2n");
-  }, [currentChord]);
+    // Derive playable notes from the selected guitar voicing positions.
+    // Open string octaves: string 1 (high E) = 4, 2 (B) = 3, 3 (G) = 3, 4 (D) = 3, 5 (A) = 2, 6 (low E) = 2
+    const notes = selectedVoicing
+      ? getNotesFromVoicing(selectedVoicing)
+      : getFullVoicing(currentChord, 4).notes;
+
+    synthRef.current.triggerAttackRelease(notes, "2n");
+  }, [currentChord, selectedVoicing]);
 
   // Keyboard shortcuts
   useEffect(() => {
