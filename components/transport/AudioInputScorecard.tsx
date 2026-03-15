@@ -14,15 +14,22 @@ import { useAppStore } from "@/state/useAppStore";
 
 interface AudioInputScorecardProps {
   enabled: boolean;
+  onEvaluationResult?: (hit: boolean) => void;
 }
 
-export function AudioInputScorecard({ enabled }: AudioInputScorecardProps) {
+export function AudioInputScorecard({
+  enabled,
+  onEvaluationResult,
+}: AudioInputScorecardProps) {
   const micActive = useAppStore((s) => s.micActive);
   const score = useAppStore((s) => s.score);
   const [showHeadphonesHint, setShowHeadphonesHint] = useState(false);
   const hasShownHintRef = useRef(false);
 
-  const { toggleMic, signalElementRef } = usePitchDetection({ enabled });
+  const { toggleMic, signalElementRef } = usePitchDetection({
+    enabled,
+    onEvaluationResult,
+  });
 
   const handleToggle = useCallback(() => {
     // Show headphones hint on first activation

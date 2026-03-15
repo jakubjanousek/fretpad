@@ -868,15 +868,15 @@ Mobile (< 640px):
 
 ### Outline Chord Changes (Track B)
 
-- [ ] Target notes pulse/animate prominently on chord changes
-- [ ] `"root"` TargetNoteMode added with exhaustive switch + `assertNever`
-- [ ] 4 steps with progressive target complexity (root → root-and-guides → approaches → free)
-- [ ] Approach notes scored by expanding target chroma set (not sequence detection)
-- [ ] Two-tier mic fallback (Mic → Visual Only with persistent banner); mic revocation shows toast
-- [ ] `usePitchDetection` has `onEvaluationResult` callback bridging to `useRollingAccuracy.record()` (scoring bridge)
-- [ ] Step advancement deferred to loop boundaries via `pendingUnlockRef` pattern (race #3)
-- [ ] Mic scoring per step with ~80% accuracy gate (10-attempt rolling window)
-- [ ] Scorecard panel replaces theory panel
+- [x] Target notes pulse/animate prominently on chord changes `[Completed 2026-03-15]`
+- [x] `"root"` TargetNoteMode added with exhaustive switch + `assertNever` `[Completed 2026-03-14 in Phase 0]`
+- [x] 4 steps with progressive target complexity (root → root-and-guides → approaches → free) `[Completed 2026-03-15]`
+- [x] Approach notes scored by expanding target chroma set (not sequence detection) `[Completed 2026-03-15]`
+- [x] Two-tier mic fallback (Mic → Visual Only with persistent banner); mic revocation shows toast `[Completed 2026-03-15]`
+- [x] `usePitchDetection` has `onEvaluationResult` callback bridging to `useRollingAccuracy.record()` (scoring bridge) `[Completed 2026-03-15]`
+- [x] Step advancement deferred to loop boundaries via `pendingUnlockRef` pattern (race #3) `[Completed 2026-03-15]`
+- [x] Mic scoring per step with ~80% accuracy gate (10-attempt rolling window) `[Completed 2026-03-15]`
+- [x] Scorecard panel replaces theory panel `[Completed 2026-03-15]`
 
 ### Comp with Voicings (Track C)
 
