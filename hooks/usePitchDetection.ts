@@ -117,9 +117,13 @@ type MicState = "idle" | "requesting" | "active" | "stopping";
 
 interface UsePitchDetectionOptions {
   enabled: boolean;
+  onEvaluationResult?: (hit: boolean) => void;
 }
 
-export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
+export function usePitchDetection({
+  enabled,
+  onEvaluationResult,
+}: UsePitchDetectionOptions) {
   const setMicActive = useAppStore((s) => s.setMicActive);
   const updateScore = useAppStore((s) => s.updateScore);
   const resetScore = useAppStore((s) => s.resetScore);
@@ -153,6 +157,10 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
   const lastSignalTimeRef = useRef(0);
   const signalActiveRef = useRef(false);
   const signalElementRef = useRef<HTMLElement | null>(null);
+
+  // Stable ref for evaluation callback (avoids re-subscribing on every render)
+  const onEvaluationResultRef = useRef(onEvaluationResult);
+  onEvaluationResultRef.current = onEvaluationResult;
 
   // Track the current transport position to avoid double-evaluation
   const prevPositionRef = useRef({ barIndex: 0, chordIndex: 0 });
@@ -437,6 +445,7 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
       );
 
       updateScore(hit);
+      onEvaluationResultRef.current?.(hit);
     });
 
     return unsubscribe;
