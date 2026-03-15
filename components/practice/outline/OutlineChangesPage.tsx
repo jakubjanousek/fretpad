@@ -94,6 +94,14 @@ export function OutlineChangesPage() {
     setActiveStepIndex(unlockedStepIndex);
   }, [unlockedStepIndex]);
 
+  // Clamp active step to unlocked level when mic is re-enabled — prevents
+  // bypassing step gating after navigating freely in visual-only mode.
+  useEffect(() => {
+    if (micActive && activeStepIndex > unlockedStepIndex) {
+      setActiveStepIndex(unlockedStepIndex);
+    }
+  }, [micActive, activeStepIndex, unlockedStepIndex]);
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: activeStepIndex is the reset trigger
   useEffect(() => {
     setUnlockMessage(null);
@@ -112,8 +120,10 @@ export function OutlineChangesPage() {
     setShowChromaticApproach,
   ]);
 
-  // Deferred step advancement — only advance at loop boundary
-  const pendingUnlockRef = useRef(false);
+  // Deferred step advancement — stores the target step index (not just a
+  // boolean) so the correct step is unlocked even if the user navigates to a
+  // different step before the loop boundary fires.
+  const pendingUnlockRef = useRef<number | null>(null);
 
   // Track unlock eligibility
   useEffect(() => {
@@ -125,8 +135,8 @@ export function OutlineChangesPage() {
     }
 
     if (isPlaying) {
-      // Defer advancement to loop boundary
-      pendingUnlockRef.current = true;
+      // Defer advancement to loop boundary — store the target index
+      pendingUnlockRef.current = nextStepIndex;
       setUnlockMessage(
         `Step ${nextStepIndex + 1} ready: ${nextStep.label} — will unlock at loop end.`,
       );
@@ -147,25 +157,18 @@ export function OutlineChangesPage() {
   // Loop-boundary detection via Zustand subscription — fires synchronously on
   // every state change, so intermediate bar transitions cannot be missed by
   // React batching (unlike a useEffect on currentBarIndex).
-  const activeStepIndexRef = useRef(activeStepIndex);
-  activeStepIndexRef.current = activeStepIndex;
-  const unlockedStepIndexRef = useRef(unlockedStepIndex);
-  unlockedStepIndexRef.current = unlockedStepIndex;
-
   useEffect(() => {
     let prevBar = useAppStore.getState().currentBarIndex;
     const unsub = useAppStore.subscribe((state) => {
       const bar = state.currentBarIndex;
-      if (pendingUnlockRef.current && bar === 0 && prevBar !== 0) {
-        pendingUnlockRef.current = false;
-        const nextStepIndex = activeStepIndexRef.current + 1;
-        const nextStep = OUTLINE_STEPS[nextStepIndex];
-        if (nextStep && unlockedStepIndexRef.current < nextStepIndex) {
-          unlockStep(MODE_ID, nextStepIndex);
+      if (pendingUnlockRef.current !== null && bar === 0 && prevBar !== 0) {
+        const targetStep = pendingUnlockRef.current;
+        pendingUnlockRef.current = null;
+        const step = OUTLINE_STEPS[targetStep];
+        if (step) {
+          unlockStep(MODE_ID, targetStep);
           refreshUnlockedStep();
-          setUnlockMessage(
-            `Step ${nextStepIndex + 1} unlocked: ${nextStep.label}`,
-          );
+          setUnlockMessage(`Step ${targetStep + 1} unlocked: ${step.label}`);
         }
       }
       prevBar = bar;
