@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const ROLLING_ACCURACY_WINDOW = 10;
 export const ROLLING_ACCURACY_THRESHOLD = 0.8;
@@ -26,20 +26,24 @@ export function useRollingAccuracy(stepIndex: number): RollingAccuracyResult {
       ? 0
       : attempts.filter(Boolean).length / attempts.length;
 
+  const record = useCallback((correct: boolean) => {
+    setAttempts((previous) => [
+      ...previous.slice(-(ROLLING_ACCURACY_WINDOW - 1)),
+      correct,
+    ]);
+  }, []);
+
+  const reset = useCallback(() => {
+    setAttempts([]);
+  }, []);
+
   return {
     accuracy,
     attemptCount: attempts.length,
     isUnlockEligible:
       attempts.length >= ROLLING_ACCURACY_WINDOW &&
       accuracy >= ROLLING_ACCURACY_THRESHOLD,
-    record: (correct) => {
-      setAttempts((previous) => [
-        ...previous.slice(-(ROLLING_ACCURACY_WINDOW - 1)),
-        correct,
-      ]);
-    },
-    reset: () => {
-      setAttempts([]);
-    },
+    record,
+    reset,
   };
 }
