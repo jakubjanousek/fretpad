@@ -117,13 +117,22 @@ type MicState = "idle" | "requesting" | "active" | "stopping";
 
 interface UsePitchDetectionOptions {
   enabled: boolean;
+  /** Fires on each detected pitch with sufficient clarity. Used by Learn mode for mic quiz answers. */
+  onPitchDetected?: (chroma: number, pitchClass: string) => void;
 }
 
-export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
+export function usePitchDetection({
+  enabled,
+  onPitchDetected,
+}: UsePitchDetectionOptions) {
   const setMicActive = useAppStore((s) => s.setMicActive);
   const updateScore = useAppStore((s) => s.updateScore);
   const resetScore = useAppStore((s) => s.resetScore);
   const setError = useAppStore((s) => s.setError);
+
+  // Stable ref for onPitchDetected callback (avoids stale closure in RAF loop)
+  const onPitchDetectedRef = useRef(onPitchDetected);
+  onPitchDetectedRef.current = onPitchDetected;
 
   // Refs for mic lifecycle
   const micStateRef = useRef<MicState>("idle");
@@ -238,6 +247,8 @@ export function usePitchDetection({ enabled }: UsePitchDetectionOptions) {
               clarityBufferRef.current[idx] = clarity;
               timestampBufferRef.current[idx] = performance.now();
               writeIndexRef.current++;
+
+              onPitchDetectedRef.current?.(chroma, Note.pitchClass(noteName));
             }
           }
         }
