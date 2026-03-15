@@ -854,8 +854,8 @@ Mobile (< 640px):
 ### Learn the Neck (Track A)
 
 - [x] Quiz is primary interface with fretboard as answer surface (tap to identify via existing `onNoteClick` pattern) `[Completed 2026-03-14]`
-- [ ] Mic detection as alternative input mode (segmented control toggle); chroma-based (any correct pitch = correct)
-- [ ] UI labels: "Play any D" (mic) vs "Tap the D here" (tap) — clarify difficulty difference
+- [x] Mic detection as alternative input mode (segmented control toggle); chroma-based (any correct pitch = correct) `[Completed 2026-03-15]`
+- [x] UI labels: "Play any D" (mic) vs "Tap the D here" (tap) — clarify difficulty difference `[Completed 2026-03-15]`
 - [x] 3 steps with filtered question pools (roots → guide tones → chord tones) `[Completed 2026-03-14]`
 - [x] ~80% accuracy (10-attempt rolling window) unlocks next step; step unlock = toast + manual advance `[Completed 2026-03-14]`
 - [x] 44px minimum touch targets for fretboard quiz interaction (WCAG 2.5.5 AAA) `[Completed 2026-03-14 via existing expanded fret marker touch targets]`

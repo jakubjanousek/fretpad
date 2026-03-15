@@ -1,13 +1,15 @@
 "use client";
 
-import { Guitar, Radio, Sparkles, Target } from "lucide-react";
+import { Guitar, Mic, MicOff, Radio, Sparkles, Target } from "lucide-react";
 import {
   startTransition,
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
+import { Note } from "tonal";
 import { useShallow } from "zustand/react/shallow";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
@@ -26,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFirstVisit } from "@/hooks/useFirstVisit";
 import { useFretboardData } from "@/hooks/useFretboardData";
+import { usePitchDetection } from "@/hooks/usePitchDetection";
 import { usePracticeModeSetup } from "@/hooks/usePracticeModeSetup";
 import { usePracticeTracker } from "@/hooks/usePracticeTracker";
 import { useRollingAccuracy } from "@/hooks/useRollingAccuracy";
@@ -46,6 +49,8 @@ interface QuizFeedback {
   tone: "correct" | "incorrect" | "neutral";
   message: string;
 }
+
+type InputMode = "tap" | "mic";
 
 const MODE_ID = "learn-the-neck";
 const MODE_CONFIG = PRACTICE_MODES[MODE_ID];
@@ -88,6 +93,7 @@ function buildQuestion(
   targetMode: TargetNoteMode,
   chordSymbol: string,
   contextKey: string,
+  inputMode: InputMode,
 ): LearnQuizQuestion | null {
   const pool = getStepPool(notes, targetMode);
   const noteNames = [...new Set(pool.map((note) => note.note))];
@@ -105,7 +111,8 @@ function buildQuestion(
     chordSymbol,
     contextKey,
     targetNote,
-    prompt: `Tap any ${targetNote}`,
+    prompt:
+      inputMode === "mic" ? `Play any ${targetNote}` : `Tap any ${targetNote}`,
   };
 }
 
@@ -114,6 +121,7 @@ export function LearnTheNeckPage() {
   const { unlockedStepIndex, refreshUnlockedStep } =
     usePracticeModeSetup(MODE_ID);
   const [activeStepIndex, setActiveStepIndex] = useState(unlockedStepIndex);
+  const [inputMode, setInputMode] = useState<InputMode>("tap");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpGuideOpen, setHelpGuideOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
@@ -160,6 +168,16 @@ export function LearnTheNeckPage() {
     }
   }, [isFirstVisit, markAsVisited]);
 
+  // Synchronous gate: prevents double-answer from sustained notes detected on consecutive RAF frames
+  const processingRef = useRef(false);
+  // Cancellable feedback timer: prevents stale closure from firing after step/mode change
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+
+  // Clean up feedback timer on unmount
+  useEffect(() => () => clearTimeout(feedbackTimerRef.current), []);
+
   useEffect(() => {
     setActiveStepIndex(unlockedStepIndex);
   }, [unlockedStepIndex]);
@@ -172,10 +190,22 @@ export function LearnTheNeckPage() {
     setQuestion(null);
     setFeedback(null);
     setUnlockMessage(null);
+    clearTimeout(feedbackTimerRef.current);
+    processingRef.current = false;
   }, [activeStepIndex, loadPreset]);
 
   const currentStep = LEARN_STEPS[activeStepIndex] ?? LEARN_STEPS[0];
   const contextKey = `${currentBarIndex}:${currentChordIndex}:${currentChord?.symbol ?? "none"}`;
+
+  // Refs for values accessed inside the feedback timeout to avoid stale closures
+  const fretNotesRef = useRef(fretNotes);
+  fretNotesRef.current = fretNotes;
+  const currentStepRef = useRef(currentStep);
+  currentStepRef.current = currentStep;
+  const currentChordRef = useRef(currentChord);
+  currentChordRef.current = currentChord;
+  const inputModeRef = useRef(inputMode);
+  inputModeRef.current = inputMode;
 
   const regenerateQuestion = useCallback(() => {
     if (!currentChord) {
@@ -189,19 +219,58 @@ export function LearnTheNeckPage() {
         currentStep.targetMode,
         currentChord.symbol,
         contextKey,
+        inputMode,
       ),
     );
-  }, [contextKey, currentChord, currentStep.targetMode, fretNotes]);
+  }, [contextKey, currentChord, currentStep.targetMode, fretNotes, inputMode]);
 
   useEffect(() => {
     regenerateQuestion();
   }, [regenerateQuestion]);
 
+  const processAnswer = useCallback(
+    (noteName: string, isCorrect: boolean) => {
+      if (!question) return;
+
+      processingRef.current = true;
+      record(isCorrect);
+      setSessionCorrect((value) => value + (isCorrect ? 1 : 0));
+      setCurrentStreak((value) => {
+        const next = isCorrect ? value + 1 : 0;
+        setBestStreak((best) => Math.max(best, next));
+        return next;
+      });
+      setFeedback({
+        tone: isCorrect ? "correct" : "incorrect",
+        message: isCorrect
+          ? `${noteName} is correct for ${question.chordSymbol}.`
+          : `${noteName} misses the prompt. Find ${question.targetNote} instead.`,
+      });
+
+      clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = setTimeout(() => {
+        processingRef.current = false;
+        setFeedback(null);
+        const { currentBarIndex: bar, currentChordIndex: chord } =
+          useAppStore.getState();
+        const ch = currentChordRef.current;
+        setQuestion(
+          buildQuestion(
+            fretNotesRef.current,
+            currentStepRef.current.targetMode,
+            ch?.symbol ?? question.chordSymbol,
+            `${bar}:${chord}:${ch?.symbol ?? question.chordSymbol}`,
+            inputModeRef.current,
+          ),
+        );
+      }, FEEDBACK_DELAY_MS);
+    },
+    [question, record],
+  );
+
   const handleAnswer = useCallback(
     (note: FretNote) => {
-      if (!question) {
-        return;
-      }
+      if (!question) return;
 
       if (question.contextKey !== contextKey) {
         setFeedback({
@@ -214,49 +283,69 @@ export function LearnTheNeckPage() {
             currentStep.targetMode,
             currentChord?.symbol ?? question.chordSymbol,
             contextKey,
+            inputMode,
           ),
         );
         return;
       }
 
-      const isCorrect = note.note === question.targetNote;
-      record(isCorrect);
-      setSessionCorrect((value) => value + (isCorrect ? 1 : 0));
-      setCurrentStreak((value) => {
-        const next = isCorrect ? value + 1 : 0;
-        setBestStreak((best) => Math.max(best, next));
-        return next;
-      });
-      setFeedback({
-        tone: isCorrect ? "correct" : "incorrect",
-        message: isCorrect
-          ? `${note.note} is correct for ${question.chordSymbol}.`
-          : `${note.note} misses the prompt. Find ${question.targetNote} instead.`,
-      });
-
-      window.setTimeout(() => {
-        setFeedback(null);
-        setQuestion(
-          buildQuestion(
-            fretNotes,
-            currentStep.targetMode,
-            currentChord?.symbol ?? question.chordSymbol,
-            `${currentBarIndex}:${currentChordIndex}:${currentChord?.symbol ?? question.chordSymbol}`,
-          ),
-        );
-      }, FEEDBACK_DELAY_MS);
+      processAnswer(note.note, note.note === question.targetNote);
     },
     [
       contextKey,
-      currentBarIndex,
       currentChord,
-      currentChordIndex,
       currentStep.targetMode,
       fretNotes,
+      inputMode,
+      processAnswer,
       question,
-      record,
     ],
   );
+
+  // Stable ref for question to avoid stale closure in mic callback
+  const questionRef = useRef(question);
+  questionRef.current = question;
+  const feedbackRef = useRef(feedback);
+  feedbackRef.current = feedback;
+  const contextKeyRef = useRef(contextKey);
+  contextKeyRef.current = contextKey;
+
+  const handleMicDetection = useCallback(
+    (chroma: number, pitchClass: string) => {
+      const q = questionRef.current;
+      // Synchronous gate: skip while feedback is showing OR already processing
+      if (!q || feedbackRef.current || processingRef.current) return;
+
+      if (q.contextKey !== contextKeyRef.current) return; // chord changed
+
+      const targetChroma = Note.chroma(q.targetNote);
+      if (targetChroma === undefined) return;
+
+      processAnswer(pitchClass, chroma === targetChroma);
+    },
+    [processAnswer],
+  );
+
+  const { toggleMic, signalElementRef, stopMic } = usePitchDetection({
+    enabled: inputMode === "mic",
+    onPitchDetected: handleMicDetection,
+  });
+
+  // Auto-toggle mic when switching to/from mic mode
+  const prevInputModeRef = useRef(inputMode);
+  useEffect(() => {
+    if (prevInputModeRef.current === inputMode) return;
+    const prev = prevInputModeRef.current;
+    prevInputModeRef.current = inputMode;
+
+    if (inputMode === "mic" && prev === "tap") {
+      toggleMic();
+    } else if (inputMode === "tap" && prev === "mic") {
+      stopMic();
+    }
+  }, [inputMode, toggleMic, stopMic]);
+
+  const micActive = useAppStore((s) => s.micActive);
 
   useEffect(() => {
     const nextStepIndex = activeStepIndex + 1;
@@ -311,8 +400,12 @@ export function LearnTheNeckPage() {
                     variant="secondary"
                     className="gap-1 bg-amber-500/15 text-amber-700 dark:text-amber-300"
                   >
-                    <Target className="h-3.5 w-3.5" />
-                    Tap Drill
+                    {inputMode === "mic" ? (
+                      <Mic className="h-3.5 w-3.5" />
+                    ) : (
+                      <Target className="h-3.5 w-3.5" />
+                    )}
+                    {inputMode === "mic" ? "Mic Drill" : "Tap Drill"}
                   </Badge>
                   <div>
                     <p className="font-serif text-2xl tracking-tight sm:text-3xl">
@@ -324,16 +417,44 @@ export function LearnTheNeckPage() {
                         {currentChord?.symbol ?? "..."}
                       </span>
                       {" · "}
-                      Labels are hidden so the neck stays the test surface.
+                      {inputMode === "mic"
+                        ? "Play the note on your instrument."
+                        : "Labels are hidden so the neck stays the test surface."}
                     </p>
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-dashed border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm">
-                  <p className="font-medium">Input mode</p>
-                  <p className="mt-1 text-muted-foreground">
-                    Tap any matching pitch on frets 0-12. Mic mode stays
-                    available in the transport bar.
+                  <p className="mb-2 font-medium">Input mode</p>
+                  <div
+                    data-slot="button-group"
+                    className="inline-flex overflow-hidden rounded-md border border-border shadow-xs"
+                  >
+                    <Button
+                      variant="toggle"
+                      size="xs"
+                      data-state={inputMode === "tap" ? "on" : "off"}
+                      onClick={() => setInputMode("tap")}
+                      className="gap-1.5 rounded-none border-0 border-r border-border"
+                    >
+                      <Target className="h-3 w-3" />
+                      Tap
+                    </Button>
+                    <Button
+                      variant="toggle"
+                      size="xs"
+                      data-state={inputMode === "mic" ? "on" : "off"}
+                      onClick={() => setInputMode("mic")}
+                      className="gap-1.5 rounded-none border-0"
+                    >
+                      <Mic className="h-3 w-3" />
+                      Mic
+                    </Button>
+                  </div>
+                  <p className="mt-2 text-muted-foreground">
+                    {inputMode === "mic"
+                      ? "Play the note on any string or fret."
+                      : "Tap matching positions on frets 0\u201312."}
                   </p>
                 </div>
               </div>
@@ -444,7 +565,9 @@ export function LearnTheNeckPage() {
                     )}
                   >
                     {feedback?.message ??
-                      "Tap a note on the board to answer the prompt."}
+                      (inputMode === "mic"
+                        ? "Play a note on your instrument to answer."
+                        : "Tap a note on the board to answer the prompt.")}
                   </p>
                   <p className="mt-2 text-xs text-muted-foreground">
                     Correct: {sessionCorrect} · Misses:{" "}
@@ -507,7 +630,40 @@ export function LearnTheNeckPage() {
         onStatsClick={() => setStatsOpen(true)}
         onQuizClick={undefined}
         onPlannerClick={undefined}
-        micSlot={<AudioInputScorecard enabled={modeConfig.showMicToggle} />}
+        micSlot={
+          inputMode === "mic" ? (
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="ghost"
+                onClick={toggleMic}
+                aria-label={
+                  micActive ? "Disable microphone" : "Enable microphone"
+                }
+                className={cn(
+                  "relative flex h-11 w-11 flex-col items-center gap-0.5 rounded-full transition-all duration-150 hover:bg-background/80 active:scale-95 sm:h-auto sm:w-auto sm:rounded-lg sm:px-2 sm:py-1.5",
+                  micActive && "text-rose-500",
+                )}
+              >
+                {micActive ? (
+                  <Mic className="h-4 w-4" />
+                ) : (
+                  <MicOff className="h-4 w-4" />
+                )}
+                <span className="hidden text-[10px] leading-tight text-muted-foreground sm:block">
+                  Mic
+                </span>
+                {micActive && (
+                  <span
+                    ref={signalElementRef}
+                    className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-slate-400 transition-colors duration-150 [&.signal-active]:bg-emerald-500 sm:right-0.5 sm:top-0.5"
+                  />
+                )}
+              </Button>
+            </div>
+          ) : (
+            <AudioInputScorecard enabled={modeConfig.showMicToggle} />
+          )
+        }
       />
 
       <TransportDrawer open={settingsOpen} onOpenChange={setSettingsOpen} />
