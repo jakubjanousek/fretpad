@@ -16,6 +16,7 @@ import { ModeHeader } from "@/components/modes/ModeHeader";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { ShareExport } from "@/components/progression/ShareExport";
 import { PracticeStats } from "@/components/stats/PracticeStats";
+import { StepStepper } from "@/components/steps/StepStepper";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TheoryPanel } from "@/components/theory/TheoryPanel";
 import { ProgressBar } from "@/components/transport/ProgressBar";
@@ -37,6 +38,7 @@ import { getFullVoicing } from "@/lib/audio/voicings";
 import { PRACTICE_MODES } from "@/lib/modes";
 import { unlockStep } from "@/lib/persistence/stepProgress";
 import { getNextChord } from "@/lib/theory/voiceLeading";
+import type { Chord, GuitarVoicing } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
@@ -129,9 +131,7 @@ export function CompWithVoicingsPage() {
   // Auto-enable voicings on mount for comp mode
   // biome-ignore lint/correctness/useExhaustiveDependencies: only run on mount
   useEffect(() => {
-    if (!showVoicings) {
-      setShowVoicings(true);
-    }
+    setShowVoicings(true);
   }, []);
 
   // Refresh voicings when chord changes
@@ -141,18 +141,15 @@ export function CompWithVoicingsPage() {
     }
   }, [currentChord, showVoicings, refreshVoicingsForChord]);
 
-  // Stage 2: auto-enable voice leading
+  // Stage 2: auto-enable voice leading once (user can toggle off after)
+  const hasAutoEnabledVoiceLeading = useRef(false);
   useEffect(() => {
-    if (isStage2 && !voiceLeadingEnabled) {
+    if (isStage2 && !hasAutoEnabledVoiceLeading.current) {
+      hasAutoEnabledVoiceLeading.current = true;
       setVoiceLeadingEnabled(true);
       setShowMovementIndicators(true);
     }
-  }, [
-    isStage2,
-    voiceLeadingEnabled,
-    setVoiceLeadingEnabled,
-    setShowMovementIndicators,
-  ]);
+  }, [isStage2, setVoiceLeadingEnabled, setShowMovementIndicators]);
 
   // Update voice leading suggestions when relevant state changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: selectedVoicingIndex triggers recalculation when user changes voicing
@@ -182,24 +179,23 @@ export function CompWithVoicingsPage() {
     return getSelectedVoicing();
   }, [getSelectedVoicing, availableVoicings, selectedVoicingIndex]);
 
-  // Track explored voicings and handle stage gating
-  const trackExploration = useCallback(
-    (voicingId: string) => {
-      setExplored((prev) => {
-        const next = new Set(prev);
-        next.add(voicingId);
+  // Track explored voicings (pure updater, no side effects)
+  const trackExploration = useCallback((voicingId: string) => {
+    setExplored((prev) => {
+      if (prev.has(voicingId)) return prev;
+      const next = new Set(prev);
+      next.add(voicingId);
+      return next;
+    });
+  }, []);
 
-        // Check if we just hit the threshold and stage 2 is still locked
-        if (next.size >= EXPLORE_THRESHOLD && unlockedStepIndex === 0) {
-          unlockStep(COMP_MODE_ID, 1);
-          refreshUnlockedStep();
-        }
-
-        return next;
-      });
-    },
-    [unlockedStepIndex, refreshUnlockedStep],
-  );
+  // Unlock stage 2 when exploration threshold is reached
+  useEffect(() => {
+    if (explored.size >= EXPLORE_THRESHOLD && unlockedStepIndex === 0) {
+      unlockStep(COMP_MODE_ID, 1);
+      refreshUnlockedStep();
+    }
+  }, [explored.size, unlockedStepIndex, refreshUnlockedStep]);
 
   // Track current voicing as explored
   useEffect(() => {
@@ -208,22 +204,16 @@ export function CompWithVoicingsPage() {
     }
   }, [selectedVoicing, trackExploration]);
 
-  // Navigate voicings and track exploration
-  const handleNextVoicing = useCallback(() => {
-    selectNextVoicing();
-  }, [selectNextVoicing]);
-
-  const handlePreviousVoicing = useCallback(() => {
-    selectPreviousVoicing();
-  }, [selectPreviousVoicing]);
-
   // Play voicing button: trigger chord strum via synth
   const synthRef = useRef<ReturnType<typeof createChordInstrument> | null>(
     null,
   );
+  const isMountedRef = useRef(true);
+  const synthCreatingRef = useRef(false);
 
   useEffect(() => {
     return () => {
+      isMountedRef.current = false;
       synthRef.current?.dispose();
       synthRef.current = null;
     };
@@ -232,12 +222,23 @@ export function CompWithVoicingsPage() {
   const handlePlayVoicing = useCallback(async () => {
     if (!currentChord) return;
 
-    await Tone.start();
-
-    if (!synthRef.current) {
-      synthRef.current = createChordInstrument(defaultChordConfig);
+    try {
+      await Tone.start();
+    } catch {
+      return;
     }
 
+    if (!isMountedRef.current) return;
+
+    if (!synthRef.current && !synthCreatingRef.current) {
+      synthCreatingRef.current = true;
+      synthRef.current = createChordInstrument(defaultChordConfig);
+      synthCreatingRef.current = false;
+    }
+
+    if (!synthRef.current) return;
+
+    // Play the chord's full voicing through the synth
     const voicing = getFullVoicing(currentChord, 4);
     synthRef.current.triggerAttackRelease(voicing.notes, "2n");
   }, [currentChord]);
@@ -259,18 +260,32 @@ export function CompWithVoicingsPage() {
 
       if (e.key === "[" && !hasModifier && !isInputFocused) {
         e.preventDefault();
-        handlePreviousVoicing();
+        selectPreviousVoicing();
       }
 
       if (e.key === "]" && !hasModifier && !isInputFocused) {
         e.preventDefault();
-        handleNextVoicing();
+        selectNextVoicing();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handlePreviousVoicing, handleNextVoicing]);
+  }, [selectPreviousVoicing, selectNextVoicing]);
+
+  // Progress config for StepStepper
+  const progressConfig = useMemo(
+    () => ({
+      percent:
+        unlockedStepIndex >= 1
+          ? 100
+          : Math.min((explored.size / EXPLORE_THRESHOLD) * 100, 100),
+      label: `Explore ${EXPLORE_THRESHOLD} unique voicings to unlock the next stage.`,
+      valueLabel:
+        unlockedStepIndex >= 1 ? "" : `${explored.size} / ${EXPLORE_THRESHOLD}`,
+    }),
+    [explored.size, unlockedStepIndex],
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -294,10 +309,14 @@ export function CompWithVoicingsPage() {
           <ProgressionEditor />
         </section>
 
-        <CompStepStepper
+        <StepStepper
+          modeId={COMP_MODE_ID}
           currentStepIndex={currentStepIndex}
           unlockedStepIndex={unlockedStepIndex}
-          explored={explored}
+          accuracy={0}
+          attemptCount={0}
+          progressConfig={progressConfig}
+          stepLabel="Stage"
         />
 
         {/* Stage-specific content */}
@@ -308,8 +327,8 @@ export function CompWithVoicingsPage() {
             availableVoicings={availableVoicings}
             selectedVoicingIndex={selectedVoicingIndex}
             showVoicingFingers={showVoicingFingers}
-            onNextVoicing={handleNextVoicing}
-            onPreviousVoicing={handlePreviousVoicing}
+            onNextVoicing={selectNextVoicing}
+            onPreviousVoicing={selectPreviousVoicing}
             onPlayVoicing={handlePlayVoicing}
           />
         )}
@@ -369,8 +388,8 @@ export function CompWithVoicingsPage() {
                 onToggleVoicingFingers={() =>
                   setShowVoicingFingers(!showVoicingFingers)
                 }
-                onNextVoicing={handleNextVoicing}
-                onPreviousVoicing={handlePreviousVoicing}
+                onNextVoicing={selectNextVoicing}
+                onPreviousVoicing={selectPreviousVoicing}
                 availableVoicingsCount={availableVoicings.length}
                 selectedVoicingIndex={selectedVoicingIndex}
               />
@@ -407,9 +426,9 @@ export function CompWithVoicingsPage() {
 // --- Stage 1: Voicing Explorer ---
 
 interface VoicingExplorerProps {
-  currentChord: import("@/lib/types").Chord | null;
-  selectedVoicing: import("@/lib/types").GuitarVoicing | null | undefined;
-  availableVoicings: import("@/lib/types").GuitarVoicing[];
+  currentChord: Chord | null;
+  selectedVoicing: GuitarVoicing | null;
+  availableVoicings: GuitarVoicing[];
   selectedVoicingIndex: number;
   showVoicingFingers: boolean;
   onNextVoicing: () => void;
@@ -518,99 +537,6 @@ function VoicingExplorer({
               <span className="hidden sm:inline">Play</span>
             </Button>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// --- Comp-specific StepStepper ---
-
-interface CompStepStepperProps {
-  currentStepIndex: number;
-  unlockedStepIndex: number;
-  explored: Set<string>;
-}
-
-function CompStepStepper({
-  currentStepIndex,
-  unlockedStepIndex,
-  explored,
-}: CompStepStepperProps) {
-  const steps = [
-    { id: "learn-shapes", label: "Learn Shapes" },
-    { id: "practice-transitions", label: "Practice Transitions" },
-  ];
-  const isAllUnlocked = unlockedStepIndex >= 1;
-  const progressPercent = isAllUnlocked
-    ? 100
-    : Math.min((explored.size / EXPLORE_THRESHOLD) * 100, 100);
-
-  return (
-    <section className="rounded-lg border bg-card px-4 py-3 flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary">Guided Steps</Badge>
-            <span className="text-sm font-medium">
-              Stage {currentStepIndex + 1} of {steps.length}
-            </span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {steps[currentStepIndex]?.label}
-          </p>
-        </div>
-        {isAllUnlocked ? (
-          <Badge className="gap-1">All unlocked</Badge>
-        ) : (
-          <Badge variant="outline">Next: {steps[1]?.label}</Badge>
-        )}
-      </div>
-
-      <div className="grid gap-2 sm:grid-cols-2">
-        {steps.map((step, index) => {
-          const isUnlocked = index <= unlockedStepIndex;
-          const isCurrent = index === currentStepIndex;
-
-          return (
-            <div
-              key={step.id}
-              className={cn(
-                "rounded-md border px-3 py-2 transition-colors",
-                isCurrent && "border-primary bg-primary/5",
-                !isUnlocked && "border-dashed opacity-60",
-              )}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Stage {index + 1}
-                </span>
-                {!isUnlocked && (
-                  <span className="text-xs text-muted-foreground">🔒</span>
-                )}
-              </div>
-              <p className="mt-1 text-sm font-medium">{step.label}</p>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-          <span>
-            {isAllUnlocked
-              ? "All stages are unlocked."
-              : `Explore ${EXPLORE_THRESHOLD} unique voicings to unlock the next stage.`}
-          </span>
-          <span className="tabular-nums">
-            {isAllUnlocked ? "" : `${explored.size} / ${EXPLORE_THRESHOLD}`}
-          </span>
-        </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-          <div
-            className="h-full rounded-full bg-primary transition-[width] duration-300 ease-out"
-            style={{ width: `${progressPercent}%` }}
-          />
         </div>
       </div>
     </section>

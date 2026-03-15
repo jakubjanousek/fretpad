@@ -10,12 +10,25 @@ import { MODE_STEPS } from "@/lib/modes";
 import type { PracticeModeId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+export interface ProgressConfig {
+  /** Progress percentage (0-100) */
+  percent: number;
+  /** Description shown below the progress bar */
+  label: string;
+  /** Value shown to the right of the label (e.g. "3 / 5" or "72%") */
+  valueLabel: string;
+}
+
 interface StepStepperProps {
   modeId: PracticeModeId;
   currentStepIndex: number;
   unlockedStepIndex: number;
   accuracy: number;
   attemptCount: number;
+  /** Optional custom progress config. When provided, overrides accuracy-based progress. */
+  progressConfig?: ProgressConfig;
+  /** Label prefix for steps (default: "Step") */
+  stepLabel?: string;
 }
 
 export function StepStepper({
@@ -24,6 +37,8 @@ export function StepStepper({
   unlockedStepIndex,
   accuracy,
   attemptCount,
+  progressConfig,
+  stepLabel = "Step",
 }: StepStepperProps) {
   const steps = MODE_STEPS[modeId];
   const safeCurrentStepIndex = Math.max(
@@ -32,11 +47,22 @@ export function StepStepper({
   );
   const nextStepIndex =
     unlockedStepIndex < steps.length - 1 ? unlockedStepIndex + 1 : null;
+
+  // Use custom progress config or default accuracy-based progress
   const accuracyPercent = Math.round(accuracy * 100);
-  const progressPercent =
+  const defaultProgressPercent =
     attemptCount === 0
       ? 0
       : Math.min(accuracy / ROLLING_ACCURACY_THRESHOLD, 1) * 100;
+
+  const progress: ProgressConfig = progressConfig ?? {
+    percent: defaultProgressPercent,
+    label:
+      nextStepIndex === null
+        ? "All steps are unlocked."
+        : `Reach ${Math.round(ROLLING_ACCURACY_THRESHOLD * 100)}% over the last ${ROLLING_ACCURACY_WINDOW} attempts to unlock the next step.`,
+    valueLabel: attemptCount === 0 ? "No attempts yet" : `${accuracyPercent}%`,
+  };
 
   return (
     <section className="rounded-lg border bg-card px-4 py-3 flex flex-col gap-3">
@@ -45,7 +71,7 @@ export function StepStepper({
           <div className="flex items-center gap-2">
             <Badge variant="secondary">Guided Steps</Badge>
             <span className="text-sm font-medium">
-              Step {safeCurrentStepIndex + 1} of {steps.length}
+              {stepLabel} {safeCurrentStepIndex + 1} of {steps.length}
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -80,7 +106,7 @@ export function StepStepper({
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-medium text-muted-foreground">
-                  Step {index + 1}
+                  {stepLabel} {index + 1}
                 </span>
                 {!isUnlocked && (
                   <LockKeyhole className="h-3.5 w-3.5 text-muted-foreground" />
@@ -97,16 +123,14 @@ export function StepStepper({
           <span>
             {nextStepIndex === null
               ? "All steps are unlocked."
-              : `Reach ${Math.round(ROLLING_ACCURACY_THRESHOLD * 100)}% over the last ${ROLLING_ACCURACY_WINDOW} attempts to unlock the next step.`}
+              : progress.label}
           </span>
-          <span className="tabular-nums">
-            {attemptCount === 0 ? "No attempts yet" : `${accuracyPercent}%`}
-          </span>
+          <span className="tabular-nums">{progress.valueLabel}</span>
         </div>
         <div className="h-1.5 overflow-hidden rounded-full bg-muted">
           <div
             className="h-full rounded-full bg-primary transition-[width] duration-300 ease-out"
-            style={{ width: `${progressPercent}%` }}
+            style={{ width: `${progress.percent}%` }}
           />
         </div>
       </div>
