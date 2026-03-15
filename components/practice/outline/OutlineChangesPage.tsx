@@ -2,7 +2,7 @@
 
 import { Activity, Crosshair, MicOff, Radio, Target } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { FretboardHeader } from "@/components/fretboard/FretboardHeader";
@@ -52,7 +52,6 @@ export function OutlineChangesPage() {
   const {
     currentChord,
     progression,
-    currentBarIndex,
     isPlaying,
     micActive,
     score,
@@ -62,7 +61,6 @@ export function OutlineChangesPage() {
     useShallow((state) => ({
       currentChord: state.currentChord,
       progression: state.progression,
-      currentBarIndex: state.currentBarIndex,
       isPlaying: state.isPlaying,
       micActive: state.micActive,
       score: state.score,
@@ -96,6 +94,11 @@ export function OutlineChangesPage() {
     setActiveStepIndex(unlockedStepIndex);
   }, [unlockedStepIndex]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: activeStepIndex is the reset trigger
+  useEffect(() => {
+    setUnlockMessage(null);
+  }, [activeStepIndex]);
+
   // Set targetNoteMode and approach notes based on current step
   const currentStep = OUTLINE_STEPS[activeStepIndex] ?? OUTLINE_STEPS[0];
   useEffect(() => {
@@ -111,14 +114,6 @@ export function OutlineChangesPage() {
 
   // Deferred step advancement — only advance at loop boundary
   const pendingUnlockRef = useRef(false);
-
-  // Handle evaluation results from pitch detection → rolling accuracy
-  const handleEvaluationResult = useCallback(
-    (hit: boolean) => {
-      record(hit);
-    },
-    [record],
-  );
 
   // Track unlock eligibility
   useEffect(() => {
@@ -149,49 +144,37 @@ export function OutlineChangesPage() {
     unlockedStepIndex,
   ]);
 
-  // Listen for loop boundary (barIndex resets to 0) to execute deferred unlock
-  const prevBarIndexRef = useRef(currentBarIndex);
+  // Loop-boundary detection via Zustand subscription — fires synchronously on
+  // every state change, so intermediate bar transitions cannot be missed by
+  // React batching (unlike a useEffect on currentBarIndex).
+  const activeStepIndexRef = useRef(activeStepIndex);
+  activeStepIndexRef.current = activeStepIndex;
+  const unlockedStepIndexRef = useRef(unlockedStepIndex);
+  unlockedStepIndexRef.current = unlockedStepIndex;
+
   useEffect(() => {
-    const prevBar = prevBarIndexRef.current;
-    prevBarIndexRef.current = currentBarIndex;
-
-    if (pendingUnlockRef.current && currentBarIndex === 0 && prevBar !== 0) {
-      pendingUnlockRef.current = false;
-      const nextStepIndex = activeStepIndex + 1;
-      const nextStep = OUTLINE_STEPS[nextStepIndex];
-      if (nextStep && unlockedStepIndex < nextStepIndex) {
-        unlockStep(MODE_ID, nextStepIndex);
-        refreshUnlockedStep();
-        setUnlockMessage(
-          `Step ${nextStepIndex + 1} unlocked: ${nextStep.label}`,
-        );
+    let prevBar = useAppStore.getState().currentBarIndex;
+    const unsub = useAppStore.subscribe((state) => {
+      const bar = state.currentBarIndex;
+      if (pendingUnlockRef.current && bar === 0 && prevBar !== 0) {
+        pendingUnlockRef.current = false;
+        const nextStepIndex = activeStepIndexRef.current + 1;
+        const nextStep = OUTLINE_STEPS[nextStepIndex];
+        if (nextStep && unlockedStepIndexRef.current < nextStepIndex) {
+          unlockStep(MODE_ID, nextStepIndex);
+          refreshUnlockedStep();
+          setUnlockMessage(
+            `Step ${nextStepIndex + 1} unlocked: ${nextStep.label}`,
+          );
+        }
       }
-    }
-  }, [
-    activeStepIndex,
-    currentBarIndex,
-    refreshUnlockedStep,
-    unlockedStepIndex,
-  ]);
-
-  // Determine mic status for two-tier display
-  const isMicScoring = micActive;
-  const isVisualOnly = !micActive;
+      prevBar = bar;
+    });
+    return unsub;
+  }, [refreshUnlockedStep]);
 
   // Stats for scorecard
   const accuracyPercent = Math.round(accuracy * 100);
-  const hitRate =
-    score.total > 0 ? Math.round((score.hits / score.total) * 100) : 0;
-
-  const stepButtons = useMemo(
-    () =>
-      OUTLINE_STEPS.map((step, index) => ({
-        disabled: micActive ? index > unlockedStepIndex : false,
-        index,
-        step,
-      })),
-    [unlockedStepIndex, micActive],
-  );
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.10),transparent_28%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--background))_45%,color-mix(in_oklab,hsl(var(--muted))_38%,transparent))]">
@@ -207,7 +190,7 @@ export function OutlineChangesPage() {
 
       <main className="container mx-auto flex flex-col gap-3 px-3 pb-44 pt-3 sm:px-4 sm:pt-4">
         {/* Visual Only banner when mic is not active */}
-        {isVisualOnly && (
+        {!micActive && (
           <div className="flex items-center gap-2 rounded-lg border border-blue-500/20 bg-blue-500/5 px-4 py-2.5 text-sm">
             <MicOff className="h-4 w-4 shrink-0 text-blue-500" />
             <p className="text-muted-foreground">
@@ -243,12 +226,12 @@ export function OutlineChangesPage() {
                         <span className="font-medium text-foreground">
                           {currentChord?.symbol ?? "..."}
                         </span>
-                        {isMicScoring && " · Mic scoring active"}
+                        {micActive && " · Mic scoring active"}
                       </p>
                     </div>
                   </div>
 
-                  {isMicScoring && (
+                  {micActive && (
                     <div className="rounded-2xl border border-dashed border-blue-500/30 bg-blue-500/5 px-4 py-3 text-sm">
                       <p className="font-medium">Scoring</p>
                       <p className="mt-1 text-muted-foreground">
@@ -346,33 +329,33 @@ export function OutlineChangesPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <div className="rounded-xl bg-muted/60 p-3">
                     <p className="text-muted-foreground">
-                      {isMicScoring ? "Rolling Accuracy" : "Accuracy"}
+                      {micActive ? "Rolling Accuracy" : "Accuracy"}
                     </p>
                     <p className="mt-1 text-2xl font-semibold tabular-nums">
-                      {isMicScoring ? `${accuracyPercent}%` : "—"}
+                      {micActive ? `${accuracyPercent}%` : "—"}
                     </p>
                   </div>
                   <div className="rounded-xl bg-muted/60 p-3">
                     <p className="text-muted-foreground">Evaluations</p>
                     <p className="mt-1 text-2xl font-semibold tabular-nums">
-                      {isMicScoring ? attemptCount : "—"}
+                      {micActive ? attemptCount : "—"}
                     </p>
                   </div>
                   <div className="rounded-xl bg-muted/60 p-3">
                     <p className="text-muted-foreground">Hits</p>
                     <p className="mt-1 text-2xl font-semibold tabular-nums">
-                      {isMicScoring ? score.hits : "—"}
+                      {micActive ? score.hits : "—"}
                     </p>
                   </div>
                   <div className="rounded-xl bg-muted/60 p-3">
-                    <p className="text-muted-foreground">Hit Rate</p>
+                    <p className="text-muted-foreground">Misses</p>
                     <p className="mt-1 text-2xl font-semibold tabular-nums">
-                      {isMicScoring && score.total > 0 ? `${hitRate}%` : "—"}
+                      {micActive ? score.total - score.hits : "—"}
                     </p>
                   </div>
                 </div>
 
-                {isVisualOnly && (
+                {!micActive && (
                   <div className="rounded-xl border border-dashed px-3 py-3">
                     <p className="text-sm text-muted-foreground">
                       Enable the microphone to see real-time scoring. Target
@@ -392,11 +375,11 @@ export function OutlineChangesPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-2">
-                {stepButtons.map(({ disabled, index, step }) => (
+                {OUTLINE_STEPS.map((step, index) => (
                   <Button
                     key={step.id}
                     variant={index === activeStepIndex ? "default" : "outline"}
-                    disabled={disabled}
+                    disabled={micActive ? index > unlockedStepIndex : false}
                     className="justify-start"
                     onClick={() => {
                       setActiveStepIndex(index);
@@ -448,7 +431,7 @@ export function OutlineChangesPage() {
         micSlot={
           <AudioInputScorecard
             enabled={MODE_CONFIG.showMicToggle}
-            onEvaluationResult={handleEvaluationResult}
+            onEvaluationResult={record}
           />
         }
       />
