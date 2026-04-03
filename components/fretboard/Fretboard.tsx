@@ -16,7 +16,6 @@ import { ArpeggioOverlay } from "./ArpeggioOverlay";
 import { DisplayToolbar } from "./DisplayToolbar";
 import { FretboardLegend, type LegendNoteType } from "./FretboardLegend";
 import { FretMarker } from "./FretMarker";
-import { LegendTooltip } from "./LegendTooltip";
 import { TargetNoteOverlay } from "./TargetNoteOverlay";
 
 interface FretboardProps {
@@ -136,7 +135,6 @@ export function Fretboard({
 
   const [hoveredLegendType, setHoveredLegendType] =
     useState<LegendNoteType>(null);
-  const [showLegendTooltip, setShowLegendTooltip] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -146,11 +144,6 @@ export function Fretboard({
     mediaQuery.addEventListener("change", update);
     return () => mediaQuery.removeEventListener("change", update);
   }, []);
-
-  const handleLegendTooltipComplete = () => {
-    setShowLegendTooltip(false);
-    setHoveredLegendType(null);
-  };
 
   const isOverlayActive = fretboardOverlay !== "none";
   const isArpeggio = fretboardOverlay === "arpeggio";
@@ -401,14 +394,6 @@ export function Fretboard({
             </div>
           )}
         </div>
-
-        {/* First-time legend tooltip */}
-        {showLegendTooltip && (
-          <LegendTooltip
-            onHighlightChange={setHoveredLegendType}
-            onComplete={handleLegendTooltipComplete}
-          />
-        )}
       </div>
 
       {/* Mobile scroll indicator */}

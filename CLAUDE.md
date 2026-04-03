@@ -4,7 +4,7 @@
 
 FretPad is a browser-based guitar practice tool that helps guitarists improvise over chord progressions using a visual fretboard, backing loop, and on-demand music theory.
 
-**Current Status:** Core MVP complete (fretboard, progression editor, audio engine with styles, metronome, playhead). See `docs/IMPROVEMENT_PLAN.md` for roadmap.
+**Current Status:** Pivoting toward guided improvisation practice with real-time pitch detection. Phase 1 (trim) complete. See `docs/PLAN.md` for roadmap.
 
 ## Commands
 
@@ -28,6 +28,16 @@ pnpm validate   # Run all checks: lint + type-check + tests
 - **Music Theory:** tonal library
 - **State:** Zustand
 - **Lint/Format:** Biome (not ESLint)
+
+## TDD (Red-Green-Refactor)
+
+All new code follows TDD. This is non-negotiable.
+
+1. **Red:** Write a failing test that describes the desired behavior from the outside (inputs → outputs, public API, observable effects). Do NOT test implementation details.
+2. **Green:** Write the minimal code to make the test pass.
+3. **Refactor:** Clean up while keeping tests green.
+
+Tests should survive refactors — they test *what* the code does, not *how* it does it. If a test breaks because an internal function was renamed or a module was restructured, the test was wrong.
 
 ## Coding Conventions
 
@@ -77,8 +87,8 @@ state/         # Zustand stores
 __tests__/     # Vitest test suite
 ```
 
-## Implementation Plan
+## Plan
 
-See `docs/IMPLEMENTATION_PLAN.md` for original milestone breakdown and `docs/IMPROVEMENT_PLAN.md` for the current roadmap with progress tracking.
+See `docs/PLAN.md` for the 4-phase pivot plan (trim → modularize → landing page → practice UI).
 
 **Default state on load:** ii-V-I in C (`Dm7 | G7 | Cmaj7 | Cmaj7`), 120 BPM
