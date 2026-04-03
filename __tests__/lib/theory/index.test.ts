@@ -46,8 +46,8 @@ describe("lib/theory barrel export", () => {
   it("exports chord functions", () => {
     const chord = parseChordSymbol("Cmaj7");
     expect(chord).not.toBeNull();
-    expect(chord!.root).toBe("C");
-    expect(chord!.guideTones).toContain("E");
+    expect(chord?.root).toBe("C");
+    expect(chord?.guideTones).toContain("E");
     expect(isChordTone(chord!, "E")).toBe(true);
     expect(isGuideTone(chord!, "E")).toBe(true);
     expect(isRoot(chord!, "C")).toBe(true);
@@ -66,12 +66,12 @@ describe("lib/theory barrel export", () => {
   it("exports progression functions", () => {
     const bar = parseBar("Dm7");
     expect(bar).not.toBeNull();
-    expect(bar!.chords[0]?.chord).toBe("Dm7");
+    expect(bar?.chords[0]?.chord).toBe("Dm7");
     const prog = PRESET_PROGRESSIONS["ii-V-I in C"];
     expect(getAllChordsFromProgression(prog).length).toBeGreaterThan(0);
     const created = createProgression(["Am7"]);
     expect(created).not.toBeNull();
-    expect(created!.bars).toHaveLength(1);
+    expect(created?.bars).toHaveLength(1);
   });
 
   it("exports presets", () => {
@@ -92,7 +92,7 @@ describe("lib/theory barrel export", () => {
     const prog = PRESET_PROGRESSIONS["ii-V-I in C"];
     const keys = detectKey(prog);
     expect(keys.length).toBeGreaterThan(0);
-    expect(keys[0]!.root).toBe("C");
+    expect(keys[0]?.root).toBe("C");
   });
 
   it("exports target note functions", () => {

@@ -1,10 +1,4 @@
 import { describe, expect, it } from "vitest";
-import type {
-  BassInstrument,
-  ChordInstrument,
-  DrumInstrument,
-  MetronomeInstrument,
-} from "@/lib/audio";
 /**
  * Tests that the audio barrel export exposes all public API functions
  * needed by external consumers.
