@@ -55,14 +55,14 @@ export function getStyle(id: StyleId): StyleDefinition {
 export const DEFAULT_STYLE_ID: StyleId = "jazzSwing";
 
 export {
-  jazzSwingStyle,
-  popRockStyle,
-  bossaNovaStyle,
   balladStyle,
-  funkStyle,
-  reggaeStyle,
-  latinMontunoStyle,
-  neoSoulStyle,
+  bossaNovaStyle,
   countryStyle,
+  funkStyle,
+  jazzSwingStyle,
+  latinMontunoStyle,
   metalStyle,
+  neoSoulStyle,
+  popRockStyle,
+  reggaeStyle,
 };
