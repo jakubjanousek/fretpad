@@ -76,10 +76,9 @@ function FretboardGraphic() {
   return (
     <svg
       viewBox={`0 0 ${sw} ${sh}`}
-      className="w-full max-w-sm opacity-90"
+      className="w-full opacity-90"
       aria-hidden="true"
     >
-      {/* Fretboard background */}
       <rect
         x={px - 4}
         y={py - 6}
@@ -88,7 +87,6 @@ function FretboardGraphic() {
         rx="4"
         className="fill-amber-800/10"
       />
-      {/* Nut */}
       <line
         x1={px}
         y1={py - 4}
@@ -97,7 +95,6 @@ function FretboardGraphic() {
         className="stroke-slate-500"
         strokeWidth="3"
       />
-      {/* Fret lines */}
       {Array.from({ length: frets }, (_, i) => (
         <line
           key={`fret-${i}`}
@@ -109,7 +106,6 @@ function FretboardGraphic() {
           strokeWidth="1"
         />
       ))}
-      {/* Strings */}
       {Array.from({ length: strings }, (_, i) => (
         <line
           key={`string-${i}`}
@@ -121,7 +117,6 @@ function FretboardGraphic() {
           strokeWidth={0.8 + i * 0.2}
         />
       ))}
-      {/* Fret dots */}
       {[3, 5].map(
         (f) =>
           f <= frets && (
@@ -134,7 +129,6 @@ function FretboardGraphic() {
             />
           ),
       )}
-      {/* Notes */}
       {notes.map((n) => (
         <circle
           key={`${n.s}-${n.f}`}
@@ -167,7 +161,6 @@ export function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-stone-950 to-stone-900" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[radial-gradient(ellipse,_rgba(251,146,60,0.06)_0%,_transparent_70%)]" />
         <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-[radial-gradient(ellipse,_rgba(59,130,246,0.04)_0%,_transparent_70%)]" />
-        {/* Grain texture */}
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -176,91 +169,87 @@ export function LandingPage() {
         />
       </div>
 
-      {/* Logo */}
-      <div className="relative z-10 px-6 sm:px-10 pt-8 sm:pt-10 max-w-6xl mx-auto">
-        <span className="text-sm font-semibold tracking-[0.2em] uppercase text-stone-400">
-          FretPad
-        </span>
-      </div>
-
-      {/* Hero */}
+      {/* Hero — side by side on desktop */}
       <main className="relative z-10">
-        <section className="px-6 sm:px-10 pt-12 sm:pt-20 pb-20 sm:pb-28 max-w-6xl mx-auto">
-          <div className="space-y-8">
-            {/* Kicker */}
-            <div className="flex items-center gap-3">
-              <span className="h-px w-8 bg-orange-500/60" />
-              <span className="text-xs font-medium tracking-[0.25em] uppercase text-orange-400">
-                Guitar practice tool
-              </span>
-            </div>
-
-            {/* Headline */}
-            <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.4rem,6vw,4.2rem)] leading-[1.05] tracking-[-0.02em] text-stone-50">
-              Play over changes.{" "}
-              <span className="text-stone-500">Hear what you land on.</span>
-            </h1>
-
-            {/* Subhead */}
-            <p className="text-lg sm:text-xl leading-relaxed text-stone-400 max-w-2xl">
-              FretPad plays a backing track, shows you the chord tones on a
-              fretboard, and listens as you improvise. No install, no account —
-              just open and play.
-            </p>
-
-            {/* CTA */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <Link
-                href="/practice/outline-chord-changes"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-stone-50 px-7 py-3.5 text-sm font-medium text-stone-900 transition-all hover:gap-3.5 hover:shadow-lg hover:shadow-orange-400/10 active:scale-[0.98]"
-              >
-                Start practicing
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-              <span className="text-sm text-stone-500">
-                Free. Works in any browser.
-              </span>
-            </div>
+        <section className="px-4 sm:px-6 lg:px-8 pt-4 pb-16 sm:pb-24 max-w-6xl mx-auto">
+          {/* Logo — matches practice page position */}
+          <div className="py-2 mb-8 sm:mb-16">
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-stone-400">
+              FretPad
+            </span>
           </div>
+          <div className="lg:grid lg:grid-cols-2 lg:gap-16 lg:items-center">
+            {/* Text column */}
+            <div className="space-y-8">
+              <div className="flex items-center gap-3">
+                <span className="h-px w-8 bg-orange-500/60" />
+                <span className="text-xs font-medium tracking-[0.25em] uppercase text-orange-400">
+                  Guitar practice tool
+                </span>
+              </div>
 
-          {/* Fretboard visual */}
-          <div className="mt-16 sm:mt-20 flex justify-center">
-            <div className="relative w-full max-w-lg">
-              {/* Glow behind fretboard */}
-              <div className="absolute inset-0 blur-3xl opacity-20 bg-gradient-to-r from-orange-400/40 via-blue-400/20 to-emerald-400/30" />
-              <div className="relative rounded-2xl border border-stone-800/60 bg-stone-900/50 backdrop-blur-sm p-6 sm:p-8">
-                <FretboardGraphic />
-                {/* Legend */}
-                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-stone-400">
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
-                    Root
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-                    Guide tone
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                    Chord tone
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-slate-400" />
-                    Scale tone
-                  </span>
+              <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.4rem,5vw,3.8rem)] leading-[1.05] tracking-[-0.02em] text-stone-50">
+                Play over changes.{" "}
+                <span className="text-stone-500">Hear what you land on.</span>
+              </h1>
+
+              <p className="text-lg leading-relaxed text-stone-400 max-w-xl">
+                FretPad plays a backing track, shows you the chord tones on a
+                fretboard, and listens as you improvise. No install, no account
+                — just open and play.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <Link
+                  href="/practice/outline-chord-changes"
+                  className="group inline-flex items-center gap-2.5 rounded-full bg-stone-50 px-7 py-3.5 text-sm font-medium text-stone-900 transition-all hover:gap-3.5 hover:shadow-lg hover:shadow-orange-400/10 active:scale-[0.98]"
+                >
+                  Start practicing
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <span className="text-sm text-stone-500">
+                  Free. Works in any browser.
+                </span>
+              </div>
+            </div>
+
+            {/* Fretboard visual — right column on desktop, below on mobile */}
+            <div className="mt-14 lg:mt-0">
+              <div className="relative w-full">
+                <div className="absolute inset-0 blur-3xl opacity-20 bg-gradient-to-r from-orange-400/40 via-blue-400/20 to-emerald-400/30" />
+                <div className="relative rounded-2xl border border-stone-800/60 bg-stone-900/50 backdrop-blur-sm p-6 sm:p-8">
+                  <FretboardGraphic />
+                  <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-stone-400">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+                      Root
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                      Guide tone
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                      Chord tone
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-slate-400" />
+                      Scale tone
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Features */}
-        <section className="px-6 sm:px-10 pb-24 sm:pb-32 max-w-6xl mx-auto">
-          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+        {/* Features — 4 columns on desktop */}
+        <section className="px-4 sm:px-6 lg:px-8 pb-24 sm:pb-32 max-w-6xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             {FEATURES.map((f) => (
               <div
                 key={f.label}
-                className="group rounded-2xl border border-stone-800/50 bg-stone-900/30 backdrop-blur-sm p-6 transition-colors hover:border-orange-700/30"
+                className="group rounded-2xl border border-stone-800/50 bg-stone-900/30 backdrop-blur-sm p-5 transition-colors hover:border-orange-700/30"
               >
                 <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-stone-800 text-stone-300 transition-colors group-hover:bg-orange-900/30 group-hover:text-orange-400">
                   <f.icon className="h-4.5 w-4.5" />
@@ -277,7 +266,7 @@ export function LandingPage() {
         </section>
 
         {/* Footer */}
-        <footer className="px-6 sm:px-10 pb-10 max-w-6xl mx-auto">
+        <footer className="px-4 sm:px-6 lg:px-8 pb-10 max-w-6xl mx-auto">
           <div className="border-t border-stone-800/50 pt-6 flex items-center justify-between text-xs text-stone-500">
             <span>FretPad</span>
             <span>No account needed. Your data stays in your browser.</span>

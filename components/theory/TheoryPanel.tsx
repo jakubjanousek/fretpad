@@ -11,25 +11,23 @@ interface TheoryPanelProps {
 }
 
 export function TheoryPanel({ chord }: TheoryPanelProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-stone-200/50 dark:border-stone-800/50 bg-white/40 dark:bg-stone-900/30 backdrop-blur-sm overflow-hidden">
+    <div className="rounded-2xl border border-stone-800/50 bg-stone-900/30 backdrop-blur-sm overflow-hidden">
       {/* Header — always visible */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "w-full flex items-center justify-between px-5 py-3",
-          "hover:bg-stone-100/50 dark:hover:bg-stone-800/30 transition-colors",
+          "hover:bg-stone-800/30 transition-colors",
         )}
       >
         <div className="flex items-center gap-2.5">
-          <span className="text-sm font-medium text-stone-700 dark:text-stone-200">
-            Theory
-          </span>
+          <span className="text-sm font-medium text-stone-200">Theory</span>
           {chord && (
-            <span className="text-xs text-stone-400 dark:text-stone-500">
+            <span className="text-xs text-stone-500">
               {chord.symbol} — {chord.notes.join(" · ")}
             </span>
           )}

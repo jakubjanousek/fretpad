@@ -15,7 +15,7 @@ export function PracticeNowPlaying({
   micEnabled,
 }: PracticeNowPlayingProps) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-stone-200/50 dark:border-stone-800/50 bg-white/40 dark:bg-stone-900/30 backdrop-blur-sm px-5 py-3 sm:px-6 sm:py-4">
+    <div className="flex items-center justify-between gap-4 rounded-2xl border border-stone-800/50 bg-stone-900/30 backdrop-blur-sm px-5 py-3 sm:px-6 sm:py-4">
       {/* Current chord — prominent */}
       {currentChord ? (
         <div key={currentChord.symbol} className="animate-chord-change min-w-0">
@@ -23,7 +23,7 @@ export function PracticeNowPlaying({
             <span className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl tracking-tight text-orange-500">
               {currentChord.symbol}
             </span>
-            <span className="text-sm text-stone-500 dark:text-stone-400 font-medium">
+            <span className="text-sm text-stone-400 font-medium">
               {currentChord.root}
             </span>
           </div>
@@ -36,10 +36,10 @@ export function PracticeNowPlaying({
       <div className="flex items-center gap-5 shrink-0">
         {nextChord && (
           <div className="text-center">
-            <span className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-stone-500">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-stone-500">
               Next
             </span>
-            <div className="font-[family-name:var(--font-display)] text-xl sm:text-2xl text-stone-400 dark:text-stone-500">
+            <div className="font-[family-name:var(--font-display)] text-xl sm:text-2xl text-stone-500">
               {nextChord.symbol}
             </div>
           </div>
