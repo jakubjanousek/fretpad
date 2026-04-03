@@ -15,6 +15,7 @@ describe("backingTrackSlice", () => {
         bassMuted: false,
         chordMuted: false,
         drumsMuted: false,
+        compingVariations: false,
       },
     });
   });

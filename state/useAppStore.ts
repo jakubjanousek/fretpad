@@ -86,6 +86,9 @@ export const useAppStore = create<AppState>()(
           if (state.backingTrack.drumsMuted === undefined) {
             state.backingTrack.drumsMuted = false;
           }
+          if (state.backingTrack.compingVariations === undefined) {
+            state.backingTrack.compingVariations = false;
+          }
         }
       },
     },

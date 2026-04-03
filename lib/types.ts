@@ -179,6 +179,7 @@ export interface BackingTrackConfig {
   bassMuted: boolean;
   chordMuted: boolean;
   drumsMuted: boolean;
+  compingVariations: boolean; // Use comping rhythm variants vs fixed pattern
 }
 
 export interface StyleDefinition {

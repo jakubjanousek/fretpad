@@ -205,13 +205,21 @@ export function useAudioEngine({
           countInBars: metronome.countIn,
           loopIteration,
           bpm: tempo,
+          compingVariations: backingTrack.compingVariations,
         },
       );
 
       scheduledEventsRef.current = eventIds;
       return totalBars;
     },
-    [progression, style, onChordChange, metronome, tempo],
+    [
+      progression,
+      style,
+      onChordChange,
+      metronome,
+      tempo,
+      backingTrack.compingVariations,
+    ],
   );
 
   useEffect(() => {

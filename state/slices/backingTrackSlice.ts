@@ -13,6 +13,7 @@ export interface BackingTrackSlice {
     type: "bass" | "chord" | "drums",
     muted: boolean,
   ) => void;
+  setCompingVariations: (enabled: boolean) => void;
 }
 
 const volumeKey = {
@@ -40,6 +41,7 @@ export const createBackingTrackSlice: StateCreator<
     bassMuted: false,
     chordMuted: false,
     drumsMuted: false,
+    compingVariations: false,
   },
 
   setBackingTrackVolume: (type, volume) => {
@@ -57,6 +59,15 @@ export const createBackingTrackSlice: StateCreator<
       backingTrack: {
         ...state.backingTrack,
         [mutedKey[type]]: muted,
+      },
+    }));
+  },
+
+  setCompingVariations: (enabled) => {
+    set((state) => ({
+      backingTrack: {
+        ...state.backingTrack,
+        compingVariations: enabled,
       },
     }));
   },

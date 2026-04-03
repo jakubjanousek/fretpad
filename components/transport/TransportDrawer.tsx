@@ -52,6 +52,9 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
   );
   const tempoRamp = useAppStore((state) => state.tempoRamp);
   const setTempoRampEnabled = useAppStore((state) => state.setTempoRampEnabled);
+  const setCompingVariations = useAppStore(
+    (state) => state.setCompingVariations,
+  );
 
   const [showShortcuts, setShowShortcuts] = useState(false);
 
@@ -394,6 +397,27 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
                   aria-label="Drums volume"
                 />
               </div>
+            </div>
+
+            {/* Comping Variations Toggle */}
+            <div className="flex items-center justify-between pt-2">
+              <Label className="text-xs text-muted-foreground">
+                Comping variations
+              </Label>
+              <Button
+                variant={backingTrack.compingVariations ? "default" : "outline"}
+                size="sm"
+                onClick={() =>
+                  setCompingVariations(!backingTrack.compingVariations)
+                }
+                className={cn(
+                  "h-7 w-12 text-xs",
+                  backingTrack.compingVariations &&
+                    "bg-orange-500 hover:bg-orange-600",
+                )}
+              >
+                {backingTrack.compingVariations ? "On" : "Off"}
+              </Button>
             </div>
           </div>
 

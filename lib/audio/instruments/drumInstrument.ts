@@ -83,15 +83,15 @@ export function createDrumInstrument(volume: number): DrumInstrument {
   });
   hihatOpen.chain(hihatOpenFilter, drumBus);
 
-  // Ride cymbal: highpass-filtered noise, longer sustain — a soft wash
+  // Ride cymbal: highpass-filtered noise — short enough to avoid retrigger artifacts
   const rideFilter = new Tone.Filter(6000, "highpass", -24);
   const ride = new Tone.NoiseSynth({
     noise: { type: "pink" },
     envelope: {
       attack: 0.002,
-      decay: 0.35,
+      decay: 0.12,
       sustain: 0,
-      release: 0.08,
+      release: 0.04,
     },
   });
   ride.chain(rideFilter, drumBus);

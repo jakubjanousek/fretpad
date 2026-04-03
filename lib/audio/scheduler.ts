@@ -41,6 +41,7 @@ interface ScheduleOptions {
   countInBars?: number;
   loopIteration?: number;
   bpm?: number;
+  compingVariations?: boolean;
 }
 
 type HumanizationProfile = NonNullable<
@@ -593,12 +594,16 @@ export function scheduleProgression(
       eventIds.push(changeEventId);
 
       // Schedule chord voicings per chord
+      const variants =
+        options?.compingVariations !== false
+          ? style.patterns.chord.variants
+          : undefined;
       const chordPatternEvents =
-        style.patterns.chord.variants?.[
+        variants?.[
           getPatternVariantIndex(
             barIndex,
             chordIndex,
-            style.patterns.chord.variants.length,
+            variants.length,
             loopIteration,
           )
         ] ?? style.patterns.chord.events;
