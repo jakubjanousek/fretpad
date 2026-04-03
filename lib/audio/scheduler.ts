@@ -102,7 +102,6 @@ export function beatsToTime(beats: number): string {
 
 interface EventTimingInput {
   time: string;
-  offsetBeats?: number;
 }
 
 /**
@@ -112,11 +111,7 @@ export function resolveBarEventBeat(
   event: EventTimingInput,
   instrumentOffsetBeats = 0,
 ): number {
-  return (
-    parseTimeToBeats(event.time) +
-    (event.offsetBeats ?? 0) +
-    instrumentOffsetBeats
-  );
+  return parseTimeToBeats(event.time) + instrumentOffsetBeats;
 }
 
 function hashHumanizationSeed(seed: string): number {

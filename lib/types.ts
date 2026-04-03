@@ -99,7 +99,6 @@ export interface PatternEvent {
   time: string; // Tone.js time format: "0:0", "0:1", "0:2:2"
   duration: string; // Note duration: "4n", "8n", "2n"
   velocity?: number; // 0-1, defaults to 0.8
-  offsetBeats?: number; // Explicit beat offset for swing feel or laid-back placement
   degree?: number; // Scale degree for bass (1, 3, 5, 7)
   type?: "root" | "fifth" | "chord" | "approach" | "walk";
 }
@@ -108,7 +107,6 @@ export interface ChordPatternEvent {
   time: string;
   duration: string;
   velocity?: number;
-  offsetBeats?: number;
   voicingType: "shell" | "full" | "triad" | "rootless";
 }
 
@@ -129,7 +127,6 @@ export interface DrumPatternEvent {
   time: string; // Tone.js time format
   sound: DrumSound;
   velocity?: number; // 0-1
-  offsetBeats?: number;
 }
 
 export interface DrumPattern {

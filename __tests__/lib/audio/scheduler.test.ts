@@ -28,33 +28,50 @@ describe("audio scheduler timing helpers", () => {
     expect(beatsToTime(1.59)).toBe("0:1:2.36");
   });
 
-  it("resolves bar-level event beat positions with offsets", () => {
-    expect(
-      resolveBarEventBeat({ time: "0:0", offsetBeats: 2 / 3 }),
-    ).toBeCloseTo(2 / 3);
-    expect(
-      resolveBarEventBeat({ time: "0:2", offsetBeats: 2 / 3 }),
-    ).toBeCloseTo(8 / 3);
+  it("resolves bar-level event beat positions", () => {
+    expect(resolveBarEventBeat({ time: "0:0" })).toBe(0);
+    expect(resolveBarEventBeat({ time: "0:2" })).toBe(2);
   });
 
   it("adds per-instrument placement offsets", () => {
-    const result = resolveBarEventBeat(
-      { time: "0:1", offsetBeats: 0.05 },
-      0.03,
-    );
-    expect(result).toBeCloseTo(1.08);
+    const result = resolveBarEventBeat({ time: "0:1" }, 0.03);
+    expect(result).toBeCloseTo(1.03);
   });
 
-  it("keeps jazz ride skip notes at triplet positions on the bar grid", () => {
-    // Skip notes are at indices 4-7 (one per beat with offsetBeats: 2/3)
-    const rideSkip1 = jazzSwingStyle.patterns.drums.events[4]; // beat 0 + 2/3
-    const rideSkip3 = jazzSwingStyle.patterns.drums.events[6]; // beat 2 + 2/3
-    if (!rideSkip1 || !rideSkip3) {
-      throw new Error("Expected jazz ride skip events to exist");
+  it("jazz swing patterns use straight grid positions (swing via Transport)", () => {
+    // All events should be on straight grid — no offsetBeats
+    const allEvents = [
+      ...jazzSwingStyle.patterns.bass.events,
+      ...jazzSwingStyle.patterns.chord.events,
+      ...jazzSwingStyle.patterns.drums.events,
+    ];
+    for (const event of allEvents) {
+      expect(event).not.toHaveProperty("offsetBeats");
     }
+  });
 
-    expect(resolveBarEventBeat(rideSkip1)).toBeCloseTo(2 / 3);
-    expect(resolveBarEventBeat(rideSkip3)).toBeCloseTo(8 / 3);
+  it("jazz swing style uses Transport swing", () => {
+    expect(jazzSwingStyle.swing).toBeGreaterThan(0);
+    expect(jazzSwingStyle.timing?.useTransportSwing).toBe(true);
+  });
+
+  it("jazz swing has multiple comping variants on straight grid", () => {
+    const variants = jazzSwingStyle.patterns.chord.variants ?? [];
+    expect(variants.length).toBeGreaterThanOrEqual(3);
+
+    // All variant events should also be on straight grid
+    for (const variant of variants) {
+      for (const event of variant) {
+        expect(event).not.toHaveProperty("offsetBeats");
+      }
+    }
+  });
+
+  it("jazz swing comping variants have different rhythms", () => {
+    const variants = jazzSwingStyle.patterns.chord.variants ?? [];
+    const timeSets = variants.map((v) => v.map((e) => e.time).join(","));
+    const unique = new Set(timeSets);
+    expect(unique.size).toBeGreaterThan(1);
   });
 
   it("produces deterministic bounded humanization offsets", () => {

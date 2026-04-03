@@ -3,21 +3,21 @@ import type { StyleDefinition } from "@/lib/types";
 /**
  * Jazz Swing style with walking bass, syncopated piano comping, and ride cymbal.
  *
- * Swing feel is created by placing upbeat events at the triplet position
- * (offsetBeats: 2/3) rather than the straight 8th (0.5). This is explicit
- * and doesn't depend on Tone.js transport swing.
+ * Swing feel is applied globally via Tone.js Transport.swing on 8th notes.
+ * All patterns are written on a straight grid — the transport warps upbeats
+ * to triplet positions automatically, keeping all instruments in sync.
  *
- * Bass: Walking quarter notes (straight, on the beat)
- * Drums: Ride pattern with triplet skip notes, hi-hat on 2 & 4
- * Comping: Sparse hits on swung upbeats
+ * Bass: Walking quarter notes (on the beat, unaffected by 8th-note swing)
+ * Drums: Ride pattern with 8th-note skip notes (swung by transport), hi-hat on 2 & 4
+ * Comping: Sparse hits on 8th-note upbeats (swung by transport)
  */
 export const jazzSwingStyle: StyleDefinition = {
   id: "jazzSwing",
   name: "Jazz Swing",
   description: "Walking bass with piano comping",
-  swing: 0,
+  swing: 0.66,
   timing: {
-    useTransportSwing: false,
+    useTransportSwing: true,
   },
   instruments: {
     bass: {
@@ -55,22 +55,62 @@ export const jazzSwingStyle: StyleDefinition = {
     },
     chord: {
       name: "comping",
-      // Swung upbeats of 1 and 3 — consistent every bar
+      // Default: upbeats of 1 and 3
       events: [
-        {
-          time: "0:0",
-          duration: "8n",
-          voicingType: "shell",
-          velocity: 0.38,
-          offsetBeats: 2 / 3,
-        },
-        {
-          time: "0:2",
-          duration: "8n",
-          voicingType: "shell",
-          velocity: 0.42,
-          offsetBeats: 2 / 3,
-        },
+        { time: "0:0:2", duration: "8n", voicingType: "shell", velocity: 0.38 },
+        { time: "0:2:2", duration: "8n", voicingType: "shell", velocity: 0.42 },
+      ],
+      // Variants cycle per bar/chord for rhythmic variety
+      variants: [
+        // Upbeats of 1 and 3
+        [
+          {
+            time: "0:0:2",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.38,
+          },
+          {
+            time: "0:2:2",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.42,
+          },
+        ],
+        // Upbeat of 2 only — sparse
+        [
+          {
+            time: "0:1:2",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.4,
+          },
+        ],
+        // Beat 2 and upbeat of 3 — Charleston rhythm
+        [
+          { time: "0:1", duration: "8n", voicingType: "shell", velocity: 0.42 },
+          {
+            time: "0:2:2",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.36,
+          },
+        ],
+        // Upbeats of 2 and 4 — anticipation
+        [
+          {
+            time: "0:1:2",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.36,
+          },
+          {
+            time: "0:3:2",
+            duration: "8n",
+            voicingType: "shell",
+            velocity: 0.4,
+          },
+        ],
       ],
     },
     drums: {
@@ -81,11 +121,11 @@ export const jazzSwingStyle: StyleDefinition = {
         { time: "0:1", sound: "hihat", velocity: 0.5 },
         { time: "0:2", sound: "hihat", velocity: 0.58 },
         { time: "0:3", sound: "hihat", velocity: 0.5 },
-        // Ride "skip" notes at triplet position on every beat (consistent swing)
-        { time: "0:0", sound: "hihat", velocity: 0.3, offsetBeats: 2 / 3 },
-        { time: "0:1", sound: "hihat", velocity: 0.26, offsetBeats: 2 / 3 },
-        { time: "0:2", sound: "hihat", velocity: 0.3, offsetBeats: 2 / 3 },
-        { time: "0:3", sound: "hihat", velocity: 0.26, offsetBeats: 2 / 3 },
+        // Ride skip notes on 8th-note upbeats (swung by transport)
+        { time: "0:0:2", sound: "hihat", velocity: 0.3 },
+        { time: "0:1:2", sound: "hihat", velocity: 0.26 },
+        { time: "0:2:2", sound: "hihat", velocity: 0.3 },
+        { time: "0:3:2", sound: "hihat", velocity: 0.26 },
 
         // Hi-hat pedal "chick" on 2 and 4
         { time: "0:1", sound: "hihat", velocity: 0.22 },
