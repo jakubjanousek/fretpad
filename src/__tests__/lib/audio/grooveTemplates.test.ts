@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { applyGrooveTemplate } from "@/lib/audio/grooveTemplates";
+import {
+  applyGrooveTemplate,
+  getGrooveVelocityMultiplier,
+} from "@/lib/audio/grooveTemplates";
 import type { GrooveTemplate } from "@/lib/types";
 
 const swingTemplate: GrooveTemplate = {
@@ -50,5 +53,35 @@ describe("applyGrooveTemplate", () => {
     // Should interpolate: 0 + 0.5 * 0.12 = 0.06
     const result = applyGrooveTemplate(0.25, swingTemplate);
     expect(result).toBeCloseTo(0.31); // 0.25 + 0.06
+  });
+});
+
+describe("getGrooveVelocityMultiplier", () => {
+  const shapedTemplate: GrooveTemplate = {
+    name: "Shaped",
+    subdivisions: 8,
+    offsets: [0, 0, 0, 0, 0, 0, 0, 0],
+    velocityShape: [1.0, 0.5, 0.8, 0.45, 0.9, 0.55, 0.8, 0.4],
+  };
+
+  it("returns 1.0 when no template provided", () => {
+    expect(getGrooveVelocityMultiplier(0, undefined)).toBe(1.0);
+  });
+
+  it("returns 1.0 when template has no velocityShape", () => {
+    expect(getGrooveVelocityMultiplier(0, straightTemplate)).toBe(1.0);
+  });
+
+  it("returns correct multiplier for downbeats", () => {
+    expect(getGrooveVelocityMultiplier(0, shapedTemplate)).toBe(1.0);
+    expect(getGrooveVelocityMultiplier(1, shapedTemplate)).toBe(0.8);
+    expect(getGrooveVelocityMultiplier(2, shapedTemplate)).toBe(0.9);
+  });
+
+  it("returns correct multiplier for upbeats", () => {
+    // Beat 0.5 -> subdivision 1 -> velocity 0.5
+    expect(getGrooveVelocityMultiplier(0.5, shapedTemplate)).toBe(0.5);
+    // Beat 1.5 -> subdivision 3 -> velocity 0.45
+    expect(getGrooveVelocityMultiplier(1.5, shapedTemplate)).toBe(0.45);
   });
 });

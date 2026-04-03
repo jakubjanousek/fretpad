@@ -3,6 +3,35 @@ import type { GrooveTemplate } from "@/lib/types";
 export type { GrooveTemplate };
 
 /**
+ * Returns a velocity multiplier from the groove template's velocityShape
+ * for the given beat position. Returns 1.0 if no velocityShape is defined.
+ */
+export function getGrooveVelocityMultiplier(
+  beatInBar: number,
+  template?: GrooveTemplate,
+): number {
+  if (!template?.velocityShape) return 1.0;
+
+  const beatsPerBar = 4;
+  const subdivisionWidth = beatsPerBar / template.subdivisions;
+  const wrappedBeat = ((beatInBar % beatsPerBar) + beatsPerBar) % beatsPerBar;
+  const subdivisionIndex = wrappedBeat / subdivisionWidth;
+  const lowerIndex = Math.floor(subdivisionIndex);
+  const fraction = subdivisionIndex - lowerIndex;
+
+  const lowerValue =
+    template.velocityShape[lowerIndex % template.subdivisions] ?? 1.0;
+
+  if (Math.abs(fraction) < 0.001) {
+    return lowerValue;
+  }
+
+  const upperIndex = (lowerIndex + 1) % template.subdivisions;
+  const upperValue = template.velocityShape[upperIndex] ?? 1.0;
+  return lowerValue + fraction * (upperValue - lowerValue);
+}
+
+/**
  * Applies a groove template to a beat position within a bar.
  * Maps the beat to the subdivision grid, looks up the offset, and shifts the beat.
  * Interpolates for positions between subdivisions.

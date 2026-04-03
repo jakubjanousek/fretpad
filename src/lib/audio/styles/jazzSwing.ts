@@ -25,24 +25,34 @@ export const jazzSwingStyle: StyleDefinition = {
       chord: 0.015,
       drums: 0,
     },
+    pocket: {
+      weight: 0.6,
+    },
+    phraseDynamics: {
+      phraseLengthBars: 4,
+      velocityContour: [0.95, 1.0, 1.05, 0.98],
+    },
     humanization: {
       bass: {
         timingBeats: 0.05,
         timingDirection: "late",
         velocityDelta: 0.1,
         durationBeats: 0.06,
+        correlation: 0.55,
       },
       chord: {
-        timingBeats: 0.06,
+        timingBeats: 0.05,
         timingDirection: "centered",
-        velocityDelta: 0.12,
+        velocityDelta: 0.1,
         durationBeats: 0.08,
+        correlation: 0.35,
       },
       drums: {
         timingBeats: 0.03,
         timingDirection: "centered",
         velocityDelta: 0.08,
         durationBeats: 0,
+        correlation: 0.4,
       },
     },
   },
@@ -142,15 +152,63 @@ export const jazzSwingStyle: StyleDefinition = {
     },
     drums: {
       name: "swing-ride",
+      // Spang-a-lang: ride on all 4 quarters + skip notes on 2-and and 4-and
       events: [
-        // Ride on 1 and 3, skip note on 1 upbeat
         { time: "0:0", sound: "ride", velocity: 0.48 },
+        { time: "0:1", sound: "ride", velocity: 0.35 },
+        { time: "0:1:2", sound: "ride", velocity: 0.2 },
         { time: "0:2", sound: "ride", velocity: 0.42 },
-        { time: "0:0:2", sound: "ride", velocity: 0.22 },
-
+        { time: "0:3", sound: "ride", velocity: 0.35 },
+        { time: "0:3:2", sound: "ride", velocity: 0.2 },
         // Hi-hat pedal "chick" on 2 and 4
         { time: "0:1", sound: "hihat", velocity: 0.28 },
         { time: "0:3", sound: "hihat", velocity: 0.28 },
+      ],
+      variants: [
+        // Variant 0: Full spang-a-lang — skip notes on 2-and and 4-and
+        [
+          { time: "0:0", sound: "ride", velocity: 0.48 },
+          { time: "0:1", sound: "ride", velocity: 0.35 },
+          { time: "0:1:2", sound: "ride", velocity: 0.2 },
+          { time: "0:2", sound: "ride", velocity: 0.42 },
+          { time: "0:3", sound: "ride", velocity: 0.35 },
+          { time: "0:3:2", sound: "ride", velocity: 0.2 },
+          { time: "0:1", sound: "hihat", velocity: 0.28 },
+          { time: "0:3", sound: "hihat", velocity: 0.28 },
+        ],
+        // Variant 1: Skip note only on 4-and — slightly open
+        [
+          { time: "0:0", sound: "ride", velocity: 0.48 },
+          { time: "0:1", sound: "ride", velocity: 0.35 },
+          { time: "0:2", sound: "ride", velocity: 0.42 },
+          { time: "0:3", sound: "ride", velocity: 0.35 },
+          { time: "0:3:2", sound: "ride", velocity: 0.18 },
+          { time: "0:1", sound: "hihat", velocity: 0.28 },
+          { time: "0:3", sound: "hihat", velocity: 0.28 },
+        ],
+        // Variant 2: Skip note only on 2-and + feathered kick on 1
+        [
+          { time: "0:0", sound: "ride", velocity: 0.48 },
+          { time: "0:1", sound: "ride", velocity: 0.35 },
+          { time: "0:1:2", sound: "ride", velocity: 0.2 },
+          { time: "0:2", sound: "ride", velocity: 0.42 },
+          { time: "0:3", sound: "ride", velocity: 0.35 },
+          { time: "0:1", sound: "hihat", velocity: 0.28 },
+          { time: "0:3", sound: "hihat", velocity: 0.28 },
+          { time: "0:0", sound: "kick", velocity: 0.18 },
+        ],
+        // Variant 3: Both skip notes + soft snare on 4
+        [
+          { time: "0:0", sound: "ride", velocity: 0.48 },
+          { time: "0:1", sound: "ride", velocity: 0.35 },
+          { time: "0:1:2", sound: "ride", velocity: 0.2 },
+          { time: "0:2", sound: "ride", velocity: 0.42 },
+          { time: "0:3", sound: "ride", velocity: 0.35 },
+          { time: "0:3:2", sound: "ride", velocity: 0.2 },
+          { time: "0:1", sound: "hihat", velocity: 0.28 },
+          { time: "0:3", sound: "hihat", velocity: 0.28 },
+          { time: "0:3", sound: "snare", velocity: 0.12 },
+        ],
       ],
     },
   },

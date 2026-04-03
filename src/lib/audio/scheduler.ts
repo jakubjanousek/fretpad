@@ -18,7 +18,10 @@ import type {
   Progression,
   StyleDefinition,
 } from "@/lib/types";
-import { applyGrooveTemplate } from "./grooveTemplates";
+import {
+  applyGrooveTemplate,
+  getGrooveVelocityMultiplier,
+} from "./grooveTemplates";
 import {
   getApproachNote,
   getBassNote,
@@ -215,6 +218,99 @@ export function getHumanization(
   };
 }
 
+/**
+ * Computes correlated humanization for a sequence of events using an AR(1) drift model.
+ * Each event's offset is a blend of the previous drift and new noise, creating
+ * natural push-pull timing instead of independent scatter.
+ *
+ * drift[n] = correlation * drift[n-1] + (1 - correlation) * noise[n]
+ *
+ * With correlation=0, output matches independent getHumanization exactly.
+ */
+export function getCorrelatedHumanization(
+  profile: HumanizationProfile | undefined,
+  instrument: "bass" | "chord" | "drums",
+  context: Omit<HumanizationContext, "eventIndex">,
+  eventCount: number,
+): HumanizationResult[] {
+  if (!profile || eventCount === 0) {
+    return Array.from({ length: eventCount }, () => ({
+      timingOffsetBeats: 0,
+      velocityOffset: 0,
+      durationOffsetBeats: 0,
+    }));
+  }
+
+  const correlation = profile.correlation ?? 0;
+  const results: HumanizationResult[] = [];
+  let timingDrift = 0;
+  let velocityDrift = 0;
+  let durationDrift = 0;
+
+  for (let i = 0; i < eventCount; i++) {
+    const independent = getHumanization(profile, instrument, {
+      ...context,
+      eventIndex: i,
+    });
+
+    if (correlation === 0) {
+      results.push(independent);
+      continue;
+    }
+
+    // AR(1): blend previous drift with new noise
+    timingDrift =
+      correlation * timingDrift +
+      (1 - correlation) * independent.timingOffsetBeats;
+    velocityDrift =
+      correlation * velocityDrift +
+      (1 - correlation) * independent.velocityOffset;
+    durationDrift =
+      correlation * durationDrift +
+      (1 - correlation) * independent.durationOffsetBeats;
+
+    // Clamp to profile bounds
+    const timingBeats = profile.timingBeats ?? 0;
+    const velocityDelta = profile.velocityDelta ?? 0;
+    const durationBeats = profile.durationBeats ?? 0;
+
+    results.push({
+      timingOffsetBeats: clamp(timingDrift, -timingBeats, timingBeats),
+      velocityOffset: clamp(velocityDrift, -velocityDelta, velocityDelta),
+      durationOffsetBeats: clamp(durationDrift, -durationBeats, durationBeats),
+    });
+  }
+
+  return results;
+}
+
+/**
+ * Returns a velocity multiplier for the given bar based on a phrase contour.
+ * Creates musical arcs (e.g., build over 4 bars then reset).
+ */
+export function getPhraseVelocityMultiplier(
+  barIndex: number,
+  phraseDynamics?: { phraseLengthBars: number; velocityContour: number[] },
+): number {
+  if (!phraseDynamics) return 1.0;
+  const position = barIndex % phraseDynamics.phraseLengthBars;
+  return phraseDynamics.velocityContour[position] ?? 1.0;
+}
+
+/**
+ * Generates a deterministic per-beat timing offset shared between bass and drums
+ * (the "pocket"). Both instruments reference this offset so they move together.
+ */
+export function getPocketOffset(
+  barIndex: number,
+  beatIndex: number,
+  loopIteration: number,
+  scale: number,
+): number {
+  const seed = `pocket:${barIndex}:${beatIndex}:loop:${loopIteration}`;
+  return getDeterministicCenteredValue(seed) * scale;
+}
+
 function getDurationInBeats(duration: string): number {
   if (duration.includes(":")) {
     return parseTimeToBeats(duration);
@@ -271,6 +367,8 @@ function scheduleBassForBar(
   loopIteration = 0,
   swingRatio = 0.5,
   grooveTemplate?: GrooveTemplate,
+  pocketWeight = 0,
+  velocityMultiplier = 1,
 ): number[] {
   const eventIds: number[] = [];
   const activePattern = pattern
@@ -284,6 +382,14 @@ function scheduleBassForBar(
       ),
     }))
     .filter(({ eventBeat }) => eventBeat < beatsPerBar);
+
+  // Pre-compute correlated humanization for all events in the bar
+  const barHumanization = getCorrelatedHumanization(
+    humanizationProfile,
+    "bass",
+    { loopIteration, barIndex, chordIndex: 0 },
+    activePattern.length,
+  );
 
   for (const slot of barChords) {
     const slotEvents = activePattern.filter(
@@ -308,16 +414,30 @@ function scheduleBassForBar(
       eventBeat: baseEventBeat,
       patternEventIndex,
     } of slotEvents) {
-      const humanization = getHumanization(humanizationProfile, "bass", {
-        loopIteration,
+      const humanization = barHumanization[
+        activePattern.findIndex(
+          (p) => p.patternEventIndex === patternEventIndex,
+        )
+      ] ?? { timingOffsetBeats: 0, velocityOffset: 0, durationOffsetBeats: 0 };
+
+      // Blend pocket offset with individual humanization
+      const beatIndex = Math.floor(baseEventBeat);
+      const pocketScale = humanizationProfile?.timingBeats ?? 0;
+      const pocket = getPocketOffset(
         barIndex,
-        chordIndex: slot.chordIndex,
-        eventIndex: patternEventIndex,
-      });
+        beatIndex,
+        loopIteration,
+        pocketScale,
+      );
+      const timingOffset =
+        pocketWeight * pocket +
+        (1 - pocketWeight) * humanization.timingOffsetBeats;
+
+      const maxDrift = (humanizationProfile?.timingBeats ?? 0) * 2;
       const eventBeat = clamp(
-        baseEventBeat + humanization.timingOffsetBeats,
-        0,
-        Math.max(beatsPerBar - 0.01, 0),
+        baseEventBeat + timingOffset,
+        Math.max(0, baseEventBeat - maxDrift),
+        Math.min(beatsPerBar - 0.01, baseEventBeat + maxDrift),
       );
       const duration = resolveHumanizedDuration(
         event.duration,
@@ -348,7 +468,8 @@ function scheduleBassForBar(
         }
 
         const velocity = clamp(
-          (event.velocity ?? 0.8) + humanization.velocityOffset,
+          ((event.velocity ?? 0.8) + humanization.velocityOffset) *
+            velocityMultiplier,
           0.05,
           1,
         );
@@ -384,24 +505,38 @@ function scheduleChordPattern(
   loopIteration = 0,
   swingRatio = 0.5,
   grooveTemplate?: GrooveTemplate,
+  velocityMultiplier = 1,
 ): number[] {
   const eventIds: number[] = [];
 
-  for (const [eventIndex, event] of pattern.entries()) {
-    const humanization = getHumanization(humanizationProfile, "chord", {
+  // Pre-compute correlated humanization for chord events
+  const chordHumanization = getCorrelatedHumanization(
+    humanizationProfile,
+    "chord",
+    {
       loopIteration,
       barIndex: scheduleContext?.barIndex ?? 0,
       chordIndex: scheduleContext?.chordIndex ?? 0,
-      eventIndex,
-    });
+    },
+    pattern.length,
+  );
+
+  for (const [eventIndex, event] of pattern.entries()) {
+    const humanization = chordHumanization[eventIndex] ?? {
+      timingOffsetBeats: 0,
+      velocityOffset: 0,
+      durationOffsetBeats: 0,
+    };
+    const baseChordBeat = applyTimingFeel(
+      resolveBarEventBeat(event, instrumentOffsetBeats),
+      swingRatio,
+      grooveTemplate,
+    );
+    const maxChordDrift = (humanizationProfile?.timingBeats ?? 0) * 2;
     const eventBeat = clamp(
-      applyTimingFeel(
-        resolveBarEventBeat(event, instrumentOffsetBeats),
-        swingRatio,
-        grooveTemplate,
-      ) + humanization.timingOffsetBeats,
-      0,
-      Math.max(chordBeats - 0.01, 0),
+      baseChordBeat + humanization.timingOffsetBeats,
+      Math.max(0, baseChordBeat - maxChordDrift),
+      Math.min(chordBeats - 0.01, baseChordBeat + maxChordDrift),
     );
     const absoluteBeat = startBeat + eventBeat;
 
@@ -413,11 +548,18 @@ function scheduleChordPattern(
       humanization.durationOffsetBeats,
     );
 
+    const rawEventBeat = resolveBarEventBeat(event, instrumentOffsetBeats);
+    const grooveVelocity = getGrooveVelocityMultiplier(
+      rawEventBeat,
+      grooveTemplate,
+    );
     const eventId = transport.schedule((audioTime) => {
       const safeTime = Math.max(audioTime, Tone.now());
       const voicing = getVoicing(chord, event.voicingType, chordOctave);
       const velocity = clamp(
-        (event.velocity ?? 0.6) + humanization.velocityOffset,
+        ((event.velocity ?? 0.6) + humanization.velocityOffset) *
+          velocityMultiplier *
+          grooveVelocity,
         0.05,
         1,
       );
@@ -451,6 +593,8 @@ function scheduleDrumsForBar(
   loopIteration = 0,
   swingRatio = 0.5,
   grooveTemplate?: GrooveTemplate,
+  pocketWeight = 0,
+  velocityMultiplier = 1,
 ): number[] {
   const eventIds: number[] = [];
   const activePattern = pattern
@@ -465,24 +609,56 @@ function scheduleDrumsForBar(
     }))
     .filter(({ eventBeat }) => eventBeat < beatsPerBar);
 
-  for (const { event, eventBeat: baseEventBeat, eventIndex } of activePattern) {
-    const humanization = getHumanization(humanizationProfile, "drums", {
+  // Pre-compute correlated humanization for all drum events in the bar
+  const barHumanization = getCorrelatedHumanization(
+    humanizationProfile,
+    "drums",
+    { loopIteration, barIndex: scheduleContext?.barIndex ?? 0, chordIndex: 0 },
+    activePattern.length,
+  );
+
+  for (const [
+    i,
+    { event, eventBeat: baseEventBeat },
+  ] of activePattern.entries()) {
+    const humanization = barHumanization[i] ?? {
+      timingOffsetBeats: 0,
+      velocityOffset: 0,
+      durationOffsetBeats: 0,
+    };
+
+    // Blend pocket offset with individual humanization
+    const beatIndex = Math.floor(baseEventBeat);
+    const barIndex = scheduleContext?.barIndex ?? 0;
+    const pocketScale = humanizationProfile?.timingBeats ?? 0;
+    const pocket = getPocketOffset(
+      barIndex,
+      beatIndex,
       loopIteration,
-      barIndex: scheduleContext?.barIndex ?? 0,
-      chordIndex: 0,
-      eventIndex,
-    });
+      pocketScale,
+    );
+    const timingOffset =
+      pocketWeight * pocket +
+      (1 - pocketWeight) * humanization.timingOffsetBeats;
+
+    const maxDrift = (humanizationProfile?.timingBeats ?? 0) * 2;
     const eventBeat = clamp(
-      baseEventBeat + humanization.timingOffsetBeats,
-      0,
-      Math.max(beatsPerBar - 0.01, 0),
+      baseEventBeat + timingOffset,
+      Math.max(0, baseEventBeat - maxDrift),
+      Math.min(beatsPerBar - 0.01, baseEventBeat + maxDrift),
     );
     const absoluteBeat = startBeat + eventBeat;
     const time = beatsToTime(absoluteBeat);
 
+    const grooveVelocity = getGrooveVelocityMultiplier(
+      baseEventBeat,
+      grooveTemplate,
+    );
     const eventId = transport.schedule((audioTime) => {
       const velocity = clamp(
-        (event.velocity ?? 0.7) + humanization.velocityOffset,
+        ((event.velocity ?? 0.7) + humanization.velocityOffset) *
+          velocityMultiplier *
+          grooveVelocity,
         0.05,
         1,
       );
@@ -583,6 +759,8 @@ export function scheduleProgression(
   const drumsSwingRatio =
     0.5 + (baseSwingRatio - 0.5) * (style.swing.drums ?? 1);
 
+  const pocketWeight = style.timing?.pocket?.weight ?? 0;
+  const phraseDynamics = style.timing?.phraseDynamics;
   const countInOffset = (options?.countInBars ?? 0) * beatsPerBar;
   let currentBeat = countInOffset;
 
@@ -592,6 +770,10 @@ export function scheduleProgression(
     const barStartBeat = currentBeat;
     const parsedBarChords: ParsedBarChordSlot[] = [];
     let barBeatCursor = 0;
+    const barVelocityMultiplier = getPhraseVelocityMultiplier(
+      barIndex,
+      phraseDynamics,
+    );
 
     // Parse chords and schedule chord change callbacks
     for (let chordIndex = 0; chordIndex < bar.chords.length; chordIndex++) {
@@ -643,6 +825,7 @@ export function scheduleProgression(
         loopIteration,
         chordSwingRatio,
         style.grooveTemplates?.chord,
+        barVelocityMultiplier,
       );
       eventIds.push(...chordEventIds);
 
@@ -668,6 +851,8 @@ export function scheduleProgression(
         loopIteration,
         bassSwingRatio,
         style.grooveTemplates?.bass,
+        pocketWeight,
+        barVelocityMultiplier,
       );
       eventIds.push(...bassEventIds);
 
@@ -700,6 +885,8 @@ export function scheduleProgression(
           loopIteration,
           drumsSwingRatio,
           style.grooveTemplates?.drums,
+          pocketWeight,
+          barVelocityMultiplier,
         );
         eventIds.push(...drumEventIds);
       }

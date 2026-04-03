@@ -22,19 +22,18 @@ export const jazzSwingNaturalStyle: StyleDefinition = {
     drums: 1,
   },
   grooveTemplates: {
-    // Bass: not dead-straight — slight push on beat 3, lay back on 2 and 4
+    // Bass: lay-back offset (0.015) folded in + slight push on beat 3, lay back on 2 and 4
     bass: {
       name: "Walking Bass",
       subdivisions: 8,
-      offsets: [0, 0, 0.01, 0, -0.01, 0, 0.015, 0],
+      offsets: [0.015, 0.015, 0.025, 0.015, 0.005, 0.015, 0.03, 0.015],
     },
-    // Chords: upbeats pushed late with non-uniform feel per beat
-    // Beat 1 upbeat swings hardest, beat 4 upbeat least
+    // Chords: comping offset (0.02) folded in + upbeats pushed late
+    // Reduced swing offsets — comping should sit close to the pocket, not drag behind it
     chord: {
       name: "Jazz Comping",
       subdivisions: 8,
-      offsets: [0, 0.17, 0, 0.13, 0, 0.15, 0, 0.1],
-      velocityShape: [1.0, 0.7, 0.85, 0.65, 1.0, 0.75, 0.85, 0.6],
+      offsets: [0.02, 0.14, 0.02, 0.11, 0.02, 0.13, 0.02, 0.1],
     },
     // Drums: classic jazz ride feel — skip notes on 1 and 3 swing harder
     drums: {
@@ -46,9 +45,17 @@ export const jazzSwingNaturalStyle: StyleDefinition = {
   },
   timing: {
     instrumentOffsets: {
-      bass: 0.015, // Bass lays back slightly behind the beat
-      chord: 0.02, // Comping further behind — relaxed feel
-      drums: 0, // Drums are the time reference
+      // Bass and chord offsets folded into groove templates below
+      bass: 0,
+      chord: 0,
+      drums: 0,
+    },
+    pocket: {
+      weight: 0.6, // Bass and drums share 60% of their timing deviation
+    },
+    phraseDynamics: {
+      phraseLengthBars: 4,
+      velocityContour: [0.95, 1.0, 1.05, 0.98],
     },
     humanization: {
       bass: {
@@ -56,18 +63,21 @@ export const jazzSwingNaturalStyle: StyleDefinition = {
         timingDirection: "late", // Bass players tend to lay back
         velocityDelta: 0.12, // Wider dynamic range
         durationBeats: 0.08, // Some notes ring, some are clipped
+        correlation: 0.55, // Walking bass has momentum
       },
       chord: {
-        timingBeats: 0.08, // ±40ms — comping is intentionally loose
+        timingBeats: 0.05, // ±25ms — tighter, sits closer to the pocket
         timingDirection: "centered", // Pushes and pulls
-        velocityDelta: 0.15, // Big dynamic contrast in comping
-        durationBeats: 0.1, // Staccato vs legato variety
+        velocityDelta: 0.1, // Moderate dynamic contrast
+        durationBeats: 0.08, // Staccato vs legato variety
+        correlation: 0.35, // Slight drift momentum
       },
       drums: {
         timingBeats: 0.04, // ±20ms — drums are tightest but not robotic
         timingDirection: "centered",
         velocityDelta: 0.1, // Ghost notes vs accents
         durationBeats: 0,
+        correlation: 0.4, // Tight mean reversion
       },
     },
   },
@@ -168,50 +178,63 @@ export const jazzSwingNaturalStyle: StyleDefinition = {
       ],
     },
     drums: {
-      name: "swing-ride-minimal",
-      // Default: ride on 1 and 3 with one skip note, hi-hat on 2 and 4
+      name: "swing-ride",
+      // Spang-a-lang: ride on all 4 quarters + skip notes on 2-and and 4-and
       events: [
         { time: "0:0", sound: "ride", velocity: 0.48 },
+        { time: "0:1", sound: "ride", velocity: 0.35 },
+        { time: "0:1:2", sound: "ride", velocity: 0.2 },
         { time: "0:2", sound: "ride", velocity: 0.42 },
-        { time: "0:0:2", sound: "ride", velocity: 0.2 },
+        { time: "0:3", sound: "ride", velocity: 0.35 },
+        { time: "0:3:2", sound: "ride", velocity: 0.2 },
         { time: "0:1", sound: "hihat", velocity: 0.25 },
         { time: "0:3", sound: "hihat", velocity: 0.25 },
       ],
       variants: [
-        // Variant 0: Ride on 1 and 3, skip note on 1
+        // Variant 0: Full spang-a-lang — skip notes on 2-and and 4-and
         [
           { time: "0:0", sound: "ride", velocity: 0.48 },
+          { time: "0:1", sound: "ride", velocity: 0.35 },
+          { time: "0:1:2", sound: "ride", velocity: 0.2 },
           { time: "0:2", sound: "ride", velocity: 0.42 },
-          { time: "0:0:2", sound: "ride", velocity: 0.2 },
+          { time: "0:3", sound: "ride", velocity: 0.35 },
+          { time: "0:3:2", sound: "ride", velocity: 0.2 },
           { time: "0:1", sound: "hihat", velocity: 0.25 },
           { time: "0:3", sound: "hihat", velocity: 0.25 },
         ],
-        // Variant 1: Just quarters on 1 and 3, no skip — very open
-        [
-          { time: "0:0", sound: "ride", velocity: 0.45 },
-          { time: "0:2", sound: "ride", velocity: 0.4 },
-          { time: "0:1", sound: "hihat", velocity: 0.22 },
-          { time: "0:3", sound: "hihat", velocity: 0.22 },
-        ],
-        // Variant 2: All four quarters, skip on 3 — slightly fuller
+        // Variant 1: Skip note only on 4-and — slightly open
         [
           { time: "0:0", sound: "ride", velocity: 0.48 },
-          { time: "0:1", sound: "ride", velocity: 0.32 },
+          { time: "0:1", sound: "ride", velocity: 0.35 },
           { time: "0:2", sound: "ride", velocity: 0.42 },
-          { time: "0:3", sound: "ride", velocity: 0.32 },
-          { time: "0:2:2", sound: "ride", velocity: 0.18 },
+          { time: "0:3", sound: "ride", velocity: 0.35 },
+          { time: "0:3:2", sound: "ride", velocity: 0.18 },
           { time: "0:1", sound: "hihat", velocity: 0.25 },
           { time: "0:3", sound: "hihat", velocity: 0.25 },
         ],
-        // Variant 3: Ride on 1 and 3, feathered kick on 1, soft snare on 4
+        // Variant 2: Skip note only on 2-and + feathered kick on 1
         [
           { time: "0:0", sound: "ride", velocity: 0.48 },
+          { time: "0:1", sound: "ride", velocity: 0.35 },
+          { time: "0:1:2", sound: "ride", velocity: 0.2 },
           { time: "0:2", sound: "ride", velocity: 0.42 },
-          { time: "0:2:2", sound: "ride", velocity: 0.18 },
+          { time: "0:3", sound: "ride", velocity: 0.35 },
           { time: "0:1", sound: "hihat", velocity: 0.25 },
           { time: "0:3", sound: "hihat", velocity: 0.25 },
-          { time: "0:0", sound: "kick", velocity: 0.2 },
-          { time: "0:3", sound: "snare", velocity: 0.14 },
+          { time: "0:0", sound: "kick", velocity: 0.18 },
+        ],
+        // Variant 3: Both skip notes + feathered kick on 1, soft snare on 4
+        [
+          { time: "0:0", sound: "ride", velocity: 0.48 },
+          { time: "0:1", sound: "ride", velocity: 0.35 },
+          { time: "0:1:2", sound: "ride", velocity: 0.2 },
+          { time: "0:2", sound: "ride", velocity: 0.42 },
+          { time: "0:3", sound: "ride", velocity: 0.35 },
+          { time: "0:3:2", sound: "ride", velocity: 0.2 },
+          { time: "0:1", sound: "hihat", velocity: 0.25 },
+          { time: "0:3", sound: "hihat", velocity: 0.25 },
+          { time: "0:0", sound: "kick", velocity: 0.18 },
+          { time: "0:3", sound: "snare", velocity: 0.12 },
         ],
       ],
     },

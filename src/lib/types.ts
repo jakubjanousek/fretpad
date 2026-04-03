@@ -208,24 +208,39 @@ export interface StyleDefinition {
       chord?: number;
       drums?: number;
     };
+    /** Shared timing pocket between bass and drums. Weight 0-1: 0 = independent, 1 = locked. */
+    pocket?: {
+      weight: number;
+    };
+    /** Velocity arc across bars for musical phrasing */
+    phraseDynamics?: {
+      phraseLengthBars: number;
+      velocityContour: number[];
+    };
     humanization?: {
       bass?: {
         timingBeats?: number;
         timingDirection?: "centered" | "late" | "early";
         velocityDelta?: number;
         durationBeats?: number;
+        /** AR(1) correlation coefficient. 0 = independent jitter, higher = more drift momentum. */
+        correlation?: number;
       };
       chord?: {
         timingBeats?: number;
         timingDirection?: "centered" | "late" | "early";
         velocityDelta?: number;
         durationBeats?: number;
+        /** AR(1) correlation coefficient. 0 = independent jitter, higher = more drift momentum. */
+        correlation?: number;
       };
       drums?: {
         timingBeats?: number;
         timingDirection?: "centered" | "late" | "early";
         velocityDelta?: number;
         durationBeats?: number;
+        /** AR(1) correlation coefficient. 0 = independent jitter, higher = more drift momentum. */
+        correlation?: number;
       };
     };
   };
