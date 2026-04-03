@@ -55,9 +55,7 @@ export const viewport: Viewport = {
 
 const themeScript = `
 (function() {
-  const theme = localStorage.getItem('theme') || 'system';
-  const dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  if (dark) document.documentElement.classList.add('dark');
+  document.documentElement.classList.add('dark');
 })();
 `;
 
