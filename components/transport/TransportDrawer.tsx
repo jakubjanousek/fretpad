@@ -24,6 +24,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { AVAILABLE_STYLES } from "@/lib/audio/styles";
+import type { StyleId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
@@ -55,6 +57,8 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
   const setCompingVariations = useAppStore(
     (state) => state.setCompingVariations,
   );
+  const selectedStyle = useAppStore((state) => state.selectedStyle);
+  const setSelectedStyle = useAppStore((state) => state.setSelectedStyle);
 
   const [showShortcuts, setShowShortcuts] = useState(false);
 
@@ -232,6 +236,28 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
             <div className="flex items-center gap-2">
               <Music className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Backing Track</span>
+            </div>
+
+            {/* Style Selector */}
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-muted-foreground">Style</Label>
+              <div className="flex gap-1">
+                {AVAILABLE_STYLES.map((s) => (
+                  <Button
+                    key={s.id}
+                    variant={selectedStyle === s.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedStyle(s.id as StyleId)}
+                    className={cn(
+                      "h-7 text-xs",
+                      selectedStyle === s.id &&
+                        "bg-orange-500 hover:bg-orange-600",
+                    )}
+                  >
+                    {s.name}
+                  </Button>
+                ))}
+              </div>
             </div>
 
             {/* Bass Volume */}

@@ -10,6 +10,7 @@ import {
   createChordInstrument,
   createDrumInstrument,
   createMetronomeInstrument,
+  createSampleDrumInstrument,
   type DrumInstrument,
   type MetronomeInstrument,
   scheduleCountIn,
@@ -139,6 +140,8 @@ export function useAudioEngine({
 
   // Initialize instruments based on style
   useEffect(() => {
+    let aborted = false;
+
     // Dispose previous instruments if they exist
     bassRef.current?.dispose();
     chordRef.current?.dispose();
@@ -148,14 +151,34 @@ export function useAudioEngine({
     // Create new instruments based on style configuration
     bassRef.current = createBassInstrument(style.instruments.bass);
     chordRef.current = createChordInstrument(style.instruments.chord);
-    drumsRef.current = createDrumInstrument(backingTrack.drumsVolume);
     metronomeRef.current = createMetronomeInstrument(metronome.volume);
+
+    // Create drums — sample-based (async) or synth (sync)
+    if (style.instruments.drums?.type === "sample") {
+      // Start with synth drums as fallback while samples load
+      drumsRef.current = createDrumInstrument(backingTrack.drumsVolume);
+      createSampleDrumInstrument(backingTrack.drumsVolume).then(
+        (sampleDrums) => {
+          if (aborted) {
+            sampleDrums.dispose();
+            return;
+          }
+          // Swap synth drums for sample drums
+          drumsRef.current?.dispose();
+          drumsRef.current = sampleDrums;
+          setInstrumentVersion((v) => v + 1);
+        },
+      );
+    } else {
+      drumsRef.current = createDrumInstrument(backingTrack.drumsVolume);
+    }
 
     isReadyRef.current = true;
     // Increment version to trigger volume effect after instrument recreation
     setInstrumentVersion((v) => v + 1);
 
     return () => {
+      aborted = true;
       // Style and volume changes recreate instruments in place; transport control
       // is handled separately so we do not kill active playback during resync.
       bassRef.current?.dispose();

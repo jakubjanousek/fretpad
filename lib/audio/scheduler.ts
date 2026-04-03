@@ -12,11 +12,13 @@ import type {
   Chord,
   ChordPatternEvent,
   DrumPatternEvent,
+  GrooveTemplate,
   MetronomeConfig,
   PatternEvent,
   Progression,
   StyleDefinition,
 } from "@/lib/types";
+import { applyGrooveTemplate } from "./grooveTemplates";
 import {
   getApproachNote,
   getBassNote,
@@ -128,6 +130,20 @@ export function applySwing(beatInBar: number, swingRatio: number): number {
     return beatInBar + (swingRatio - 0.5);
   }
   return beatInBar;
+}
+
+/**
+ * Applies groove template if available, otherwise falls back to swing.
+ */
+function applyTimingFeel(
+  beatInBar: number,
+  swingRatio: number,
+  grooveTemplate?: GrooveTemplate,
+): number {
+  if (grooveTemplate) {
+    return applyGrooveTemplate(beatInBar, grooveTemplate);
+  }
+  return applySwing(beatInBar, swingRatio);
 }
 
 /**
@@ -254,15 +270,17 @@ function scheduleBassForBar(
   humanizationProfile?: HumanizationProfile,
   loopIteration = 0,
   swingRatio = 0.5,
+  grooveTemplate?: GrooveTemplate,
 ): number[] {
   const eventIds: number[] = [];
   const activePattern = pattern
     .map((event, patternEventIndex) => ({
       event,
       patternEventIndex,
-      eventBeat: applySwing(
+      eventBeat: applyTimingFeel(
         resolveBarEventBeat(event, instrumentOffsetBeats),
         swingRatio,
+        grooveTemplate,
       ),
     }))
     .filter(({ eventBeat }) => eventBeat < beatsPerBar);
@@ -365,6 +383,7 @@ function scheduleChordPattern(
   scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
   loopIteration = 0,
   swingRatio = 0.5,
+  grooveTemplate?: GrooveTemplate,
 ): number[] {
   const eventIds: number[] = [];
 
@@ -376,9 +395,10 @@ function scheduleChordPattern(
       eventIndex,
     });
     const eventBeat = clamp(
-      applySwing(
+      applyTimingFeel(
         resolveBarEventBeat(event, instrumentOffsetBeats),
         swingRatio,
+        grooveTemplate,
       ) + humanization.timingOffsetBeats,
       0,
       Math.max(chordBeats - 0.01, 0),
@@ -430,15 +450,17 @@ function scheduleDrumsForBar(
   scheduleContext?: Pick<HumanizationContext, "barIndex">,
   loopIteration = 0,
   swingRatio = 0.5,
+  grooveTemplate?: GrooveTemplate,
 ): number[] {
   const eventIds: number[] = [];
   const activePattern = pattern
     .map((event, eventIndex) => ({
       event,
       eventIndex,
-      eventBeat: applySwing(
+      eventBeat: applyTimingFeel(
         resolveBarEventBeat(event, instrumentOffsetBeats),
         swingRatio,
+        grooveTemplate,
       ),
     }))
     .filter(({ eventBeat }) => eventBeat < beatsPerBar);
@@ -620,6 +642,7 @@ export function scheduleProgression(
         { barIndex, chordIndex },
         loopIteration,
         chordSwingRatio,
+        style.grooveTemplates?.chord,
       );
       eventIds.push(...chordEventIds);
 
@@ -644,13 +667,30 @@ export function scheduleProgression(
         humanization?.bass,
         loopIteration,
         bassSwingRatio,
+        style.grooveTemplates?.bass,
       );
       eventIds.push(...bassEventIds);
 
       if (instruments.drums) {
+        const drumPatternEvents = (() => {
+          const drumVariants =
+            options?.compingVariations !== false
+              ? style.patterns.drums.variants
+              : undefined;
+          return (
+            drumVariants?.[
+              getPatternVariantIndex(
+                barIndex,
+                0,
+                drumVariants.length,
+                loopIteration,
+              )
+            ] ?? style.patterns.drums.events
+          );
+        })();
         const drumEventIds = scheduleDrumsForBar(
           transport,
-          style.patterns.drums.events,
+          drumPatternEvents,
           barStartBeat,
           beatsPerBar,
           instruments.drums,
@@ -659,6 +699,7 @@ export function scheduleProgression(
           { barIndex },
           loopIteration,
           drumsSwingRatio,
+          style.grooveTemplates?.drums,
         );
         eventIds.push(...drumEventIds);
       }

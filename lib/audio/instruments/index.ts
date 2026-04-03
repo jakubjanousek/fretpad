@@ -16,3 +16,4 @@ export {
   METRONOME_CLICK_NOTE,
   type MetronomeInstrument,
 } from "./metronomeInstrument";
+export { createSampleDrumInstrument } from "./sampleDrumInstrument";

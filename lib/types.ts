@@ -93,7 +93,7 @@ export const STANDARD_TUNING: NoteName[] = ["E", "B", "G", "D", "A", "E"]; // hi
 // Backing Track Types
 // ============================================
 
-export type StyleId = "jazzSwing";
+export type StyleId = "jazzSwing" | "jazzSwingNatural";
 
 export interface PatternEvent {
   time: string; // Tone.js time format: "0:0", "0:1", "0:2:2"
@@ -132,6 +132,17 @@ export interface DrumPatternEvent {
 export interface DrumPattern {
   name: string;
   events: DrumPatternEvent[];
+  variants?: DrumPatternEvent[][];
+}
+
+export interface GrooveTemplate {
+  name: string;
+  /** Number of subdivisions per bar (8 for 8th-note grid in 4/4) */
+  subdivisions: number;
+  /** Timing offset in beats for each subdivision position */
+  offsets: number[];
+  /** Optional per-position velocity multipliers */
+  velocityShape?: number[];
 }
 
 export interface BassInstrumentConfig {
@@ -218,9 +229,15 @@ export interface StyleDefinition {
       };
     };
   };
+  grooveTemplates?: {
+    bass?: GrooveTemplate;
+    chord?: GrooveTemplate;
+    drums?: GrooveTemplate;
+  };
   instruments: {
     bass: BassInstrumentConfig;
     chord: ChordInstrumentConfig;
+    drums?: { type: "synth" | "sample"; sampleKit?: string };
   };
   patterns: {
     bass: BassPattern;
