@@ -68,23 +68,24 @@ Tests should survive refactors — they test *what* the code does, not *how* it 
 ## Folder Structure
 
 ```
-app/           # Next.js pages
-components/
-  ui/          # shadcn components
-  fretboard/   # Fretboard visualization
-  progression/ # Chord progression editor
-  transport/   # Playback controls
-  theory/      # Theory info panels
-hooks/         # Custom React hooks
-lib/
-  audio/       # Audio engine (styles/, instruments/, scheduler.ts, voicings.ts)
-  theory/      # Music theory helpers (chords.ts, scales.ts, progression.ts)
-  errors.ts    # Custom error types
-  fretboard.ts # Fretboard mapping utilities
-  id.ts        # ID generation utility
-  types.ts     # Type definitions
-state/         # Zustand stores
-__tests__/     # Vitest test suite
+src/
+  app/           # Next.js pages
+  components/
+    ui/          # shadcn components
+    fretboard/   # Fretboard visualization
+    progression/ # Chord progression editor
+    transport/   # Playback controls
+    theory/      # Theory info panels
+  hooks/         # Custom React hooks
+  lib/
+    audio/       # Audio engine (styles/, instruments/, scheduler.ts, voicings.ts)
+    theory/      # Music theory helpers (chords.ts, scales.ts, progression.ts)
+    errors.ts    # Custom error types
+    fretboard.ts # Fretboard mapping utilities
+    id.ts        # ID generation utility
+    types.ts     # Type definitions
+  state/         # Zustand stores
+  __tests__/     # Vitest test suite
 ```
 
 ## Plan
