@@ -204,13 +204,14 @@ export function useAudioEngine({
           metronomeConfig: metronome,
           countInBars: metronome.countIn,
           loopIteration,
+          bpm: tempo,
         },
       );
 
       scheduledEventsRef.current = eventIds;
       return totalBars;
     },
-    [progression, style, onChordChange, metronome],
+    [progression, style, onChordChange, metronome, tempo],
   );
 
   useEffect(() => {
@@ -255,14 +256,10 @@ export function useAudioEngine({
     };
   }, [rescheduleProgression]);
 
-  // Update swing setting when style changes
+  // Disable Transport.swing — swing is applied per-instrument in the scheduler
   useEffect(() => {
-    const transport = Tone.getTransport();
-    const useTransportSwing =
-      style.timing?.useTransportSwing ?? style.swing > 0;
-    transport.swing = useTransportSwing ? style.swing : 0;
-    transport.swingSubdivision = "8n";
-  }, [style.swing, style.timing?.useTransportSwing]);
+    Tone.getTransport().swing = 0;
+  }, []);
 
   // Update backing track volume and mute state dynamically
   // Also runs when instrumentVersion changes (after instrument recreation)

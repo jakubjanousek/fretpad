@@ -15,9 +15,10 @@ export const jazzSwingStyle: StyleDefinition = {
   id: "jazzSwing",
   name: "Jazz Swing",
   description: "Walking bass with piano comping",
-  swing: 0.66,
-  timing: {
-    useTransportSwing: true,
+  swing: {
+    bass: 0,
+    chord: 0.85,
+    drums: 1,
   },
   instruments: {
     bass: {

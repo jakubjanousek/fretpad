@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  applySwing,
   beatsToTime,
   getDeterministicCenteredValue,
   getHumanization,
   getPatternVariantIndex,
+  getTempoSwingRatio,
   parseTimeToBeats,
   resolveBarEventBeat,
   resolveHumanizedDuration,
@@ -50,9 +52,52 @@ describe("audio scheduler timing helpers", () => {
     }
   });
 
-  it("jazz swing style uses Transport swing", () => {
-    expect(jazzSwingStyle.swing).toBeGreaterThan(0);
-    expect(jazzSwingStyle.timing?.useTransportSwing).toBe(true);
+  it("jazz swing style defines per-instrument swing multipliers", () => {
+    const { swing } = jazzSwingStyle;
+    expect(swing.drums).toBe(1); // ride defines the swing
+    expect(swing.chord).toBeGreaterThan(0);
+    expect(swing.chord).toBeLessThan(1); // comping slightly less than ride
+    expect(swing.bass).toBe(0); // quarter notes, no swing
+  });
+
+  it("computes tempo-adaptive swing ratio", () => {
+    // Medium tempo: near triplet feel (~0.667)
+    const medium = getTempoSwingRatio(120);
+    expect(medium).toBeGreaterThan(0.6);
+    expect(medium).toBeLessThan(0.72);
+
+    // Fast tempo: compresses toward straight
+    const fast = getTempoSwingRatio(220);
+    expect(fast).toBeGreaterThan(0.5);
+    expect(fast).toBeLessThan(0.6);
+
+    // Slow tempo: wider swing
+    const slow = getTempoSwingRatio(70);
+    expect(slow).toBeGreaterThan(0.67);
+    expect(slow).toBeLessThanOrEqual(0.75);
+
+    // Faster = less swing
+    expect(fast).toBeLessThan(medium);
+    expect(medium).toBeLessThan(slow);
+  });
+
+  it("applies swing only to upbeat 8th positions", () => {
+    const ratio = 0.667;
+    // Downbeats: untouched
+    expect(applySwing(0, ratio)).toBe(0);
+    expect(applySwing(1, ratio)).toBe(1);
+    expect(applySwing(2, ratio)).toBe(2);
+    // Upbeat 8ths: shifted
+    expect(applySwing(0.5, ratio)).toBeCloseTo(0.667);
+    expect(applySwing(1.5, ratio)).toBeCloseTo(1.667);
+    // Other positions (16ths): untouched
+    expect(applySwing(0.25, ratio)).toBe(0.25);
+    expect(applySwing(0.75, ratio)).toBe(0.75);
+  });
+
+  it("applies no swing when ratio is 0.5 (straight)", () => {
+    expect(applySwing(0.5, 0.5)).toBe(0.5);
+    expect(applySwing(1.5, 0.5)).toBe(1.5);
   });
 
   it("jazz swing has multiple comping variants on straight grid", () => {

@@ -185,9 +185,12 @@ export interface StyleDefinition {
   id: StyleId;
   name: string;
   description: string;
-  swing: number; // 0-1, 0 = straight, 1 = full triplet swing
+  swing: {
+    bass?: number; // 0 = straight, 1 = full swing (default 0 for quarter notes)
+    chord?: number; // 0-1, multiplier on tempo-derived swing ratio
+    drums?: number; // 0-1, multiplier on tempo-derived swing ratio
+  };
   timing?: {
-    useTransportSwing?: boolean;
     instrumentOffsets?: {
       bass?: number;
       chord?: number;

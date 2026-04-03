@@ -40,6 +40,7 @@ interface ScheduleOptions {
   metronomeConfig?: MetronomeConfig;
   countInBars?: number;
   loopIteration?: number;
+  bpm?: number;
 }
 
 type HumanizationProfile = NonNullable<
@@ -102,6 +103,30 @@ export function beatsToTime(beats: number): string {
 
 interface EventTimingInput {
   time: string;
+}
+
+/**
+ * Computes tempo-adaptive swing ratio based on Friberg & Sundström research.
+ * The offbeat duration stays roughly constant at ~100ms across tempos,
+ * so faster tempos compress toward straight and slower tempos widen toward triplet+.
+ */
+export function getTempoSwingRatio(bpm: number): number {
+  const offbeatMs = 170; // empirical constant from Friberg & Sundström research
+  const beatMs = 60000 / bpm;
+  const naturalRatio = 1 - offbeatMs / beatMs;
+  return Math.max(0.52, Math.min(0.75, naturalRatio));
+}
+
+/**
+ * Applies swing to a beat position. Only upbeat 8th notes (x.5 positions)
+ * are shifted; downbeats and other subdivisions pass through unchanged.
+ */
+export function applySwing(beatInBar: number, swingRatio: number): number {
+  const beatFraction = beatInBar % 1;
+  if (Math.abs(beatFraction - 0.5) < 0.001) {
+    return beatInBar + (swingRatio - 0.5);
+  }
+  return beatInBar;
 }
 
 /**
@@ -227,13 +252,17 @@ function scheduleBassForBar(
   variationIndex = 0,
   humanizationProfile?: HumanizationProfile,
   loopIteration = 0,
+  swingRatio = 0.5,
 ): number[] {
   const eventIds: number[] = [];
   const activePattern = pattern
     .map((event, patternEventIndex) => ({
       event,
       patternEventIndex,
-      eventBeat: resolveBarEventBeat(event, instrumentOffsetBeats),
+      eventBeat: applySwing(
+        resolveBarEventBeat(event, instrumentOffsetBeats),
+        swingRatio,
+      ),
     }))
     .filter(({ eventBeat }) => eventBeat < beatsPerBar);
 
@@ -334,6 +363,7 @@ function scheduleChordPattern(
   humanizationProfile?: HumanizationProfile,
   scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
   loopIteration = 0,
+  swingRatio = 0.5,
 ): number[] {
   const eventIds: number[] = [];
 
@@ -345,8 +375,10 @@ function scheduleChordPattern(
       eventIndex,
     });
     const eventBeat = clamp(
-      resolveBarEventBeat(event, instrumentOffsetBeats) +
-        humanization.timingOffsetBeats,
+      applySwing(
+        resolveBarEventBeat(event, instrumentOffsetBeats),
+        swingRatio,
+      ) + humanization.timingOffsetBeats,
       0,
       Math.max(chordBeats - 0.01, 0),
     );
@@ -396,13 +428,17 @@ function scheduleDrumsForBar(
   humanizationProfile?: HumanizationProfile,
   scheduleContext?: Pick<HumanizationContext, "barIndex">,
   loopIteration = 0,
+  swingRatio = 0.5,
 ): number[] {
   const eventIds: number[] = [];
   const activePattern = pattern
     .map((event, eventIndex) => ({
       event,
       eventIndex,
-      eventBeat: resolveBarEventBeat(event, instrumentOffsetBeats),
+      eventBeat: applySwing(
+        resolveBarEventBeat(event, instrumentOffsetBeats),
+        swingRatio,
+      ),
     }))
     .filter(({ eventBeat }) => eventBeat < beatsPerBar);
 
@@ -517,6 +553,12 @@ export function scheduleProgression(
   const instrumentOffsets = style.timing?.instrumentOffsets;
   const humanization = style.timing?.humanization;
   const loopIteration = options?.loopIteration ?? 0;
+  const baseSwingRatio = getTempoSwingRatio(options?.bpm ?? 120);
+  const bassSwingRatio = 0.5 + (baseSwingRatio - 0.5) * (style.swing.bass ?? 0);
+  const chordSwingRatio =
+    0.5 + (baseSwingRatio - 0.5) * (style.swing.chord ?? 1);
+  const drumsSwingRatio =
+    0.5 + (baseSwingRatio - 0.5) * (style.swing.drums ?? 1);
 
   const countInOffset = (options?.countInBars ?? 0) * beatsPerBar;
   let currentBeat = countInOffset;
@@ -572,6 +614,7 @@ export function scheduleProgression(
         humanization?.chord,
         { barIndex, chordIndex },
         loopIteration,
+        chordSwingRatio,
       );
       eventIds.push(...chordEventIds);
 
@@ -595,6 +638,7 @@ export function scheduleProgression(
         getPatternVariantIndex(barIndex, 0, 4, loopIteration),
         humanization?.bass,
         loopIteration,
+        bassSwingRatio,
       );
       eventIds.push(...bassEventIds);
 
@@ -609,6 +653,7 @@ export function scheduleProgression(
           humanization?.drums,
           { barIndex },
           loopIteration,
+          drumsSwingRatio,
         );
         eventIds.push(...drumEventIds);
       }
