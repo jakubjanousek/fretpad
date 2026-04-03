@@ -38,28 +38,6 @@ export const createPracticeModeSlice: StateCreator<
       delta.isPlaying = false;
     }
 
-    if (state.quizActive) {
-      Object.assign(delta, {
-        quizActive: false,
-        quizQuestion: null,
-        quizScore: 0,
-        quizTotal: 0,
-        quizStreak: 0,
-        quizBestStreak: 0,
-        quizLastResult: null,
-      });
-    }
-
-    if (state.sessionActive) {
-      Object.assign(delta, {
-        sessionActive: false,
-        sessionPhaseIndex: 0,
-        sessionPhaseElapsedMs: 0,
-        sessionTotalElapsedMs: 0,
-        sessionPaused: false,
-      });
-    }
-
     if (state.micActive) {
       delta.micActive = false;
     }
@@ -79,26 +57,15 @@ export const createPracticeModeSlice: StateCreator<
       delta.progressionFuture = [];
     }
 
-    if (!config.showVoicingsButton && state.showVoicings) {
-      delta.showVoicings = false;
-    }
     if (!config.showTargetsDropdown && state.targetNoteMode !== "none") {
       Object.assign(delta, {
         targetNoteMode: "none",
         showChromaticApproach: false,
         showDiatonicApproach: false,
-        showEnclosures: false,
-        focusedEnclosureTarget: null,
       });
     }
     if (!config.showOverlayDropdown && state.fretboardOverlay !== "none") {
       delta.fretboardOverlay = "none";
-    }
-    if (!config.showOverlayDropdown || !config.showCAGED) {
-      delta.focusedPosition = null;
-    }
-    if (!config.showCAGED && state.showCAGEDPositions) {
-      delta.showCAGEDPositions = false;
     }
 
     try {

@@ -3,50 +3,30 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFretboardDisplay } from "@/hooks/useFretboardDisplay";
 import { getTargetStrength } from "@/lib/theory/targetNotes";
-import type { VoiceLeadingPath } from "@/lib/theory/voiceLeading";
 import type {
   ApproachNote,
   ArpeggioConnection,
-  EnclosurePattern,
   FretNote,
-  FretPosition,
-  GuitarVoicing,
   NoteLabelMode,
   NoteName,
 } from "@/lib/types";
-import { CAGED_POSITION_LABELS, STANDARD_TUNING } from "@/lib/types";
+import { STANDARD_TUNING } from "@/lib/types";
 
 import { ArpeggioOverlay } from "./ArpeggioOverlay";
 import { DisplayToolbar } from "./DisplayToolbar";
-import { EnclosureOverlay } from "./EnclosureOverlay";
 import { FretboardLegend, type LegendNoteType } from "./FretboardLegend";
-import { FretMarker, type OverlayColorMode } from "./FretMarker";
+import { FretMarker } from "./FretMarker";
 import { LegendTooltip } from "./LegendTooltip";
 import { TargetNoteOverlay } from "./TargetNoteOverlay";
-import { VoiceLeadingOverlay } from "./VoiceLeadingOverlay";
-import { VoicingOverlay } from "./VoicingOverlay";
 
 interface FretboardProps {
   fretNotes: FretNote[];
   numFrets?: number;
   tuning?: NoteName[];
-  voiceLeadingPaths?: VoiceLeadingPath[];
-  quizMode?: boolean;
-  quizTargetPosition?: FretPosition | null;
   targetNotes?: FretNote[];
   chromaticApproaches?: ApproachNote[];
   diatonicApproaches?: ApproachNote[];
-  enclosures?: EnclosurePattern[];
   arpeggioConnections?: ArpeggioConnection[];
-  showVoicings?: boolean;
-  selectedVoicing?: GuitarVoicing | null;
-  showVoicingFingers?: boolean;
-  onToggleVoicings?: () => void;
-  onToggleVoicingFingers?: () => void;
-  onNextVoicing?: () => void;
-  onPreviousVoicing?: () => void;
-  availableVoicingsCount?: number;
-  selectedVoicingIndex?: number;
   noteLabelModeOverride?: NoteLabelMode;
   onNoteClick?: (note: FretNote) => void;
   showControls?: boolean;
@@ -115,23 +95,10 @@ export function Fretboard({
   fretNotes,
   numFrets = DESKTOP_FRETS,
   tuning = STANDARD_TUNING,
-  voiceLeadingPaths = [],
-  quizMode = false,
-  quizTargetPosition = null,
   targetNotes = [],
   chromaticApproaches = [],
   diatonicApproaches = [],
-  enclosures = [],
   arpeggioConnections = [],
-  showVoicings = false,
-  selectedVoicing = null,
-  showVoicingFingers = true,
-  onToggleVoicings,
-  onToggleVoicingFingers,
-  onNextVoicing,
-  onPreviousVoicing,
-  availableVoicingsCount = 0,
-  selectedVoicingIndex = 0,
   noteLabelModeOverride,
   onNoteClick,
   showControls = true,
@@ -139,26 +106,16 @@ export function Fretboard({
   const {
     showScaleTones,
     setShowScaleTones,
-    showVoiceLeading,
-    setShowVoiceLeading,
     noteLabelMode,
     setNoteLabelMode,
     fretboardOverlay,
     setFretboardOverlay,
-    showCAGEDPositions,
-    setShowCAGEDPositions,
-    focusedPosition,
-    setFocusedPosition,
     targetNoteMode,
     setTargetNoteMode,
     showChromaticApproach,
     setShowChromaticApproach,
     showDiatonicApproach,
     setShowDiatonicApproach,
-    showEnclosures,
-    setShowEnclosures,
-    focusedEnclosureTarget,
-    setFocusedEnclosureTarget,
   } = useFretboardDisplay();
   const responsiveFretCount = useResponsiveFrets(numFrets);
   const { scrollRef, canScroll, checkScroll } = useScrollIndicator();
@@ -195,17 +152,7 @@ export function Fretboard({
     setHoveredLegendType(null);
   };
 
-  // Helper to check if a note is the quiz target
-  const isQuizTarget = (note: FretNote): boolean => {
-    if (!quizMode || !quizTargetPosition) return false;
-    return (
-      note.string === quizTargetPosition.string &&
-      note.fret === quizTargetPosition.fret
-    );
-  };
-
   const isOverlayActive = fretboardOverlay !== "none";
-  const isThreeNPS = fretboardOverlay === "threeNotePerString";
   const isArpeggio = fretboardOverlay === "arpeggio";
   const isTargetModeActive = targetNoteMode !== "none";
 
@@ -232,108 +179,11 @@ export function Fretboard({
       : "animate-target-secondary";
   };
 
-  // Helper to check if a note is part of the selected voicing
-  const isVoicingPosition = (
-    stringNum: number,
-    fret: number,
-  ): {
-    isVoicing: boolean;
-    finger?: 1 | 2 | 3 | 4 | "T";
-    isBarre?: boolean;
-  } => {
-    if (!showVoicings || !selectedVoicing) {
-      return { isVoicing: false };
-    }
-    const position = selectedVoicing.positions.find(
-      (p) => p.string === stringNum && p.fret === fret && p.fret >= 0,
-    );
-    if (position) {
-      const isBarre =
-        selectedVoicing.isBarreChord &&
-        selectedVoicing.barreFret === fret &&
-        selectedVoicing.barreStrings !== undefined &&
-        stringNum >= selectedVoicing.barreStrings[0] &&
-        stringNum <= selectedVoicing.barreStrings[1];
-      return {
-        isVoicing: true,
-        finger: position.finger,
-        isBarre,
-      };
-    }
-    return { isVoicing: false };
-  };
-
-  // Handler for clicking on a target note to show enclosure
-  const handleTargetNoteClick = useCallback(
-    (note: FretNote) => {
-      if (!showEnclosures || !note.isChordTone) return;
-
-      // Toggle focus: if already focused on this note, unfocus; otherwise focus
-      if (
-        focusedEnclosureTarget?.fret === note.fret &&
-        focusedEnclosureTarget?.string === note.string
-      ) {
-        setFocusedEnclosureTarget(null);
-      } else {
-        setFocusedEnclosureTarget({
-          fret: note.fret,
-          string: note.string,
-        });
-      }
-    },
-    [focusedEnclosureTarget, setFocusedEnclosureTarget, showEnclosures],
-  );
-
-  const handleMarkerClick = useCallback(
-    (note: FretNote) => {
-      onNoteClick?.(note);
-
-      if (showEnclosures && note.isChordTone) {
-        handleTargetNoteClick(note);
-      }
-    },
-    [handleTargetNoteClick, onNoteClick, showEnclosures],
-  );
-
-  // Determine the overlay color mode for notes
-  const getOverlayColorMode = (note: FretNote): OverlayColorMode => {
-    if (!isOverlayActive) return "none";
-    if (showCAGEDPositions && (note.cagedPosition || note.threeNPSPosition)) {
-      return "caged";
-    }
-    return "chord-role";
-  };
-
-  // Helper to determine if a note matches the hovered legend type or focused position
+  // Helper to determine if a note matches the hovered legend type
   const getNoteHighlightState = (
     note: FretNote,
   ): "highlighted" | "dimmed" | "normal" => {
-    // In quiz mode, highlight only the target note
-    if (quizMode && quizTargetPosition) {
-      return isQuizTarget(note) ? "highlighted" : "dimmed";
-    }
-
-    // Focus position mode — dim notes not in the focused position
-    if (focusedPosition !== null && isOverlayActive && showCAGEDPositions) {
-      const notePos = isThreeNPS ? note.threeNPSPosition : note.cagedPosition;
-      if (notePos !== focusedPosition) return "dimmed";
-      if (!hoveredLegendType) return "normal";
-    }
-
     if (!hoveredLegendType) return "normal";
-
-    // In overlay mode with CAGED positions on, highlight by position
-    if (isOverlayActive && showCAGEDPositions) {
-      if (note.cagedPosition) {
-        const posLabel = CAGED_POSITION_LABELS[note.cagedPosition];
-        const legendKey = `pos-${posLabel}`;
-        return hoveredLegendType === legendKey ? "highlighted" : "dimmed";
-      }
-      if (note.threeNPSPosition) {
-        const legendKey = `pos-${note.threeNPSPosition}`;
-        return hoveredLegendType === legendKey ? "highlighted" : "dimmed";
-      }
-    }
 
     // Chord-role highlighting
     const noteType: LegendNoteType = note.isRoot
@@ -385,15 +235,6 @@ export function Fretboard({
 
           {/* Fretboard grid */}
           <div className="relative border rounded-lg bg-linear-to-b from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30">
-            {/* Voice leading overlay */}
-            {voiceLeadingPaths.length > 0 && (
-              <VoiceLeadingOverlay
-                paths={voiceLeadingPaths}
-                numFrets={responsiveFretCount}
-                numStrings={tuning.length}
-              />
-            )}
-
             {/* Target note approach overlays */}
             {(showChromaticApproach || showDiatonicApproach) && (
               <TargetNoteOverlay
@@ -409,33 +250,13 @@ export function Fretboard({
               />
             )}
 
-            {/* Enclosure overlay */}
-            {showEnclosures && enclosures.length > 0 && (
-              <EnclosureOverlay
-                enclosures={enclosures}
-                focusedTarget={focusedEnclosureTarget}
-                numFrets={responsiveFretCount}
-                numStrings={tuning.length}
-              />
-            )}
-
             {/* Arpeggio overlay */}
             {isArpeggio && arpeggioConnections.length > 0 && (
               <ArpeggioOverlay
                 connections={arpeggioConnections}
                 numFrets={responsiveFretCount}
                 numStrings={tuning.length}
-                focusedPosition={focusedPosition}
-              />
-            )}
-
-            {/* Voicing overlay */}
-            {showVoicings && selectedVoicing && (
-              <VoicingOverlay
-                voicing={selectedVoicing}
-                numFrets={responsiveFretCount}
-                numStrings={tuning.length}
-                showFingers={showVoicingFingers}
+                focusedPosition={null}
               />
             )}
 
@@ -486,40 +307,14 @@ export function Fretboard({
                     <div className="w-10 shrink-0 flex items-center justify-center border-r-4 border-slate-400 dark:border-slate-500 py-2.5 sm:py-3">
                       {(() => {
                         const nutNote = noteMap.get(`${stringNum}-0`);
-                        const voicingInfo = isVoicingPosition(stringNum, 0);
-                        // Augment note with voicing info
-                        const augmentedNote = nutNote
-                          ? {
-                              ...nutNote,
-                              isVoicingNote: voicingInfo.isVoicing,
-                              voicingFinger: voicingInfo.finger,
-                              isBarreNote: voicingInfo.isBarre,
-                            }
-                          : null;
-                        return augmentedNote ? (
+                        return nutNote ? (
                           <FretMarker
-                            note={augmentedNote}
+                            note={nutNote}
                             labelMode={noteLabelModeOverride ?? noteLabelMode}
-                            highlightState={getNoteHighlightState(
-                              augmentedNote,
-                            )}
-                            overlayMode={getOverlayColorMode(augmentedNote)}
-                            labelOverride={
-                              quizMode && isQuizTarget(augmentedNote)
-                                ? "?"
-                                : undefined
-                            }
-                            className={getTargetAnimationClass(augmentedNote)}
-                            onClickNote={
-                              onNoteClick ||
-                              (showEnclosures && augmentedNote.isChordTone)
-                                ? handleMarkerClick
-                                : undefined
-                            }
-                            showVoicingStyle={showVoicings}
-                            showFingerNumber={
-                              showVoicings && showVoicingFingers
-                            }
+                            highlightState={getNoteHighlightState(nutNote)}
+                            overlayMode="none"
+                            className={getTargetAnimationClass(nutNote)}
+                            onClickNote={onNoteClick}
                           />
                         ) : (
                           <div className="w-8 h-8 sm:w-7 sm:h-7" />
@@ -531,16 +326,6 @@ export function Fretboard({
                     {frets.slice(1).map((fret) => {
                       const key = `${stringNum}-${fret}`;
                       const note = noteMap.get(key);
-                      const voicingInfo = isVoicingPosition(stringNum, fret);
-                      // Augment note with voicing info
-                      const augmentedNote = note
-                        ? {
-                            ...note,
-                            isVoicingNote: voicingInfo.isVoicing,
-                            voicingFinger: voicingInfo.finger,
-                            isBarreNote: voicingInfo.isBarre,
-                          }
-                        : null;
 
                       return (
                         <div
@@ -555,35 +340,17 @@ export function Fretboard({
                             }}
                           />
                           {/* Note marker */}
-                          {augmentedNote ? (
+                          {note ? (
                             <div className="relative z-10">
                               <FretMarker
-                                note={augmentedNote}
+                                note={note}
                                 labelMode={
                                   noteLabelModeOverride ?? noteLabelMode
                                 }
-                                highlightState={getNoteHighlightState(
-                                  augmentedNote,
-                                )}
-                                overlayMode={getOverlayColorMode(augmentedNote)}
-                                labelOverride={
-                                  quizMode && isQuizTarget(augmentedNote)
-                                    ? "?"
-                                    : undefined
-                                }
-                                className={getTargetAnimationClass(
-                                  augmentedNote,
-                                )}
-                                onClickNote={
-                                  onNoteClick ||
-                                  (showEnclosures && augmentedNote.isChordTone)
-                                    ? handleMarkerClick
-                                    : undefined
-                                }
-                                showVoicingStyle={showVoicings}
-                                showFingerNumber={
-                                  showVoicings && showVoicingFingers
-                                }
+                                highlightState={getNoteHighlightState(note)}
+                                overlayMode="none"
+                                className={getTargetAnimationClass(note)}
+                                onClickNote={onNoteClick}
                               />
                             </div>
                           ) : (
@@ -598,45 +365,26 @@ export function Fretboard({
             </div>
           </div>
 
-          {/* Legend and controls (hidden in quiz mode) */}
-          {!quizMode && showControls && (
+          {/* Legend and controls */}
+          {showControls && (
             <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               {/* Interactive Legend */}
               <FretboardLegend
                 hoveredType={hoveredLegendType}
                 onHoverChange={setHoveredLegendType}
                 overlayActive={isOverlayActive}
-                showCAGEDPositions={showCAGEDPositions}
-                isThreeNPS={isThreeNPS}
-                focusedPosition={focusedPosition}
-                onFocusPosition={setFocusedPosition}
+                showCAGEDPositions={false}
+                isThreeNPS={false}
+                focusedPosition={null}
+                onFocusPosition={() => {}}
               />
 
               {/* Display Toolbar */}
               <DisplayToolbar
                 fretboardOverlay={fretboardOverlay}
                 onOverlayChange={setFretboardOverlay}
-                showCAGEDPositions={showCAGEDPositions}
-                onToggleCAGEDPositions={() =>
-                  setShowCAGEDPositions(!showCAGEDPositions)
-                }
-                focusedPosition={focusedPosition}
-                onFocusedPositionChange={setFocusedPosition}
                 noteLabelMode={noteLabelMode}
                 onNoteLabelModeChange={setNoteLabelMode}
-                showVoicings={showVoicings}
-                onToggleVoicings={onToggleVoicings}
-                showVoicingFingers={showVoicingFingers}
-                onToggleVoicingFingers={onToggleVoicingFingers}
-                selectedVoicing={selectedVoicing}
-                availableVoicingsCount={availableVoicingsCount}
-                selectedVoicingIndex={selectedVoicingIndex}
-                onNextVoicing={onNextVoicing}
-                onPreviousVoicing={onPreviousVoicing}
-                showVoiceLeading={showVoiceLeading}
-                onToggleVoiceLeading={() =>
-                  setShowVoiceLeading(!showVoiceLeading)
-                }
                 showScaleTones={showScaleTones}
                 onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
                 targetNoteMode={targetNoteMode}
@@ -649,15 +397,13 @@ export function Fretboard({
                 onToggleDiatonicApproach={() =>
                   setShowDiatonicApproach(!showDiatonicApproach)
                 }
-                showEnclosures={showEnclosures}
-                onToggleEnclosures={() => setShowEnclosures(!showEnclosures)}
               />
             </div>
           )}
         </div>
 
         {/* First-time legend tooltip */}
-        {showLegendTooltip && !quizMode && (
+        {showLegendTooltip && (
           <LegendTooltip
             onHighlightChange={setHoveredLegendType}
             onComplete={handleLegendTooltipComplete}

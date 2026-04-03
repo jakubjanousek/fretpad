@@ -24,7 +24,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { VoicingControlsPanel } from "@/components/voicing/VoicingControlsPanel";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 import { StyleSelector } from "./StyleSelector";
@@ -400,9 +399,6 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
               </div>
             </div>
           </div>
-
-          {/* Voicing Controls */}
-          <VoicingControlsPanel />
 
           {/* Keyboard Shortcuts */}
           <div className="pt-2 border-t">

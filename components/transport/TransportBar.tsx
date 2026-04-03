@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  BookOpen,
-  BrainCircuit,
-  ListMusic,
-  Play,
-  Settings,
-  Square,
-  Trophy,
-} from "lucide-react";
+import { Play, Settings, Square } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -22,25 +14,10 @@ import { AudioInterruptedOverlay } from "./AudioInterruptedOverlay";
 
 interface TransportBarProps {
   onSettingsClick: () => void;
-  onGuideClick: () => void;
-  onStatsClick: () => void;
-  onQuizClick?: () => void;
-  onPlannerClick?: () => void;
   micSlot?: ReactNode;
 }
 
-/**
- * Fixed bottom transport bar with grouped playback controls.
- * Layout: [Tempo Group] [Playback Group] [Utilities]
- */
-export function TransportBar({
-  onSettingsClick,
-  onGuideClick,
-  onStatsClick,
-  onQuizClick,
-  onPlannerClick,
-  micSlot,
-}: TransportBarProps) {
+export function TransportBar({ onSettingsClick, micSlot }: TransportBarProps) {
   const {
     isPlaying,
     tempo,
@@ -56,7 +33,7 @@ export function TransportBar({
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/95 backdrop-blur-sm safe-area-inset-bottom">
         <div className="container mx-auto px-3 sm:px-4">
           <div className="flex items-center justify-between gap-3 sm:gap-4 h-16 sm:h-16">
-            {/* Tempo Group - hidden on very small screens */}
+            {/* Tempo Group */}
             <div className="hidden xs:flex items-center gap-2 sm:gap-3 flex-1 max-w-48 sm:max-w-xs">
               <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-muted/50 rounded-xl px-3 py-1.5">
                 <Slider
@@ -76,7 +53,6 @@ export function TransportBar({
 
             {/* Playback Group */}
             <div className="flex items-center gap-3 sm:gap-4">
-              {/* Hero Play/Stop Button */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex flex-col items-center">
@@ -112,86 +88,6 @@ export function TransportBar({
             {/* Utilities Group */}
             <div className="flex items-center gap-0.5 sm:gap-1">
               {micSlot}
-
-              {onPlannerClick && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      onClick={onPlannerClick}
-                      aria-label="Practice Session"
-                      className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
-                    >
-                      <ListMusic className="h-4 w-4 text-cyan-500" />
-                      <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
-                        Practice
-                      </span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="sm:hidden">
-                    Practice Session
-                  </TooltipContent>
-                </Tooltip>
-              )}
-
-              {onQuizClick && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      onClick={onQuizClick}
-                      aria-label="Chord Tone Quiz"
-                      className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
-                    >
-                      <BrainCircuit className="h-4 w-4 text-violet-500" />
-                      <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
-                        Quiz
-                      </span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="sm:hidden">
-                    Chord Tone Quiz
-                  </TooltipContent>
-                </Tooltip>
-              )}
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    onClick={onStatsClick}
-                    aria-label="Practice Stats"
-                    className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
-                  >
-                    <Trophy className="h-4 w-4 text-amber-500" />
-                    <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
-                      Stats
-                    </span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="sm:hidden">
-                  Practice Stats
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    onClick={onGuideClick}
-                    aria-label="Help Guide"
-                    className="h-11 w-11 sm:h-auto sm:w-auto sm:px-2 sm:py-1.5 rounded-full sm:rounded-lg hover:bg-background/80 active:scale-95 transition-all duration-150 flex flex-col items-center gap-0.5"
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    <span className="hidden sm:block text-[10px] leading-tight text-muted-foreground">
-                      Help
-                    </span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="sm:hidden">
-                  Help Guide
-                </TooltipContent>
-              </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>

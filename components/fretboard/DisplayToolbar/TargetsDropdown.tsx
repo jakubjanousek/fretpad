@@ -30,8 +30,6 @@ interface TargetsDropdownProps {
   onToggleChromaticApproach?: () => void;
   showDiatonicApproach: boolean;
   onToggleDiatonicApproach?: () => void;
-  showEnclosures: boolean;
-  onToggleEnclosures?: () => void;
 }
 
 export function TargetsDropdown({
@@ -41,8 +39,6 @@ export function TargetsDropdown({
   onToggleChromaticApproach,
   showDiatonicApproach,
   onToggleDiatonicApproach,
-  showEnclosures,
-  onToggleEnclosures,
 }: TargetsDropdownProps) {
   const isActive = targetNoteMode !== "none";
 
@@ -101,17 +97,6 @@ export function TargetsDropdown({
                 <span>Diatonic</span>
                 <span className="text-[10px] text-muted-foreground">
                   Scale-step approaches (blue)
-                </span>
-              </div>
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showEnclosures}
-              onCheckedChange={onToggleEnclosures}
-            >
-              <div className="flex flex-col gap-0.5">
-                <span>Enclosures</span>
-                <span className="text-[10px] text-muted-foreground">
-                  Click target to see enclosure
                 </span>
               </div>
             </DropdownMenuCheckboxItem>

@@ -20,18 +20,6 @@ function resetStore() {
     activeMode: null,
     isPlaying: false,
     micActive: false,
-    quizActive: false,
-    quizQuestion: null,
-    quizScore: 0,
-    quizTotal: 0,
-    quizStreak: 0,
-    quizBestStreak: 0,
-    quizLastResult: null,
-    sessionActive: false,
-    sessionPhaseIndex: 0,
-    sessionPhaseElapsedMs: 0,
-    sessionTotalElapsedMs: 0,
-    sessionPaused: false,
     progression,
     currentBarIndex: 0,
     currentChordIndex: 0,
@@ -40,15 +28,10 @@ function resetStore() {
     selectedStyle: "jazzSwing",
     progressionHistory: [],
     progressionFuture: [],
-    showVoicings: false,
     targetNoteMode: "none",
     showChromaticApproach: false,
     showDiatonicApproach: false,
-    showEnclosures: false,
-    focusedEnclosureTarget: null,
     fretboardOverlay: "none",
-    showCAGEDPositions: false,
-    focusedPosition: null,
   });
   localStorage.clear();
   stopMock.mockReset();
@@ -94,30 +77,14 @@ describe("practiceModeSlice", () => {
     expect(localStorage.getItem("fretpad-last-mode")).toBe("learn-the-neck");
   });
 
-  it("stops transport, clears transient state, and enforces display constraints", () => {
+  it("stops transport and clears transient state", () => {
     useAppStore.setState({
       isPlaying: true,
       micActive: true,
-      quizActive: true,
-      quizScore: 3,
-      quizTotal: 4,
-      quizStreak: 2,
-      quizBestStreak: 3,
-      quizLastResult: "correct",
-      sessionActive: true,
-      sessionPhaseIndex: 2,
-      sessionPhaseElapsedMs: 1200,
-      sessionTotalElapsedMs: 8000,
-      sessionPaused: true,
-      showVoicings: true,
       targetNoteMode: "root-and-guides",
       showChromaticApproach: true,
       showDiatonicApproach: true,
-      showEnclosures: true,
-      focusedEnclosureTarget: { string: 2, fret: 5 },
       fretboardOverlay: "pentatonicMinor",
-      showCAGEDPositions: true,
-      focusedPosition: 3,
     });
 
     useAppStore.getState().enterMode("outline-chord-changes");
@@ -127,23 +94,9 @@ describe("practiceModeSlice", () => {
     expect(cancelMock).toHaveBeenCalledTimes(1);
     expect(state.isPlaying).toBe(false);
     expect(state.micActive).toBe(false);
-    expect(state.quizActive).toBe(false);
-    expect(state.quizScore).toBe(0);
-    expect(state.quizTotal).toBe(0);
-    expect(state.quizStreak).toBe(0);
-    expect(state.quizBestStreak).toBe(0);
-    expect(state.quizLastResult).toBeNull();
-    expect(state.sessionActive).toBe(false);
-    expect(state.sessionPhaseIndex).toBe(0);
-    expect(state.sessionPhaseElapsedMs).toBe(0);
-    expect(state.sessionTotalElapsedMs).toBe(0);
-    expect(state.sessionPaused).toBe(false);
-    expect(state.showVoicings).toBe(false);
     expect(state.targetNoteMode).toBe("root-and-guides");
     expect(state.showChromaticApproach).toBe(true);
     expect(state.fretboardOverlay).toBe("none");
-    expect(state.showCAGEDPositions).toBe(false);
-    expect(state.focusedPosition).toBeNull();
   });
 
   it("clears hidden target-note controls when entering a mode without targets", () => {
@@ -151,8 +104,6 @@ describe("practiceModeSlice", () => {
       targetNoteMode: "root",
       showChromaticApproach: true,
       showDiatonicApproach: true,
-      showEnclosures: true,
-      focusedEnclosureTarget: { string: 3, fret: 4 },
     });
 
     useAppStore
@@ -163,8 +114,6 @@ describe("practiceModeSlice", () => {
     expect(state.targetNoteMode).toBe("none");
     expect(state.showChromaticApproach).toBe(false);
     expect(state.showDiatonicApproach).toBe(false);
-    expect(state.showEnclosures).toBe(false);
-    expect(state.focusedEnclosureTarget).toBeNull();
   });
 
   it("preserves progression data when defaults are skipped", () => {

@@ -13,13 +13,6 @@ export {
   loadFromLocalStorage,
   saveToLocalStorage,
 } from "./localStorage";
-export type { PracticeSession, PracticeStats } from "./practiceStats";
-export {
-  getTodayPracticeTime,
-  loadPracticeStats,
-  recordPracticeTime,
-  savePracticeStats,
-} from "./practiceStats";
 export type { ShareableState } from "./urlState";
 export {
   clearUrlState,

@@ -27,12 +27,6 @@ import {
   getChordAtPosition,
   type ProgressionSlice,
 } from "./slices/progressionSlice";
-import { createQuizSlice, type QuizSlice } from "./slices/quizSlice";
-import {
-  createSessionPlannerSlice,
-  type SessionPlannerSlice,
-} from "./slices/sessionPlannerSlice";
-import { createVoicingSlice, type VoicingSlice } from "./slices/voicingSlice";
 
 export type AppState = ProgressionSlice &
   PlaybackSlice &
@@ -40,9 +34,6 @@ export type AppState = ProgressionSlice &
   BackingTrackSlice &
   DisplaySlice &
   ErrorSlice &
-  QuizSlice &
-  SessionPlannerSlice &
-  VoicingSlice &
   PracticeModeSlice &
   AudioInputSlice;
 
@@ -55,9 +46,6 @@ export const useAppStore = create<AppState>()(
       ...createBackingTrackSlice(...a),
       ...createDisplaySlice(...a),
       ...createErrorSlice(...a),
-      ...createQuizSlice(...a),
-      ...createSessionPlannerSlice(...a),
-      ...createVoicingSlice(...a),
       ...createPracticeModeSlice(...a),
       ...createAudioInputSlice(...a),
     }),
@@ -72,21 +60,12 @@ export const useAppStore = create<AppState>()(
         metronome: state.metronome,
         backingTrack: state.backingTrack,
         showScaleTones: state.showScaleTones,
-        showVoiceLeading: state.showVoiceLeading,
         noteLabelMode: state.noteLabelMode,
         fretboardOverlay: state.fretboardOverlay,
-        showCAGEDPositions: state.showCAGEDPositions,
-        // Voicing preferences
-        showVoicings: state.showVoicings,
-        showVoicingFingers: state.showVoicingFingers,
-        voicingFilter: state.voicingFilter,
-        vSystemFilter: state.vSystemFilter,
-        voiceLeading: state.voiceLeading,
         // Target Notes settings
         targetNoteMode: state.targetNoteMode,
         showChromaticApproach: state.showChromaticApproach,
         showDiatonicApproach: state.showDiatonicApproach,
-        showEnclosures: state.showEnclosures,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
@@ -106,10 +85,6 @@ export const useAppStore = create<AppState>()(
           }
           if (state.backingTrack.drumsMuted === undefined) {
             state.backingTrack.drumsMuted = false;
-          }
-          // Initialize voicings if enabled
-          if (state.showVoicings && chord) {
-            state.refreshVoicingsForChord(chord);
           }
         }
       },

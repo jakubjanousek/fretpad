@@ -4,14 +4,12 @@ import { ChevronDown, Grid3X3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { CAGEDPosition, FretboardOverlay } from "@/lib/types";
+import type { FretboardOverlay } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const OVERLAY_OPTIONS: {
@@ -31,21 +29,12 @@ const OVERLAY_OPTIONS: {
     shortLabel: "Maj Pent",
   },
   { value: "blues", label: "Blues", shortLabel: "Blues" },
-  {
-    value: "threeNotePerString",
-    label: "3-Note-Per-String",
-    shortLabel: "3NPS",
-  },
   { value: "arpeggio", label: "Arpeggio", shortLabel: "Arpeggio" },
 ];
 
 interface OverlayDropdownProps {
   fretboardOverlay: FretboardOverlay;
   onOverlayChange?: (overlay: FretboardOverlay) => void;
-  showCAGEDPositions: boolean;
-  onToggleCAGEDPositions?: () => void;
-  focusedPosition?: CAGEDPosition | null;
-  onFocusedPositionChange?: (pos: CAGEDPosition | null) => void;
 }
 
 function getOverlayLabel(overlay: FretboardOverlay, short = false): string {
@@ -53,17 +42,9 @@ function getOverlayLabel(overlay: FretboardOverlay, short = false): string {
   return short ? (opt?.shortLabel ?? "None") : (opt?.label ?? "None");
 }
 
-function getPositionsLabel(overlay: FretboardOverlay): string {
-  if (overlay === "threeNotePerString") return "3NPS Positions";
-  if (overlay === "arpeggio") return "Arpeggio Positions";
-  return "CAGED Positions";
-}
-
 export function OverlayDropdown({
   fretboardOverlay,
   onOverlayChange,
-  showCAGEDPositions,
-  onToggleCAGEDPositions,
 }: OverlayDropdownProps) {
   const isActive = fretboardOverlay !== "none";
 
@@ -101,18 +82,6 @@ export function OverlayDropdown({
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
-
-        {isActive && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={showCAGEDPositions}
-              onCheckedChange={onToggleCAGEDPositions}
-            >
-              {getPositionsLabel(fretboardOverlay)}
-            </DropdownMenuCheckboxItem>
-          </>
-        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
