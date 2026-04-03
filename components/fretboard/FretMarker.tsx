@@ -7,7 +7,6 @@ import {
   getFretNoteShapeClasses,
   getFretNoteTextColor,
   getOverlayChordRoleColor,
-  getOverlayNoteColor,
   getOverlayNoteTextColor,
 } from "@/lib/fretboard";
 import type { FretNote, NoteLabelMode } from "@/lib/types";

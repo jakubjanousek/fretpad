@@ -18,13 +18,8 @@ interface PracticePageProps {
 export function PracticePage({ modeId }: PracticePageProps) {
   usePracticeModeSetup(modeId);
 
-  const {
-    currentChord,
-    progression,
-    fretNotes,
-    targetNoteData,
-    arpeggioConnections,
-  } = useFretboardData();
+  const { currentChord, fretNotes, targetNoteData, arpeggioConnections } =
+    useFretboardData();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
 
