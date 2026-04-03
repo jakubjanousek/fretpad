@@ -89,6 +89,6 @@ __tests__/     # Vitest test suite
 
 ## Plan
 
-See `docs/PLAN.md` for the 4-phase pivot plan (trim → modularize → landing page → practice UI).
+The 4-phase pivot plan (trim → modularize → landing page → practice UI) is complete. Archived at `docs/archive/PLAN.md`.
 
 **Default state on load:** ii-V-I in C (`Dm7 | G7 | Cmaj7 | Cmaj7`), 120 BPM
