@@ -29,6 +29,8 @@ interface FretboardProps {
   noteLabelModeOverride?: NoteLabelMode;
   onNoteClick?: (note: FretNote) => void;
   showControls?: boolean;
+  showLegend?: boolean;
+  showToolbar?: boolean;
 }
 
 // Fret markers positions (standard dots)
@@ -101,7 +103,12 @@ export function Fretboard({
   noteLabelModeOverride,
   onNoteClick,
   showControls = true,
+  showLegend,
+  showToolbar,
 }: FretboardProps) {
+  // New props take precedence; fall back to showControls for backwards compat
+  const shouldShowLegend = showLegend ?? showControls;
+  const shouldShowToolbar = showToolbar ?? showControls;
   const {
     showScaleTones,
     setShowScaleTones,
@@ -359,38 +366,42 @@ export function Fretboard({
           </div>
 
           {/* Legend and controls */}
-          {showControls && (
+          {(shouldShowLegend || shouldShowToolbar) && (
             <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               {/* Interactive Legend */}
-              <FretboardLegend
-                hoveredType={hoveredLegendType}
-                onHoverChange={setHoveredLegendType}
-                overlayActive={isOverlayActive}
-                showCAGEDPositions={false}
-                isThreeNPS={false}
-                focusedPosition={null}
-                onFocusPosition={() => {}}
-              />
+              {shouldShowLegend && (
+                <FretboardLegend
+                  hoveredType={hoveredLegendType}
+                  onHoverChange={setHoveredLegendType}
+                  overlayActive={isOverlayActive}
+                  showCAGEDPositions={false}
+                  isThreeNPS={false}
+                  focusedPosition={null}
+                  onFocusPosition={() => {}}
+                />
+              )}
 
               {/* Display Toolbar */}
-              <DisplayToolbar
-                fretboardOverlay={fretboardOverlay}
-                onOverlayChange={setFretboardOverlay}
-                noteLabelMode={noteLabelMode}
-                onNoteLabelModeChange={setNoteLabelMode}
-                showScaleTones={showScaleTones}
-                onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
-                targetNoteMode={targetNoteMode}
-                onTargetNoteModeChange={setTargetNoteMode}
-                showChromaticApproach={showChromaticApproach}
-                onToggleChromaticApproach={() =>
-                  setShowChromaticApproach(!showChromaticApproach)
-                }
-                showDiatonicApproach={showDiatonicApproach}
-                onToggleDiatonicApproach={() =>
-                  setShowDiatonicApproach(!showDiatonicApproach)
-                }
-              />
+              {shouldShowToolbar && (
+                <DisplayToolbar
+                  fretboardOverlay={fretboardOverlay}
+                  onOverlayChange={setFretboardOverlay}
+                  noteLabelMode={noteLabelMode}
+                  onNoteLabelModeChange={setNoteLabelMode}
+                  showScaleTones={showScaleTones}
+                  onToggleScaleTones={() => setShowScaleTones(!showScaleTones)}
+                  targetNoteMode={targetNoteMode}
+                  onTargetNoteModeChange={setTargetNoteMode}
+                  showChromaticApproach={showChromaticApproach}
+                  onToggleChromaticApproach={() =>
+                    setShowChromaticApproach(!showChromaticApproach)
+                  }
+                  showDiatonicApproach={showDiatonicApproach}
+                  onToggleDiatonicApproach={() =>
+                    setShowDiatonicApproach(!showDiatonicApproach)
+                  }
+                />
+              )}
             </div>
           )}
         </div>

@@ -3,6 +3,7 @@ import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
 import {
   createProgression,
   getAllChordsFromProgression,
+  getNextChord,
   getProgressionTotalBeats,
   parseBar,
   parseProgression,
@@ -251,6 +252,52 @@ describe("getProgressionTotalBeats", () => {
     const prog = PRESET_PROGRESSIONS["12-bar blues in A"];
     const totalBeats = getProgressionTotalBeats(prog);
     expect(totalBeats).toBe(48); // 12 bars * 4 beats
+  });
+});
+
+describe("getNextChord", () => {
+  it("returns the next chord in the next bar", () => {
+    // | Dm7 | G7 | Cmaj7 |
+    const prog = parseProgression("| Dm7 | G7 | Cmaj7 |");
+    expect(prog).not.toBeNull();
+    const next = getNextChord(prog!, 0, 0);
+    expect(next).not.toBeNull();
+    expect(next!.symbol).toBe("G7");
+  });
+
+  it("returns the next chord within the same bar", () => {
+    // | Dm7 G7 | Cmaj7 |
+    const prog = parseProgression("| Dm7 G7 | Cmaj7 |");
+    expect(prog).not.toBeNull();
+    const next = getNextChord(prog!, 0, 0);
+    expect(next).not.toBeNull();
+    expect(next!.symbol).toBe("G7");
+  });
+
+  it("moves to the next bar when at the last chord in a bar", () => {
+    // | Dm7 G7 | Cmaj7 |
+    const prog = parseProgression("| Dm7 G7 | Cmaj7 |");
+    expect(prog).not.toBeNull();
+    const next = getNextChord(prog!, 0, 1);
+    expect(next).not.toBeNull();
+    expect(next!.symbol).toBe("Cmaj7");
+  });
+
+  it("wraps from the last bar to the first bar", () => {
+    // | Dm7 | G7 | Cmaj7 |
+    const prog = parseProgression("| Dm7 | G7 | Cmaj7 |");
+    expect(prog).not.toBeNull();
+    const next = getNextChord(prog!, 2, 0);
+    expect(next).not.toBeNull();
+    expect(next!.symbol).toBe("Dm7");
+  });
+
+  it("returns the same chord for a single-chord single-bar progression", () => {
+    const prog = parseProgression("| Cmaj7 |");
+    expect(prog).not.toBeNull();
+    const next = getNextChord(prog!, 0, 0);
+    expect(next).not.toBeNull();
+    expect(next!.symbol).toBe("Cmaj7");
   });
 });
 

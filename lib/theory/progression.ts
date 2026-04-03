@@ -1,6 +1,7 @@
 import { generateId } from "@/lib/id";
 import type {
   BarChord,
+  Chord,
   ChordSymbol,
   Progression,
   ProgressionBar,
@@ -155,6 +156,30 @@ export function createProgression(
     timeSignature,
     bars,
   };
+}
+
+/**
+ * Returns the next chord in the progression, wrapping around at the end.
+ */
+export function getNextChord(
+  progression: Progression,
+  barIndex: number,
+  chordIndex: number,
+): Chord | null {
+  const bar = progression.bars[barIndex];
+  if (!bar) return null;
+
+  // Next chord in same bar
+  if (chordIndex + 1 < bar.chords.length) {
+    const next = bar.chords[chordIndex + 1];
+    return next ? parseChordSymbol(next.chord) : null;
+  }
+
+  // First chord of next bar (wrapping)
+  const nextBarIndex = (barIndex + 1) % progression.bars.length;
+  const nextBar = progression.bars[nextBarIndex];
+  const nextChord = nextBar?.chords[0];
+  return nextChord ? parseChordSymbol(nextChord.chord) : null;
 }
 
 /**

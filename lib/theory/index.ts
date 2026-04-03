@@ -39,6 +39,7 @@ export {
 export {
   createProgression,
   getAllChordsFromProgression,
+  getNextChord,
   getProgressionTotalBeats,
   parseBar,
   parseProgression,

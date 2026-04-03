@@ -15,7 +15,12 @@ const SEGMENT_COLORS = [
   { text: "text-amber-500", bg: "bg-amber-500", rgba: "245,158,11" },
 ];
 
-export function ProgressBar() {
+interface ProgressBarProps {
+  variant?: "full" | "slim";
+}
+
+export function ProgressBar({ variant = "full" }: ProgressBarProps) {
+  const isSlim = variant === "slim";
   const progression = useAppStore((state) => state.progression);
   const isPlaying = useAppStore((state) => state.isPlaying);
   const metronome = useAppStore((state) => state.metronome);
@@ -124,28 +129,35 @@ export function ProgressBar() {
   return (
     <div className="w-full">
       {/* Bar labels */}
-      <div className="flex mb-1">
-        {barSegments.map((segment) => (
-          <div
-            key={segment.id}
-            className="text-xs text-center text-muted-foreground truncate px-0.5"
-            style={{ width: `${segment.width}%` }}
-          >
-            <span
-              className={cn(
-                "font-mono transition-colors",
-                segment.isCurrentBar && `${segment.color.text} font-medium`,
-                segment.isPastBar && "text-foreground/70",
-              )}
+      {!isSlim && (
+        <div className="flex mb-1">
+          {barSegments.map((segment) => (
+            <div
+              key={segment.id}
+              className="text-xs text-center text-muted-foreground truncate px-0.5"
+              style={{ width: `${segment.width}%` }}
             >
-              {segment.chordNames}
-            </span>
-          </div>
-        ))}
-      </div>
+              <span
+                className={cn(
+                  "font-mono transition-colors",
+                  segment.isCurrentBar && `${segment.color.text} font-medium`,
+                  segment.isPastBar && "text-foreground/70",
+                )}
+              >
+                {segment.chordNames}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Progress bar track */}
-      <div className="relative h-5 bg-muted rounded-full overflow-hidden">
+      <div
+        className={cn(
+          "relative bg-muted rounded-full overflow-hidden",
+          isSlim ? "h-1.5" : "h-5",
+        )}
+      >
         {/* Active segment background highlight */}
         {barSegments.map((segment, index) => (
           <div
@@ -249,31 +261,37 @@ export function ProgressBar() {
       </div>
 
       {/* Beat/bar counter */}
-      <div className="flex justify-between mt-1.5 text-xs text-muted-foreground">
-        <span>
-          {playbackPosition.isCountingIn ? (
-            <span className="text-orange-500 font-medium animate-pulse">
-              Count-in...
-            </span>
-          ) : (
-            <>
-              Bar{" "}
-              <span
-                className={
-                  playbackPosition.isActive ? "font-medium text-foreground" : ""
-                }
-              >
-                {playbackPosition.isActive ? playbackPosition.barIndex + 1 : 1}
-              </span>{" "}
-              of {totalBars}
-            </>
-          )}
-        </span>
-        <span>
-          {progression.timeSignature.numerator}/
-          {progression.timeSignature.denominator}
-        </span>
-      </div>
+      {!isSlim && (
+        <div className="flex justify-between mt-1.5 text-xs text-muted-foreground">
+          <span>
+            {playbackPosition.isCountingIn ? (
+              <span className="text-orange-500 font-medium animate-pulse">
+                Count-in...
+              </span>
+            ) : (
+              <>
+                Bar{" "}
+                <span
+                  className={
+                    playbackPosition.isActive
+                      ? "font-medium text-foreground"
+                      : ""
+                  }
+                >
+                  {playbackPosition.isActive
+                    ? playbackPosition.barIndex + 1
+                    : 1}
+                </span>{" "}
+                of {totalBars}
+              </>
+            )}
+          </span>
+          <span>
+            {progression.timeSignature.numerator}/
+            {progression.timeSignature.denominator}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

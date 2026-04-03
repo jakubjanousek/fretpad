@@ -330,21 +330,6 @@
     opacity 0s;
 }
 
-/* Glow effect for play button */
-.hero-play {
-  animation: hero-glow 2s ease-in-out infinite;
-}
-
-@keyframes hero-glow {
-  0%,
-  100% {
-    box-shadow: 0 10px 25px -5px oklch(0.78 0.15 194 / 30%);
-  }
-  50% {
-    box-shadow: 0 10px 30px -3px oklch(0.78 0.15 194 / 50%);
-  }
-}
-
 /* Play/Pause icon transition */
 @keyframes icon-pop {
   0% {
@@ -542,11 +527,31 @@
   animation: target-pulse-secondary 2s ease-in-out infinite;
 }
 
+/* ============================
+   Practice Mode Transition
+   ============================ */
+
+@keyframes practice-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-practice-enter {
+  animation: practice-enter 200ms ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-note-appear,
   .animate-fretboard-crossfade,
   .animate-target-primary,
-  .animate-target-secondary {
+  .animate-target-secondary,
+  .animate-practice-enter {
     animation: none;
   }
 }

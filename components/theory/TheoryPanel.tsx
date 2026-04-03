@@ -1,9 +1,7 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Music } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import type { Chord } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ChordInfoPanel } from "./ChordInfoPanel";
@@ -16,50 +14,44 @@ export function TheoryPanel({ chord }: TheoryPanelProps) {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <Card className="overflow-hidden">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        {/* Collapsible header - always visible */}
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className={cn(
-            "w-full flex items-center justify-between px-4 py-2.5",
-            "hover:bg-muted/50 transition-colors",
-            "border-b border-transparent",
-            isOpen && "border-border",
-          )}
-        >
-          <div className="flex items-center gap-2">
-            <Music className="w-4 h-4 text-muted-foreground" />
-            <span className="font-medium text-sm">
-              {chord ? `${chord.symbol} Theory` : "Theory"}
+    <div className="rounded-2xl border border-stone-200/50 dark:border-stone-800/50 bg-white/40 dark:bg-stone-900/30 backdrop-blur-sm overflow-hidden">
+      {/* Header — always visible */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "w-full flex items-center justify-between px-5 py-3",
+          "hover:bg-stone-100/50 dark:hover:bg-stone-800/30 transition-colors",
+        )}
+      >
+        <div className="flex items-center gap-2.5">
+          <span className="text-sm font-medium text-stone-700 dark:text-stone-200">
+            Theory
+          </span>
+          {chord && (
+            <span className="text-xs text-stone-400 dark:text-stone-500">
+              {chord.symbol} — {chord.notes.join(" · ")}
             </span>
-            {chord && (
-              <span className="text-xs text-muted-foreground">
-                {chord.notes.join(" · ")}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {!isOpen && chord && (
-              <span className="text-xs text-muted-foreground">
-                Click to expand
-              </span>
-            )}
-            {isOpen ? (
-              <ChevronUp className="w-4 h-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
-            )}
-          </div>
-        </button>
+          )}
+        </div>
+        {isOpen ? (
+          <ChevronUp className="w-4 h-4 text-stone-400" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-stone-400" />
+        )}
+      </button>
 
-        <CollapsibleContent>
-          <CardContent className="pt-4 pb-4 max-h-[50vh] overflow-y-auto">
-            <ChordInfoPanel chord={chord} />
-          </CardContent>
-        </CollapsibleContent>
-      </Collapsible>
-    </Card>
+      {/* Content */}
+      <div
+        className={cn(
+          "transition-all duration-300 ease-in-out overflow-hidden",
+          isOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0",
+        )}
+      >
+        <div className="px-5 pb-5 pt-1">
+          <ChordInfoPanel chord={chord} />
+        </div>
+      </div>
+    </div>
   );
 }
