@@ -121,7 +121,7 @@ export interface ChordPattern {
   variants?: ChordPatternEvent[][];
 }
 
-export type DrumSound = "kick" | "snare" | "hihat" | "hihatOpen";
+export type DrumSound = "kick" | "snare" | "hihat" | "hihatOpen" | "ride";
 
 export interface DrumPatternEvent {
   time: string; // Tone.js time format

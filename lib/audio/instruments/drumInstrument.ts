@@ -9,17 +9,17 @@ export interface DrumInstrument {
 
 /**
  * Creates a synthesized drum kit instrument using Tone.js synths.
- * Uses noise + oscillator combinations to approximate kick, snare, and hihat.
+ * Cymbals use filtered noise (not MetalSynth) for a soft, non-metallic sound.
  */
 export function createDrumInstrument(volume: number): DrumInstrument {
   const drumBus = new Tone.Gain();
-  const highCut = new Tone.Filter(7200, "lowpass");
+  const highCut = new Tone.Filter(5000, "lowpass");
   const room = new Tone.Reverb({
     decay: 0.9,
-    wet: 0.12,
+    wet: 0.15,
     preDelay: 0.01,
   });
-  const compressor = new Tone.Compressor(-20, 3);
+  const compressor = new Tone.Compressor(-24, 4);
 
   drumBus.chain(highCut, compressor, room, Tone.Destination);
 
@@ -57,42 +57,55 @@ export function createDrumInstrument(volume: number): DrumInstrument {
     },
   }).connect(drumBus);
 
-  // Closed hihat: filtered noise, very short
-  const hihat = new Tone.MetalSynth({
+  // Closed hihat: bandpass-filtered noise, very short — a soft "tik"
+  const hihatFilter = new Tone.Filter(8000, "bandpass", -12);
+  const hihat = new Tone.NoiseSynth({
+    noise: { type: "white" },
     envelope: {
       attack: 0.001,
-      decay: 0.12,
+      decay: 0.04,
+      sustain: 0,
+      release: 0.01,
+    },
+  });
+  hihat.chain(hihatFilter, drumBus);
+
+  // Open hihat: wider bandpass, longer decay — a soft "tssh"
+  const hihatOpenFilter = new Tone.Filter(7000, "bandpass", -12);
+  const hihatOpen = new Tone.NoiseSynth({
+    noise: { type: "white" },
+    envelope: {
+      attack: 0.001,
+      decay: 0.14,
+      sustain: 0,
       release: 0.04,
     },
-    harmonicity: 3.6,
-    modulationIndex: 18,
-    resonance: 2200,
-    octaves: 1.2,
-  }).connect(drumBus);
+  });
+  hihatOpen.chain(hihatOpenFilter, drumBus);
 
-  // Open hihat: filtered noise, longer decay
-  const hihatOpen = new Tone.MetalSynth({
+  // Ride cymbal: highpass-filtered noise, longer sustain — a soft wash
+  const rideFilter = new Tone.Filter(6000, "highpass", -24);
+  const ride = new Tone.NoiseSynth({
+    noise: { type: "pink" },
     envelope: {
-      attack: 0.001,
-      decay: 0.28,
+      attack: 0.002,
+      decay: 0.35,
+      sustain: 0,
       release: 0.08,
     },
-    harmonicity: 4.2,
-    modulationIndex: 22,
-    resonance: 2800,
-    octaves: 1.3,
-  }).connect(drumBus);
+  });
+  ride.chain(rideFilter, drumBus);
 
-  // Set initial volumes
-  kick.volume.value = volume;
-  snareNoise.volume.value = volume - 4;
-  snareBody.volume.value = volume - 6;
+  // Set initial volumes — drums sit behind bass and chords in the mix
+  kick.volume.value = volume - 6;
+  snareNoise.volume.value = volume - 8;
+  snareBody.volume.value = volume - 10;
   hihat.volume.value = volume - 10;
   hihatOpen.volume.value = volume - 8;
+  ride.volume.value = volume - 6;
 
   return {
     trigger: (sound: DrumSound, time: number, velocity: number) => {
-      // Guard against stale times that have already passed in the audio context
       const safeTime = Math.max(time, Tone.now());
       switch (sound) {
         case "kick":
@@ -103,26 +116,34 @@ export function createDrumInstrument(volume: number): DrumInstrument {
           snareBody.triggerAttackRelease("E3", "16n", safeTime, velocity * 0.5);
           break;
         case "hihat":
-          hihat.triggerAttackRelease("16n", safeTime, velocity * 0.5);
+          hihat.triggerAttackRelease("32n", safeTime, velocity);
           break;
         case "hihatOpen":
-          hihatOpen.triggerAttackRelease("8n", safeTime, velocity * 0.5);
+          hihatOpen.triggerAttackRelease("8n", safeTime, velocity);
+          break;
+        case "ride":
+          ride.triggerAttackRelease("8n", safeTime, velocity);
           break;
       }
     },
     setVolume: (newVolume: number) => {
-      kick.volume.value = newVolume;
-      snareNoise.volume.value = newVolume - 4;
-      snareBody.volume.value = newVolume - 6;
+      kick.volume.value = newVolume - 6;
+      snareNoise.volume.value = newVolume - 8;
+      snareBody.volume.value = newVolume - 10;
       hihat.volume.value = newVolume - 10;
       hihatOpen.volume.value = newVolume - 8;
+      ride.volume.value = newVolume - 6;
     },
     dispose: () => {
       kick.dispose();
       snareNoise.dispose();
       snareBody.dispose();
       hihat.dispose();
+      hihatFilter.dispose();
       hihatOpen.dispose();
+      hihatOpenFilter.dispose();
+      ride.dispose();
+      rideFilter.dispose();
       drumBus.dispose();
       highCut.dispose();
       room.dispose();

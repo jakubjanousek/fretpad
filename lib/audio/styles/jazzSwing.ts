@@ -3,13 +3,12 @@ import type { StyleDefinition } from "@/lib/types";
 /**
  * Jazz Swing style with walking bass, syncopated piano comping, and ride cymbal.
  *
- * Swing feel is applied globally via Tone.js Transport.swing on 8th notes.
- * All patterns are written on a straight grid — the transport warps upbeats
- * to triplet positions automatically, keeping all instruments in sync.
+ * Swing is applied per-instrument in the scheduler with tempo-adaptive ratios.
+ * Patterns are written on a straight grid; upbeat 8ths get shifted automatically.
  *
- * Bass: Walking quarter notes (on the beat, unaffected by 8th-note swing)
- * Drums: Ride pattern with 8th-note skip notes (swung by transport), hi-hat on 2 & 4
- * Comping: Sparse hits on 8th-note upbeats (swung by transport)
+ * Bass: Walking quarter notes (straight, no swing)
+ * Drums: Ride cymbal pattern with skip notes, hi-hat chick on 2 & 4, soft kick on 1
+ * Comping: Sparse shell voicings on swung upbeats with rhythmic variants
  */
 export const jazzSwingStyle: StyleDefinition = {
   id: "jazzSwing",
@@ -117,20 +116,23 @@ export const jazzSwingStyle: StyleDefinition = {
     drums: {
       name: "swing-ride",
       events: [
-        // Ride cymbal: quarter note on every beat
-        { time: "0:0", sound: "hihat", velocity: 0.6 },
-        { time: "0:1", sound: "hihat", velocity: 0.5 },
-        { time: "0:2", sound: "hihat", velocity: 0.58 },
-        { time: "0:3", sound: "hihat", velocity: 0.5 },
-        // Ride skip notes on 8th-note upbeats (swung by transport)
-        { time: "0:0:2", sound: "hihat", velocity: 0.3 },
-        { time: "0:1:2", sound: "hihat", velocity: 0.26 },
-        { time: "0:2:2", sound: "hihat", velocity: 0.3 },
-        { time: "0:3:2", sound: "hihat", velocity: 0.26 },
+        // Ride cymbal: quarter notes on every beat
+        { time: "0:0", sound: "ride", velocity: 0.55 },
+        { time: "0:1", sound: "ride", velocity: 0.42 },
+        { time: "0:2", sound: "ride", velocity: 0.5 },
+        { time: "0:3", sound: "ride", velocity: 0.42 },
+        // Ride skip notes on upbeats (swung by scheduler)
+        { time: "0:0:2", sound: "ride", velocity: 0.28 },
+        { time: "0:1:2", sound: "ride", velocity: 0.22 },
+        { time: "0:2:2", sound: "ride", velocity: 0.28 },
+        { time: "0:3:2", sound: "ride", velocity: 0.22 },
 
         // Hi-hat pedal "chick" on 2 and 4
-        { time: "0:1", sound: "hihat", velocity: 0.22 },
-        { time: "0:3", sound: "hihat", velocity: 0.22 },
+        { time: "0:1", sound: "hihat", velocity: 0.3 },
+        { time: "0:3", sound: "hihat", velocity: 0.3 },
+
+        // Soft kick on beat 1
+        { time: "0:0", sound: "kick", velocity: 0.35 },
       ],
     },
   },

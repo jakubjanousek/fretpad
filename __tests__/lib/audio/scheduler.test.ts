@@ -52,6 +52,15 @@ describe("audio scheduler timing helpers", () => {
     }
   });
 
+  it("jazz swing drum pattern uses ride, hihat, and kick", () => {
+    const sounds = new Set(
+      jazzSwingStyle.patterns.drums.events.map((e) => e.sound),
+    );
+    expect(sounds).toContain("ride");
+    expect(sounds).toContain("hihat");
+    expect(sounds).toContain("kick");
+  });
+
   it("jazz swing style defines per-instrument swing multipliers", () => {
     const { swing } = jazzSwingStyle;
     expect(swing.drums).toBe(1); // ride defines the swing
