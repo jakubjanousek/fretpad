@@ -6,7 +6,6 @@ import {
   getPatternVariantIndex,
   parseTimeToBeats,
   resolveBarEventBeat,
-  resolveEventBeat,
   resolveHumanizedDuration,
 } from "@/lib/audio/scheduler";
 import { jazzSwingStyle } from "@/lib/audio/styles/jazzSwing";
@@ -29,16 +28,7 @@ describe("audio scheduler timing helpers", () => {
     expect(beatsToTime(1.59)).toBe("0:1:2.36");
   });
 
-  it("applies explicit event offsets for swung placements", () => {
-    const swungOffbeat = resolveEventBeat(
-      { time: "0:0", offsetBeats: 2 / 3 },
-      4,
-    );
-
-    expect(swungOffbeat).toBeCloseTo(2 / 3);
-  });
-
-  it("preserves bar-level jazz timing without compressing it to chord length", () => {
+  it("resolves bar-level event beat positions with offsets", () => {
     expect(
       resolveBarEventBeat({ time: "0:0", offsetBeats: 2 / 3 }),
     ).toBeCloseTo(2 / 3);
@@ -47,34 +37,24 @@ describe("audio scheduler timing helpers", () => {
     ).toBeCloseTo(8 / 3);
   });
 
-  it("scales event offsets with multi-chord bars", () => {
-    const compressedSwing = resolveEventBeat(
-      { time: "0:1", offsetBeats: 2 / 3 },
-      2,
-    );
-
-    expect(compressedSwing).toBeCloseTo(5 / 6);
-  });
-
-  it("adds per-instrument placement offsets after event timing", () => {
-    const laidBackComping = resolveEventBeat(
-      { time: "0:1", offsetBeats: 0.56 },
-      4,
+  it("adds per-instrument placement offsets", () => {
+    const result = resolveBarEventBeat(
+      { time: "0:1", offsetBeats: 0.05 },
       0.03,
     );
-
-    expect(laidBackComping).toBeCloseTo(1.59);
+    expect(result).toBeCloseTo(1.08);
   });
 
-  it("keeps jazz ride events on the full bar grid", () => {
-    const rideSkip = jazzSwingStyle.patterns.drums.events[1];
-    const secondHalfSkip = jazzSwingStyle.patterns.drums.events[4];
-    if (!rideSkip || !secondHalfSkip) {
+  it("keeps jazz ride skip notes at triplet positions on the bar grid", () => {
+    // Skip notes are at indices 4-7 (one per beat with offsetBeats: 2/3)
+    const rideSkip1 = jazzSwingStyle.patterns.drums.events[4]; // beat 0 + 2/3
+    const rideSkip3 = jazzSwingStyle.patterns.drums.events[6]; // beat 2 + 2/3
+    if (!rideSkip1 || !rideSkip3) {
       throw new Error("Expected jazz ride skip events to exist");
     }
 
-    expect(resolveBarEventBeat(rideSkip)).toBeCloseTo(2 / 3);
-    expect(resolveBarEventBeat(secondHalfSkip)).toBeCloseTo(8 / 3);
+    expect(resolveBarEventBeat(rideSkip1)).toBeCloseTo(2 / 3);
+    expect(resolveBarEventBeat(rideSkip3)).toBeCloseTo(8 / 3);
   });
 
   it("produces deterministic bounded humanization offsets", () => {

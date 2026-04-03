@@ -1,10 +1,15 @@
 import type { StyleDefinition } from "@/lib/types";
 
 /**
- * Jazz Swing style with walking bass and syncopated piano comping
+ * Jazz Swing style with walking bass, syncopated piano comping, and ride cymbal.
  *
- * Bass pattern: Root-led walking line with deterministic connectors
- * Chord pattern: Rotating comping cells with shell/rootless contrast
+ * Swing feel is created by placing upbeat events at the triplet position
+ * (offsetBeats: 2/3) rather than the straight 8th (0.5). This is explicit
+ * and doesn't depend on Tone.js transport swing.
+ *
+ * Bass: Walking quarter notes (straight, on the beat)
+ * Drums: Ride pattern with triplet skip notes, hi-hat on 2 & 4
+ * Comping: Sparse hits on swung upbeats
  */
 export const jazzSwingStyle: StyleDefinition = {
   id: "jazzSwing",
@@ -13,30 +18,6 @@ export const jazzSwingStyle: StyleDefinition = {
   swing: 0,
   timing: {
     useTransportSwing: false,
-    instrumentOffsets: {
-      bass: 0.01,
-      chord: 0.03,
-      drums: 0,
-    },
-    humanization: {
-      bass: {
-        timingBeats: 0.006,
-        timingDirection: "late",
-        velocityDelta: 0.05,
-        durationBeats: 0.04,
-      },
-      chord: {
-        timingBeats: 0.012,
-        timingDirection: "late",
-        velocityDelta: 0.08,
-        durationBeats: 0.08,
-      },
-      drums: {
-        timingBeats: 0.002,
-        timingDirection: "late",
-        velocityDelta: 0.05,
-      },
-    },
   },
   instruments: {
     bass: {
@@ -67,146 +48,48 @@ export const jazzSwingStyle: StyleDefinition = {
       name: "walking",
       events: [
         { time: "0:0", duration: "4n", type: "walk", velocity: 0.92 },
-        {
-          time: "0:1",
-          duration: "4n",
-          type: "walk",
-          velocity: 0.76,
-        },
-        {
-          time: "0:2",
-          duration: "4n",
-          type: "walk",
-          velocity: 0.7,
-        },
-        {
-          time: "0:3",
-          duration: "4n",
-          type: "approach",
-          velocity: 0.82,
-          offsetBeats: -0.03,
-        },
+        { time: "0:1", duration: "4n", type: "walk", velocity: 0.76 },
+        { time: "0:2", duration: "4n", type: "walk", velocity: 0.7 },
+        { time: "0:3", duration: "4n", type: "approach", velocity: 0.82 },
       ],
     },
     chord: {
       name: "comping",
+      // Swung upbeats of 1 and 3 — consistent every bar
       events: [
         {
           time: "0:0",
           duration: "8n",
           voicingType: "shell",
-          velocity: 0.36,
+          velocity: 0.38,
           offsetBeats: 2 / 3,
         },
         {
-          time: "0:1",
-          duration: "8n",
-          voicingType: "shell",
-          velocity: 0.48,
-          offsetBeats: 0.56,
-        },
-        {
-          time: "0:3",
+          time: "0:2",
           duration: "8n",
           voicingType: "shell",
           velocity: 0.42,
-          offsetBeats: -0.08,
+          offsetBeats: 2 / 3,
         },
-      ],
-      variants: [
-        [
-          {
-            time: "0:0",
-            duration: "8n",
-            voicingType: "shell",
-            velocity: 0.36,
-            offsetBeats: 2 / 3,
-          },
-          {
-            time: "0:1",
-            duration: "8n",
-            voicingType: "rootless",
-            velocity: 0.5,
-            offsetBeats: 0.56,
-          },
-          {
-            time: "0:3",
-            duration: "8n",
-            voicingType: "shell",
-            velocity: 0.42,
-            offsetBeats: -0.08,
-          },
-        ],
-        [
-          {
-            time: "0:1",
-            duration: "8n",
-            voicingType: "shell",
-            velocity: 0.38,
-            offsetBeats: 0.62,
-          },
-          {
-            time: "0:2",
-            duration: "8n",
-            voicingType: "rootless",
-            velocity: 0.34,
-            offsetBeats: 2 / 3,
-          },
-        ],
-        [
-          {
-            time: "0:0",
-            duration: "8n",
-            voicingType: "rootless",
-            velocity: 0.32,
-            offsetBeats: 2 / 3,
-          },
-          {
-            time: "0:2",
-            duration: "8n",
-            voicingType: "shell",
-            velocity: 0.44,
-            offsetBeats: 2 / 3,
-          },
-          {
-            time: "0:3",
-            duration: "8n",
-            voicingType: "rootless",
-            velocity: 0.28,
-            offsetBeats: 0.12,
-          },
-        ],
-        [
-          {
-            time: "0:1",
-            duration: "8n",
-            voicingType: "rootless",
-            velocity: 0.46,
-            offsetBeats: 0.58,
-          },
-          {
-            time: "0:3",
-            duration: "8n",
-            voicingType: "shell",
-            velocity: 0.4,
-            offsetBeats: 0.05,
-          },
-        ],
       ],
     },
     drums: {
       name: "swing-ride",
       events: [
-        { time: "0:0", sound: "hihat", velocity: 0.62 },
-        { time: "0:0", sound: "hihat", velocity: 0.34, offsetBeats: 2 / 3 },
-        { time: "0:1", sound: "hihat", velocity: 0.48 },
-        { time: "0:2", sound: "hihat", velocity: 0.56 },
-        { time: "0:2", sound: "hihat", velocity: 0.32, offsetBeats: 2 / 3 },
-        { time: "0:3", sound: "hihat", velocity: 0.46 },
-        { time: "0:0", sound: "kick", velocity: 0.58 },
-        { time: "0:2", sound: "kick", velocity: 0.28, offsetBeats: 0.08 },
-        { time: "0:1", sound: "snare", velocity: 0.16, offsetBeats: 0.58 },
-        { time: "0:3", sound: "snare", velocity: 0.22, offsetBeats: 0.05 },
+        // Ride cymbal: quarter note on every beat
+        { time: "0:0", sound: "hihat", velocity: 0.6 },
+        { time: "0:1", sound: "hihat", velocity: 0.5 },
+        { time: "0:2", sound: "hihat", velocity: 0.58 },
+        { time: "0:3", sound: "hihat", velocity: 0.5 },
+        // Ride "skip" notes at triplet position on every beat (consistent swing)
+        { time: "0:0", sound: "hihat", velocity: 0.3, offsetBeats: 2 / 3 },
+        { time: "0:1", sound: "hihat", velocity: 0.26, offsetBeats: 2 / 3 },
+        { time: "0:2", sound: "hihat", velocity: 0.3, offsetBeats: 2 / 3 },
+        { time: "0:3", sound: "hihat", velocity: 0.26, offsetBeats: 2 / 3 },
+
+        // Hi-hat pedal "chick" on 2 and 4
+        { time: "0:1", sound: "hihat", velocity: 0.22 },
+        { time: "0:3", sound: "hihat", velocity: 0.22 },
       ],
     },
   },

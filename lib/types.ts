@@ -93,17 +93,7 @@ export const STANDARD_TUNING: NoteName[] = ["E", "B", "G", "D", "A", "E"]; // hi
 // Backing Track Types
 // ============================================
 
-export type StyleId =
-  | "jazzSwing"
-  | "popRock"
-  | "bossaNova"
-  | "ballad"
-  | "funk"
-  | "reggae"
-  | "latinMontuno"
-  | "neoSoul"
-  | "country"
-  | "metal";
+export type StyleId = "jazzSwing";
 
 export interface PatternEvent {
   time: string; // Tone.js time format: "0:0", "0:1", "0:2:2"

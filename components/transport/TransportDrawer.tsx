@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
-import { StyleSelector } from "./StyleSelector";
+
 import { TempoRampControls } from "./TempoRampControls";
 
 interface TransportDrawerProps {
@@ -118,9 +118,6 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
         </SheetHeader>
 
         <div className="flex flex-col gap-6 p-4">
-          {/* Style Selector */}
-          <StyleSelector />
-
           {/* Metronome Settings */}
           <div className="flex flex-col gap-3 pt-2 border-t">
             <div className="flex items-center justify-between">

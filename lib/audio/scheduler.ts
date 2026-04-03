@@ -72,12 +72,10 @@ interface ParsedBarChordSlot {
 export function parseTimeToBeats(time: string): number {
   const parts = time.split(":").map(Number);
   if (parts.length === 2) {
-    // "bars:beats" format
     const bars = parts[0] ?? 0;
     const beats = parts[1] ?? 0;
     return bars * 4 + beats;
   } else if (parts.length === 3) {
-    // "bars:beats:sixteenths" format
     const bars = parts[0] ?? 0;
     const beats = parts[1] ?? 0;
     const sixteenths = parts[2] ?? 0;
@@ -107,6 +105,9 @@ interface EventTimingInput {
   offsetBeats?: number;
 }
 
+/**
+ * Resolves event beat position on the full bar grid (no scaling).
+ */
 export function resolveBarEventBeat(
   event: EventTimingInput,
   instrumentOffsetBeats = 0,
@@ -116,19 +117,6 @@ export function resolveBarEventBeat(
     (event.offsetBeats ?? 0) +
     instrumentOffsetBeats
   );
-}
-
-export function resolveEventBeat(
-  event: EventTimingInput,
-  chordBeats: number,
-  instrumentOffsetBeats = 0,
-): number {
-  const patternBeats = 4;
-  const scale = chordBeats / patternBeats;
-  const baseBeat = parseTimeToBeats(event.time) * scale;
-  const explicitOffset = (event.offsetBeats ?? 0) * scale;
-
-  return baseBeat + explicitOffset + instrumentOffsetBeats;
 }
 
 function hashHumanizationSeed(seed: string): number {
@@ -217,108 +205,20 @@ export function resolveHumanizedDuration(
   return beatsToTime(resolvedBeats);
 }
 
-/**
- * Schedules bass pattern events for a single chord
- */
-function scheduleBassPattern(
-  transport: typeof Tone.Transport,
-  pattern: PatternEvent[],
-  chord: Chord,
-  nextChord: Chord | null,
-  startBeat: number,
-  chordBeats: number,
-  bassInstrument: BassInstrument,
-  bassOctave: number,
-  instrumentOffsetBeats = 0,
-  variationIndex = 0,
-  humanizationProfile?: HumanizationProfile,
-  scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
+export function getPatternVariantIndex(
+  barIndex: number,
+  chordIndex: number,
+  variantCount: number,
   loopIteration = 0,
-): number[] {
-  const eventIds: number[] = [];
-  const activePattern = pattern.filter((event) => {
-    const eventBeat = resolveEventBeat(
-      event,
-      chordBeats,
-      instrumentOffsetBeats,
-    );
-    return eventBeat < chordBeats;
-  });
-  const walkEvents = activePattern.filter((event) => event.type === "walk");
-  const walkingLine = getWalkingBassLine(chord, {
-    octave: bassOctave,
-    steps: walkEvents.length,
-    variationIndex,
-    nextChord,
-  });
-  let walkingLineIndex = 0;
-
-  for (const [eventIndex, event] of activePattern.entries()) {
-    const humanization = getHumanization(humanizationProfile, "bass", {
-      loopIteration,
-      barIndex: scheduleContext?.barIndex ?? 0,
-      chordIndex: scheduleContext?.chordIndex ?? 0,
-      eventIndex,
-    });
-    const eventBeat = clamp(
-      resolveEventBeat(event, chordBeats, instrumentOffsetBeats) +
-        humanization.timingOffsetBeats,
-      0,
-      Math.max(chordBeats - 0.01, 0),
-    );
-    const duration = resolveHumanizedDuration(
-      event.duration,
-      humanization.durationOffsetBeats,
-    );
-    const absoluteBeat = startBeat + eventBeat;
-
-    // Skip if event falls outside this chord's duration
-    if (eventBeat >= chordBeats) continue;
-
-    const time = beatsToTime(absoluteBeat);
-
-    const eventId = transport.schedule((audioTime) => {
-      const safeTime = Math.max(audioTime, Tone.now());
-      let noteToPlay: string;
-
-      if (event.type === "approach" && nextChord) {
-        // Approach note to next chord
-        noteToPlay = getApproachNote(nextChord, bassOctave);
-      } else if (event.type === "walk") {
-        noteToPlay =
-          walkingLine[walkingLineIndex] ?? getBassNote(chord, 1, bassOctave);
-        walkingLineIndex += 1;
-      } else {
-        // Regular bass note based on degree
-        const degree = event.degree ?? 1;
-        noteToPlay = getBassNote(
-          chord,
-          degree,
-          bassOctave,
-          nextChord ?? undefined,
-        );
-      }
-
-      const velocity = clamp(
-        (event.velocity ?? 0.8) + humanization.velocityOffset,
-        0.05,
-        1,
-      );
-      bassInstrument.triggerAttackRelease(
-        noteToPlay,
-        duration,
-        safeTime,
-        velocity,
-      );
-    }, time);
-
-    eventIds.push(eventId);
-  }
-
-  return eventIds;
+): number {
+  if (variantCount <= 1) return 0;
+  return (barIndex * 3 + chordIndex + loopIteration) % variantCount;
 }
 
-function scheduleBassPatternForBar(
+/**
+ * Schedules bass pattern events for a bar, with walking bass across chord changes.
+ */
+function scheduleBassForBar(
   transport: typeof Tone.Transport,
   pattern: PatternEvent[],
   progression: Progression,
@@ -450,7 +350,7 @@ function scheduleChordPattern(
       eventIndex,
     });
     const eventBeat = clamp(
-      resolveEventBeat(event, chordBeats, instrumentOffsetBeats) +
+      resolveBarEventBeat(event, instrumentOffsetBeats) +
         humanization.timingOffsetBeats,
       0,
       Math.max(chordBeats - 0.01, 0),
@@ -488,67 +388,10 @@ function scheduleChordPattern(
   return eventIds;
 }
 
-export function getPatternVariantIndex(
-  barIndex: number,
-  chordIndex: number,
-  variantCount: number,
-  loopIteration = 0,
-): number {
-  if (variantCount <= 1) return 0;
-  return (barIndex * 3 + chordIndex + loopIteration) % variantCount;
-}
-
 /**
- * Schedules drum pattern events for a single chord
+ * Schedules drum pattern events for a bar
  */
-function scheduleDrumPattern(
-  transport: typeof Tone.Transport,
-  pattern: DrumPatternEvent[],
-  startBeat: number,
-  chordBeats: number,
-  drumInstrument: DrumInstrument,
-  instrumentOffsetBeats = 0,
-  humanizationProfile?: HumanizationProfile,
-  scheduleContext?: Pick<HumanizationContext, "barIndex" | "chordIndex">,
-  loopIteration = 0,
-): number[] {
-  const eventIds: number[] = [];
-
-  for (const [eventIndex, event] of pattern.entries()) {
-    const humanization = getHumanization(humanizationProfile, "drums", {
-      loopIteration,
-      barIndex: scheduleContext?.barIndex ?? 0,
-      chordIndex: scheduleContext?.chordIndex ?? 0,
-      eventIndex,
-    });
-    const eventBeat = clamp(
-      resolveEventBeat(event, chordBeats, instrumentOffsetBeats) +
-        humanization.timingOffsetBeats,
-      0,
-      Math.max(chordBeats - 0.01, 0),
-    );
-    const absoluteBeat = startBeat + eventBeat;
-
-    if (eventBeat >= chordBeats) continue;
-
-    const time = beatsToTime(absoluteBeat);
-
-    const eventId = transport.schedule((audioTime) => {
-      const velocity = clamp(
-        (event.velocity ?? 0.7) + humanization.velocityOffset,
-        0.05,
-        1,
-      );
-      drumInstrument.trigger(event.sound, audioTime, velocity);
-    }, time);
-
-    eventIds.push(eventId);
-  }
-
-  return eventIds;
-}
-
-function scheduleDrumPatternForBar(
+function scheduleDrumsForBar(
   transport: typeof Tone.Transport,
   pattern: DrumPatternEvent[],
   startBeat: number,
@@ -619,7 +462,6 @@ function scheduleMetronome(
     const eventId = transport.schedule((audioTime) => {
       const safeTime = Math.max(audioTime, Tone.now());
       if (isDownbeat && accentDownbeat) {
-        // Accented downbeat
         metronomeInstrument.accent.triggerAttackRelease(
           METRONOME_ACCENT_NOTE,
           "32n",
@@ -627,7 +469,6 @@ function scheduleMetronome(
           0.9,
         );
       } else {
-        // Regular click
         metronomeInstrument.click.triggerAttackRelease(
           METRONOME_CLICK_NOTE,
           "32n",
@@ -665,7 +506,8 @@ export function scheduleCountIn(
 }
 
 /**
- * Main scheduling function that schedules the entire progression
+ * Main scheduling function that schedules the entire progression.
+ * All instruments use bar-level scheduling (patterns stay on the full bar grid).
  */
 export function scheduleProgression(
   progression: Progression,
@@ -681,12 +523,9 @@ export function scheduleProgression(
   const humanization = style.timing?.humanization;
   const loopIteration = options?.loopIteration ?? 0;
 
-  // Offset all events by count-in bars if specified
   const countInOffset = (options?.countInBars ?? 0) * beatsPerBar;
-
   let currentBeat = countInOffset;
 
-  // Iterate through each bar
   for (let barIndex = 0; barIndex < progression.bars.length; barIndex++) {
     const bar = progression.bars[barIndex];
     if (!bar) continue;
@@ -694,25 +533,19 @@ export function scheduleProgression(
     const parsedBarChords: ParsedBarChordSlot[] = [];
     let barBeatCursor = 0;
 
-    // Iterate through each chord in the bar
+    // Parse chords and schedule chord change callbacks
     for (let chordIndex = 0; chordIndex < bar.chords.length; chordIndex++) {
       const barChord = bar.chords[chordIndex];
       if (!barChord) continue;
       const chord = parseChordSymbol(barChord.chord);
-
       if (!chord) continue;
+
       parsedBarChords.push({
         chord,
         chordIndex,
         startBeat: barBeatCursor,
         endBeat: barBeatCursor + barChord.beats,
       });
-
-      // Get the next chord for approach notes
-      const nextChordInfo = getNextChord(progression, barIndex, chordIndex);
-      const nextChord = nextChordInfo
-        ? parseChordSymbol(nextChordInfo.chord)
-        : null;
 
       // Schedule chord change callback
       const changeEventId = transport.schedule((time) => {
@@ -722,27 +555,7 @@ export function scheduleProgression(
       }, beatsToTime(currentBeat));
       eventIds.push(changeEventId);
 
-      // Schedule bass pattern
-      if (style.id !== "jazzSwing") {
-        const bassEventIds = scheduleBassPattern(
-          transport,
-          style.patterns.bass.events,
-          chord,
-          nextChord,
-          currentBeat,
-          barChord.beats,
-          instruments.bass,
-          style.instruments.bass.octave,
-          instrumentOffsets?.bass ?? 0,
-          getPatternVariantIndex(barIndex, chordIndex, 4, loopIteration),
-          humanization?.bass,
-          { barIndex, chordIndex },
-          loopIteration,
-        );
-        eventIds.push(...bassEventIds);
-      }
-
-      // Schedule chord pattern
+      // Schedule chord voicings per chord
       const chordPatternEvents =
         style.patterns.chord.variants?.[
           getPatternVariantIndex(
@@ -767,28 +580,13 @@ export function scheduleProgression(
       );
       eventIds.push(...chordEventIds);
 
-      // Schedule drum pattern
-      if (instruments.drums && style.id !== "jazzSwing") {
-        const drumEventIds = scheduleDrumPattern(
-          transport,
-          style.patterns.drums.events,
-          currentBeat,
-          barChord.beats,
-          instruments.drums,
-          instrumentOffsets?.drums ?? 0,
-          humanization?.drums,
-          { barIndex, chordIndex },
-          loopIteration,
-        );
-        eventIds.push(...drumEventIds);
-      }
-
       currentBeat += barChord.beats;
       barBeatCursor += barChord.beats;
     }
 
-    if (style.id === "jazzSwing" && parsedBarChords.length > 0) {
-      const bassEventIds = scheduleBassPatternForBar(
+    // Schedule bass and drums at bar level (walking bass spans chord changes)
+    if (parsedBarChords.length > 0) {
+      const bassEventIds = scheduleBassForBar(
         transport,
         style.patterns.bass.events,
         progression,
@@ -806,7 +604,7 @@ export function scheduleProgression(
       eventIds.push(...bassEventIds);
 
       if (instruments.drums) {
-        const drumEventIds = scheduleDrumPatternForBar(
+        const drumEventIds = scheduleDrumsForBar(
           transport,
           style.patterns.drums.events,
           barStartBeat,
@@ -822,7 +620,7 @@ export function scheduleProgression(
     }
   }
 
-  // Calculate total bars (excluding count-in offset)
+  // Calculate total bars
   const progressionBeats = currentBeat - countInOffset;
   const totalBars = Math.ceil(progressionBeats / beatsPerBar);
 
@@ -853,18 +651,15 @@ function getNextChord(
   const currentBar = progression.bars[currentBarIndex];
   if (!currentBar) return null;
 
-  // Check if there's another chord in the same bar
   if (currentChordIndex < currentBar.chords.length - 1) {
     return currentBar.chords[currentChordIndex + 1] ?? null;
   }
 
-  // Check if there's another bar
   if (currentBarIndex < progression.bars.length - 1) {
     const nextBar = progression.bars[currentBarIndex + 1];
     return nextBar?.chords[0] ?? null;
   }
 
-  // Wrap around to the first chord
   const firstBar = progression.bars[0];
   return firstBar?.chords[0] ?? null;
 }

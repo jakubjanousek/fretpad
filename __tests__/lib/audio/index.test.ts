@@ -18,7 +18,6 @@ import {
   // Preview
   playChordPreview,
   playScalePreview,
-  STYLES_MAP,
   scheduleCountIn,
   // Scheduler
   scheduleProgression,
@@ -38,7 +37,6 @@ describe("lib/audio barrel export", () => {
     expect(DEFAULT_STYLE_ID).toBe("jazzSwing");
     const style = getStyle("jazzSwing");
     expect(style.name).toBeTruthy();
-    expect(STYLES_MAP.jazzSwing).toBeDefined();
   });
 
   it("exports scheduler functions", () => {

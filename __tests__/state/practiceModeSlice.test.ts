@@ -54,7 +54,7 @@ describe("practiceModeSlice", () => {
       currentBarIndex: 2,
       currentChordIndex: 0,
       tempo: 40,
-      selectedStyle: "ballad",
+      selectedStyle: "jazzSwing",
       progressionHistory: [PRESET_PROGRESSIONS["Minor Blues in Am"]],
       progressionFuture: [PRESET_PROGRESSIONS["Rhythm Changes (A)"]],
     });
@@ -68,7 +68,7 @@ describe("practiceModeSlice", () => {
     expect(state.currentChordIndex).toBe(0);
     expect(state.currentChord?.root).toBe("D");
     expect(state.tempo).toBe(90);
-    expect(state.selectedStyle).toBe("bossaNova");
+    expect(state.selectedStyle).toBe("jazzSwing");
     expect(state.progressionHistory).toEqual([
       PRESET_PROGRESSIONS["Minor Blues in Am"],
       PRESET_PROGRESSIONS["12-bar blues in A"],
@@ -124,7 +124,7 @@ describe("practiceModeSlice", () => {
       currentChordIndex: 0,
       currentChord: getChordAtPosition(progression, 3, 0),
       tempo: 150,
-      selectedStyle: "funk",
+      selectedStyle: "jazzSwing",
     });
 
     useAppStore
@@ -136,7 +136,7 @@ describe("practiceModeSlice", () => {
     expect(state.currentBarIndex).toBe(3);
     expect(state.currentChordIndex).toBe(0);
     expect(state.tempo).toBe(150);
-    expect(state.selectedStyle).toBe("funk");
+    expect(state.selectedStyle).toBe("jazzSwing");
   });
 
   it("caps mode-switch history at 10 entries", () => {

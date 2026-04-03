@@ -33,9 +33,4 @@ export {
   scheduleProgression,
 } from "./scheduler";
 // Styles
-export {
-  AVAILABLE_STYLES,
-  DEFAULT_STYLE_ID,
-  getStyle,
-  STYLES_MAP,
-} from "./styles";
+export { AVAILABLE_STYLES, DEFAULT_STYLE_ID, getStyle } from "./styles";

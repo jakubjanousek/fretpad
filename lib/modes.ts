@@ -20,7 +20,7 @@ export const PRACTICE_MODES: Record<
       "Build fretboard familiarity — know where notes and intervals are.",
     defaultPreset: "Dorian Vamp (Dm7)",
     defaultTempo: 90,
-    defaultStyle: "bossaNova",
+    defaultStyle: "jazzSwing",
 
     showOverlayDropdown: true,
     showLabels: true,

@@ -61,16 +61,8 @@ describe("playbackSlice", () => {
 
   describe("setSelectedStyle", () => {
     it("changes the selected style", () => {
-      getState().setSelectedStyle("bossaNova");
-      expect(getState().selectedStyle).toBe("bossaNova");
-    });
-
-    it("can set all valid styles", () => {
-      const styles = ["jazzSwing", "popRock", "bossaNova", "ballad"] as const;
-      for (const style of styles) {
-        getState().setSelectedStyle(style);
-        expect(getState().selectedStyle).toBe(style);
-      }
+      getState().setSelectedStyle("jazzSwing");
+      expect(getState().selectedStyle).toBe("jazzSwing");
     });
   });
 
