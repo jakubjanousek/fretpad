@@ -79,9 +79,11 @@
 
 ---
 
-## Phase 3: Landing Page
+## Phase 3: Landing Page ✅
 
 **Goal:** New homepage that communicates the new value prop. First impression for new visitors.
+
+**Status:** Complete. New landing page with hero, fretboard graphic, feature cards. Dark theme, mobile-responsive, DM Serif Display headline.
 
 ### Requirements
 - Clear pitch: "Practice improvising over chord changes. The app listens and gives you feedback."

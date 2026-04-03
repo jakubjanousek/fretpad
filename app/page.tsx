@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Launcher } from "@/components/modes/Launcher";
+import { LandingPage } from "@/components/landing/LandingPage";
 import { DEFAULT_SHARE_MODE } from "@/lib/modes";
 import { decodeStateFromUrl } from "@/lib/persistence";
 
@@ -12,5 +12,5 @@ export default async function Page({
   if (p && decodeStateFromUrl(p)) {
     redirect(`/practice/${DEFAULT_SHARE_MODE}?p=${encodeURIComponent(p)}`);
   }
-  return <Launcher />;
+  return <LandingPage />;
 }
