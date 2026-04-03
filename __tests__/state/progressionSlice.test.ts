@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
+import { PRESET_PROGRESSIONS } from "@/lib/theory";
 import {
   defaultProgression,
   getChordAtPosition,

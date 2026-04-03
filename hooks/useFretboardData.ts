@@ -4,16 +4,14 @@ import { useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { getFretNotesForChord } from "@/lib/fretboard";
 import {
+  filterApproachNotesFromChordTones,
   getArpeggioConnections,
   getArpeggioNotes,
-} from "@/lib/theory/arpeggios";
-import { getOverlayNotes } from "@/lib/theory/pentatonic";
-import {
-  filterApproachNotesFromChordTones,
   getChromaticApproachNotes,
   getDiatonicApproachNotes,
+  getOverlayNotes,
   getTargetNotes,
-} from "@/lib/theory/targetNotes";
+} from "@/lib/theory";
 import { useAppStore } from "@/state/useAppStore";
 
 export function useFretboardData() {

@@ -1,7 +1,7 @@
 import * as Tone from "tone";
 import type { StateCreator } from "zustand";
 import { PRACTICE_MODES } from "@/lib/modes";
-import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
+import { PRESET_PROGRESSIONS } from "@/lib/theory";
 import type { PracticeModeId } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 import { getChordAtPosition } from "./progressionSlice";

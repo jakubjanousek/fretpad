@@ -1,6 +1,6 @@
 import { Scale } from "tonal";
 import * as Tone from "tone";
-import { parseChordSymbol } from "@/lib/theory/chords";
+import { parseChordSymbol } from "@/lib/theory";
 import { getFullVoicing } from "./voicings";
 
 /**

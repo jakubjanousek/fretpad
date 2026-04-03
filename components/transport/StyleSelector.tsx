@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AVAILABLE_STYLES } from "@/lib/audio/styles";
+import { AVAILABLE_STYLES } from "@/lib/audio";
 import type { StyleId } from "@/lib/types";
 import { useAppStore } from "@/state/useAppStore";
 

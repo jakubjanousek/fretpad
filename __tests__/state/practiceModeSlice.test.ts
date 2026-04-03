@@ -10,7 +10,7 @@ vi.mock("tone", () => ({
   }),
 }));
 
-import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
+import { PRESET_PROGRESSIONS } from "@/lib/theory";
 import { getChordAtPosition } from "@/state/slices/progressionSlice";
 import { useAppStore } from "@/state/useAppStore";
 

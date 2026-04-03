@@ -4,25 +4,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import {
   type BassInstrument,
-  createBassInstrument,
-} from "@/lib/audio/instruments/bassInstrument";
-import {
   type ChordInstrument,
-  createChordInstrument,
-} from "@/lib/audio/instruments/chordInstrument";
-import {
-  createDrumInstrument,
-  type DrumInstrument,
-} from "@/lib/audio/instruments/drumInstrument";
-import {
-  createMetronomeInstrument,
-  type MetronomeInstrument,
-} from "@/lib/audio/instruments/metronomeInstrument";
-import {
   clearScheduledEvents,
+  createBassInstrument,
+  createChordInstrument,
+  createDrumInstrument,
+  createMetronomeInstrument,
+  type DrumInstrument,
+  type MetronomeInstrument,
   scheduleCountIn,
   scheduleProgression,
-} from "@/lib/audio/scheduler";
+} from "@/lib/audio";
 import type {
   BackingTrackConfig,
   MetronomeConfig,

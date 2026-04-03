@@ -26,7 +26,7 @@ import {
   PRESET_PROGRESSIONS,
   type PresetCategory,
   type PresetMetadata,
-} from "@/lib/theory/presets";
+} from "@/lib/theory";
 import { useAppStore } from "@/state/useAppStore";
 
 const CATEGORY_LABELS: Record<PresetCategory, string> = {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFretboardDisplay } from "@/hooks/useFretboardDisplay";
-import { getTargetStrength } from "@/lib/theory/targetNotes";
+import { getTargetStrength } from "@/lib/theory";
 import type {
   ApproachNote,
   ArpeggioConnection,

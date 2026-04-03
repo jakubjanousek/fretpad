@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand";
-import { DEFAULT_STYLE_ID } from "@/lib/audio/styles";
+import { DEFAULT_STYLE_ID } from "@/lib/audio";
 import type { StyleId, TempoRampConfig } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 

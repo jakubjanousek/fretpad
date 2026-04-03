@@ -8,7 +8,7 @@ import {
   saveCustomPresets,
   saveRecentPresets,
 } from "@/lib/persistence/customPresets";
-import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
+import { PRESET_PROGRESSIONS } from "@/lib/theory";
 
 const samplePreset: CustomPreset = {
   id: "test-1",

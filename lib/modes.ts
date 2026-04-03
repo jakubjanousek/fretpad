@@ -1,4 +1,4 @@
-import type { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
+import type { PRESET_PROGRESSIONS } from "@/lib/theory";
 import type { PracticeModeConfig, PracticeModeId } from "@/lib/types";
 
 export const DEFAULT_SHARE_MODE: PracticeModeId = "outline-chord-changes";

@@ -15,7 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useCustomPresets } from "@/hooks/useCustomPresets";
-import { playChordPreview, stopPreview } from "@/lib/audio/preview";
+import { playChordPreview, stopPreview } from "@/lib/audio";
 import type { CustomPreset } from "@/lib/persistence";
 import {
   getPresetsByCategory,
@@ -23,7 +23,7 @@ import {
   type PresetCategory,
   type PresetDifficulty,
   type PresetMetadata,
-} from "@/lib/theory/presets";
+} from "@/lib/theory";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 

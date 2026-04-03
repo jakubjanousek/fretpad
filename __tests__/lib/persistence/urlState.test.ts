@@ -6,7 +6,7 @@ import {
   generateShareUrl,
   type ShareableState,
 } from "@/lib/persistence/urlState";
-import { PRESET_PROGRESSIONS } from "@/lib/theory/presets";
+import { PRESET_PROGRESSIONS } from "@/lib/theory";
 
 const sampleState: ShareableState = {
   progression: PRESET_PROGRESSIONS["ii-V-I in C"],

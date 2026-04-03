@@ -1,10 +1,10 @@
 import {
   getIntervalName,
+  getScaleNotes,
   isChordTone,
   isGuideTone,
   isRoot,
-} from "@/lib/theory/chords";
-import { getScaleNotes } from "@/lib/theory/scales";
+} from "@/lib/theory";
 import type {
   CAGEDPosition,
   Chord,

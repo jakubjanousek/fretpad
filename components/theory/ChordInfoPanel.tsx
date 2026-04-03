@@ -9,7 +9,7 @@ import {
   playChordPreview,
   playScalePreview,
   stopPreview,
-} from "@/lib/audio/preview";
+} from "@/lib/audio";
 import type { Chord } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";

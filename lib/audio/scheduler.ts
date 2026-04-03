@@ -7,7 +7,7 @@ import {
   METRONOME_CLICK_NOTE,
   type MetronomeInstrument,
 } from "@/lib/audio/instruments/metronomeInstrument";
-import { parseChordSymbol } from "@/lib/theory/chords";
+import { parseChordSymbol } from "@/lib/theory";
 import type {
   Chord,
   ChordPatternEvent,

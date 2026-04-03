@@ -1,7 +1,7 @@
 import { Note } from "tonal";
 import { describe, expect, it } from "vitest";
 import { getFretNotesForChord } from "@/lib/fretboard";
-import { getIntervalName, parseChordSymbol } from "@/lib/theory/chords";
+import { getIntervalName, parseChordSymbol } from "@/lib/theory";
 import type { Chord, ChordQuality } from "@/lib/types";
 
 // Helper: parse a chord and assert it's valid

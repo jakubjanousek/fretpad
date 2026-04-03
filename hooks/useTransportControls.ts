@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { useAudioEngine } from "@/hooks/useAudioEngine";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { getStyle } from "@/lib/audio/styles";
+import { getStyle } from "@/lib/audio";
 import { useAppStore } from "@/state/useAppStore";
 
 /**
