@@ -66,8 +66,7 @@ describe("audio scheduler timing helpers", () => {
   it("jazz swing style defines per-instrument swing multipliers", () => {
     const { swing } = jazzSwingStyle;
     expect(swing.drums).toBe(1); // ride defines the swing
-    expect(swing.chord).toBeGreaterThan(0);
-    expect(swing.chord).toBeLessThan(1); // comping slightly less than ride
+    expect(swing.chord).toBe(1); // comping shares the ride grid; placement comes from slot patterns
     expect(swing.bass).toBe(0); // quarter notes, no swing
   });
 
