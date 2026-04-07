@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import { ArrowRight, Headphones, Mic, Music, Waves } from "lucide-react";
 import { DM_Serif_Display } from "next/font/google";
 import Link from "next/link";
@@ -202,6 +203,7 @@ export function LandingPage() {
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Link
                   href="/practice/outline-chord-changes"
+                  onClick={() => track("cta_click")}
                   className="group inline-flex items-center gap-2.5 rounded-full bg-stone-50 px-7 py-3.5 text-sm font-medium text-stone-900 transition-all hover:gap-3.5 hover:shadow-lg hover:shadow-orange-400/10 active:scale-[0.98]"
                 >
                   Start practicing

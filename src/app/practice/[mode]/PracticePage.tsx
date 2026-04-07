@@ -3,6 +3,7 @@
 import { DM_Serif_Display } from "next/font/google";
 import Link from "next/link";
 import { useState } from "react";
+import { FeedbackToast } from "@/components/feedback/FeedbackToast";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { PracticeNowPlaying } from "@/components/practice/PracticeNowPlaying";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
@@ -36,6 +37,8 @@ export function PracticePage({ modeId }: PracticePageProps) {
   const progression = useAppStore((s) => s.progression);
   const currentBarIndex = useAppStore((s) => s.currentBarIndex);
   const currentChordIndex = useAppStore((s) => s.currentChordIndex);
+  const loopCount = useAppStore((s) => s.loopCount);
+  const tempo = useAppStore((s) => s.tempo);
 
   const { currentChord, fretNotes, targetNoteData, arpeggioConnections } =
     useFretboardData();
@@ -154,6 +157,7 @@ export function PracticePage({ modeId }: PracticePageProps) {
         micSlot={!isPlaying ? <AudioInputScorecard enabled /> : undefined}
       />
       <TransportDrawer open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <FeedbackToast loopCount={loopCount} mode={modeId} tempo={tempo} />
     </div>
   );
 }

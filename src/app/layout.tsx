@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { InstallPromptBanner } from "@/components/InstallPromptBanner";
@@ -77,6 +78,7 @@ export default function RootLayout({
         {children}
         <OfflineIndicator />
         <InstallPromptBanner />
+        <Analytics />
       </body>
     </html>
   );

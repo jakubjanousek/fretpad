@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import { useEffect, useRef } from "react";
 import type { PracticeModeId } from "@/lib/types";
 import { useAppStore } from "@/state/useAppStore";
@@ -21,6 +22,7 @@ export function usePracticeModeSetup(modeId: PracticeModeId): void {
       enterMode(modeId, {
         applyDefaults: !hasInitialUrlStateRef.current,
       });
+      track("mode_enter", { modeId });
     }
   }, [enterMode, modeId]);
 }

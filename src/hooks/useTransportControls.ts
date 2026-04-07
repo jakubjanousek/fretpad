@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import { useCallback } from "react";
 import { useAudioEngine } from "@/hooks/useAudioEngine";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -23,6 +24,8 @@ export function useTransportControls() {
   const setIsPlaying = useAppStore((state) => state.setIsPlaying);
   const setCurrentPosition = useAppStore((state) => state.setCurrentPosition);
   const setMetronomeEnabled = useAppStore((state) => state.setMetronomeEnabled);
+  const activeMode = useAppStore((state) => state.activeMode);
+  const loopCount = useAppStore((state) => state.loopCount);
   const incrementLoopCount = useAppStore((state) => state.incrementLoopCount);
   const resetLoopCount = useAppStore((state) => state.resetLoopCount);
 
@@ -61,13 +64,20 @@ export function useTransportControls() {
     resetLoopCount();
     await start();
     setIsPlaying(true);
-  }, [start, setIsPlaying, resetLoopCount]);
+    track("session_start", { mode: activeMode ?? "unknown", tempo });
+  }, [start, setIsPlaying, resetLoopCount, activeMode, tempo]);
 
   const handleStopClick = useCallback(() => {
+    const sessionLoopCount = loopCount;
     stop();
     setIsPlaying(false);
+    track("session_stop", {
+      mode: activeMode ?? "unknown",
+      tempo,
+      loopCount: sessionLoopCount,
+    });
     resetLoopCount();
-  }, [stop, setIsPlaying, resetLoopCount]);
+  }, [stop, setIsPlaying, resetLoopCount, activeMode, tempo, loopCount]);
 
   useKeyboardShortcuts({
     onPlay: handlePlay,
@@ -97,6 +107,7 @@ export function useTransportControls() {
     tempo,
     tempoRamp,
     metronome,
+    loopCount,
     handlePlay,
     handleStopClick,
     handleResume,
