@@ -1,7 +1,7 @@
 "use client";
 
 import { track } from "@vercel/analytics";
-import { ArrowRight, Headphones, Mic, Music, Waves } from "lucide-react";
+import { ArrowRight, Guitar, Mic, Music, Waves } from "lucide-react";
 import { DM_Serif_Display } from "next/font/google";
 import Link from "next/link";
 
@@ -31,10 +31,10 @@ const FEATURES = [
       "See roots, guide tones, and scale notes color-coded in real time as chords change.",
   },
   {
-    icon: Headphones,
-    label: "Theory on demand",
+    icon: Guitar,
+    label: "Chord voicings",
     detail:
-      "Chord info, suggested scales, and guide tones — there when you need them.",
+      "Voice-led chord diagrams that minimize hand movement through the progression.",
   },
 ] as const;
 
@@ -191,22 +191,34 @@ export function LandingPage() {
 
               <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.4rem,5vw,3.8rem)] leading-[1.05] tracking-[-0.02em] text-stone-50">
                 Play over changes.{" "}
-                <span className="text-stone-500">Hear what you land on.</span>
+                <span className="text-stone-500">Nail the voicings.</span>
               </h1>
 
               <p className="text-lg leading-relaxed text-stone-400 max-w-xl">
-                FretPad plays a backing track, shows you the chord tones on a
-                fretboard, and listens as you improvise. No install, no account
-                — just open and play.
+                FretPad plays a backing track and shows you what to play — chord
+                tones for improvising, voice-led voicings for comping. No
+                install, no account — just open and play.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Link
                   href="/practice/outline-chord-changes"
-                  onClick={() => track("cta_click")}
+                  onClick={() =>
+                    track("cta_click", { mode: "outline-chord-changes" })
+                  }
                   className="group inline-flex items-center gap-2.5 rounded-full bg-stone-50 px-7 py-3.5 text-sm font-medium text-stone-900 transition-all hover:gap-3.5 hover:shadow-lg hover:shadow-orange-400/10 active:scale-[0.98]"
                 >
-                  Start practicing
+                  Start improvising
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <Link
+                  href="/practice/comp-with-voicings"
+                  onClick={() =>
+                    track("cta_click", { mode: "comp-with-voicings" })
+                  }
+                  className="group inline-flex items-center gap-2.5 rounded-full border border-stone-700 px-7 py-3.5 text-sm font-medium text-stone-300 transition-all hover:border-orange-600/40 hover:text-stone-100 active:scale-[0.98]"
+                >
+                  Practice voicings
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <span className="text-sm text-stone-500">
