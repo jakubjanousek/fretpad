@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { toFlatChordIndex, useVoicingData } from "@/hooks/useVoicingData";
 import type { GuitarVoicing } from "@/lib/types";
 import { useAppStore } from "@/state/useAppStore";
-import { ChordDiagram, type DiagramLabelMode } from "./ChordDiagram";
+import { type DiagramLabelMode } from "./ChordDiagram";
 import { VoiceLeadingPath } from "./VoiceLeadingPath";
 import { VoicingStrip } from "./VoicingStrip";
 
@@ -84,77 +84,57 @@ export function CompVoicingsView() {
     : null;
 
   return (
-    <div className="space-y-4 lg:space-y-5">
-      {/* Top section: hero panel + path overview */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-center md:gap-6 lg:gap-8 gap-4">
-        {/* Hero panel — featured voicing */}
-        {selectedVoicing && activeChord && (
-          <div className="flex flex-col items-center shrink-0 rounded-xl border border-stone-800/50 bg-stone-900/40 p-4 sm:p-5 lg:p-6">
-            <span className="text-2xl lg:text-3xl font-semibold font-[var(--font-display)] text-orange-400 mb-2">
-              {activeChord.symbol}
-            </span>
-            <ChordDiagram
-              voicing={selectedVoicing}
-              size="xl"
-              guideTones={activeChord.guideTones}
-              labelMode={labelMode}
-              root={activeChord.root}
-            />
-            <div className="flex items-center gap-2 mt-3 text-xs text-stone-400">
-              <span>
-                {TYPE_LABELS[selectedVoicing.type] ?? selectedVoicing.type}
-              </span>
-              {fretRange && (
-                <>
-                  <span className="text-stone-600">·</span>
-                  <span>{fretRange}</span>
-                </>
-              )}
-            </div>
-            {/* Notes / Intervals toggle */}
-            <div className="flex items-center gap-1 mt-3 rounded-full bg-stone-800/60 p-0.5">
-              <button
-                type="button"
-                onClick={() => setLabelMode("notes")}
-                className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
-                  labelMode === "notes"
-                    ? "bg-stone-700 text-stone-200"
-                    : "text-stone-500 hover:text-stone-300"
-                }`}
-              >
-                Notes
-              </button>
-              <button
-                type="button"
-                onClick={() => setLabelMode("intervals")}
-                className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
-                  labelMode === "intervals"
-                    ? "bg-stone-700 text-stone-200"
-                    : "text-stone-500 hover:text-stone-300"
-                }`}
-              >
-                Intervals
-              </button>
-            </div>
-          </div>
-        )}
+    <div className="space-y-3 sm:space-y-4">
+      {/* Progression path — the main visualization */}
+      <VoiceLeadingPath
+        chords={chords}
+        path={effectivePath}
+        currentIndex={activeIndex}
+        onSelectChord={handleSelectChord}
+        labelMode={labelMode}
+      />
 
-        {/* Path panel */}
-        <div className="min-w-0 flex flex-col rounded-xl border border-stone-800/50 bg-stone-900/40 p-3 sm:p-4">
-          <div className="flex items-center gap-2 mb-2 px-1">
-            <span className="text-xs font-medium text-stone-500 uppercase tracking-wider">
-              Voice Leading Path
-            </span>
+      {/* Detail bar — info about the active voicing + label toggle */}
+      {selectedVoicing && activeChord && (
+        <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap">
+          <span className="text-sm font-semibold font-[var(--font-display)] text-orange-400">
+            {activeChord.symbol}
+          </span>
+          <span className="text-xs text-stone-500">
+            {TYPE_LABELS[selectedVoicing.type] ?? selectedVoicing.type}
+          </span>
+          {fretRange && (
+            <>
+              <span className="text-stone-700">·</span>
+              <span className="text-xs text-stone-500">{fretRange}</span>
+            </>
+          )}
+          <div className="flex items-center gap-1 rounded-full bg-stone-800/60 p-0.5">
+            <button
+              type="button"
+              onClick={() => setLabelMode("notes")}
+              className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
+                labelMode === "notes"
+                  ? "bg-stone-700 text-stone-200"
+                  : "text-stone-500 hover:text-stone-300"
+              }`}
+            >
+              Notes
+            </button>
+            <button
+              type="button"
+              onClick={() => setLabelMode("intervals")}
+              className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
+                labelMode === "intervals"
+                  ? "bg-stone-700 text-stone-200"
+                  : "text-stone-500 hover:text-stone-300"
+              }`}
+            >
+              Intervals
+            </button>
           </div>
-          <VoiceLeadingPath
-            chords={chords}
-            path={effectivePath}
-            currentIndex={activeIndex}
-            onSelectChord={handleSelectChord}
-            labelMode={labelMode}
-          />
         </div>
-      </div>
+      )}
 
       {/* Alternative voicings strip */}
       {!isPlaying && activeChord && (
