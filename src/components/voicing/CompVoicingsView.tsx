@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { toFlatChordIndex, useVoicingData } from "@/hooks/useVoicingData";
 import type { GuitarVoicing } from "@/lib/types";
 import { useAppStore } from "@/state/useAppStore";
-import { ChordDiagram } from "./ChordDiagram";
+import { ChordDiagram, type DiagramLabelMode } from "./ChordDiagram";
 import { VoiceLeadingPath } from "./VoiceLeadingPath";
 import { VoicingStrip } from "./VoicingStrip";
 
@@ -22,6 +22,7 @@ export function CompVoicingsView() {
   const currentBarIndex = useAppStore((s) => s.currentBarIndex);
   const currentChordIndex = useAppStore((s) => s.currentChordIndex);
   const isPlaying = useAppStore((s) => s.isPlaying);
+  const setCurrentPosition = useAppStore((s) => s.setCurrentPosition);
 
   const { chords, voicingsPerChord, path } = useVoicingData(progression);
 
@@ -31,18 +32,36 @@ export function CompVoicingsView() {
     currentChordIndex,
   );
 
-  // Which chord position the user is browsing (defaults to current playback position)
-  const [browsingIndex, setBrowsingIndex] = useState(0);
-  const activeIndex = isPlaying ? flatIndex : browsingIndex;
+  const activeIndex = flatIndex;
 
   // User overrides for the voice-leading path (index → voicing)
   const [overrides, setOverrides] = useState<Record<number, GuitarVoicing>>({});
+
+  // Label mode toggle: notes vs intervals
+  const [labelMode, setLabelMode] = useState<DiagramLabelMode>("notes");
 
   const handleSelectVoicing = useCallback(
     (voicing: GuitarVoicing) => {
       setOverrides((prev) => ({ ...prev, [activeIndex]: voicing }));
     },
     [activeIndex],
+  );
+
+  /** Navigate to chord at flat index by finding the corresponding bar/chord position */
+  const handleSelectChord = useCallback(
+    (index: number) => {
+      if (isPlaying) return;
+      let remaining = index;
+      for (let bar = 0; bar < progression.bars.length; bar++) {
+        const barChordCount = progression.bars[bar]?.chords.length ?? 0;
+        if (remaining < barChordCount) {
+          setCurrentPosition(bar, remaining);
+          return;
+        }
+        remaining -= barChordCount;
+      }
+    },
+    [isPlaying, progression.bars, setCurrentPosition],
   );
 
   const activeChord = chords[activeIndex];
@@ -78,6 +97,8 @@ export function CompVoicingsView() {
               voicing={selectedVoicing}
               size="xl"
               guideTones={activeChord.guideTones}
+              labelMode={labelMode}
+              root={activeChord.root}
             />
             <div className="flex items-center gap-2 mt-3 text-xs text-stone-400">
               <span>
@@ -89,6 +110,31 @@ export function CompVoicingsView() {
                   <span>{fretRange}</span>
                 </>
               )}
+            </div>
+            {/* Notes / Intervals toggle */}
+            <div className="flex items-center gap-1 mt-3 rounded-full bg-stone-800/60 p-0.5">
+              <button
+                type="button"
+                onClick={() => setLabelMode("notes")}
+                className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
+                  labelMode === "notes"
+                    ? "bg-stone-700 text-stone-200"
+                    : "text-stone-500 hover:text-stone-300"
+                }`}
+              >
+                Notes
+              </button>
+              <button
+                type="button"
+                onClick={() => setLabelMode("intervals")}
+                className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
+                  labelMode === "intervals"
+                    ? "bg-stone-700 text-stone-200"
+                    : "text-stone-500 hover:text-stone-300"
+                }`}
+              >
+                Intervals
+              </button>
             </div>
           </div>
         )}
@@ -104,9 +150,8 @@ export function CompVoicingsView() {
             chords={chords}
             path={effectivePath}
             currentIndex={activeIndex}
-            onSelectChord={(i) => {
-              if (!isPlaying) setBrowsingIndex(i);
-            }}
+            onSelectChord={handleSelectChord}
+            labelMode={labelMode}
           />
         </div>
       </div>
@@ -120,6 +165,8 @@ export function CompVoicingsView() {
             selectedId={selectedVoicing?.id}
             onSelect={handleSelectVoicing}
             guideTones={activeChord.guideTones}
+            labelMode={labelMode}
+            root={activeChord.root}
           />
         </div>
       )}

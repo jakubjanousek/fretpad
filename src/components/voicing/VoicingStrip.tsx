@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import type { GuitarVoicing, NoteName } from "@/lib/types";
+import type { DiagramLabelMode } from "./ChordDiagram";
 import { VoicingCard } from "./VoicingCard";
 
 interface VoicingStripProps {
@@ -10,6 +11,8 @@ interface VoicingStripProps {
   selectedId?: string;
   onSelect?: (voicing: GuitarVoicing) => void;
   guideTones?: NoteName[];
+  labelMode?: DiagramLabelMode;
+  root?: string;
 }
 
 export function VoicingStrip({
@@ -18,6 +21,8 @@ export function VoicingStrip({
   selectedId,
   onSelect,
   guideTones,
+  labelMode,
+  root,
 }: VoicingStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +60,8 @@ export function VoicingStrip({
               isSelected={v.id === selectedId}
               onClick={() => onSelect?.(v)}
               guideTones={guideTones}
+              labelMode={labelMode}
+              root={root}
             />
           ))}
         </div>

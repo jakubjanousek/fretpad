@@ -1,6 +1,6 @@
 "use client";
 
-import { Note } from "tonal";
+import { Interval, Note } from "tonal";
 import type { GuitarFretPosition, GuitarVoicing, NoteName } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -44,12 +44,47 @@ export function getNoteColor(
   return COLORS.chordTone;
 }
 
+/** Get short interval label (R, b3, 3, 5, b7, 7, etc.) relative to root */
+function getIntervalLabel(note: string, root: string): string {
+  const distance = Interval.distance(root, note);
+  if (!distance) return "?";
+
+  const semitones = Interval.semitones(distance);
+  if (semitones === undefined) return "?";
+
+  const labels: Record<number, string> = {
+    0: "R",
+    1: "b2",
+    2: "2",
+    3: "b3",
+    4: "3",
+    5: "4",
+    6: "b5",
+    7: "5",
+    8: "#5",
+    9: "6",
+    10: "b7",
+    11: "7",
+  };
+  return labels[((semitones % 12) + 12) % 12] ?? "?";
+}
+
+/** Convert string number (1=highE, 6=lowE) to SVG x position.
+ *  Standard chord diagram: low E (6) on left, high E (1) on right. */
+function stringToX(stringNum: number): number {
+  return PADDING_X + (STRING_COUNT - stringNum) * STRING_SPACING;
+}
+
+export type DiagramLabelMode = "notes" | "intervals";
+
 interface ChordDiagramProps {
   voicing: GuitarVoicing;
   className?: string;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   showLabel?: boolean;
   guideTones?: NoteName[];
+  labelMode?: DiagramLabelMode;
+  root?: string;
 }
 
 export function ChordDiagram({
@@ -58,6 +93,8 @@ export function ChordDiagram({
   size = "md",
   showLabel = false,
   guideTones,
+  labelMode = "notes",
+  root,
 }: ChordDiagramProps) {
   const baseFret = voicing.baseFret;
   const hasOpenStrings = voicing.positions.some((p) => p.fret === 0);
@@ -144,11 +181,7 @@ export function ChordDiagram({
           voicing.barreFret !== undefined &&
           voicing.barreStrings && (
             <rect
-              x={
-                PADDING_X +
-                (voicing.barreStrings[0] - 1) * STRING_SPACING -
-                DOT_RADIUS
-              }
+              x={stringToX(voicing.barreStrings[1]) - DOT_RADIUS}
               y={
                 PADDING_TOP +
                 (voicing.barreFret - displayBaseFret + 0.5) * FRET_SPACING -
@@ -166,10 +199,9 @@ export function ChordDiagram({
             />
           )}
 
-        {/* String markers (dots, X, O) */}
+        {/* String markers (dots, X, O) — low E on left, high E on right */}
         {voicing.positions.map((pos) => {
-          const stringIdx = pos.string - 1; // 0-based for drawing
-          const x = PADDING_X + stringIdx * STRING_SPACING;
+          const x = stringToX(pos.string);
 
           if (pos.fret === -1) {
             // Muted string — X
@@ -209,10 +241,20 @@ export function ChordDiagram({
           const y = PADDING_TOP + (fretOffset + 0.5) * FRET_SPACING;
           const color = getNoteColor(pos, guideTones);
 
+          // Determine label text
+          let label = "";
+          if (pos.note) {
+            if (labelMode === "intervals" && root) {
+              label = getIntervalLabel(pos.note, root);
+            } else {
+              label = pos.note.replace("#", "\u266F").replace("b", "\u266D");
+            }
+          }
+
           return (
             <g key={`dot-${pos.string}`}>
               <circle cx={x} cy={y} r={DOT_RADIUS} fill={color} />
-              {pos.note && (
+              {label && (
                 <text
                   x={x}
                   y={y + 0.5}
@@ -222,7 +264,7 @@ export function ChordDiagram({
                   fontSize={5.5}
                   fontWeight={600}
                 >
-                  {pos.note.replace("#", "\u266F").replace("b", "\u266D")}
+                  {label}
                 </text>
               )}
             </g>

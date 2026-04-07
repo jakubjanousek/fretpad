@@ -4,13 +4,14 @@ import { ChevronRight } from "lucide-react";
 import { Fragment } from "react";
 import type { Chord, GuitarVoicing } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { ChordDiagram } from "./ChordDiagram";
+import { ChordDiagram, type DiagramLabelMode } from "./ChordDiagram";
 
 interface VoiceLeadingPathProps {
   chords: Chord[];
   path: GuitarVoicing[];
   currentIndex?: number;
   onSelectChord?: (index: number) => void;
+  labelMode?: DiagramLabelMode;
 }
 
 export function VoiceLeadingPath({
@@ -18,6 +19,7 @@ export function VoiceLeadingPath({
   path,
   currentIndex,
   onSelectChord,
+  labelMode,
 }: VoiceLeadingPathProps) {
   if (path.length === 0) {
     return (
@@ -65,6 +67,8 @@ export function VoiceLeadingPath({
                   voicing={voicing}
                   size="sm"
                   guideTones={chord?.guideTones}
+                  labelMode={labelMode}
+                  root={chord?.root}
                 />
               </button>
             </Fragment>

@@ -2,6 +2,7 @@
 
 import { DM_Serif_Display } from "next/font/google";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FeedbackToast } from "@/components/feedback/FeedbackToast";
 import { Fretboard } from "@/components/fretboard/Fretboard";
@@ -15,7 +16,7 @@ import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { CompVoicingsView } from "@/components/voicing/CompVoicingsView";
 import { useFretboardData } from "@/hooks/useFretboardData";
 import { usePracticeModeSetup } from "@/hooks/usePracticeModeSetup";
-import { PRACTICE_MODES } from "@/lib/modes";
+import { buildQueryString } from "@/hooks/useUrlSync";
 import { getNextChord } from "@/lib/theory";
 import type { PracticeModeId } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -51,6 +52,18 @@ export function PracticePage({ modeId }: PracticePageProps) {
   );
 
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const router = useRouter();
+
+  const TOGGLE_MODES: { id: PracticeModeId; label: string }[] = [
+    { id: "outline-chord-changes", label: "Fretboard" },
+    { id: "comp-with-voicings", label: "Voicings" },
+  ];
+
+  const handleModeSwitch = (targetMode: PracticeModeId) => {
+    if (targetMode === modeId) return;
+    const qs = buildQueryString(progression, tempo);
+    router.push(`/practice/${targetMode}?${qs}`);
+  };
 
   return (
     <div className={`${display.variable} relative min-h-screen pb-20`}>
@@ -83,9 +96,24 @@ export function PracticePage({ modeId }: PracticePageProps) {
             >
               FretPad
             </Link>
-            <span className="text-xs text-stone-500">
-              {PRACTICE_MODES[modeId].label}
-            </span>
+            {/* Mode toggle */}
+            <div className="flex items-center gap-1 rounded-full bg-stone-800/60 p-0.5">
+              {TOGGLE_MODES.map((mode) => (
+                <button
+                  key={mode.id}
+                  type="button"
+                  onClick={() => handleModeSwitch(mode.id)}
+                  className={cn(
+                    "text-xs font-medium px-3 py-1 rounded-full transition-colors",
+                    modeId === mode.id
+                      ? "bg-stone-700 text-stone-200"
+                      : "text-stone-500 hover:text-stone-300",
+                  )}
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         {/* Setup controls — slide up and fade when playing */}

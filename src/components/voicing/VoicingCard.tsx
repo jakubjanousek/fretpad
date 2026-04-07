@@ -2,7 +2,7 @@
 
 import type { GuitarVoicing, NoteName } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { ChordDiagram } from "./ChordDiagram";
+import { ChordDiagram, type DiagramLabelMode } from "./ChordDiagram";
 
 const TYPE_COLORS: Record<string, string> = {
   shell: "text-blue-400 bg-blue-500/10 border-blue-500/20",
@@ -27,6 +27,8 @@ interface VoicingCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   guideTones?: NoteName[];
+  labelMode?: DiagramLabelMode;
+  root?: string;
 }
 
 export function VoicingCard({
@@ -34,6 +36,8 @@ export function VoicingCard({
   isSelected = false,
   onClick,
   guideTones,
+  labelMode,
+  root,
 }: VoicingCardProps) {
   const typeColor =
     TYPE_COLORS[voicing.type] ??
@@ -51,7 +55,13 @@ export function VoicingCard({
           : "border-stone-800/40 bg-stone-900/30",
       )}
     >
-      <ChordDiagram voicing={voicing} size="md" guideTones={guideTones} />
+      <ChordDiagram
+        voicing={voicing}
+        size="md"
+        guideTones={guideTones}
+        labelMode={labelMode}
+        root={root}
+      />
       <div className="flex items-center gap-1.5 mt-2">
         <span
           className={cn(
