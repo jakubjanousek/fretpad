@@ -15,7 +15,7 @@ const FEATURES = [
     icon: Music,
     label: "Live backing tracks",
     detail:
-      "Bass, drums, and chords in 10 styles. Practice over real music, not a metronome.",
+      "Bass, drums, and chords in a jazz swing style. Practice over a real groove, not a metronome.",
   },
   {
     icon: Mic,
@@ -33,7 +33,7 @@ const FEATURES = [
     icon: Headphones,
     label: "Theory on demand",
     detail:
-      "Chord info, suggested scales, and approach patterns — there when you need them.",
+      "Chord info, suggested scales, and guide tones — there when you need them.",
   },
 ] as const;
 
