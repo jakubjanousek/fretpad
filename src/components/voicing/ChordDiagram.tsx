@@ -1,6 +1,7 @@
 "use client";
 
-import type { GuitarFretPosition, GuitarVoicing } from "@/lib/types";
+import { Note } from "tonal";
+import type { GuitarFretPosition, GuitarVoicing, NoteName } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 // SVG layout constants
@@ -19,23 +20,36 @@ const SVG_WIDTH = GRID_WIDTH + PADDING_X * 2;
 const SVG_HEIGHT = PADDING_TOP + GRID_HEIGHT + PADDING_BOTTOM;
 
 // Colors matching the app's fretboard palette
-const COLORS = {
+export const COLORS = {
   root: "#f97316", // orange-500
   guideTone: "#3b82f6", // blue-500
   chordTone: "#10b981", // emerald-500
   default: "#a8a29e", // stone-400
 } as const;
 
-function getNoteColor(pos: GuitarFretPosition): string {
+export function getNoteColor(
+  pos: GuitarFretPosition,
+  guideTones?: NoteName[],
+): string {
   if (pos.isRoot) return COLORS.root;
+  if (pos.note && guideTones?.length) {
+    const chroma = Note.chroma(pos.note);
+    if (
+      chroma !== undefined &&
+      guideTones.some((gt) => Note.chroma(gt) === chroma)
+    ) {
+      return COLORS.guideTone;
+    }
+  }
   return COLORS.chordTone;
 }
 
 interface ChordDiagramProps {
   voicing: GuitarVoicing;
   className?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   showLabel?: boolean;
+  guideTones?: NoteName[];
 }
 
 export function ChordDiagram({
@@ -43,15 +57,18 @@ export function ChordDiagram({
   className,
   size = "md",
   showLabel = false,
+  guideTones,
 }: ChordDiagramProps) {
   const baseFret = voicing.baseFret;
   const hasOpenStrings = voicing.positions.some((p) => p.fret === 0);
   const displayBaseFret = baseFret <= 1 && hasOpenStrings ? 1 : baseFret;
 
   const sizeClasses = {
-    sm: "w-16 h-auto",
-    md: "w-24 h-auto",
-    lg: "w-32 h-auto",
+    xs: "w-16 h-auto",
+    sm: "w-20 sm:w-24 h-auto",
+    md: "w-24 sm:w-28 lg:w-32 h-auto",
+    lg: "w-32 lg:w-40 h-auto",
+    xl: "w-44 sm:w-52 lg:w-60 h-auto",
   };
 
   return (
@@ -190,7 +207,7 @@ export function ChordDiagram({
           const fretOffset = pos.fret - displayBaseFret;
           if (fretOffset < 0 || fretOffset >= FRETS_SHOWN) return null;
           const y = PADDING_TOP + (fretOffset + 0.5) * FRET_SPACING;
-          const color = getNoteColor(pos);
+          const color = getNoteColor(pos, guideTones);
 
           return (
             <g key={`dot-${pos.string}`}>

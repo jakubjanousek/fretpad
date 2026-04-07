@@ -1,5 +1,7 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
+import { Fragment } from "react";
 import type { Chord, GuitarVoicing } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ChordDiagram } from "./ChordDiagram";
@@ -26,35 +28,49 @@ export function VoiceLeadingPath({
   }
 
   return (
-    <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 items-end justify-center">
-      {path.map((voicing, i) => {
-        const chord = chords[i];
-        const isCurrent = i === currentIndex;
+    <div className="relative">
+      {/* Scroll fade indicators */}
+      <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-stone-900/80 to-transparent z-10 md:hidden" />
+      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-stone-900/80 to-transparent z-10 md:hidden" />
 
-        return (
-          <button
-            key={`${voicing.id}-${i}`}
-            type="button"
-            onClick={() => onSelectChord?.(i)}
-            className={cn(
-              "flex flex-col items-center rounded-xl border p-1.5 sm:p-2 transition-all shrink-0",
-              isCurrent
-                ? "border-orange-500/50 bg-stone-800/60 ring-1 ring-orange-500/20 scale-105"
-                : "border-stone-800/30 bg-stone-900/20 hover:border-stone-700",
-            )}
-          >
-            <span
-              className={cn(
-                "text-xs font-semibold font-[var(--font-display)] mb-0.5",
-                isCurrent ? "text-orange-400" : "text-stone-400",
+      <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-stone-700 snap-x snap-mandatory md:justify-center md:flex-wrap">
+        {path.map((voicing, i) => {
+          const chord = chords[i];
+          const isCurrent = i === currentIndex;
+
+          return (
+            <Fragment key={`${voicing.id}-${i}`}>
+              {i > 0 && (
+                <ChevronRight className="w-4 h-4 text-stone-600 shrink-0" />
               )}
-            >
-              {chord?.symbol ?? "?"}
-            </span>
-            <ChordDiagram voicing={voicing} size={isCurrent ? "md" : "sm"} />
-          </button>
-        );
-      })}
+              <button
+                type="button"
+                onClick={() => onSelectChord?.(i)}
+                className={cn(
+                  "flex flex-col items-center rounded-lg border p-1.5 sm:p-2 transition-all shrink-0 snap-center",
+                  isCurrent
+                    ? "border-orange-500/50 bg-stone-800/60 ring-1 ring-orange-500/20 scale-105"
+                    : "border-transparent opacity-70 hover:opacity-100 hover:border-stone-700 hover:bg-stone-800/30",
+                )}
+              >
+                <span
+                  className={cn(
+                    "text-xs font-semibold font-[var(--font-display)] mb-0.5",
+                    isCurrent ? "text-orange-400" : "text-stone-400",
+                  )}
+                >
+                  {chord?.symbol ?? "?"}
+                </span>
+                <ChordDiagram
+                  voicing={voicing}
+                  size="sm"
+                  guideTones={chord?.guideTones}
+                />
+              </button>
+            </Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 }

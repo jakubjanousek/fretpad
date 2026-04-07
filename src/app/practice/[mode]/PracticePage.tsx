@@ -66,7 +66,7 @@ export function PracticePage({ modeId }: PracticePageProps) {
         />
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-4 space-y-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 space-y-4">
         {/* Top bar — collapses during play */}
         <div
           className={cn(
@@ -125,7 +125,7 @@ export function PracticePage({ modeId }: PracticePageProps) {
         <div
           className={cn(
             "rounded-2xl border border-stone-800/50 bg-stone-900/30 backdrop-blur-sm transition-all duration-300",
-            isPlaying ? "p-3 sm:p-4" : "p-4 sm:p-5",
+            isPlaying ? "p-3 sm:p-4" : "p-4 sm:p-5 lg:p-6",
           )}
         >
           {modeId === "comp-with-voicings" ? (
