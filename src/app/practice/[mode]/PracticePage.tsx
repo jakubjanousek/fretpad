@@ -12,6 +12,7 @@ import { AudioInputScorecard } from "@/components/transport/AudioInputScorecard"
 import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
+import { CompVoicingsView } from "@/components/voicing/CompVoicingsView";
 import { useFretboardData } from "@/hooks/useFretboardData";
 import { usePracticeModeSetup } from "@/hooks/usePracticeModeSetup";
 import { PRACTICE_MODES } from "@/lib/modes";
@@ -120,22 +121,26 @@ export function PracticePage({ modeId }: PracticePageProps) {
           </div>
         </div>
 
-        {/* Fretboard — always mounted, grows when playing */}
+        {/* Main visualization — Fretboard or Voicings depending on mode */}
         <div
           className={cn(
             "rounded-2xl border border-stone-800/50 bg-stone-900/30 backdrop-blur-sm transition-all duration-300",
             isPlaying ? "p-3 sm:p-4" : "p-4 sm:p-5",
           )}
         >
-          <Fretboard
-            fretNotes={fretNotes}
-            targetNotes={targetNoteData.targets}
-            chromaticApproaches={targetNoteData.chromatic}
-            diatonicApproaches={targetNoteData.diatonic}
-            arpeggioConnections={arpeggioConnections}
-            showLegend
-            showToolbar={!isPlaying}
-          />
+          {modeId === "comp-with-voicings" ? (
+            <CompVoicingsView />
+          ) : (
+            <Fretboard
+              fretNotes={fretNotes}
+              targetNotes={targetNoteData.targets}
+              chromaticApproaches={targetNoteData.chromatic}
+              diatonicApproaches={targetNoteData.diatonic}
+              arpeggioConnections={arpeggioConnections}
+              showLegend
+              showToolbar={!isPlaying}
+            />
+          )}
         </div>
 
         {/* Theory panel — collapses when playing */}
