@@ -1,4 +1,5 @@
 import type { StateCreator } from "zustand";
+import { clamp } from "@/lib/clamp";
 import type { BackingTrackConfig } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
@@ -45,7 +46,7 @@ export const createBackingTrackSlice: StateCreator<
   },
 
   setBackingTrackVolume: (type, volume) => {
-    const clampedVolume = Math.max(-30, Math.min(0, volume));
+    const clampedVolume = clamp(volume, -30, 0);
     set((state) => ({
       backingTrack: {
         ...state.backingTrack,

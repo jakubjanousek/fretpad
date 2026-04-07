@@ -1,4 +1,5 @@
 import type { StateCreator } from "zustand";
+import { clamp } from "@/lib/clamp";
 import type { MetronomeConfig } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
@@ -30,7 +31,7 @@ export const createMetronomeSlice: StateCreator<
   },
 
   setMetronomeVolume: (volume) => {
-    const clampedVolume = Math.max(-20, Math.min(0, volume));
+    const clampedVolume = clamp(volume, -20, 0);
     set((state) => ({
       metronome: { ...state.metronome, volume: clampedVolume },
     }));

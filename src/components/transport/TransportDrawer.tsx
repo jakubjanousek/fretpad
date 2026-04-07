@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Keyboard,
-  Music,
-  Timer,
-  TrendingUp,
-  Volume2,
-  VolumeOff,
-} from "lucide-react";
+import { Keyboard, Music, Timer, TrendingUp } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -19,17 +12,13 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { AVAILABLE_STYLES } from "@/lib/audio/styles";
 import type { StyleId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
 import { TempoRampControls } from "./TempoRampControls";
+import { VolumeControl } from "./VolumeControl";
 
 interface TransportDrawerProps {
   open: boolean;
@@ -71,48 +60,6 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
     },
     [setMetronomeVolume],
   );
-
-  const handleBassVolumeChange = useCallback(
-    (value: number[]) => {
-      const newVolume = value[0];
-      if (newVolume !== undefined) {
-        setBackingTrackVolume("bass", newVolume);
-      }
-    },
-    [setBackingTrackVolume],
-  );
-
-  const handleChordVolumeChange = useCallback(
-    (value: number[]) => {
-      const newVolume = value[0];
-      if (newVolume !== undefined) {
-        setBackingTrackVolume("chord", newVolume);
-      }
-    },
-    [setBackingTrackVolume],
-  );
-
-  const handleDrumsVolumeChange = useCallback(
-    (value: number[]) => {
-      const newVolume = value[0];
-      if (newVolume !== undefined) {
-        setBackingTrackVolume("drums", newVolume);
-      }
-    },
-    [setBackingTrackVolume],
-  );
-
-  const handleBassMuteToggle = useCallback(() => {
-    setBackingTrackMuted("bass", !backingTrack.bassMuted);
-  }, [backingTrack.bassMuted, setBackingTrackMuted]);
-
-  const handleChordMuteToggle = useCallback(() => {
-    setBackingTrackMuted("chord", !backingTrack.chordMuted);
-  }, [backingTrack.chordMuted, setBackingTrackMuted]);
-
-  const handleDrumsMuteToggle = useCallback(() => {
-    setBackingTrackMuted("drums", !backingTrack.drumsMuted);
-  }, [backingTrack.drumsMuted, setBackingTrackMuted]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -261,170 +208,38 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
               </div>
             ) : null}
 
-            {/* Bass Volume */}
-            <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleBassMuteToggle}
-                    aria-label={
-                      backingTrack.bassMuted ? "Unmute bass" : "Mute bass"
-                    }
-                    className="h-9 w-9 shrink-0"
-                  >
-                    {backingTrack.bassMuted ? (
-                      <VolumeOff className="h-3.5 w-3.5 text-muted-foreground" />
-                    ) : (
-                      <Volume2 className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  {backingTrack.bassMuted ? "Unmute bass" : "Mute bass"}
-                </TooltipContent>
-              </Tooltip>
-              <div className="flex-1 flex flex-col gap-1">
-                <div className="flex items-center justify-between">
-                  <Label
-                    htmlFor="bass-volume-slider"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Bass
-                  </Label>
-                  <span className="text-xs font-mono tabular-nums text-muted-foreground">
-                    {backingTrack.bassMuted
-                      ? "Muted"
-                      : `${backingTrack.bassVolume} dB`}
-                  </span>
-                </div>
-                <Slider
-                  id="bass-volume-slider"
-                  min={-30}
-                  max={0}
-                  step={1}
-                  value={[backingTrack.bassVolume]}
-                  onValueChange={handleBassVolumeChange}
-                  disabled={backingTrack.bassMuted}
-                  className={cn(
-                    "w-full",
-                    backingTrack.bassMuted && "opacity-50",
-                  )}
-                  aria-label="Bass volume"
-                />
-              </div>
-            </div>
+            <VolumeControl
+              id="bass"
+              label="Bass"
+              volume={backingTrack.bassVolume}
+              isMuted={backingTrack.bassMuted}
+              onVolumeChange={(v) => setBackingTrackVolume("bass", v)}
+              onMuteToggle={() =>
+                setBackingTrackMuted("bass", !backingTrack.bassMuted)
+              }
+            />
 
-            {/* Chord Volume */}
-            <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleChordMuteToggle}
-                    aria-label={
-                      backingTrack.chordMuted ? "Unmute chords" : "Mute chords"
-                    }
-                    className="h-9 w-9 shrink-0"
-                  >
-                    {backingTrack.chordMuted ? (
-                      <VolumeOff className="h-3.5 w-3.5 text-muted-foreground" />
-                    ) : (
-                      <Volume2 className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  {backingTrack.chordMuted ? "Unmute chords" : "Mute chords"}
-                </TooltipContent>
-              </Tooltip>
-              <div className="flex-1 flex flex-col gap-1">
-                <div className="flex items-center justify-between">
-                  <Label
-                    htmlFor="chord-volume-slider"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Chords
-                  </Label>
-                  <span className="text-xs font-mono tabular-nums text-muted-foreground">
-                    {backingTrack.chordMuted
-                      ? "Muted"
-                      : `${backingTrack.chordVolume} dB`}
-                  </span>
-                </div>
-                <Slider
-                  id="chord-volume-slider"
-                  min={-30}
-                  max={0}
-                  step={1}
-                  value={[backingTrack.chordVolume]}
-                  onValueChange={handleChordVolumeChange}
-                  disabled={backingTrack.chordMuted}
-                  className={cn(
-                    "w-full",
-                    backingTrack.chordMuted && "opacity-50",
-                  )}
-                  aria-label="Chord volume"
-                />
-              </div>
-            </div>
+            <VolumeControl
+              id="chord"
+              label="Chords"
+              volume={backingTrack.chordVolume}
+              isMuted={backingTrack.chordMuted}
+              onVolumeChange={(v) => setBackingTrackVolume("chord", v)}
+              onMuteToggle={() =>
+                setBackingTrackMuted("chord", !backingTrack.chordMuted)
+              }
+            />
 
-            {/* Drums Volume */}
-            <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleDrumsMuteToggle}
-                    aria-label={
-                      backingTrack.drumsMuted ? "Unmute drums" : "Mute drums"
-                    }
-                    className="h-9 w-9 shrink-0"
-                  >
-                    {backingTrack.drumsMuted ? (
-                      <VolumeOff className="h-3.5 w-3.5 text-muted-foreground" />
-                    ) : (
-                      <Volume2 className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  {backingTrack.drumsMuted ? "Unmute drums" : "Mute drums"}
-                </TooltipContent>
-              </Tooltip>
-              <div className="flex-1 flex flex-col gap-1">
-                <div className="flex items-center justify-between">
-                  <Label
-                    htmlFor="drums-volume-slider"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Drums
-                  </Label>
-                  <span className="text-xs font-mono tabular-nums text-muted-foreground">
-                    {backingTrack.drumsMuted
-                      ? "Muted"
-                      : `${backingTrack.drumsVolume} dB`}
-                  </span>
-                </div>
-                <Slider
-                  id="drums-volume-slider"
-                  min={-30}
-                  max={0}
-                  step={1}
-                  value={[backingTrack.drumsVolume]}
-                  onValueChange={handleDrumsVolumeChange}
-                  disabled={backingTrack.drumsMuted}
-                  className={cn(
-                    "w-full",
-                    backingTrack.drumsMuted && "opacity-50",
-                  )}
-                  aria-label="Drums volume"
-                />
-              </div>
-            </div>
+            <VolumeControl
+              id="drums"
+              label="Drums"
+              volume={backingTrack.drumsVolume}
+              isMuted={backingTrack.drumsMuted}
+              onVolumeChange={(v) => setBackingTrackVolume("drums", v)}
+              onMuteToggle={() =>
+                setBackingTrackMuted("drums", !backingTrack.drumsMuted)
+              }
+            />
 
             {/* Comping Variations Toggle */}
             <div className="flex items-center justify-between pt-2">

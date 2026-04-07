@@ -1,4 +1,5 @@
 import { Interval, Note } from "tonal";
+import { clamp } from "@/lib/clamp";
 import type { Chord, NoteName } from "@/lib/types";
 
 /**
@@ -160,10 +161,6 @@ function uniqueNotes(notes: Array<NoteName | undefined>): NoteName[] {
     if (!note) return false;
     return list.indexOf(note) === index;
   });
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
 }
 
 function midiToNoteName(midi: number): string {

@@ -1,5 +1,6 @@
 import type { StateCreator } from "zustand";
 import { DEFAULT_STYLE_ID } from "@/lib/audio";
+import { clamp } from "@/lib/clamp";
 import type { StyleId, TempoRampConfig } from "@/lib/types";
 import type { AppState } from "../useAppStore";
 
@@ -44,7 +45,7 @@ export const createPlaybackSlice: StateCreator<
   loopCount: 0,
 
   setTempo: (tempo) => {
-    const clampedTempo = Math.max(40, Math.min(200, tempo));
+    const clampedTempo = clamp(tempo, 40, 200);
     set({ tempo: clampedTempo });
   },
 
@@ -65,7 +66,7 @@ export const createPlaybackSlice: StateCreator<
   },
 
   setTempoRampIncrement: (increment) => {
-    const clamped = Math.max(1, Math.min(20, increment));
+    const clamped = clamp(increment, 1, 20);
     set((state) => ({
       tempoRamp: { ...state.tempoRamp, increment: clamped },
     }));
@@ -76,7 +77,7 @@ export const createPlaybackSlice: StateCreator<
   },
 
   setTempoRampMaxTempo: (maxTempo) => {
-    const clamped = Math.max(40, Math.min(300, maxTempo));
+    const clamped = clamp(maxTempo, 40, 300);
     set((state) => ({
       tempoRamp: { ...state.tempoRamp, maxTempo: clamped },
     }));

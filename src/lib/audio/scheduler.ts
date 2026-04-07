@@ -7,6 +7,7 @@ import {
   METRONOME_CLICK_NOTE,
   type MetronomeInstrument,
 } from "@/lib/audio/instruments/metronomeInstrument";
+import { clamp } from "@/lib/clamp";
 import { parseChordSymbol } from "@/lib/theory";
 import type {
   Chord,
@@ -177,10 +178,6 @@ function hashHumanizationSeed(seed: string): number {
 export function getDeterministicCenteredValue(seed: string): number {
   const hash = hashHumanizationSeed(seed);
   return (hash / 0xffffffff) * 2 - 1;
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
 }
 
 function getChordPatternForSlot(

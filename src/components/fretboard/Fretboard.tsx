@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFretboardDisplay } from "@/hooks/useFretboardDisplay";
+import { useResponsiveFrets } from "@/hooks/useResponsiveFrets";
+import { useScrollIndicator } from "@/hooks/useScrollIndicator";
 import { getTargetStrength } from "@/lib/theory";
 import type {
   ApproachNote,
@@ -37,60 +39,7 @@ interface FretboardProps {
 const FRET_MARKERS = [3, 5, 7, 9, 12];
 const DOUBLE_MARKER_FRETS = [12];
 
-// Responsive fret counts
-const MOBILE_FRETS = 8;
-const TABLET_FRETS = 10;
 const DESKTOP_FRETS = 12;
-
-function useResponsiveFrets(maxFrets: number): number {
-  const [fretCount, setFretCount] = useState(maxFrets);
-
-  useEffect(() => {
-    const updateFretCount = () => {
-      const width = window.innerWidth;
-      if (width < 480) {
-        setFretCount(Math.min(MOBILE_FRETS, maxFrets));
-      } else if (width < 768) {
-        setFretCount(Math.min(TABLET_FRETS, maxFrets));
-      } else {
-        setFretCount(maxFrets);
-      }
-    };
-
-    updateFretCount();
-    window.addEventListener("resize", updateFretCount);
-    return () => window.removeEventListener("resize", updateFretCount);
-  }, [maxFrets]);
-
-  return fretCount;
-}
-
-function useScrollIndicator() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScroll, setCanScroll] = useState(false);
-
-  const checkScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const hasMoreToScroll = el.scrollWidth - el.scrollLeft - el.clientWidth > 2;
-    setCanScroll(hasMoreToScroll);
-  }, []);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    checkScroll();
-    el.addEventListener("scroll", checkScroll, { passive: true });
-    window.addEventListener("resize", checkScroll);
-    return () => {
-      el.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
-    };
-  }, [checkScroll]);
-
-  return { scrollRef, canScroll, checkScroll };
-}
 
 export function Fretboard({
   fretNotes,

@@ -15,13 +15,7 @@ export type { ProgressionAnalysis } from "./harmonicAnalysis";
 export { analyzeProgression, getAnalysisSummary } from "./harmonicAnalysis";
 export type { DetectedKey } from "./keyDetection";
 // Key Detection
-export { detectKey, getParentScale } from "./keyDetection";
-// Mode Descriptions
-export {
-  getModeCharacter,
-  getModeDescription,
-  getModeUses,
-} from "./modeDescriptions";
+export { detectKey } from "./keyDetection";
 // Pentatonic / Overlays
 export { getOverlayNotes } from "./pentatonic";
 export type {
@@ -57,7 +51,6 @@ export {
   filterApproachNotesFromChordTones,
   getChromaticApproachNotes,
   getDiatonicApproachNotes,
-  getEnclosurePatterns,
   getTargetNotes,
   getTargetStrength,
 } from "./targetNotes";
