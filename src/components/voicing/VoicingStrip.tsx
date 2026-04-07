@@ -45,7 +45,7 @@ export function VoicingStrip({
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-stone-900/60 to-transparent z-10" />
         <div
           ref={scrollRef}
-          className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-stone-700 px-1"
+          className="flex gap-2 sm:gap-3 overflow-x-auto p-1 scrollbar-thin scrollbar-thumb-stone-700"
         >
           {voicings.map((v) => (
             <VoicingCard

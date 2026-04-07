@@ -70,7 +70,7 @@ export function CompVoicingsView() {
       <div className="flex flex-col md:flex-row md:gap-6 lg:gap-8 gap-4">
         {/* Hero panel — featured voicing */}
         {selectedVoicing && activeChord && (
-          <div className="flex flex-col items-center shrink-0 md:bg-stone-900/40 md:rounded-xl md:p-5 lg:p-6">
+          <div className="flex flex-col items-center shrink-0 rounded-xl border border-stone-800/50 bg-stone-900/40 p-4 sm:p-5 lg:p-6">
             <span className="text-2xl lg:text-3xl font-semibold font-[var(--font-display)] text-orange-400 mb-2">
               {activeChord.symbol}
             </span>
@@ -94,7 +94,7 @@ export function CompVoicingsView() {
         )}
 
         {/* Path panel */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center">
+        <div className="flex-1 min-w-0 flex flex-col rounded-xl border border-stone-800/50 bg-stone-900/40 p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-2 px-1">
             <span className="text-xs font-medium text-stone-500 uppercase tracking-wider">
               Voice Leading Path
