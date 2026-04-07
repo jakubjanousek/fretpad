@@ -93,7 +93,7 @@ export const STANDARD_TUNING: NoteName[] = ["E", "B", "G", "D", "A", "E"]; // hi
 // Backing Track Types
 // ============================================
 
-export type StyleId = "jazzSwing" | "jazzSwingNatural";
+export type StyleId = "jazzSwing";
 
 export interface PatternEvent {
   time: string; // Tone.js time format: "0:0", "0:1", "0:2:2"
@@ -119,6 +119,11 @@ export interface ChordPattern {
   name: string;
   events: ChordPatternEvent[];
   variants?: ChordPatternEvent[][];
+  slotVariants?: Array<{
+    slotBeats: number;
+    events: ChordPatternEvent[];
+    variants?: ChordPatternEvent[][];
+  }>;
 }
 
 export type DrumSound = "kick" | "snare" | "hihat" | "hihatOpen" | "ride";

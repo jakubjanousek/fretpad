@@ -1,14 +1,10 @@
 import type { StyleDefinition, StyleId } from "@/lib/types";
 import { jazzSwingStyle } from "./jazzSwing";
-import { jazzSwingNaturalStyle } from "./jazzSwingNatural";
 
 /**
  * All available backing track styles
  */
-export const AVAILABLE_STYLES: StyleDefinition[] = [
-  jazzSwingStyle,
-  jazzSwingNaturalStyle,
-];
+export const AVAILABLE_STYLES: StyleDefinition[] = [jazzSwingStyle];
 
 /**
  * Gets a style definition by ID
@@ -22,4 +18,4 @@ export function getStyle(id: StyleId): StyleDefinition {
  */
 export const DEFAULT_STYLE_ID: StyleId = "jazzSwing";
 
-export { jazzSwingNaturalStyle, jazzSwingStyle };
+export { jazzSwingStyle };

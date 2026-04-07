@@ -8,7 +8,7 @@ import type { StyleDefinition } from "@/lib/types";
  *
  * Bass: Walking quarter notes (straight, no swing)
  * Drums: Ride cymbal pattern with skip notes, hi-hat chick on 2 & 4, soft kick on 1
- * Comping: Sparse shell voicings on swung upbeats with rhythmic variants
+ * Comping: Slot-aware rootless voicings that state each harmony early
  */
 export const jazzSwingStyle: StyleDefinition = {
   id: "jazzSwing",
@@ -16,13 +16,13 @@ export const jazzSwingStyle: StyleDefinition = {
   description: "Walking bass with piano comping",
   swing: {
     bass: 0,
-    chord: 0.85,
+    chord: 1,
     drums: 1,
   },
   timing: {
     instrumentOffsets: {
       bass: 0.012, // Bass lays back a touch
-      chord: 0.015,
+      chord: 0.055,
       drums: 0,
     },
     pocket: {
@@ -92,62 +92,180 @@ export const jazzSwingStyle: StyleDefinition = {
     },
     chord: {
       name: "comping",
-      // Default: upbeats of 1 and 3
       events: [
-        { time: "0:0:2", duration: "8n", voicingType: "shell", velocity: 0.38 },
-        { time: "0:2:2", duration: "8n", voicingType: "shell", velocity: 0.42 },
+        {
+          time: "0:0",
+          duration: "8n",
+          voicingType: "rootless",
+          velocity: 0.34,
+        },
+        {
+          time: "0:1:2",
+          duration: "8n",
+          voicingType: "rootless",
+          velocity: 0.28,
+        },
+        {
+          time: "0:3",
+          duration: "8n",
+          voicingType: "rootless",
+          velocity: 0.32,
+        },
       ],
-      // Variants cycle per bar/chord for rhythmic variety
       variants: [
-        // Upbeats of 1 and 3
+        // Beat 1, upbeat of 2, beat 4
+        [
+          {
+            time: "0:0",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.34,
+          },
+          {
+            time: "0:1:2",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.28,
+          },
+          {
+            time: "0:3",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.32,
+          },
+        ],
+        // Upbeat of 1, beat 3, upbeat of 4
         [
           {
             time: "0:0:2",
             duration: "8n",
-            voicingType: "shell",
-            velocity: 0.38,
+            voicingType: "rootless",
+            velocity: 0.28,
           },
           {
-            time: "0:2:2",
+            time: "0:2",
             duration: "8n",
-            voicingType: "shell",
-            velocity: 0.42,
-          },
-        ],
-        // Upbeat of 2 only — sparse
-        [
-          {
-            time: "0:1:2",
-            duration: "8n",
-            voicingType: "shell",
-            velocity: 0.4,
-          },
-        ],
-        // Beat 2 and upbeat of 3 — Charleston rhythm
-        [
-          { time: "0:1", duration: "8n", voicingType: "shell", velocity: 0.42 },
-          {
-            time: "0:2:2",
-            duration: "8n",
-            voicingType: "shell",
-            velocity: 0.36,
-          },
-        ],
-        // Upbeats of 2 and 4 — anticipation
-        [
-          {
-            time: "0:1:2",
-            duration: "8n",
-            voicingType: "shell",
-            velocity: 0.36,
+            voicingType: "rootless",
+            velocity: 0.34,
           },
           {
             time: "0:3:2",
             duration: "8n",
-            voicingType: "shell",
-            velocity: 0.4,
+            voicingType: "rootless",
+            velocity: 0.26,
           },
         ],
+        // Beat 1 with a late two-beat answer
+        [
+          {
+            time: "0:0",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.34,
+          },
+          {
+            time: "0:2:2",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.3,
+          },
+        ],
+        // Upbeat pickup with beat-2 answer
+        [
+          {
+            time: "0:0:2",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.28,
+          },
+          {
+            time: "0:1",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.33,
+          },
+          {
+            time: "0:3",
+            duration: "8n",
+            voicingType: "rootless",
+            velocity: 0.3,
+          },
+        ],
+      ],
+      slotVariants: [
+        {
+          slotBeats: 2,
+          events: [
+            {
+              time: "0:0",
+              duration: "8n",
+              voicingType: "rootless",
+              velocity: 0.32,
+            },
+            {
+              time: "0:1:2",
+              duration: "8n",
+              voicingType: "rootless",
+              velocity: 0.24,
+            },
+          ],
+          variants: [
+            // Beat 1 with an upbeat release
+            [
+              {
+                time: "0:0",
+                duration: "8n",
+                voicingType: "rootless",
+                velocity: 0.32,
+              },
+              {
+                time: "0:1:2",
+                duration: "8n",
+                voicingType: "rootless",
+                velocity: 0.24,
+              },
+            ],
+            // Upbeat pickup, but still inside the first beat
+            [
+              {
+                time: "0:0:2",
+                duration: "8n",
+                voicingType: "rootless",
+                velocity: 0.26,
+              },
+              {
+                time: "0:1",
+                duration: "8n",
+                voicingType: "rootless",
+                velocity: 0.3,
+              },
+            ],
+            // Short two-hit answer
+            [
+              {
+                time: "0:0",
+                duration: "8n",
+                voicingType: "rootless",
+                velocity: 0.32,
+              },
+              {
+                time: "0:1",
+                duration: "8n",
+                voicingType: "rootless",
+                velocity: 0.28,
+              },
+            ],
+            // Single clear statement for dense progressions
+            [
+              {
+                time: "0:0:2",
+                duration: "8n",
+                voicingType: "rootless",
+                velocity: 0.26,
+              },
+            ],
+          ],
+        },
       ],
     },
     drums: {

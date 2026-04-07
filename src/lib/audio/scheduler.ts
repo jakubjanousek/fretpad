@@ -73,6 +73,10 @@ interface ParsedBarChordSlot {
   endBeat: number;
 }
 
+interface ResolvedChordPattern {
+  events: ChordPatternEvent[];
+}
+
 /**
  * Parses a Tone.js time string like "0:2" or "0:1:2" into total beats
  */
@@ -177,6 +181,47 @@ export function getDeterministicCenteredValue(seed: string): number {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
+}
+
+function getChordPatternForSlot(
+  pattern: StyleDefinition["patterns"]["chord"],
+  chordBeats: number,
+  barIndex: number,
+  chordIndex: number,
+  loopIteration: number,
+  useVariations: boolean,
+): ResolvedChordPattern {
+  const slotPattern = pattern.slotVariants?.find(
+    (candidate) => candidate.slotBeats === chordBeats,
+  );
+
+  if (slotPattern) {
+    const variants = useVariations ? slotPattern.variants : undefined;
+    return {
+      events:
+        variants?.[
+          getPatternVariantIndex(
+            barIndex,
+            chordIndex,
+            variants.length,
+            loopIteration,
+          )
+        ] ?? slotPattern.events,
+    };
+  }
+
+  const variants = useVariations ? pattern.variants : undefined;
+  return {
+    events:
+      variants?.[
+        getPatternVariantIndex(
+          barIndex,
+          chordIndex,
+          variants.length,
+          loopIteration,
+        )
+      ] ?? pattern.events,
+  };
 }
 
 export function getHumanization(
@@ -798,19 +843,14 @@ export function scheduleProgression(
       eventIds.push(changeEventId);
 
       // Schedule chord voicings per chord
-      const variants =
-        options?.compingVariations !== false
-          ? style.patterns.chord.variants
-          : undefined;
-      const chordPatternEvents =
-        variants?.[
-          getPatternVariantIndex(
-            barIndex,
-            chordIndex,
-            variants.length,
-            loopIteration,
-          )
-        ] ?? style.patterns.chord.events;
+      const chordPatternEvents = getChordPatternForSlot(
+        style.patterns.chord,
+        barChord.beats,
+        barIndex,
+        chordIndex,
+        loopIteration,
+        options?.compingVariations !== false,
+      ).events;
       const chordEventIds = scheduleChordPattern(
         transport,
         chordPatternEvents,

@@ -39,6 +39,14 @@ export function loadFromLocalStorage(): PersistedState | null {
     if (!stored) return null;
 
     const parsed = JSON.parse(stored) as unknown;
+    if (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      (parsed as { selectedStyle?: unknown }).selectedStyle ===
+        "jazzSwingNatural"
+    ) {
+      (parsed as { selectedStyle: StyleId }).selectedStyle = "jazzSwing";
+    }
     if (!isValidPersistedState(parsed)) {
       console.warn("Invalid state in localStorage, ignoring");
       return null;
@@ -81,7 +89,7 @@ function isValidPersistedState(value: unknown): value is PersistedState {
   return (
     isValidProgression(obj.progression) &&
     typeof obj.tempo === "number" &&
-    typeof obj.selectedStyle === "string" &&
+    obj.selectedStyle === "jazzSwing" &&
     isValidMetronomeConfig(obj.metronome) &&
     typeof obj.showScaleTones === "boolean"
   );

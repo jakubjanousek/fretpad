@@ -33,7 +33,7 @@ describe("lib/audio barrel export", () => {
   });
 
   it("exports style definitions", () => {
-    expect(AVAILABLE_STYLES.length).toBeGreaterThan(0);
+    expect(AVAILABLE_STYLES).toHaveLength(1);
     expect(DEFAULT_STYLE_ID).toBe("jazzSwing");
     const style = getStyle("jazzSwing");
     expect(style.name).toBeTruthy();

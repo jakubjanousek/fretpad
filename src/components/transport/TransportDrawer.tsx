@@ -238,27 +238,28 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
               <span className="text-sm font-medium">Backing Track</span>
             </div>
 
-            {/* Style Selector */}
-            <div className="flex items-center justify-between">
-              <Label className="text-xs text-muted-foreground">Style</Label>
-              <div className="flex gap-1">
-                {AVAILABLE_STYLES.map((s) => (
-                  <Button
-                    key={s.id}
-                    variant={selectedStyle === s.id ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedStyle(s.id as StyleId)}
-                    className={cn(
-                      "h-7 text-xs",
-                      selectedStyle === s.id &&
-                        "bg-orange-500 hover:bg-orange-600",
-                    )}
-                  >
-                    {s.name}
-                  </Button>
-                ))}
+            {AVAILABLE_STYLES.length > 1 ? (
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Style</Label>
+                <div className="flex gap-1">
+                  {AVAILABLE_STYLES.map((s) => (
+                    <Button
+                      key={s.id}
+                      variant={selectedStyle === s.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedStyle(s.id as StyleId)}
+                      className={cn(
+                        "h-7 text-xs",
+                        selectedStyle === s.id &&
+                          "bg-orange-500 hover:bg-orange-600",
+                      )}
+                    >
+                      {s.name}
+                    </Button>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
 
             {/* Bass Volume */}
             <div className="flex items-center gap-2">

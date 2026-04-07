@@ -14,7 +14,6 @@ import {
   resolveHumanizedDuration,
 } from "@/lib/audio/scheduler";
 import { jazzSwingStyle } from "@/lib/audio/styles/jazzSwing";
-import { jazzSwingNaturalStyle } from "@/lib/audio/styles/jazzSwingNatural";
 
 describe("audio scheduler timing helpers", () => {
   it("parses bar-beat-sixteenth time strings into beats", () => {
@@ -129,6 +128,23 @@ describe("audio scheduler timing helpers", () => {
     const timeSets = variants.map((v) => v.map((e) => e.time).join(","));
     const unique = new Set(timeSets);
     expect(unique.size).toBeGreaterThan(1);
+  });
+
+  it("jazz swing half-bar comping variants announce the chord inside the first beat", () => {
+    const halfBarPattern = jazzSwingStyle.patterns.chord.slotVariants?.find(
+      (variant) => variant.slotBeats === 2,
+    );
+
+    expect(halfBarPattern).toBeDefined();
+
+    for (const variant of halfBarPattern?.variants ?? []) {
+      const firstEvent = variant[0];
+      expect(firstEvent).toBeDefined();
+      if (!firstEvent) {
+        throw new Error("Expected a half-bar comping event");
+      }
+      expect(parseTimeToBeats(firstEvent.time)).toBeLessThanOrEqual(0.5);
+    }
   });
 
   it("produces deterministic bounded humanization offsets", () => {
@@ -255,11 +271,16 @@ describe("audio scheduler timing helpers", () => {
           ...context,
           eventIndex: i,
         });
-        expect(results[i]!.timingOffsetBeats).toBeCloseTo(
+        const result = results[i];
+        expect(result).toBeDefined();
+        if (!result) {
+          throw new Error(`Missing correlated humanization result at ${i}`);
+        }
+        expect(result.timingOffsetBeats).toBeCloseTo(
           independent.timingOffsetBeats,
           10,
         );
-        expect(results[i]!.velocityOffset).toBeCloseTo(
+        expect(result.velocityOffset).toBeCloseTo(
           independent.velocityOffset,
           10,
         );
@@ -303,10 +324,10 @@ describe("audio scheduler timing helpers", () => {
       ): number {
         let changes = 0;
         for (let i = 1; i < values.length; i++) {
-          if (
-            values[i]!.timingOffsetBeats * values[i - 1]!.timingOffsetBeats <
-            0
-          ) {
+          const current = values[i];
+          const previous = values[i - 1];
+          if (!current || !previous) continue;
+          if (current.timingOffsetBeats * previous.timingOffsetBeats < 0) {
             changes++;
           }
         }
@@ -402,33 +423,12 @@ describe("audio scheduler timing helpers", () => {
   });
 
   describe("timing stack simplification", () => {
-    it("jazzSwingNatural has zero instrument offsets for bass and chord (folded into groove templates)", () => {
-      expect(jazzSwingNaturalStyle.timing?.instrumentOffsets?.bass ?? 0).toBe(
-        0,
-      );
-      expect(jazzSwingNaturalStyle.timing?.instrumentOffsets?.chord ?? 0).toBe(
-        0,
-      );
-    });
-
-    it("jazzSwingNatural groove templates include the folded instrument offsets", () => {
-      // Bass template should have non-zero offsets on downbeats (folded from 0.015)
-      const bassOffsets =
-        jazzSwingNaturalStyle.grooveTemplates?.bass?.offsets ?? [];
-      // Beat 0 (index 0) should include the bass lay-back offset
-      expect(bassOffsets[0]).toBeGreaterThan(0);
-
-      // Chord template should have folded 0.02 into all positions
-      const chordOffsets =
-        jazzSwingNaturalStyle.grooveTemplates?.chord?.offsets ?? [];
-      expect(chordOffsets[0]).toBeGreaterThan(0);
-    });
-
-    it("jazzSwing retains instrument offsets (no groove templates to fold into)", () => {
+    it("jazzSwing retains instrument offsets and does not use groove templates", () => {
       expect(jazzSwingStyle.timing?.instrumentOffsets?.bass).toBeGreaterThan(0);
       expect(jazzSwingStyle.timing?.instrumentOffsets?.chord).toBeGreaterThan(
         0,
       );
+      expect(jazzSwingStyle.grooveTemplates).toBeUndefined();
     });
   });
 
@@ -450,20 +450,8 @@ describe("audio scheduler timing helpers", () => {
       }
     });
 
-    it("jazzSwingNatural default drum pattern has ride on all four quarter notes", () => {
-      const rideTimes = getRideTimesFromEvents(
-        jazzSwingNaturalStyle.patterns.drums.events,
-      );
-      for (const beat of quarterNoteBeats) {
-        expect(rideTimes).toContain(beat);
-      }
-    });
-
     it("all drum variants maintain ride on all four quarter notes", () => {
-      const allVariants = [
-        ...(jazzSwingStyle.patterns.drums.variants ?? []),
-        ...(jazzSwingNaturalStyle.patterns.drums.variants ?? []),
-      ];
+      const allVariants = [...(jazzSwingStyle.patterns.drums.variants ?? [])];
       for (const variant of allVariants) {
         const rideTimes = getRideTimesFromEvents(variant);
         for (const beat of quarterNoteBeats) {
@@ -473,11 +461,11 @@ describe("audio scheduler timing helpers", () => {
     });
 
     it("default drum patterns include skip notes on upbeats", () => {
-      for (const style of [jazzSwingStyle, jazzSwingNaturalStyle]) {
-        const rideTimes = getRideTimesFromEvents(style.patterns.drums.events);
-        const hasSkipNote = rideTimes.some((t) => t.includes(":2"));
-        expect(hasSkipNote).toBe(true);
-      }
+      const rideTimes = getRideTimesFromEvents(
+        jazzSwingStyle.patterns.drums.events,
+      );
+      const hasSkipNote = rideTimes.some((t) => t.includes(":2"));
+      expect(hasSkipNote).toBe(true);
     });
   });
 });
