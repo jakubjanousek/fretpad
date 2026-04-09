@@ -580,6 +580,63 @@ const drop2Min7b5Str4Inv3: VoicingTemplate = {
 };
 
 // ============================================
+// Drop 3 voicings — strings 6-4-3-2 (skip A)
+// Root position: 3-R-5-7 (or b3/b5/b7 variants)
+// ============================================
+
+const drop3Maj7: VoicingTemplate = {
+  name: "Drop 3 maj7 (6-4-3-2)",
+  type: "drop3",
+  quality: "maj7",
+  relativePositions: [null, 2, 2, 0, null, 2],
+  rootString: 3,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "drop3",
+};
+
+const drop3Min7: VoicingTemplate = {
+  name: "Drop 3 min7 (6-4-3-2)",
+  type: "drop3",
+  quality: "min7",
+  relativePositions: [null, 1, 2, 0, null, 1],
+  rootString: 3,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "drop3",
+};
+
+const drop3Dom7: VoicingTemplate = {
+  name: "Drop 3 dom7 (6-4-3-2)",
+  type: "drop3",
+  quality: "7",
+  relativePositions: [null, 1, 2, 0, null, 2],
+  rootString: 3,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "drop3",
+};
+
+const drop3Min7b5: VoicingTemplate = {
+  name: "Drop 3 min7b5 (6-4-3-2)",
+  type: "drop3",
+  quality: "min7b5",
+  relativePositions: [null, 1, 1, 0, null, 1],
+  rootString: 3,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "drop3",
+};
+
+// ============================================
 // Barre chords — E-form (6th string root)
 // ============================================
 
@@ -724,6 +781,11 @@ export const VOICING_TEMPLATES: VoicingTemplate[] = [
   drop2Min7Str4Inv3,
   drop2Dom7Str4Inv3,
   drop2Min7b5Str4Inv3,
+  // Drop 3 — strings 6-4-3-2
+  drop3Maj7,
+  drop3Min7,
+  drop3Dom7,
+  drop3Min7b5,
   // Barre chords — E-form (6th string)
   barreMajStr6,
   barreMinStr6,
