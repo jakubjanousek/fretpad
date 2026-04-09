@@ -397,6 +397,16 @@ describe("generateVoicingsForChord", () => {
       expect(voicings.length).toBeGreaterThan(0);
     });
 
+    it("generates voicings for sus2 chords", () => {
+      const voicings = generateVoicingsForChord(chord("Csus2"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("generates voicings for add9 chords", () => {
+      const voicings = generateVoicingsForChord(chord("Cadd9"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
     it("all notes in extended quality voicings are correct chord tones", () => {
       for (const symbol of [
         "Bdim7",
@@ -408,6 +418,8 @@ describe("generateVoicingsForChord", () => {
         "Cmaj9",
         "Cm9",
         "Csus4",
+        "Csus2",
+        "Cadd9",
       ]) {
         const c = chord(symbol);
         const voicings = generateVoicingsForChord(c);

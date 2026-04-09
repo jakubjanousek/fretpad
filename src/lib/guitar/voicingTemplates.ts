@@ -1012,6 +1012,53 @@ const shellSus4Str5: VoicingTemplate = {
 };
 
 // ============================================
+// sus2 voicings
+// ============================================
+
+const shellSus2Str6: VoicingTemplate = {
+  name: "Shell R-2-5 sus2 (6th string)",
+  type: "shell",
+  quality: "sus2",
+  relativePositions: [null, null, null, -3, -3, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const shellSus2Str5: VoicingTemplate = {
+  name: "Shell R-2-5 sus2 (5th string)",
+  type: "shell",
+  quality: "sus2",
+  relativePositions: [null, null, -3, -3, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
+// add9 voicings (major triad + 9th)
+// ============================================
+
+const voicingAdd9Str5: VoicingTemplate = {
+  name: "R-3-5-9 add9 (5th string)",
+  type: "shell",
+  quality: "add9",
+  relativePositions: [null, 0, -3, -1, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
 // dim triad voicing
 // ============================================
 
@@ -1208,6 +1255,11 @@ export const VOICING_TEMPLATES: VoicingTemplate[] = [
   // sus4
   shellSus4Str6,
   shellSus4Str5,
+  // sus2
+  shellSus2Str6,
+  shellSus2Str5,
+  // add9
+  voicingAdd9Str5,
   // dim triad
   triadDimTop3,
   // Drop 3 — strings 6-4-3-2
