@@ -9,6 +9,8 @@ import {
   getArpeggioNotes,
   getChromaticApproachNotes,
   getDiatonicApproachNotes,
+  getGhostNotes,
+  getNextChord,
   getOverlayNotes,
   getTargetNotes,
 } from "@/lib/theory";
@@ -25,6 +27,9 @@ export function useFretboardData() {
     targetNoteMode,
     showChromaticApproach,
     showDiatonicApproach,
+    showGhostNotes,
+    currentBarIndex,
+    currentChordIndex,
   } = useAppStore(
     useShallow((state) => ({
       currentChord: state.currentChord,
@@ -36,6 +41,9 @@ export function useFretboardData() {
       targetNoteMode: state.targetNoteMode,
       showChromaticApproach: state.showChromaticApproach,
       showDiatonicApproach: state.showDiatonicApproach,
+      showGhostNotes: state.showGhostNotes,
+      currentBarIndex: state.currentBarIndex,
+      currentChordIndex: state.currentChordIndex,
     })),
   );
 
@@ -126,6 +134,28 @@ export function useFretboardData() {
     targetNoteMode,
   ]);
 
+  const ghostNotes = useMemo(() => {
+    if (!showGhostNotes) return [];
+
+    const nextChord = getNextChord(
+      progression,
+      currentBarIndex,
+      currentChordIndex,
+    );
+
+    return getGhostNotes(nextChord, {
+      numFrets: maxFrets,
+      excludePositions: fretNotes,
+    });
+  }, [
+    showGhostNotes,
+    progression,
+    currentBarIndex,
+    currentChordIndex,
+    maxFrets,
+    fretNotes,
+  ]);
+
   return {
     currentChord,
     progression,
@@ -133,5 +163,6 @@ export function useFretboardData() {
     maxFrets,
     targetNoteData,
     arpeggioConnections,
+    ghostNotes,
   };
 }

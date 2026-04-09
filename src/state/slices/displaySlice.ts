@@ -18,6 +18,7 @@ export interface DisplaySlice {
   targetNoteMode: TargetNoteMode;
   showChromaticApproach: boolean;
   showDiatonicApproach: boolean;
+  showGhostNotes: boolean;
 
   setShowScaleTones: (show: boolean) => void;
   setNoteLabelMode: (mode: NoteLabelMode) => void;
@@ -29,6 +30,7 @@ export interface DisplaySlice {
   setTargetNoteMode: (mode: TargetNoteMode) => void;
   setShowChromaticApproach: (show: boolean) => void;
   setShowDiatonicApproach: (show: boolean) => void;
+  setShowGhostNotes: (show: boolean) => void;
 }
 
 export const createDisplaySlice: StateCreator<
@@ -47,6 +49,7 @@ export const createDisplaySlice: StateCreator<
   targetNoteMode: "none",
   showChromaticApproach: false,
   showDiatonicApproach: false,
+  showGhostNotes: false,
 
   setShowScaleTones: (show) => {
     set({ showScaleTones: show });
@@ -86,5 +89,9 @@ export const createDisplaySlice: StateCreator<
 
   setShowDiatonicApproach: (show) => {
     set({ showDiatonicApproach: show });
+  },
+
+  setShowGhostNotes: (show) => {
+    set({ showGhostNotes: show });
   },
 });

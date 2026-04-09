@@ -44,8 +44,13 @@ export function PracticePage({ modeId }: PracticePageProps) {
   const loopCount = useAppStore((s) => s.loopCount);
   const tempo = useAppStore((s) => s.tempo);
 
-  const { currentChord, fretNotes, targetNoteData, arpeggioConnections } =
-    useFretboardData();
+  const {
+    currentChord,
+    fretNotes,
+    targetNoteData,
+    arpeggioConnections,
+    ghostNotes,
+  } = useFretboardData();
 
   const nextChord = getNextChord(
     progression,
@@ -164,6 +169,7 @@ export function PracticePage({ modeId }: PracticePageProps) {
             <Fretboard
               fretNotes={fretNotes}
               targetNotes={targetNoteData.targets}
+              ghostNotes={ghostNotes}
               chromaticApproaches={targetNoteData.chromatic}
               diatonicApproaches={targetNoteData.diatonic}
               arpeggioConnections={arpeggioConnections}

@@ -30,6 +30,8 @@ interface TargetsDropdownProps {
   onToggleChromaticApproach?: () => void;
   showDiatonicApproach: boolean;
   onToggleDiatonicApproach?: () => void;
+  showGhostNotes: boolean;
+  onToggleGhostNotes?: () => void;
 }
 
 export function TargetsDropdown({
@@ -39,6 +41,8 @@ export function TargetsDropdown({
   onToggleChromaticApproach,
   showDiatonicApproach,
   onToggleDiatonicApproach,
+  showGhostNotes,
+  onToggleGhostNotes,
 }: TargetsDropdownProps) {
   const isActive = targetNoteMode !== "none";
 
@@ -102,6 +106,20 @@ export function TargetsDropdown({
             </DropdownMenuCheckboxItem>
           </>
         )}
+
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Voice Leading</DropdownMenuLabel>
+        <DropdownMenuCheckboxItem
+          checked={showGhostNotes}
+          onCheckedChange={onToggleGhostNotes}
+        >
+          <div className="flex flex-col gap-0.5">
+            <span>Ghost Notes</span>
+            <span className="text-[10px] text-muted-foreground">
+              Preview next chord's root + guide tones
+            </span>
+          </div>
+        </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

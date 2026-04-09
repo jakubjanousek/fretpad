@@ -20,6 +20,8 @@ export function useFretboardDisplay() {
       setShowChromaticApproach: state.setShowChromaticApproach,
       showDiatonicApproach: state.showDiatonicApproach,
       setShowDiatonicApproach: state.setShowDiatonicApproach,
+      showGhostNotes: state.showGhostNotes,
+      setShowGhostNotes: state.setShowGhostNotes,
     })),
   );
 }

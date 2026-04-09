@@ -13,6 +13,7 @@ import type {
   NoteName,
 } from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 import { ArpeggioOverlay } from "./ArpeggioOverlay";
 import { DisplayToolbar } from "./DisplayToolbar";
@@ -25,6 +26,7 @@ interface FretboardProps {
   numFrets?: number;
   tuning?: NoteName[];
   targetNotes?: FretNote[];
+  ghostNotes?: FretNote[];
   chromaticApproaches?: ApproachNote[];
   diatonicApproaches?: ApproachNote[];
   arpeggioConnections?: ArpeggioConnection[];
@@ -44,6 +46,7 @@ export function Fretboard({
   numFrets,
   tuning = STANDARD_TUNING,
   targetNotes = [],
+  ghostNotes = [],
   chromaticApproaches = [],
   diatonicApproaches = [],
   arpeggioConnections = [],
@@ -71,6 +74,8 @@ export function Fretboard({
     setShowDiatonicApproach,
     maxFrets,
     setMaxFrets,
+    showGhostNotes,
+    setShowGhostNotes,
   } = useFretboardDisplay();
   const responsiveFretCount = useResponsiveFrets(numFrets ?? maxFrets);
   const { scrollRef, canScroll, checkScroll } = useScrollIndicator();
@@ -151,6 +156,16 @@ export function Fretboard({
   for (const note of fretNotes) {
     const key = `${note.string}-${note.fret}`;
     noteMap.set(key, note);
+  }
+
+  // Create a map for ghost note positions (next chord preview)
+  const ghostNoteMap = new Map<string, FretNote>();
+  for (const note of ghostNotes) {
+    const key = `${note.string}-${note.fret}`;
+    // Don't show ghost notes where active notes already exist
+    if (!noteMap.has(key)) {
+      ghostNoteMap.set(key, note);
+    }
   }
 
   // Generate fret numbers for header (use responsive count)
@@ -256,6 +271,7 @@ export function Fretboard({
                     <div className="w-10 shrink-0 flex items-center justify-center border-r-4 border-slate-400 dark:border-slate-500 py-2.5 sm:py-3">
                       {(() => {
                         const nutNote = noteMap.get(`${stringNum}-0`);
+                        const ghostNote = ghostNoteMap.get(`${stringNum}-0`);
                         return nutNote ? (
                           <FretMarker
                             note={nutNote}
@@ -264,6 +280,15 @@ export function Fretboard({
                             overlayMode="none"
                             className={getTargetAnimationClass(nutNote)}
                             onClickNote={onNoteClick}
+                          />
+                        ) : ghostNote ? (
+                          <div
+                            className={cn(
+                              "w-6 h-6 sm:w-5 sm:h-5 rounded-full opacity-30",
+                              ghostNote.isRoot
+                                ? "bg-orange-500"
+                                : "bg-blue-500",
+                            )}
                           />
                         ) : (
                           <div className="w-8 h-8 sm:w-7 sm:h-7" />
@@ -275,6 +300,7 @@ export function Fretboard({
                     {frets.slice(1).map((fret) => {
                       const key = `${stringNum}-${fret}`;
                       const note = noteMap.get(key);
+                      const ghostNote = ghostNoteMap.get(key);
 
                       return (
                         <div
@@ -302,6 +328,15 @@ export function Fretboard({
                                 onClickNote={onNoteClick}
                               />
                             </div>
+                          ) : ghostNote ? (
+                            <div
+                              className={cn(
+                                "relative z-10 w-6 h-6 sm:w-5 sm:h-5 rounded-full opacity-30",
+                                ghostNote.isRoot
+                                  ? "bg-orange-500"
+                                  : "bg-blue-500",
+                              )}
+                            />
                           ) : (
                             <div className="w-8 h-8 sm:w-7 sm:h-7" />
                           )}
@@ -349,6 +384,8 @@ export function Fretboard({
                   onToggleDiatonicApproach={() =>
                     setShowDiatonicApproach(!showDiatonicApproach)
                   }
+                  showGhostNotes={showGhostNotes}
+                  onToggleGhostNotes={() => setShowGhostNotes(!showGhostNotes)}
                   maxFrets={maxFrets}
                   onMaxFretsChange={setMaxFrets}
                 />

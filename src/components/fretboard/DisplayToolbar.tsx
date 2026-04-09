@@ -35,6 +35,8 @@ export interface DisplayToolbarProps {
   onToggleChromaticApproach?: () => void;
   showDiatonicApproach: boolean;
   onToggleDiatonicApproach?: () => void;
+  showGhostNotes: boolean;
+  onToggleGhostNotes?: () => void;
 
   // Fret count
   maxFrets?: MaxFrets;
@@ -61,6 +63,8 @@ export function DisplayToolbar({
   onToggleChromaticApproach,
   showDiatonicApproach,
   onToggleDiatonicApproach,
+  showGhostNotes,
+  onToggleGhostNotes,
 
   maxFrets,
   onMaxFretsChange,
@@ -111,6 +115,8 @@ export function DisplayToolbar({
           onToggleChromaticApproach={onToggleChromaticApproach}
           showDiatonicApproach={showDiatonicApproach}
           onToggleDiatonicApproach={onToggleDiatonicApproach}
+          showGhostNotes={showGhostNotes}
+          onToggleGhostNotes={onToggleGhostNotes}
         />
       )}
     </div>

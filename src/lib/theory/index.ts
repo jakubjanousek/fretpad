@@ -58,6 +58,7 @@ export {
   filterApproachNotesFromChordTones,
   getChromaticApproachNotes,
   getDiatonicApproachNotes,
+  getGhostNotes,
   getTargetNotes,
   getTargetStrength,
 } from "./targetNotes";

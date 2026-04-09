@@ -1,5 +1,5 @@
 import { Note } from "tonal";
-import { getNoteAtFret } from "@/lib/fretboard";
+import { getFretNotesForChord, getNoteAtFret } from "@/lib/fretboard";
 import type {
   ApproachNote,
   Chord,
@@ -226,4 +226,37 @@ export function filterApproachNotesFromChordTones(
     chordNotes.map((n) => `${n.string}-${n.fret}`),
   );
   return approaches.filter((a) => !chordPositions.has(`${a.string}-${a.fret}`));
+}
+
+export interface GhostNoteOptions {
+  numFrets?: number;
+  excludePositions?: FretNote[];
+}
+
+/**
+ * Gets "ghost notes" for a chord — root + guide tone positions
+ * marked with isGhost for rendering at reduced opacity.
+ * Used to preview the next chord's key tones on the fretboard.
+ */
+export function getGhostNotes(
+  chord: Chord | null,
+  options: GhostNoteOptions = {},
+): FretNote[] {
+  if (!chord) return [];
+
+  const { numFrets, excludePositions } = options;
+
+  const allNotes = getFretNotesForChord(chord, { numFrets });
+  const rootAndGuides = allNotes.filter((n) => n.isRoot || n.isGuideTone);
+
+  let result = rootAndGuides;
+
+  if (excludePositions && excludePositions.length > 0) {
+    const excludeSet = new Set(
+      excludePositions.map((n) => `${n.string}-${n.fret}`),
+    );
+    result = result.filter((n) => !excludeSet.has(`${n.string}-${n.fret}`));
+  }
+
+  return result.map((n) => ({ ...n, isGhost: true }));
 }

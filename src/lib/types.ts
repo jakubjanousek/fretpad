@@ -80,6 +80,7 @@ export interface FretNote extends FretPosition {
   isChordTone: boolean;
   isGuideTone: boolean;
   isScaleTone: boolean;
+  isGhost?: boolean;
   cagedPosition?: CAGEDPosition;
   threeNPSPosition?: ThreeNPSPosition;
 }
