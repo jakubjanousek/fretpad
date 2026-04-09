@@ -1,6 +1,7 @@
 import type { StateCreator } from "zustand";
 import type {
   FretboardOverlay,
+  MaxFrets,
   NoteLabelMode,
   TargetNoteMode,
 } from "@/lib/types";
@@ -11,6 +12,7 @@ export interface DisplaySlice {
   noteLabelMode: NoteLabelMode;
   previewScale: string | null;
   fretboardOverlay: FretboardOverlay;
+  maxFrets: MaxFrets;
 
   // Target Notes state
   targetNoteMode: TargetNoteMode;
@@ -21,6 +23,7 @@ export interface DisplaySlice {
   setNoteLabelMode: (mode: NoteLabelMode) => void;
   setPreviewScale: (scale: string | null) => void;
   setFretboardOverlay: (overlay: FretboardOverlay) => void;
+  setMaxFrets: (frets: MaxFrets) => void;
 
   // Target Notes actions
   setTargetNoteMode: (mode: TargetNoteMode) => void;
@@ -38,6 +41,7 @@ export const createDisplaySlice: StateCreator<
   noteLabelMode: "notes",
   previewScale: null,
   fretboardOverlay: "none",
+  maxFrets: 12,
 
   // Target Notes defaults
   targetNoteMode: "none",
@@ -58,6 +62,10 @@ export const createDisplaySlice: StateCreator<
 
   setFretboardOverlay: (overlay) => {
     set({ fretboardOverlay: overlay });
+  },
+
+  setMaxFrets: (frets) => {
+    set({ maxFrets: frets });
   },
 
   // Target Notes actions

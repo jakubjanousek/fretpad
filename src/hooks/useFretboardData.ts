@@ -21,6 +21,7 @@ export function useFretboardData() {
     previewScale,
     showScaleTones,
     fretboardOverlay,
+    maxFrets,
     targetNoteMode,
     showChromaticApproach,
     showDiatonicApproach,
@@ -31,6 +32,7 @@ export function useFretboardData() {
       previewScale: state.previewScale,
       showScaleTones: state.showScaleTones,
       fretboardOverlay: state.fretboardOverlay,
+      maxFrets: state.maxFrets,
       targetNoteMode: state.targetNoteMode,
       showChromaticApproach: state.showChromaticApproach,
       showDiatonicApproach: state.showDiatonicApproach,
@@ -50,23 +52,27 @@ export function useFretboardData() {
       if (fretboardOverlay === "arpeggio") {
         return getArpeggioNotes(currentChord.root, {
           chord: currentChord,
+          numFrets: maxFrets,
         });
       }
 
       return getOverlayNotes(currentChord.root, fretboardOverlay, {
         chord: currentChord,
+        numFrets: maxFrets,
       });
     }
 
     return getFretNotesForChord(currentChord, {
       includeScale: showScaleTones || Boolean(previewScale),
       scaleName: activeScale || undefined,
+      numFrets: maxFrets,
     });
   }, [
     activeScale,
     currentChord,
     fretboardOverlay,
     isOverlayActive,
+    maxFrets,
     previewScale,
     showScaleTones,
   ]);
@@ -124,6 +130,7 @@ export function useFretboardData() {
     currentChord,
     progression,
     fretNotes,
+    maxFrets,
     targetNoteData,
     arpeggioConnections,
   };

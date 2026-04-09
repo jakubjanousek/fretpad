@@ -12,6 +12,8 @@ export function useFretboardDisplay() {
       setNoteLabelMode: state.setNoteLabelMode,
       fretboardOverlay: state.fretboardOverlay,
       setFretboardOverlay: state.setFretboardOverlay,
+      maxFrets: state.maxFrets,
+      setMaxFrets: state.setMaxFrets,
       targetNoteMode: state.targetNoteMode,
       setTargetNoteMode: state.setTargetNoteMode,
       showChromaticApproach: state.showChromaticApproach,

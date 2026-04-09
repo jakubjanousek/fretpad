@@ -270,6 +270,8 @@ export interface StyleDefinition {
 // Fretboard Display Types
 // ============================================
 
+export type MaxFrets = 12 | 15 | 17;
+
 export type NoteLabelMode = "notes" | "degrees" | "none";
 
 export type FretboardOverlay =

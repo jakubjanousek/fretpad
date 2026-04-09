@@ -62,6 +62,7 @@ export const useAppStore = create<AppState>()(
         showScaleTones: state.showScaleTones,
         noteLabelMode: state.noteLabelMode,
         fretboardOverlay: state.fretboardOverlay,
+        maxFrets: state.maxFrets,
         // Target Notes settings
         targetNoteMode: state.targetNoteMode,
         showChromaticApproach: state.showChromaticApproach,

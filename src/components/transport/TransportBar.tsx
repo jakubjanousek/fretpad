@@ -37,7 +37,7 @@ export function TransportBar({
     <>
       <AudioInterruptedOverlay onResume={handleResume} />
       <div className="fixed bottom-0 left-0 right-0 z-40 safe-area-inset-bottom">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-3 sm:pb-4">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 pb-3 sm:pb-4">
           <div
             className={cn(
               "rounded-2xl border border-surface-border backdrop-blur-md",

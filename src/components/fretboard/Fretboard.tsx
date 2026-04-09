@@ -36,14 +36,12 @@ interface FretboardProps {
 }
 
 // Fret markers positions (standard dots)
-const FRET_MARKERS = [3, 5, 7, 9, 12];
+const FRET_MARKERS = [3, 5, 7, 9, 12, 15, 17];
 const DOUBLE_MARKER_FRETS = [12];
-
-const DESKTOP_FRETS = 12;
 
 export function Fretboard({
   fretNotes,
-  numFrets = DESKTOP_FRETS,
+  numFrets,
   tuning = STANDARD_TUNING,
   targetNotes = [],
   chromaticApproaches = [],
@@ -71,8 +69,10 @@ export function Fretboard({
     setShowChromaticApproach,
     showDiatonicApproach,
     setShowDiatonicApproach,
+    maxFrets,
+    setMaxFrets,
   } = useFretboardDisplay();
-  const responsiveFretCount = useResponsiveFrets(numFrets);
+  const responsiveFretCount = useResponsiveFrets(numFrets ?? maxFrets);
   const { scrollRef, canScroll, checkScroll } = useScrollIndicator();
 
   // Track chord changes for crossfade animation
@@ -349,6 +349,8 @@ export function Fretboard({
                   onToggleDiatonicApproach={() =>
                     setShowDiatonicApproach(!showDiatonicApproach)
                   }
+                  maxFrets={maxFrets}
+                  onMaxFretsChange={setMaxFrets}
                 />
               )}
             </div>
