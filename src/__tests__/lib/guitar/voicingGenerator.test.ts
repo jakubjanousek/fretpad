@@ -339,13 +339,48 @@ describe("generateVoicingsForChord", () => {
     it("drop 3 voicings use lower strings than drop 2 top4", () => {
       const voicings = generateVoicingsForChord(chord("Cmaj7"));
       const drop3 = voicings.filter((v) => v.type === "drop3");
-      // Drop 3 on bottom4 should use strings 6,5,4,3 (indices 3,4,5,6 in 1-based)
       for (const v of drop3) {
         const soundingStrings = v.positions
           .filter((p) => p.fret >= 0)
           .map((p) => p.string);
-        // At least one sounding note on string 5 or 6
         expect(soundingStrings.some((s) => s >= 5)).toBe(true);
+      }
+    });
+  });
+
+  describe("extended quality voicings", () => {
+    it("generates voicings for dim7 chords", () => {
+      const voicings = generateVoicingsForChord(chord("Bdim7"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("generates voicings for 6 chords", () => {
+      const voicings = generateVoicingsForChord(chord("C6"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("generates voicings for min6 chords", () => {
+      const voicings = generateVoicingsForChord(chord("Cm6"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("generates voicings for 9 chords", () => {
+      const voicings = generateVoicingsForChord(chord("C9"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("generates voicings for dim chords", () => {
+      const voicings = generateVoicingsForChord(chord("Cdim"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("all notes in extended quality voicings are correct chord tones", () => {
+      for (const symbol of ["Bdim7", "C6", "Cm6", "C9", "Cdim"]) {
+        const c = chord(symbol);
+        const voicings = generateVoicingsForChord(c);
+        for (const v of voicings) {
+          expect(allNotesInChord(v, c.notes)).toBe(true);
+        }
       }
     });
   });

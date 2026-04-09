@@ -637,6 +637,221 @@ const drop3Min7b5: VoicingTemplate = {
 };
 
 // ============================================
+// dim7 voicings
+// ============================================
+
+const shellDim7Str6: VoicingTemplate = {
+  name: "Shell R-bb7-b3 dim7 (6th string)",
+  type: "shell",
+  quality: "dim7",
+  relativePositions: [null, null, 0, -1, null, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const shellDim7Str5: VoicingTemplate = {
+  name: "Shell R-b3-bb7 dim7 (5th string)",
+  type: "shell",
+  quality: "dim7",
+  relativePositions: [null, null, -1, -2, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const drop2Dim7Str3: VoicingTemplate = {
+  name: "Drop 2 dim7 (top 4)",
+  type: "drop2",
+  quality: "dim7",
+  relativePositions: [0, -1, 0, -1, null, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "drop2",
+};
+
+const drop2Dim7Str4: VoicingTemplate = {
+  name: "Drop 2 dim7 (inner 4)",
+  type: "drop2",
+  quality: "dim7",
+  relativePositions: [null, 0, -2, 0, -1, null],
+  rootString: 3,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "drop2",
+};
+
+// ============================================
+// 6 chord voicings
+// ============================================
+
+const shell6Str6: VoicingTemplate = {
+  name: "Shell R-6-3 (6th string)",
+  type: "shell",
+  quality: "6",
+  relativePositions: [null, null, 1, -1, null, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const shell6Str5: VoicingTemplate = {
+  name: "Shell R-3-6 (5th string)",
+  type: "shell",
+  quality: "6",
+  relativePositions: [null, null, -1, -1, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const drop2Chord6Str3: VoicingTemplate = {
+  name: "Drop 2 6 (top 4)",
+  type: "drop2",
+  quality: "6",
+  relativePositions: [0, 0, 0, 0, null, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: true,
+  inversion: 0,
+  voicingStructure: "drop2",
+};
+
+const drop2Chord6Str4: VoicingTemplate = {
+  name: "Drop 2 6 (inner 4)",
+  type: "drop2",
+  quality: "6",
+  relativePositions: [null, 0, -1, 0, 0, null],
+  rootString: 3,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "drop2",
+};
+
+// ============================================
+// min6 chord voicings
+// ============================================
+
+const shellMin6Str6: VoicingTemplate = {
+  name: "Shell R-6-b3 min6 (6th string)",
+  type: "shell",
+  quality: "min6",
+  relativePositions: [null, null, 0, -1, null, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const shellMin6Str5: VoicingTemplate = {
+  name: "Shell R-b3-6 min6 (5th string)",
+  type: "shell",
+  quality: "min6",
+  relativePositions: [null, null, -1, -2, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const drop2Min6Str3: VoicingTemplate = {
+  name: "Drop 2 min6 (top 4)",
+  type: "drop2",
+  quality: "min6",
+  relativePositions: [0, -1, 0, 0, null, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "drop2",
+};
+
+const drop2Min6Str4: VoicingTemplate = {
+  name: "Drop 2 min6 (inner 4)",
+  type: "drop2",
+  quality: "min6",
+  relativePositions: [null, 0, -2, 0, 0, null],
+  rootString: 3,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "drop2",
+};
+
+// ============================================
+// 9 chord voicings (dominant 9th, drop the 5th)
+// ============================================
+
+const shell9Str6: VoicingTemplate = {
+  name: "Shell R-b7-9 (6th string)",
+  type: "shell",
+  quality: "9",
+  relativePositions: [null, null, -1, 0, null, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const voicing9Str5: VoicingTemplate = {
+  name: "R-3-b7-9 (5th string)",
+  type: "shell",
+  quality: "9",
+  relativePositions: [null, 0, 0, -1, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
+// dim triad voicing
+// ============================================
+
+const triadDimTop3: VoicingTemplate = {
+  name: "Close triad dim (top 3)",
+  type: "triadic",
+  quality: "dim",
+  relativePositions: [-3, -1, 0, null, null, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
 // Barre chords — E-form (6th string root)
 // ============================================
 
@@ -781,6 +996,26 @@ export const VOICING_TEMPLATES: VoicingTemplate[] = [
   drop2Min7Str4Inv3,
   drop2Dom7Str4Inv3,
   drop2Min7b5Str4Inv3,
+  // dim7
+  shellDim7Str6,
+  shellDim7Str5,
+  drop2Dim7Str3,
+  drop2Dim7Str4,
+  // 6 chords
+  shell6Str6,
+  shell6Str5,
+  drop2Chord6Str3,
+  drop2Chord6Str4,
+  // min6
+  shellMin6Str6,
+  shellMin6Str5,
+  drop2Min6Str3,
+  drop2Min6Str4,
+  // 9 chords
+  shell9Str6,
+  voicing9Str5,
+  // dim triad
+  triadDimTop3,
   // Drop 3 — strings 6-4-3-2
   drop3Maj7,
   drop3Min7,
