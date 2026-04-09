@@ -892,6 +892,126 @@ const voicing9Str5: VoicingTemplate = {
 };
 
 // ============================================
+// aug triad voicings
+// ============================================
+
+const triadAugTop3: VoicingTemplate = {
+  name: "Close triad aug (top 3)",
+  type: "triadic",
+  quality: "aug",
+  relativePositions: [-1, 0, 0, null, null, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const triadAugStr6: VoicingTemplate = {
+  name: "Aug triad (6th string)",
+  type: "triadic",
+  quality: "aug",
+  relativePositions: [null, null, 1, 1, null, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
+// maj9 voicings (drop the 5th: R-3-7-9)
+// ============================================
+
+const shellMaj9Str6: VoicingTemplate = {
+  name: "Shell R-7-9 maj9 (6th string)",
+  type: "shell",
+  quality: "maj9",
+  relativePositions: [null, null, -1, 1, null, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const voicingMaj9Str5: VoicingTemplate = {
+  name: "R-3-7-9 maj9 (5th string)",
+  type: "shell",
+  quality: "maj9",
+  relativePositions: [null, 0, 1, -1, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
+// min9 voicings (drop the 5th: R-b3-b7-9)
+// ============================================
+
+const shellMin9Str6: VoicingTemplate = {
+  name: "Shell R-b7-9 min9 (6th string)",
+  type: "shell",
+  quality: "min9",
+  relativePositions: [null, null, -1, 0, null, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const voicingMin9Str5: VoicingTemplate = {
+  name: "R-b3-b7-9 min9 (5th string)",
+  type: "shell",
+  quality: "min9",
+  relativePositions: [null, 0, 0, -2, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
+// sus4 voicings
+// ============================================
+
+const shellSus4Str6: VoicingTemplate = {
+  name: "Shell R-4-5 sus4 (6th string)",
+  type: "shell",
+  quality: "sus4",
+  relativePositions: [null, null, null, -3, 0, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const shellSus4Str5: VoicingTemplate = {
+  name: "Shell R-4-5 sus4 (5th string)",
+  type: "shell",
+  quality: "sus4",
+  relativePositions: [null, null, -3, 0, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
 // dim triad voicing
 // ============================================
 
@@ -1076,6 +1196,18 @@ export const VOICING_TEMPLATES: VoicingTemplate[] = [
   // 9 chords
   shell9Str6,
   voicing9Str5,
+  // aug
+  triadAugTop3,
+  triadAugStr6,
+  // maj9
+  shellMaj9Str6,
+  voicingMaj9Str5,
+  // min9
+  shellMin9Str6,
+  voicingMin9Str5,
+  // sus4
+  shellSus4Str6,
+  shellSus4Str5,
   // dim triad
   triadDimTop3,
   // Drop 3 — strings 6-4-3-2

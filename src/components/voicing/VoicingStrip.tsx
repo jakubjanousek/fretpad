@@ -5,6 +5,11 @@ import type { GuitarVoicing, NoteName } from "@/lib/types";
 import type { DiagramLabelMode } from "./ChordDiagram";
 import { VoicingCard } from "./VoicingCard";
 
+interface FilterOption<T extends string> {
+  value: T;
+  label: string;
+}
+
 interface VoicingStripProps {
   voicings: GuitarVoicing[];
   chordSymbol: string;
@@ -13,6 +18,9 @@ interface VoicingStripProps {
   guideTones?: NoteName[];
   labelMode?: DiagramLabelMode;
   root?: string;
+  filterOptions?: FilterOption<string>[];
+  activeFilter?: string;
+  onFilterChange?: (value: string) => void;
 }
 
 export function VoicingStrip({
@@ -23,6 +31,9 @@ export function VoicingStrip({
   guideTones,
   labelMode,
   root,
+  filterOptions,
+  activeFilter,
+  onFilterChange,
 }: VoicingStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -36,13 +47,31 @@ export function VoicingStrip({
 
   return (
     <div className="space-y-2.5">
-      <div className="flex items-baseline justify-between gap-2 px-1">
-        <span className="text-xs font-medium text-stone-400 uppercase tracking-wider shrink-0">
-          Alternatives
-        </span>
-        <span className="text-xs text-stone-500 text-right">
-          {voicings.length} option{voicings.length !== 1 && "s"} · tap to select
-        </span>
+      <div className="flex items-center justify-between gap-2 px-1">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium text-stone-400 uppercase tracking-wider shrink-0">
+            Alternatives
+          </span>
+          <span className="text-xs text-stone-600">{voicings.length}</span>
+        </div>
+        {filterOptions && onFilterChange && (
+          <div className="flex items-center gap-0.5 rounded-full bg-stone-800/80 p-0.5">
+            {filterOptions.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onFilterChange(opt.value)}
+                className={`text-[10px] font-medium px-2 py-0.5 rounded-full transition-colors ${
+                  activeFilter === opt.value
+                    ? "bg-stone-600 text-stone-100"
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <div className="relative">
         {/* Scroll fade indicators */}

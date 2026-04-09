@@ -128,9 +128,9 @@ export function CompVoicingsView() {
         labelMode={labelMode}
       />
 
-      {/* Detail bar — info about the active voicing + label toggle */}
+      {/* Detail bar — selected voicing info + label toggle */}
       {selectedVoicing && activeChord && (
-        <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap">
+        <div className="flex items-center justify-center gap-3 sm:gap-4">
           <span className="text-sm font-semibold font-[var(--font-display)] text-orange-400">
             {activeChord.symbol}
           </span>
@@ -143,22 +143,6 @@ export function CompVoicingsView() {
               <span className="text-xs text-stone-500">{fretRange}</span>
             </>
           )}
-          <div className="flex items-center gap-1 rounded-full bg-stone-800/60 p-0.5">
-            {FILTER_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setVoicingFilter(opt.value)}
-                className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
-                  voicingFilter === opt.value
-                    ? "bg-stone-700 text-stone-200"
-                    : "text-stone-500 hover:text-stone-300"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
           <div className="flex items-center gap-1 rounded-full bg-stone-800/60 p-0.5">
             <button
               type="button"
@@ -186,7 +170,7 @@ export function CompVoicingsView() {
         </div>
       )}
 
-      {/* Alternative voicings strip */}
+      {/* Alternative voicings strip with type filter */}
       {!isPlaying && activeChord && (
         <div className="rounded-xl border border-stone-800/50 bg-stone-900/20 p-3 sm:p-4">
           <VoicingStrip
@@ -197,6 +181,9 @@ export function CompVoicingsView() {
             guideTones={activeChord.guideTones}
             labelMode={labelMode}
             root={activeChord.root}
+            filterOptions={FILTER_OPTIONS}
+            activeFilter={voicingFilter}
+            onFilterChange={setVoicingFilter as (v: string) => void}
           />
         </div>
       )}
