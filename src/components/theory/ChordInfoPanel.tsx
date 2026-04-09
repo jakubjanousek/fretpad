@@ -82,12 +82,6 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
     }
   };
 
-  const handleScaleHover = (scale: string | null) => {
-    if (!previewScale) {
-      setPreviewScale(scale);
-    }
-  };
-
   return (
     <div className="space-y-5">
       {/* Content grid */}
@@ -224,8 +218,6 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
                   <button
                     type="button"
                     onClick={() => handleScaleClick(scale)}
-                    onMouseEnter={() => handleScaleHover(scale)}
-                    onMouseLeave={() => handleScaleHover(null)}
                     className="inline-flex items-center gap-1 active:scale-95"
                   >
                     {isActive && <Check className="w-3 h-3" />}
