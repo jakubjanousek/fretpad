@@ -637,6 +637,63 @@ const drop3Min7b5: VoicingTemplate = {
 };
 
 // ============================================
+// Shell inversions — 1st inversion (3rd in bass)
+// Strings 5-4-3: 3-7-R (guide tones below root)
+// ============================================
+
+const shellMaj7Inv1: VoicingTemplate = {
+  name: "Shell 3-7-R maj7 (1st inv)",
+  type: "shell",
+  quality: "maj7",
+  relativePositions: [null, null, 0, 4, 2, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 1,
+  voicingStructure: "close",
+};
+
+const shellMin7Inv1: VoicingTemplate = {
+  name: "Shell b3-b7-R min7 (1st inv)",
+  type: "shell",
+  quality: "min7",
+  relativePositions: [null, null, 0, 3, 1, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 1,
+  voicingStructure: "close",
+};
+
+const shellDom7Inv1: VoicingTemplate = {
+  name: "Shell 3-b7-R dom7 (1st inv)",
+  type: "shell",
+  quality: "7",
+  relativePositions: [null, null, 0, 3, 2, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 1,
+  voicingStructure: "close",
+};
+
+const shellMin7b5Inv1: VoicingTemplate = {
+  name: "Shell b3-b7-R min7b5 (1st inv)",
+  type: "shell",
+  quality: "min7b5",
+  relativePositions: [null, null, 0, 3, 1, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "intermediate",
+  isBarreChord: false,
+  inversion: 1,
+  voicingStructure: "close",
+};
+
+// ============================================
 // dim7 voicings
 // ============================================
 
@@ -996,6 +1053,11 @@ export const VOICING_TEMPLATES: VoicingTemplate[] = [
   drop2Min7Str4Inv3,
   drop2Dom7Str4Inv3,
   drop2Min7b5Str4Inv3,
+  // Shell — 1st inversion (3rd in bass)
+  shellMaj7Inv1,
+  shellMin7Inv1,
+  shellDom7Inv1,
+  shellMin7b5Inv1,
   // dim7
   shellDim7Str6,
   shellDim7Str5,

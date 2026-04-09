@@ -384,4 +384,25 @@ describe("generateVoicingsForChord", () => {
       }
     });
   });
+
+  describe("shell inversions", () => {
+    it("generates shell voicings with both root position and 1st inversion", () => {
+      const voicings = generateVoicingsForChord(chord("Cmaj7"));
+      const shells = voicings.filter((v) => v.type === "shell");
+      const inversions = new Set(shells.map((v) => v.inversion));
+      expect(inversions).toContain(0);
+      expect(inversions).toContain(1);
+    });
+
+    it("shell inversions have correct chord tones for all qualities", () => {
+      for (const symbol of ["Cmaj7", "Dm7", "G7", "Bm7b5"]) {
+        const c = chord(symbol);
+        const voicings = generateVoicingsForChord(c);
+        const shells = voicings.filter((v) => v.type === "shell");
+        for (const v of shells) {
+          expect(allNotesInChord(v, c.notes)).toBe(true);
+        }
+      }
+    });
+  });
 });
