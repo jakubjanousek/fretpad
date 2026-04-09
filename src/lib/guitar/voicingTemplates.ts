@@ -580,6 +580,96 @@ const drop2Min7b5Str4Inv3: VoicingTemplate = {
 };
 
 // ============================================
+// Barre chords — E-form (6th string root)
+// ============================================
+
+const barreMajStr6: VoicingTemplate = {
+  name: "E-form barre major (6th string)",
+  type: "barre",
+  quality: "maj",
+  relativePositions: [0, 0, 1, 2, 2, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: true,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const barreMinStr6: VoicingTemplate = {
+  name: "E-form barre minor (6th string)",
+  type: "barre",
+  quality: "min",
+  relativePositions: [0, 0, 0, 2, 2, 0],
+  rootString: 5,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: true,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
+// Barre chords — A-form (5th string root)
+// ============================================
+
+const barreMajStr5: VoicingTemplate = {
+  name: "A-form barre major (5th string)",
+  type: "barre",
+  quality: "maj",
+  relativePositions: [0, 2, 2, 2, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: true,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const barreMinStr5: VoicingTemplate = {
+  name: "A-form barre minor (5th string)",
+  type: "barre",
+  quality: "min",
+  relativePositions: [0, 1, 2, 2, 0, null],
+  rootString: 4,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: true,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
+// Close triads — top 3 strings (highE, B, G)
+// ============================================
+
+const triadMajTop3: VoicingTemplate = {
+  name: "Close triad major (top 3)",
+  type: "triadic",
+  quality: "maj",
+  relativePositions: [-2, 0, 0, null, null, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+const triadMinTop3: VoicingTemplate = {
+  name: "Close triad minor (top 3)",
+  type: "triadic",
+  quality: "min",
+  relativePositions: [-2, -1, 0, null, null, null],
+  rootString: 2,
+  rootFretOffset: 0,
+  difficulty: "beginner",
+  isBarreChord: false,
+  inversion: 0,
+  voicingStructure: "close",
+};
+
+// ============================================
 // Exports
 // ============================================
 
@@ -634,6 +724,15 @@ export const VOICING_TEMPLATES: VoicingTemplate[] = [
   drop2Min7Str4Inv3,
   drop2Dom7Str4Inv3,
   drop2Min7b5Str4Inv3,
+  // Barre chords — E-form (6th string)
+  barreMajStr6,
+  barreMinStr6,
+  // Barre chords — A-form (5th string)
+  barreMajStr5,
+  barreMinStr5,
+  // Close triads — top 3 strings
+  triadMajTop3,
+  triadMinTop3,
 ];
 
 export function getTemplatesForQuality(
