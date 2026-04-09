@@ -180,7 +180,12 @@ export function getProgressionScaleContext(
       };
     }
 
-    const suggestedScale = chord.suggestedScales[0] || `${chord.root} Major`;
+    const suggestedScale =
+      chord.suggestedScales.find((s) =>
+        chromaSetsEqual(getChromaSet(s), keyChroma),
+      ) ||
+      chord.suggestedScales[0] ||
+      `${chord.root} Major`;
     const scaleChroma = getChromaSet(suggestedScale);
     const scaleChangesFromKey = !chromaSetsEqual(scaleChroma, keyChroma);
 

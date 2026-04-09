@@ -74,6 +74,22 @@ describe("getProgressionScaleContext", () => {
     expect(context[2]?.suggestedScale).toBe("C Major");
   });
 
+  it("marks all chords as same key for i-iv-V in A minor", () => {
+    // Am7, Dm7, E7 are all diatonic to A minor
+    // Am7 should pick A Aeolian (not A Dorian) since we're in A minor
+    const progression = createProgression(["Am7", "Dm7", "E7", "Am7"], {
+      name: "i-iv-V in Am",
+    });
+    expect(progression).not.toBeNull();
+
+    const context = getProgressionScaleContext(progression!);
+    expect(context).toHaveLength(4);
+
+    // Am7 should not be flagged as a scale change in A minor
+    expect(context[0]?.scaleChangesFromKey).toBe(false);
+    expect(context[0]?.chordSymbol).toBe("Am7");
+  });
+
   it("marks borrowed chord as scale change", () => {
     // I - ii - V - bIII7 - I in C: Cmaj7, Dm7, G7 are diatonic,
     // but Eb7 (Eb Mixolydian) has different notes than C Major
