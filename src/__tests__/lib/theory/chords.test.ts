@@ -104,6 +104,13 @@ describe("parseChordSymbol", () => {
       expect(chord?.quality).toBe("dim7");
     });
 
+    it("does not suggest Whole Tone scale for diminished chords", () => {
+      const chord = parseChordSymbol("Cdim");
+      expect(chord).not.toBeNull();
+      expect(chord?.suggestedScales).toContain("C Diminished");
+      expect(chord?.suggestedScales).not.toContain("C Whole Tone");
+    });
+
     it("parses Cm7b5", () => {
       const chord = parseChordSymbol("Cm7b5");
       expect(chord).not.toBeNull();
