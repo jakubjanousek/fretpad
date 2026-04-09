@@ -37,14 +37,6 @@ export function VoicingStrip({
 }: VoicingStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  if (voicings.length === 0) {
-    return (
-      <div className="text-center text-stone-500 text-sm py-4">
-        No voicings available for {chordSymbol}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-2.5">
       <div className="flex items-center justify-between gap-2 px-1">
@@ -73,28 +65,34 @@ export function VoicingStrip({
           </div>
         )}
       </div>
-      <div className="relative">
-        {/* Scroll fade indicators */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-stone-900/60 to-transparent z-10" />
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-stone-900/60 to-transparent z-10" />
-        <div
-          ref={scrollRef}
-          className="flex gap-2 sm:gap-3 overflow-x-auto p-1 scrollbar-thin scrollbar-thumb-stone-700"
-        >
-          {voicings.map((v) => (
-            <VoicingCard
-              key={v.id}
-              voicing={v}
-              chordSymbol={chordSymbol}
-              isSelected={v.id === selectedId}
-              onClick={() => onSelect?.(v)}
-              guideTones={guideTones}
-              labelMode={labelMode}
-              root={root}
-            />
-          ))}
+      {voicings.length === 0 ? (
+        <div className="text-center text-stone-500 text-sm py-4">
+          No voicings available for {chordSymbol}
         </div>
-      </div>
+      ) : (
+        <div className="relative">
+          {/* Scroll fade indicators */}
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-stone-900/60 to-transparent z-10" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-stone-900/60 to-transparent z-10" />
+          <div
+            ref={scrollRef}
+            className="flex gap-2 sm:gap-3 overflow-x-auto p-1 scrollbar-thin scrollbar-thumb-stone-700"
+          >
+            {voicings.map((v) => (
+              <VoicingCard
+                key={v.id}
+                voicing={v}
+                chordSymbol={chordSymbol}
+                isSelected={v.id === selectedId}
+                onClick={() => onSelect?.(v)}
+                guideTones={guideTones}
+                labelMode={labelMode}
+                root={root}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

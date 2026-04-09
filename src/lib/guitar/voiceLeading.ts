@@ -43,40 +43,53 @@ export function computeVoiceLeadingPath(
   const T = voicingsPerChord.length;
   if (T === 0) return [];
 
-  const firstGroup = voicingsPerChord[0];
-  if (!firstGroup || firstGroup.length === 0) return [];
-  const firstVoicing = firstGroup[0];
-  if (!firstVoicing) return [];
-  if (T === 1) return [firstVoicing];
+  // Collect indices of non-empty groups for the DP
+  const nonEmpty: number[] = [];
+  for (let t = 0; t < T; t++) {
+    const group = voicingsPerChord[t];
+    if (group && group.length > 0) nonEmpty.push(t);
+  }
 
-  // dpCost[t][j] = minimum cost to reach voicing j at position t
+  // If no groups have voicings, return empty placeholders
+  if (nonEmpty.length === 0) return new Array<GuitarVoicing>(T);
+
+  // Single non-empty group: just pick first voicing
+  if (nonEmpty.length === 1) {
+    const path = new Array<GuitarVoicing>(T);
+    const idx = nonEmpty[0]!;
+    path[idx] = voicingsPerChord[idx]![0]!;
+    return path;
+  }
+
+  // Run Viterbi only on non-empty groups
+  const groups = nonEmpty.map((t) => voicingsPerChord[t]!);
+
+  // dpCost[s][j] = minimum cost to reach voicing j at step s
   const dpCost: number[][] = [];
-  // dpBack[t][j] = index of best predecessor at position t-1
+  // dpBack[s][j] = index of best predecessor at step s-1
   const dpBack: number[][] = [];
 
-  // Initialize t=0: slight bias toward mid-fretboard
-  dpCost.push(firstGroup.map((v) => Math.abs(v.baseFret - 5) * 0.1));
-  dpBack.push(firstGroup.map(() => -1));
+  // Initialize step 0: slight bias toward mid-fretboard
+  dpCost.push(groups[0]!.map((v) => Math.abs(v.baseFret - 5) * 0.1));
+  dpBack.push(groups[0]!.map(() => -1));
 
-  // Forward pass
-  for (let t = 1; t < T; t++) {
-    const current = voicingsPerChord[t] ?? [];
-    const prev = voicingsPerChord[t - 1] ?? [];
-    const prevCosts = dpCost[t - 1] ?? [];
+  // Forward pass over non-empty groups
+  for (let s = 1; s < groups.length; s++) {
+    const current = groups[s]!;
+    const prev = groups[s - 1]!;
+    const prevCosts = dpCost[s - 1]!;
     const costs: number[] = [];
     const backs: number[] = [];
 
     for (let j = 0; j < current.length; j++) {
       let bestCost = Number.POSITIVE_INFINITY;
       let bestPrev = 0;
-      const cur = current[j];
-      if (!cur) continue;
+      const cur = current[j]!;
 
       for (let k = 0; k < prev.length; k++) {
-        const p = prev[k];
-        if (!p) continue;
+        const p = prev[k]!;
         const transitionCost = voicingTransitionCost(p, cur);
-        const totalCost = (prevCosts[k] ?? 0) + transitionCost;
+        const totalCost = prevCosts[k]! + transitionCost;
         if (totalCost < bestCost) {
           bestCost = totalCost;
           bestPrev = k;
@@ -92,25 +105,23 @@ export function computeVoiceLeadingPath(
   }
 
   // Find best final voicing
-  const lastCosts = dpCost[T - 1] ?? [];
+  const S = groups.length;
+  const lastCosts = dpCost[S - 1]!;
   let bestFinalIdx = 0;
   for (let j = 1; j < lastCosts.length; j++) {
-    if ((lastCosts[j] ?? Infinity) < (lastCosts[bestFinalIdx] ?? Infinity)) {
+    if (lastCosts[j]! < lastCosts[bestFinalIdx]!) {
       bestFinalIdx = j;
     }
   }
 
-  // Backtrack
-  const path: (GuitarVoicing | undefined)[] = new Array(T);
-  const lastGroup = voicingsPerChord[T - 1] ?? [];
-  path[T - 1] = lastGroup[bestFinalIdx];
+  // Backtrack into sparse path
+  const path = new Array<GuitarVoicing>(T);
+  path[nonEmpty[S - 1]!] = groups[S - 1]![bestFinalIdx]!;
   let idx = bestFinalIdx;
-  for (let t = T - 1; t > 0; t--) {
-    const backRow = dpBack[t] ?? [];
-    idx = backRow[idx] ?? 0;
-    const group = voicingsPerChord[t - 1] ?? [];
-    path[t - 1] = group[idx];
+  for (let s = S - 1; s > 0; s--) {
+    idx = dpBack[s]![idx]!;
+    path[nonEmpty[s - 1]!] = groups[s - 1]![idx]!;
   }
 
-  return path.filter((v): v is GuitarVoicing => v !== undefined);
+  return path;
 }
