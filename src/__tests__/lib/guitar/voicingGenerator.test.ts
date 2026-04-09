@@ -377,8 +377,38 @@ describe("generateVoicingsForChord", () => {
       expect(voicings.length).toBeGreaterThan(0);
     });
 
+    it("generates voicings for aug chords", () => {
+      const voicings = generateVoicingsForChord(chord("Caug"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("generates voicings for maj9 chords", () => {
+      const voicings = generateVoicingsForChord(chord("Cmaj9"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("generates voicings for min9 chords", () => {
+      const voicings = generateVoicingsForChord(chord("Cm9"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("generates voicings for sus4 chords", () => {
+      const voicings = generateVoicingsForChord(chord("Csus4"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
     it("all notes in extended quality voicings are correct chord tones", () => {
-      for (const symbol of ["Bdim7", "C6", "Cm6", "C9", "Cdim"]) {
+      for (const symbol of [
+        "Bdim7",
+        "C6",
+        "Cm6",
+        "C9",
+        "Cdim",
+        "Caug",
+        "Cmaj9",
+        "Cm9",
+        "Csus4",
+      ]) {
         const c = chord(symbol);
         const voicings = generateVoicingsForChord(c);
         for (const v of voicings) {
