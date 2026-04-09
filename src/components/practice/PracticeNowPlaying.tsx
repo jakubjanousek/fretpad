@@ -19,14 +19,9 @@ export function PracticeNowPlaying({
       {/* Current chord — prominent */}
       {currentChord ? (
         <div key={currentChord.symbol} className="animate-chord-change min-w-0">
-          <div className="flex items-baseline gap-2.5">
-            <span className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl tracking-tight text-orange-500">
-              {currentChord.symbol}
-            </span>
-            <span className="text-sm text-muted-foreground font-medium">
-              {currentChord.root}
-            </span>
-          </div>
+          <span className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl tracking-tight text-orange-500">
+            {currentChord.symbol}
+          </span>
         </div>
       ) : (
         <div className="text-muted-foreground text-sm">No chord selected</div>
