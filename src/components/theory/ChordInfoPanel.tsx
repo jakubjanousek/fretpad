@@ -10,37 +10,13 @@ import {
   playScalePreview,
   stopPreview,
 } from "@/lib/audio";
+import { getIntervalName } from "@/lib/theory/chords";
 import type { Chord } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/useAppStore";
 
 interface ChordInfoPanelProps {
   chord: Chord | null;
-}
-
-function formatQuality(quality: string): string {
-  const qualityNames: Record<string, string> = {
-    maj: "Major",
-    min: "Minor",
-    maj7: "Major 7th",
-    min7: "Minor 7th",
-    "7": "Dominant 7th",
-    min7b5: "Half-Diminished",
-    dim: "Diminished",
-    dim7: "Diminished 7th",
-    aug: "Augmented",
-    sus2: "Suspended 2nd",
-    sus4: "Suspended 4th",
-    "6": "Major 6th",
-    min6: "Minor 6th",
-    "9": "Dominant 9th",
-    maj9: "Major 9th",
-    min9: "Minor 9th",
-    add9: "Add 9",
-    other: "Other",
-  };
-
-  return qualityNames[quality] || quality;
 }
 
 export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
@@ -114,62 +90,6 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
 
   return (
     <div className="space-y-5">
-      {/* Header row */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <span className="font-[family-name:var(--font-display)] text-2xl tracking-tight text-stone-800 dark:text-stone-100">
-          {chord.symbol}
-        </span>
-        <span className="text-sm text-stone-500 dark:text-muted-foreground">
-          {formatQuality(chord.quality)}
-        </span>
-        {chord.bassNote && (
-          <span className="text-xs text-stone-400 dark:text-muted-foreground">
-            Bass: {chord.bassNote}
-          </span>
-        )}
-        {/* Audio preview buttons */}
-        <div className="flex items-center gap-1 ml-auto">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handlePlayChord}
-            className={cn(
-              "h-7 px-2 text-xs gap-1 rounded-full text-stone-500 hover:text-stone-700 dark:text-muted-foreground dark:hover:text-stone-200",
-              playingChord === "chord" &&
-                "text-orange-500 dark:text-orange-400",
-            )}
-            title="Play chord"
-          >
-            <Volume2
-              className={cn(
-                "w-3.5 h-3.5",
-                playingChord === "chord" && "animate-pulse",
-              )}
-            />
-            Chord
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handlePlayArpeggio}
-            className={cn(
-              "h-7 px-2 text-xs gap-1 rounded-full text-stone-500 hover:text-stone-700 dark:text-muted-foreground dark:hover:text-stone-200",
-              playingChord === "arpeggio" &&
-                "text-orange-500 dark:text-orange-400",
-            )}
-            title="Play arpeggio"
-          >
-            <Play
-              className={cn(
-                "w-3.5 h-3.5",
-                playingChord === "arpeggio" && "animate-pulse",
-              )}
-            />
-            Arp
-          </Button>
-        </div>
-      </div>
-
       {/* Content grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
         {/* Key Context */}
@@ -201,19 +121,62 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
 
         {/* Chord Tones */}
         <div>
-          <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-muted-foreground mb-2">
-            Chord Tones
-          </h4>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-muted-foreground">
+              Chord Tones
+            </h4>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePlayChord}
+                className={cn(
+                  "h-6 px-1.5 text-[10px] gap-0.5 rounded-full text-stone-500 hover:text-stone-700 dark:text-muted-foreground dark:hover:text-stone-200",
+                  playingChord === "chord" &&
+                    "text-orange-500 dark:text-orange-400",
+                )}
+                title="Play chord"
+              >
+                <Volume2
+                  className={cn(
+                    "w-3 h-3",
+                    playingChord === "chord" && "animate-pulse",
+                  )}
+                />
+                Chord
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePlayArpeggio}
+                className={cn(
+                  "h-6 px-1.5 text-[10px] gap-0.5 rounded-full text-stone-500 hover:text-stone-700 dark:text-muted-foreground dark:hover:text-stone-200",
+                  playingChord === "arpeggio" &&
+                    "text-orange-500 dark:text-orange-400",
+                )}
+                title="Play arpeggio"
+              >
+                <Play
+                  className={cn(
+                    "w-3 h-3",
+                    playingChord === "arpeggio" && "animate-pulse",
+                  )}
+                />
+                Arp
+              </Button>
+            </div>
+          </div>
           <div className="flex flex-wrap gap-1.5">
             {chord.notes.map((note, index) => {
               const isRoot = note === chord.root;
               const isGuide = chord.guideTones.includes(note);
+              const interval = getIntervalName(chord.root, note);
 
               return (
                 <span
                   key={`${note}-${index}`}
                   className={cn(
-                    "inline-flex items-center font-mono text-xs px-2.5 py-1 rounded-full border",
+                    "inline-flex items-center gap-1.5 font-mono text-xs px-2.5 py-1 rounded-full border",
                     isRoot &&
                       "border-orange-400/50 bg-orange-500/10 text-orange-700 dark:text-orange-400",
                     isGuide &&
@@ -225,41 +188,11 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
                   )}
                 >
                   {note}
-                  {isRoot && (
-                    <span className="ml-1 text-[10px] opacity-60">R</span>
-                  )}
-                  {isGuide && !isRoot && (
-                    <span className="ml-1 text-[10px] opacity-60">G</span>
-                  )}
+                  <span className="text-[10px] opacity-60">{interval}</span>
                 </span>
               );
             })}
           </div>
-        </div>
-
-        {/* Guide Tones */}
-        <div>
-          <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-muted-foreground mb-2">
-            Guide Tones{" "}
-            <span className="normal-case tracking-normal">(3rd & 7th)</span>
-          </h4>
-          <div className="flex gap-2">
-            {chord.guideTones.length > 0 ? (
-              chord.guideTones.map((note, index) => (
-                <span
-                  key={`guide-${note}-${index}`}
-                  className="inline-flex items-center font-mono text-xs px-2.5 py-1 rounded-full bg-blue-500 text-white"
-                >
-                  {note}
-                </span>
-              ))
-            ) : (
-              <span className="text-xs text-stone-400">No guide tones</span>
-            )}
-          </div>
-          <p className="text-[10px] text-stone-400 dark:text-muted-foreground mt-1.5">
-            Define the chord's character
-          </p>
         </div>
 
         {/* Suggested Scales */}
