@@ -9,7 +9,7 @@ import {
 describe("buildDocumentTitle", () => {
   it("uses progression name when present", () => {
     const input: DocumentTitleInput = {
-      name: "ii-V-I in C",
+      name: "ii-V-I",
       bars: [
         { chords: ["Dm7"] },
         { chords: ["G7"] },
@@ -17,7 +17,7 @@ describe("buildDocumentTitle", () => {
         { chords: ["Cmaj7"] },
       ],
     };
-    expect(buildDocumentTitle(input)).toBe("ii-V-I in C — FretPad");
+    expect(buildDocumentTitle(input)).toBe("ii-V-I — FretPad");
   });
 
   it("falls back to chord symbols when name is empty", () => {

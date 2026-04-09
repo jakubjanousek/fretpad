@@ -189,23 +189,23 @@ describe("createProgression", () => {
 
 describe("PRESET_PROGRESSIONS", () => {
   it("has ii-V-I in C preset", () => {
-    const prog = PRESET_PROGRESSIONS["ii-V-I in C"];
+    const prog = PRESET_PROGRESSIONS["ii-V-I"];
     expect(prog).toBeDefined();
-    expect(prog.name).toBe("ii-V-I in C");
+    expect(prog.name).toBe("ii-V-I");
     expect(prog.bars).toHaveLength(4);
   });
 
   it("has I-V-vi-IV in C preset", () => {
-    const prog = PRESET_PROGRESSIONS["I-V-vi-IV in C"];
+    const prog = PRESET_PROGRESSIONS["I-V-vi-IV"];
     expect(prog).toBeDefined();
-    expect(prog.name).toBe("I-V-vi-IV in C");
+    expect(prog.name).toBe("I-V-vi-IV");
     expect(prog.bars).toHaveLength(4);
   });
 
   it("has 12-bar blues in A preset", () => {
-    const prog = PRESET_PROGRESSIONS["12-bar blues in A"];
+    const prog = PRESET_PROGRESSIONS["12-Bar Blues"];
     expect(prog).toBeDefined();
-    expect(prog.name).toBe("12-bar blues in A");
+    expect(prog.name).toBe("12-Bar Blues");
     expect(prog.bars).toHaveLength(12);
   });
 });
@@ -221,7 +221,7 @@ describe("getAllChordsFromProgression", () => {
   });
 
   it("returns chords in order", () => {
-    const prog = PRESET_PROGRESSIONS["ii-V-I in C"];
+    const prog = PRESET_PROGRESSIONS["ii-V-I"];
     const chords = getAllChordsFromProgression(prog);
     expect(chords).toEqual(["Dm7", "G7", "Cmaj7", "Cmaj7"]);
   });
@@ -249,7 +249,7 @@ describe("getProgressionTotalBeats", () => {
   });
 
   it("handles 12-bar blues", () => {
-    const prog = PRESET_PROGRESSIONS["12-bar blues in A"];
+    const prog = PRESET_PROGRESSIONS["12-Bar Blues"];
     const totalBeats = getProgressionTotalBeats(prog);
     expect(totalBeats).toBe(48); // 12 bars * 4 beats
   });

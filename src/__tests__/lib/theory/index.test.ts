@@ -67,7 +67,7 @@ describe("lib/theory barrel export", () => {
     const bar = parseBar("Dm7");
     expect(bar).not.toBeNull();
     expect(bar?.chords[0]?.chord).toBe("Dm7");
-    const prog = PRESET_PROGRESSIONS["ii-V-I in C"];
+    const prog = PRESET_PROGRESSIONS["ii-V-I"];
     expect(getAllChordsFromProgression(prog).length).toBeGreaterThan(0);
     const created = createProgression(["Am7"]);
     expect(created).not.toBeNull();
@@ -75,21 +75,21 @@ describe("lib/theory barrel export", () => {
   });
 
   it("exports presets", () => {
-    expect(PRESET_PROGRESSIONS["ii-V-I in C"]).toBeDefined();
-    expect(PRESET_METADATA["ii-V-I in C"]).toBeDefined();
+    expect(PRESET_PROGRESSIONS["ii-V-I"]).toBeDefined();
+    expect(PRESET_METADATA["ii-V-I"]).toBeDefined();
     const byCategory = getPresetsByCategory();
     expect(byCategory.jazz).toBeDefined();
   });
 
   it("exports transpose functions", () => {
     expect(transposeChordSymbol("Cmaj7", 2)).toBe("Dmaj7");
-    const prog = PRESET_PROGRESSIONS["ii-V-I in C"];
+    const prog = PRESET_PROGRESSIONS["ii-V-I"];
     const transposed = transposeProgression(prog, 2);
     expect(transposed.bars[0]?.chords[0]?.chord).toContain("E");
   });
 
   it("exports key detection", () => {
-    const prog = PRESET_PROGRESSIONS["ii-V-I in C"];
+    const prog = PRESET_PROGRESSIONS["ii-V-I"];
     const keys = detectKey(prog);
     expect(keys.length).toBeGreaterThan(0);
     expect(keys[0]?.root).toBe("C");

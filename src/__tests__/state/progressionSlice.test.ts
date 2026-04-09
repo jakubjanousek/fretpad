@@ -41,7 +41,7 @@ describe("progressionSlice", () => {
       getState().setCurrentPosition(1, 0);
       expect(getState().currentBarIndex).toBe(1);
 
-      const preset = PRESET_PROGRESSIONS["12-bar blues in A"];
+      const preset = PRESET_PROGRESSIONS["12-Bar Blues"];
       getState().setProgression(preset);
 
       expect(getState().progression).toBe(preset);
@@ -54,10 +54,10 @@ describe("progressionSlice", () => {
   describe("loadPreset", () => {
     it("loads a preset progression and resets position", () => {
       getState().setCurrentPosition(1, 0);
-      getState().loadPreset("12-bar blues in A");
+      getState().loadPreset("12-Bar Blues");
 
       const state = getState();
-      expect(state.progression).toBe(PRESET_PROGRESSIONS["12-bar blues in A"]);
+      expect(state.progression).toBe(PRESET_PROGRESSIONS["12-Bar Blues"]);
       expect(state.currentBarIndex).toBe(0);
       expect(state.currentChordIndex).toBe(0);
     });

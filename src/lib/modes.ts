@@ -18,7 +18,7 @@ export const PRACTICE_MODES: Record<
     label: "Learn the Neck",
     description:
       "Build fretboard familiarity — know where notes and intervals are.",
-    defaultPreset: "Dorian Vamp (Dm7)",
+    defaultPreset: "Dorian Vamp",
     defaultTempo: 90,
     defaultStyle: "jazzSwing",
 
@@ -38,7 +38,7 @@ export const PRACTICE_MODES: Record<
     label: "Outline Chord Changes",
     description:
       "Practice hearing and visualizing chord tones as changes go by.",
-    defaultPreset: "ii-V-I in C",
+    defaultPreset: "ii-V-I",
     defaultTempo: 120,
     defaultStyle: "jazzSwing",
 
@@ -58,7 +58,7 @@ export const PRACTICE_MODES: Record<
     label: "Comp with Voicings",
     description:
       "Practice comping with good voice leading through a progression.",
-    defaultPreset: "ii-V-I in C",
+    defaultPreset: "ii-V-I",
     defaultTempo: 120,
     defaultStyle: "jazzSwing",
 

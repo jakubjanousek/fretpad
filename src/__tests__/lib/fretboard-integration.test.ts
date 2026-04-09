@@ -1117,7 +1117,7 @@ describe("G. Edge cases", () => {
     }
   });
 
-  it("ii-V-I in C produces valid fret notes for all chords", () => {
+  it("ii-V-I produces valid fret notes for all chords", () => {
     const progression = ["Dm7", "G7", "Cmaj7"];
     for (const sym of progression) {
       const chord = mustParse(sym);

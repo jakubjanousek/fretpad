@@ -53,8 +53,8 @@ export function getChordAtPosition(
   return parseChordSymbol(barChord.chord);
 }
 
-// Default progression: ii-V-I in C
-export const defaultProgression = PRESET_PROGRESSIONS["ii-V-I in C"];
+// Default progression: ii-V-I
+export const defaultProgression = PRESET_PROGRESSIONS["ii-V-I"];
 export const defaultChord = getChordAtPosition(defaultProgression, 0, 0);
 
 /**

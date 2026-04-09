@@ -13,7 +13,7 @@ import { PRESET_PROGRESSIONS } from "@/lib/theory";
 const samplePreset: CustomPreset = {
   id: "test-1",
   name: "My Preset",
-  progression: PRESET_PROGRESSIONS["ii-V-I in C"],
+  progression: PRESET_PROGRESSIONS["ii-V-I"],
   createdAt: Date.now(),
 };
 
@@ -64,7 +64,7 @@ describe("customPresets", () => {
 
   describe("saveRecentPresets / loadRecentPresets", () => {
     const sampleRecent: RecentPreset = {
-      key: "ii-V-I in C",
+      key: "ii-V-I",
       type: "builtin",
       timestamp: Date.now(),
     };
@@ -73,7 +73,7 @@ describe("customPresets", () => {
       saveRecentPresets([sampleRecent]);
       const loaded = loadRecentPresets();
       expect(loaded).toHaveLength(1);
-      expect(loaded[0]?.key).toBe("ii-V-I in C");
+      expect(loaded[0]?.key).toBe("ii-V-I");
     });
 
     it("returns empty array when nothing stored", () => {
@@ -83,9 +83,9 @@ describe("customPresets", () => {
 
   describe("addRecentPreset", () => {
     it("adds a preset to recents", () => {
-      const result = addRecentPreset("ii-V-I in C", "builtin");
+      const result = addRecentPreset("ii-V-I", "builtin");
       expect(result).toHaveLength(1);
-      expect(result[0]?.key).toBe("ii-V-I in C");
+      expect(result[0]?.key).toBe("ii-V-I");
     });
 
     it("moves existing preset to front", () => {

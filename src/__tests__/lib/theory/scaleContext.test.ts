@@ -50,7 +50,7 @@ describe("areModesOfSameParent", () => {
 describe("getProgressionScaleContext", () => {
   it("marks all chords as same key for ii-V-I in C", () => {
     const progression = createProgression(["Dm7", "G7", "Cmaj7", "Cmaj7"], {
-      name: "ii-V-I in C",
+      name: "ii-V-I",
     });
     expect(progression).not.toBeNull();
 

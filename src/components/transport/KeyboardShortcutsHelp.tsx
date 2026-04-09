@@ -23,7 +23,7 @@ const SHORTCUTS: ShortcutItem[] = [
   { key: "H", description: "Open help guide" },
   { key: "↑", description: "Increase tempo (+5 BPM)" },
   { key: "↓", description: "Decrease tempo (-5 BPM)" },
-  { key: "1", description: "Load preset: ii-V-I in C" },
+  { key: "1", description: "Load preset: ii-V-I" },
   { key: "2", description: "Load preset: Autumn Leaves" },
   { key: "3", description: "Load preset: Rhythm Changes" },
 ];

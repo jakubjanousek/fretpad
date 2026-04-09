@@ -4,13 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildUrlParams, parseUrlParams } from "@/hooks/useUrlSync";
 import { PRESET_PROGRESSIONS } from "@/lib/theory";
 
-const iiVI = PRESET_PROGRESSIONS["ii-V-I in C"];
+const iiVI = PRESET_PROGRESSIONS["ii-V-I"];
 
 describe("useUrlSync helpers", () => {
   describe("buildUrlParams", () => {
     it("encodes single-chord bars separated by pipe", () => {
       const params = buildUrlParams(iiVI, 120);
-      // ii-V-I in C is | Dm7 | G7 | Cmaj7 | Cmaj7 |
+      // ii-V-I is | Dm7 | G7 | Cmaj7 | Cmaj7 |
       expect(params.get("chords")).toBe("Dm7|G7|Cmaj7|Cmaj7");
     });
 

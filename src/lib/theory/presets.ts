@@ -38,11 +38,11 @@ export interface PresetMetadata {
  */
 export const PRESET_PROGRESSIONS = {
   // Jazz Standards
-  "ii-V-I in C": assertProgression(
+  "ii-V-I": assertProgression(
     createProgression(["Dm7", "G7", "Cmaj7", "Cmaj7"], {
-      name: "ii-V-I in C",
+      name: "ii-V-I",
     }),
-    "ii-V-I in C",
+    "ii-V-I",
   ),
 
   "Autumn Leaves (A section)": assertProgression(
@@ -91,9 +91,9 @@ export const PRESET_PROGRESSIONS = {
     "So What",
   ),
 
-  "iii-vi-ii-V in C": assertProgression(
-    parseProgression("| Em7 | Am7 | Dm7 | G7 |", { name: "iii-vi-ii-V in C" }),
-    "iii-vi-ii-V in C",
+  "iii-vi-ii-V": assertProgression(
+    parseProgression("| Em7 | Am7 | Dm7 | G7 |", { name: "iii-vi-ii-V" }),
+    "iii-vi-ii-V",
   ),
 
   "On the Sunny Side of the Street": assertProgression(
@@ -129,124 +129,124 @@ export const PRESET_PROGRESSIONS = {
   ),
 
   // Pop Progressions
-  "I-V-vi-IV in C": assertProgression(
+  "I-V-vi-IV": assertProgression(
     createProgression(["C", "G", "Am", "F"], {
-      name: "I-V-vi-IV in C",
+      name: "I-V-vi-IV",
     }),
-    "I-V-vi-IV in C",
+    "I-V-vi-IV",
   ),
 
-  "vi-IV-I-V in C": assertProgression(
+  "vi-IV-I-V": assertProgression(
     createProgression(["Am", "F", "C", "G"], {
-      name: "vi-IV-I-V in C",
+      name: "vi-IV-I-V",
     }),
-    "vi-IV-I-V in C",
+    "vi-IV-I-V",
   ),
 
-  "I-vi-IV-V in C": assertProgression(
+  "I-vi-IV-V": assertProgression(
     createProgression(["C", "Am", "F", "G"], {
-      name: "I-vi-IV-V in C",
+      name: "I-vi-IV-V",
     }),
-    "I-vi-IV-V in C",
+    "I-vi-IV-V",
   ),
 
-  "I-IV-V-IV in G": assertProgression(
+  "I-IV-V-IV": assertProgression(
     createProgression(["G", "C", "D", "C"], {
-      name: "I-IV-V-IV in G",
+      name: "I-IV-V-IV",
     }),
-    "I-IV-V-IV in G",
+    "I-IV-V-IV",
   ),
 
-  "I-IV-vi-V in G": assertProgression(
+  "I-IV-vi-V": assertProgression(
     createProgression(["G", "C", "Em", "D"], {
-      name: "I-IV-vi-V in G",
+      name: "I-IV-vi-V",
     }),
-    "I-IV-vi-V in G",
+    "I-IV-vi-V",
   ),
 
-  "i-bVI-bIII-bVII in Am": assertProgression(
+  "i-bVI-bIII-bVII": assertProgression(
     createProgression(["Am", "F", "C", "G"], {
-      name: "i-bVI-bIII-bVII in Am",
+      name: "i-bVI-bIII-bVII",
     }),
-    "i-bVI-bIII-bVII in Am",
+    "i-bVI-bIII-bVII",
   ),
 
-  "I-iii-IV-V in D": assertProgression(
+  "I-iii-IV-V": assertProgression(
     createProgression(["D", "F#m", "G", "A"], {
-      name: "I-iii-IV-V in D",
+      name: "I-iii-IV-V",
     }),
-    "I-iii-IV-V in D",
+    "I-iii-IV-V",
   ),
 
-  "IV-V-iii-vi in C": assertProgression(
+  "IV-V-iii-vi": assertProgression(
     createProgression(["F", "G", "Em", "Am"], {
-      name: "IV-V-iii-vi in C",
+      name: "IV-V-iii-vi",
     }),
-    "IV-V-iii-vi in C",
+    "IV-V-iii-vi",
   ),
 
   // Blues Progressions
-  "12-bar blues in A": assertProgression(
+  "12-Bar Blues": assertProgression(
     parseProgression(
       "| A7 | A7 | A7 | A7 | D7 | D7 | A7 | A7 | E7 | D7 | A7 | E7 |",
-      { name: "12-bar blues in A" },
+      { name: "12-Bar Blues" },
     ),
-    "12-bar blues in A",
+    "12-Bar Blues",
   ),
 
-  "Minor Blues in Am": assertProgression(
+  "Minor Blues": assertProgression(
     parseProgression(
       "| Am7 | Am7 | Am7 | Am7 | Dm7 | Dm7 | Am7 | Am7 | Fmaj7 | E7 | Am7 | E7 |",
-      { name: "Minor Blues in Am" },
+      { name: "Minor Blues" },
     ),
-    "Minor Blues in Am",
+    "Minor Blues",
   ),
 
-  "Jazz Blues in Bb": assertProgression(
+  "Jazz Blues": assertProgression(
     parseProgression(
       "| Bb7 | Eb7 | Bb7 | Fm7 Bb7 | Eb7 | Edim7 | Bb7 | Dm7 G7 | Cm7 | F7 | Bb7 G7 | Cm7 F7 |",
-      { name: "Jazz Blues in Bb" },
+      { name: "Jazz Blues" },
     ),
-    "Jazz Blues in Bb",
+    "Jazz Blues",
   ),
 
-  "8-bar Blues in E": assertProgression(
+  "8-Bar Blues": assertProgression(
     parseProgression("| E7 | A7 | E7 | E7 | A7 | B7 | E7 | B7 |", {
-      name: "8-bar Blues in E",
+      name: "8-Bar Blues",
     }),
-    "8-bar Blues in E",
+    "8-Bar Blues",
   ),
 
-  "Slow Blues in G": assertProgression(
+  "Slow Blues": assertProgression(
     parseProgression(
       "| G7 | C7 | G7 | G7 | C7 | C7 | G7 | Em7 | Am7 | D7 | G7 D7 | G7 D7 |",
-      { name: "Slow Blues in G" },
+      { name: "Slow Blues" },
     ),
-    "Slow Blues in G",
+    "Slow Blues",
   ),
 
-  "Blues Shuffle in E": assertProgression(
+  "Blues Shuffle": assertProgression(
     parseProgression(
       "| E7 | E7 | E7 | E7 | A7 | A7 | E7 | E7 | B7 | A7 | E7 | B7 |",
-      { name: "Blues Shuffle in E" },
+      { name: "Blues Shuffle" },
     ),
-    "Blues Shuffle in E",
+    "Blues Shuffle",
   ),
 
-  "Stormy Monday in G": assertProgression(
+  "Stormy Monday": assertProgression(
     parseProgression(
       "| G7 | C7 | G7 | Gm7 C7 | C7 | C#dim7 | G7 | Am7 D7 | Am7 | D7 | G7 C7 | G7 D7 |",
-      { name: "Stormy Monday in G" },
+      { name: "Stormy Monday" },
     ),
-    "Stormy Monday in G",
+    "Stormy Monday",
   ),
 
-  "Quick Change Blues in A": assertProgression(
+  "Quick Change Blues": assertProgression(
     parseProgression(
       "| A7 | D7 | A7 | A7 | D7 | D7 | A7 | A7 | E7 | D7 | A7 | E7 |",
-      { name: "Quick Change Blues in A" },
+      { name: "Quick Change Blues" },
     ),
-    "Quick Change Blues in A",
+    "Quick Change Blues",
   ),
 
   "Jockey Full of Bourbon": assertProgression(
@@ -278,60 +278,60 @@ export const PRESET_PROGRESSIONS = {
   ),
 
   // Modal Vamps
-  "Dorian Vamp (Dm7)": assertProgression(
+  "Dorian Vamp": assertProgression(
     createProgression(["Dm7", "Em7", "Dm7", "Dm7"], {
-      name: "Dorian Vamp (Dm7)",
+      name: "Dorian Vamp",
     }),
-    "Dorian Vamp (Dm7)",
+    "Dorian Vamp",
   ),
 
-  "Mixolydian Vamp (G7)": assertProgression(
+  "Mixolydian Vamp": assertProgression(
     createProgression(["G7", "F", "G7", "G7"], {
-      name: "Mixolydian Vamp (G7)",
+      name: "Mixolydian Vamp",
     }),
-    "Mixolydian Vamp (G7)",
+    "Mixolydian Vamp",
   ),
 
-  "Phrygian Vamp (Em)": assertProgression(
+  "Phrygian Vamp": assertProgression(
     createProgression(["Em", "Fmaj7", "Em", "Em"], {
-      name: "Phrygian Vamp (Em)",
+      name: "Phrygian Vamp",
     }),
-    "Phrygian Vamp (Em)",
+    "Phrygian Vamp",
   ),
 
-  "Lydian Vamp (Fmaj7)": assertProgression(
+  "Lydian Vamp": assertProgression(
     createProgression(["Fmaj7", "G", "Fmaj7", "Fmaj7"], {
-      name: "Lydian Vamp (Fmaj7)",
+      name: "Lydian Vamp",
     }),
-    "Lydian Vamp (Fmaj7)",
+    "Lydian Vamp",
   ),
 
-  "Aeolian Vamp (Am)": assertProgression(
+  "Aeolian Vamp": assertProgression(
     createProgression(["Am", "F", "G", "Am"], {
-      name: "Aeolian Vamp (Am)",
+      name: "Aeolian Vamp",
     }),
-    "Aeolian Vamp (Am)",
+    "Aeolian Vamp",
   ),
 
-  "Locrian Vamp (Bm7b5)": assertProgression(
+  "Locrian Vamp": assertProgression(
     createProgression(["Bm7b5", "Cmaj7", "Bm7b5", "Bm7b5"], {
-      name: "Locrian Vamp (Bm7b5)",
+      name: "Locrian Vamp",
     }),
-    "Locrian Vamp (Bm7b5)",
+    "Locrian Vamp",
   ),
 
-  "Dorian Funk (Am7)": assertProgression(
+  "Dorian Funk": assertProgression(
     createProgression(["Am7", "D7", "Am7", "Am7"], {
-      name: "Dorian Funk (Am7)",
+      name: "Dorian Funk",
     }),
-    "Dorian Funk (Am7)",
+    "Dorian Funk",
   ),
 
-  "Mixolydian Blues (E7)": assertProgression(
+  "Mixolydian Blues": assertProgression(
     createProgression(["E7", "D", "A", "E7"], {
-      name: "Mixolydian Blues (E7)",
+      name: "Mixolydian Blues",
     }),
-    "Mixolydian Blues (E7)",
+    "Mixolydian Blues",
   ),
 } as const;
 
@@ -343,8 +343,8 @@ export const PRESET_METADATA: Record<
   PresetMetadata
 > = {
   // Jazz
-  "ii-V-I in C": {
-    key: "ii-V-I in C",
+  "ii-V-I": {
+    key: "ii-V-I",
     label: "ii–V–I",
     description: "The most common jazz cadence",
     category: "jazz",
@@ -354,7 +354,7 @@ export const PRESET_METADATA: Record<
   "Autumn Leaves (A section)": {
     key: "Autumn Leaves (A section)",
     label: "Autumn Leaves",
-    description: "Classic jazz standard in G major",
+    description: "Classic jazz standard",
     category: "jazz",
     difficulty: "intermediate",
     barCount: 8,
@@ -379,7 +379,7 @@ export const PRESET_METADATA: Record<
   "Blue Bossa": {
     key: "Blue Bossa",
     label: "Blue Bossa",
-    description: "Latin jazz classic in C minor",
+    description: "Latin jazz classic",
     category: "jazz",
     difficulty: "intermediate",
     barCount: 16,
@@ -400,8 +400,8 @@ export const PRESET_METADATA: Record<
     difficulty: "beginner",
     barCount: 16,
   },
-  "iii-vi-ii-V in C": {
-    key: "iii-vi-ii-V in C",
+  "iii-vi-ii-V": {
+    key: "iii-vi-ii-V",
     label: "iii–vi–ii–V",
     description: "Extended turnaround progression",
     category: "jazz",
@@ -419,7 +419,7 @@ export const PRESET_METADATA: Record<
   "Sonnymoon for Two": {
     key: "Sonnymoon for Two",
     label: "Sonnymoon for Two",
-    description: "Sonny Rollins blues head in Bb",
+    description: "Sonny Rollins blues head",
     category: "jazz",
     difficulty: "intermediate",
     barCount: 12,
@@ -442,32 +442,32 @@ export const PRESET_METADATA: Record<
   },
 
   // Pop
-  "I-V-vi-IV in C": {
-    key: "I-V-vi-IV in C",
+  "I-V-vi-IV": {
+    key: "I-V-vi-IV",
     label: "I–V–vi–IV",
     description: "Most popular pop progression",
     category: "pop",
     difficulty: "beginner",
     barCount: 4,
   },
-  "vi-IV-I-V in C": {
-    key: "vi-IV-I-V in C",
+  "vi-IV-I-V": {
+    key: "vi-IV-I-V",
     label: "vi–IV–I–V",
     description: "Sensitive/emotional progression",
     category: "pop",
     difficulty: "beginner",
     barCount: 4,
   },
-  "I-vi-IV-V in C": {
-    key: "I-vi-IV-V in C",
+  "I-vi-IV-V": {
+    key: "I-vi-IV-V",
     label: "I–vi–IV–V",
     description: "'50s doo-wop progression",
     category: "pop",
     difficulty: "beginner",
     barCount: 4,
   },
-  "I-IV-V-IV in G": {
-    key: "I-IV-V-IV in G",
+  "I-IV-V-IV": {
+    key: "I-IV-V-IV",
     label: "I–IV–V–IV",
     description: "Classic rock progression",
     category: "pop",
@@ -475,32 +475,32 @@ export const PRESET_METADATA: Record<
     barCount: 4,
   },
 
-  "I-IV-vi-V in G": {
-    key: "I-IV-vi-V in G",
+  "I-IV-vi-V": {
+    key: "I-IV-vi-V",
     label: "I–IV–vi–V",
     description: "Modern pop/worship progression",
     category: "pop",
     difficulty: "beginner",
     barCount: 4,
   },
-  "i-bVI-bIII-bVII in Am": {
-    key: "i-bVI-bIII-bVII in Am",
+  "i-bVI-bIII-bVII": {
+    key: "i-bVI-bIII-bVII",
     label: "i–bVI–bIII–bVII",
     description: "Andalusian cadence / epic minor",
     category: "pop",
     difficulty: "beginner",
     barCount: 4,
   },
-  "I-iii-IV-V in D": {
-    key: "I-iii-IV-V in D",
+  "I-iii-IV-V": {
+    key: "I-iii-IV-V",
     label: "I–iii–IV–V",
-    description: "Bright folk/pop progression in D",
+    description: "Bright folk/pop progression",
     category: "pop",
     difficulty: "beginner",
     barCount: 4,
   },
-  "IV-V-iii-vi in C": {
-    key: "IV-V-iii-vi in C",
+  "IV-V-iii-vi": {
+    key: "IV-V-iii-vi",
     label: "IV–V–iii–vi",
     description: "Royal road progression (J-pop staple)",
     category: "pop",
@@ -509,32 +509,32 @@ export const PRESET_METADATA: Record<
   },
 
   // Blues
-  "12-bar blues in A": {
-    key: "12-bar blues in A",
+  "12-Bar Blues": {
+    key: "12-Bar Blues",
     label: "12-Bar Blues",
-    description: "Standard blues form in A",
+    description: "Standard blues form",
     category: "blues",
     difficulty: "beginner",
     barCount: 12,
   },
-  "Minor Blues in Am": {
-    key: "Minor Blues in Am",
+  "Minor Blues": {
+    key: "Minor Blues",
     label: "Minor Blues",
     description: "12-bar minor blues",
     category: "blues",
     difficulty: "intermediate",
     barCount: 12,
   },
-  "Jazz Blues in Bb": {
-    key: "Jazz Blues in Bb",
+  "Jazz Blues": {
+    key: "Jazz Blues",
     label: "Jazz Blues",
     description: "Blues with jazz substitutions",
     category: "blues",
     difficulty: "advanced",
     barCount: 12,
   },
-  "8-bar Blues in E": {
-    key: "8-bar Blues in E",
+  "8-Bar Blues": {
+    key: "8-Bar Blues",
     label: "8-Bar Blues",
     description: "Shorter blues form",
     category: "blues",
@@ -542,32 +542,32 @@ export const PRESET_METADATA: Record<
     barCount: 8,
   },
 
-  "Slow Blues in G": {
-    key: "Slow Blues in G",
+  "Slow Blues": {
+    key: "Slow Blues",
     label: "Slow Blues",
     description: "Laid-back blues with passing chords",
     category: "blues",
     difficulty: "intermediate",
     barCount: 12,
   },
-  "Blues Shuffle in E": {
-    key: "Blues Shuffle in E",
+  "Blues Shuffle": {
+    key: "Blues Shuffle",
     label: "Blues Shuffle",
-    description: "Classic shuffle feel in E",
+    description: "Classic shuffle feel",
     category: "blues",
     difficulty: "beginner",
     barCount: 12,
   },
-  "Stormy Monday in G": {
-    key: "Stormy Monday in G",
+  "Stormy Monday": {
+    key: "Stormy Monday",
     label: "Stormy Monday",
     description: "T-Bone Walker style with chromatic movement",
     category: "blues",
     difficulty: "advanced",
     barCount: 12,
   },
-  "Quick Change Blues in A": {
-    key: "Quick Change Blues in A",
+  "Quick Change Blues": {
+    key: "Quick Change Blues",
     label: "Quick Change Blues",
     description: "Blues with IV chord in bar 2",
     category: "blues",
@@ -608,66 +608,66 @@ export const PRESET_METADATA: Record<
   },
 
   // Modal
-  "Dorian Vamp (Dm7)": {
-    key: "Dorian Vamp (Dm7)",
-    label: "Dorian (Dm7)",
-    description: "D Dorian mode vamp",
+  "Dorian Vamp": {
+    key: "Dorian Vamp",
+    label: "Dorian Vamp",
+    description: "Dorian mode vamp",
     category: "modal",
     difficulty: "beginner",
     barCount: 4,
   },
-  "Mixolydian Vamp (G7)": {
-    key: "Mixolydian Vamp (G7)",
-    label: "Mixolydian (G7)",
-    description: "G Mixolydian mode vamp",
+  "Mixolydian Vamp": {
+    key: "Mixolydian Vamp",
+    label: "Mixolydian Vamp",
+    description: "Mixolydian mode vamp",
     category: "modal",
     difficulty: "beginner",
     barCount: 4,
   },
-  "Phrygian Vamp (Em)": {
-    key: "Phrygian Vamp (Em)",
-    label: "Phrygian (Em)",
-    description: "E Phrygian mode vamp",
+  "Phrygian Vamp": {
+    key: "Phrygian Vamp",
+    label: "Phrygian Vamp",
+    description: "Phrygian mode vamp",
     category: "modal",
     difficulty: "intermediate",
     barCount: 4,
   },
-  "Lydian Vamp (Fmaj7)": {
-    key: "Lydian Vamp (Fmaj7)",
-    label: "Lydian (Fmaj7)",
-    description: "F Lydian mode vamp",
+  "Lydian Vamp": {
+    key: "Lydian Vamp",
+    label: "Lydian Vamp",
+    description: "Lydian mode vamp",
     category: "modal",
     difficulty: "intermediate",
     barCount: 4,
   },
-  "Aeolian Vamp (Am)": {
-    key: "Aeolian Vamp (Am)",
-    label: "Aeolian (Am)",
-    description: "A natural minor mode vamp",
+  "Aeolian Vamp": {
+    key: "Aeolian Vamp",
+    label: "Aeolian Vamp",
+    description: "Natural minor mode vamp",
     category: "modal",
     difficulty: "beginner",
     barCount: 4,
   },
-  "Locrian Vamp (Bm7b5)": {
-    key: "Locrian Vamp (Bm7b5)",
-    label: "Locrian (Bm7b5)",
+  "Locrian Vamp": {
+    key: "Locrian Vamp",
+    label: "Locrian Vamp",
     description: "Rare Locrian mode exploration",
     category: "modal",
     difficulty: "advanced",
     barCount: 4,
   },
-  "Dorian Funk (Am7)": {
-    key: "Dorian Funk (Am7)",
-    label: "Dorian Funk (Am7)",
-    description: "A Dorian with funk feel",
+  "Dorian Funk": {
+    key: "Dorian Funk",
+    label: "Dorian Funk",
+    description: "Dorian with funk feel",
     category: "modal",
     difficulty: "beginner",
     barCount: 4,
   },
-  "Mixolydian Blues (E7)": {
-    key: "Mixolydian Blues (E7)",
-    label: "Mixolydian Blues (E7)",
-    description: "E Mixolydian with bluesy motion",
+  "Mixolydian Blues": {
+    key: "Mixolydian Blues",
+    label: "Mixolydian Blues",
+    description: "Mixolydian with bluesy motion",
     category: "modal",
     difficulty: "intermediate",
     barCount: 4,

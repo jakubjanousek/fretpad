@@ -15,7 +15,7 @@ import { getChordAtPosition } from "@/state/slices/progressionSlice";
 import { useAppStore } from "@/state/useAppStore";
 
 function resetStore() {
-  const progression = PRESET_PROGRESSIONS["ii-V-I in C"];
+  const progression = PRESET_PROGRESSIONS["ii-V-I"];
   useAppStore.setState({
     activeMode: null,
     isPlaying: false,
@@ -45,9 +45,9 @@ describe("practiceModeSlice", () => {
 
   it("switches mode in one pass and applies mode defaults", () => {
     useAppStore.setState({
-      progression: PRESET_PROGRESSIONS["12-bar blues in A"],
+      progression: PRESET_PROGRESSIONS["12-Bar Blues"],
       currentChord: getChordAtPosition(
-        PRESET_PROGRESSIONS["12-bar blues in A"],
+        PRESET_PROGRESSIONS["12-Bar Blues"],
         0,
         0,
       ),
@@ -55,7 +55,7 @@ describe("practiceModeSlice", () => {
       currentChordIndex: 0,
       tempo: 40,
       selectedStyle: "jazzSwing",
-      progressionHistory: [PRESET_PROGRESSIONS["Minor Blues in Am"]],
+      progressionHistory: [PRESET_PROGRESSIONS["Minor Blues"]],
       progressionFuture: [PRESET_PROGRESSIONS["Rhythm Changes (A)"]],
     });
 
@@ -63,15 +63,15 @@ describe("practiceModeSlice", () => {
 
     const state = useAppStore.getState();
     expect(state.activeMode).toBe("learn-the-neck");
-    expect(state.progression).toBe(PRESET_PROGRESSIONS["Dorian Vamp (Dm7)"]);
+    expect(state.progression).toBe(PRESET_PROGRESSIONS["Dorian Vamp"]);
     expect(state.currentBarIndex).toBe(0);
     expect(state.currentChordIndex).toBe(0);
     expect(state.currentChord?.root).toBe("D");
     expect(state.tempo).toBe(90);
     expect(state.selectedStyle).toBe("jazzSwing");
     expect(state.progressionHistory).toEqual([
-      PRESET_PROGRESSIONS["Minor Blues in Am"],
-      PRESET_PROGRESSIONS["12-bar blues in A"],
+      PRESET_PROGRESSIONS["Minor Blues"],
+      PRESET_PROGRESSIONS["12-Bar Blues"],
     ]);
     expect(state.progressionFuture).toEqual([]);
     expect(localStorage.getItem("fretpad-last-mode")).toBe("learn-the-neck");
@@ -117,7 +117,7 @@ describe("practiceModeSlice", () => {
   });
 
   it("preserves progression data when defaults are skipped", () => {
-    const progression = PRESET_PROGRESSIONS["12-bar blues in A"];
+    const progression = PRESET_PROGRESSIONS["12-Bar Blues"];
     useAppStore.setState({
       progression,
       currentBarIndex: 3,
@@ -141,12 +141,12 @@ describe("practiceModeSlice", () => {
 
   it("caps mode-switch history at 10 entries", () => {
     const history = Array.from({ length: 10 }, (_, index) => ({
-      ...PRESET_PROGRESSIONS["ii-V-I in C"],
+      ...PRESET_PROGRESSIONS["ii-V-I"],
       name: `History ${index}`,
     }));
 
     useAppStore.setState({
-      progression: PRESET_PROGRESSIONS["12-bar blues in A"],
+      progression: PRESET_PROGRESSIONS["12-Bar Blues"],
       progressionHistory: history,
     });
 
@@ -155,7 +155,7 @@ describe("practiceModeSlice", () => {
     const { progressionHistory } = useAppStore.getState();
     expect(progressionHistory).toHaveLength(10);
     expect(progressionHistory.at(0)?.name).toBe("History 1");
-    expect(progressionHistory.at(-1)?.name).toBe("12-bar blues in A");
+    expect(progressionHistory.at(-1)?.name).toBe("12-Bar Blues");
   });
 
   it("notifies subscribers once for a mode switch", () => {

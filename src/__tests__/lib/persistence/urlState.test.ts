@@ -9,7 +9,7 @@ import {
 import { PRESET_PROGRESSIONS } from "@/lib/theory";
 
 const sampleState: ShareableState = {
-  progression: PRESET_PROGRESSIONS["ii-V-I in C"],
+  progression: PRESET_PROGRESSIONS["ii-V-I"],
   tempo: 120,
 };
 
@@ -119,7 +119,7 @@ describe("urlState", () => {
 
   describe("exportProgressionToText", () => {
     it("exports single-chord bars", () => {
-      const text = exportProgressionToText(PRESET_PROGRESSIONS["ii-V-I in C"]);
+      const text = exportProgressionToText(PRESET_PROGRESSIONS["ii-V-I"]);
       expect(text).toContain("|");
       expect(text).toContain("Dm7");
       expect(text).toContain("G7");

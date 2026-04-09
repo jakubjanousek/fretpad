@@ -92,4 +92,4 @@ src/
 
 The 4-phase pivot plan (trim → modularize → landing page → practice UI) is complete. Archived at `docs/archive/PLAN.md`.
 
-**Default state on load:** ii-V-I in C (`Dm7 | G7 | Cmaj7 | Cmaj7`), 120 BPM
+**Default state on load:** ii-V-I (`Dm7 | G7 | Cmaj7 | Cmaj7`), 120 BPM
