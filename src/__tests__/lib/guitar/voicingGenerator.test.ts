@@ -308,4 +308,45 @@ describe("generateVoicingsForChord", () => {
       expect(barreVoicings.length).toBeGreaterThan(0);
     });
   });
+
+  describe("drop 3 voicings", () => {
+    it("generates drop 3 voicings for Cmaj7", () => {
+      const voicings = generateVoicingsForChord(chord("Cmaj7"));
+      const drop3 = voicings.filter((v) => v.type === "drop3");
+      expect(drop3.length).toBeGreaterThan(0);
+    });
+
+    it("generates drop 3 voicings for all four seventh chord qualities", () => {
+      for (const symbol of ["Cmaj7", "Dm7", "G7", "Bm7b5"]) {
+        const c = chord(symbol);
+        const voicings = generateVoicingsForChord(c);
+        const drop3 = voicings.filter((v) => v.type === "drop3");
+        expect(drop3.length).toBeGreaterThan(0);
+      }
+    });
+
+    it("all notes in drop 3 voicings are correct chord tones", () => {
+      for (const symbol of ["Cmaj7", "Dm7", "G7", "Am7b5"]) {
+        const c = chord(symbol);
+        const voicings = generateVoicingsForChord(c);
+        const drop3 = voicings.filter((v) => v.type === "drop3");
+        for (const v of drop3) {
+          expect(allNotesInChord(v, c.notes)).toBe(true);
+        }
+      }
+    });
+
+    it("drop 3 voicings use lower strings than drop 2 top4", () => {
+      const voicings = generateVoicingsForChord(chord("Cmaj7"));
+      const drop3 = voicings.filter((v) => v.type === "drop3");
+      // Drop 3 on bottom4 should use strings 6,5,4,3 (indices 3,4,5,6 in 1-based)
+      for (const v of drop3) {
+        const soundingStrings = v.positions
+          .filter((p) => p.fret >= 0)
+          .map((p) => p.string);
+        // At least one sounding note on string 5 or 6
+        expect(soundingStrings.some((s) => s >= 5)).toBe(true);
+      }
+    });
+  });
 });
