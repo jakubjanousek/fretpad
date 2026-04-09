@@ -206,4 +206,66 @@ describe("generateVoicingsForChord", () => {
       }
     });
   });
+
+  describe("drop 2 inversions", () => {
+    it("generates voicings with inversions 0, 1, 2, and 3 for Cmaj7", () => {
+      const voicings = generateVoicingsForChord(chord("Cmaj7"));
+      const drop2 = voicings.filter((v) => v.type === "drop2");
+      const inversions = new Set(drop2.map((v) => v.inversion));
+      expect(inversions).toContain(0);
+      expect(inversions).toContain(1);
+      expect(inversions).toContain(2);
+      expect(inversions).toContain(3);
+    });
+
+    it("generates voicings with inversions 0, 1, 2, and 3 for Dm7", () => {
+      const voicings = generateVoicingsForChord(chord("Dm7"));
+      const drop2 = voicings.filter((v) => v.type === "drop2");
+      const inversions = new Set(drop2.map((v) => v.inversion));
+      expect(inversions).toContain(0);
+      expect(inversions).toContain(1);
+      expect(inversions).toContain(2);
+      expect(inversions).toContain(3);
+    });
+
+    it("generates voicings with inversions 0, 1, 2, and 3 for G7", () => {
+      const voicings = generateVoicingsForChord(chord("G7"));
+      const drop2 = voicings.filter((v) => v.type === "drop2");
+      const inversions = new Set(drop2.map((v) => v.inversion));
+      expect(inversions).toContain(0);
+      expect(inversions).toContain(1);
+      expect(inversions).toContain(2);
+      expect(inversions).toContain(3);
+    });
+
+    it("generates voicings with inversions 0, 1, 2, and 3 for Am7b5", () => {
+      const voicings = generateVoicingsForChord(chord("Am7b5"));
+      const drop2 = voicings.filter((v) => v.type === "drop2");
+      const inversions = new Set(drop2.map((v) => v.inversion));
+      expect(inversions).toContain(0);
+      expect(inversions).toContain(1);
+      expect(inversions).toContain(2);
+      expect(inversions).toContain(3);
+    });
+
+    it("all drop 2 inversion voicings have correct chord tones", () => {
+      for (const symbol of ["Cmaj7", "Dm7", "G7", "Bm7b5"]) {
+        const c = chord(symbol);
+        const voicings = generateVoicingsForChord(c);
+        const drop2 = voicings.filter((v) => v.type === "drop2");
+        for (const v of drop2) {
+          expect(allNotesInChord(v, c.notes)).toBe(true);
+        }
+      }
+    });
+
+    it("generates more voicings than with root position only", () => {
+      // With inversions, we should have significantly more drop 2 voicings
+      const voicings = generateVoicingsForChord(chord("Cmaj7"));
+      const drop2 = voicings.filter((v) => v.type === "drop2");
+      // Root position only produced ~2 drop 2 voicings for Cmaj7
+      // With inversions we expect significantly more
+      expect(drop2.length).toBeGreaterThan(5);
+    });
+  });
 });
