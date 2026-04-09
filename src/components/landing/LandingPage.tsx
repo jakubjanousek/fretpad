@@ -159,7 +159,7 @@ export function LandingPage() {
     <div className={`${display.variable} relative min-h-screen`}>
       {/* Ambient background */}
       <div className="fixed inset-0 -z-10" aria-hidden="true">
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-stone-950 to-stone-900" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-surface" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[radial-gradient(ellipse,_rgba(251,146,60,0.06)_0%,_transparent_70%)]" />
         <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-[radial-gradient(ellipse,_rgba(59,130,246,0.04)_0%,_transparent_70%)]" />
         <div
@@ -175,7 +175,7 @@ export function LandingPage() {
         <section className="px-4 sm:px-6 lg:px-8 pt-4 pb-16 sm:pb-24 max-w-6xl mx-auto">
           {/* Logo — matches practice page position */}
           <div className="py-2 mb-8 sm:mb-16">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-stone-400">
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-muted-foreground">
               FretPad
             </span>
           </div>
@@ -191,10 +191,12 @@ export function LandingPage() {
 
               <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.4rem,5vw,3.8rem)] leading-[1.05] tracking-[-0.02em] text-stone-50">
                 Play over changes.{" "}
-                <span className="text-stone-500">Nail the voicings.</span>
+                <span className="text-muted-foreground">
+                  Nail the voicings.
+                </span>
               </h1>
 
-              <p className="text-lg leading-relaxed text-stone-400 max-w-xl">
+              <p className="text-lg leading-relaxed text-muted-foreground max-w-xl">
                 FretPad plays a backing track and shows you what to play — chord
                 tones for improvising, voice-led voicings for comping. No
                 install, no account — just open and play.
@@ -221,7 +223,7 @@ export function LandingPage() {
                   Practice voicings
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
-                <span className="text-sm text-stone-500">
+                <span className="text-sm text-muted-foreground">
                   Free. Works in any browser.
                 </span>
               </div>
@@ -231,9 +233,9 @@ export function LandingPage() {
             <div className="mt-14 lg:mt-0">
               <div className="relative w-full">
                 <div className="absolute inset-0 blur-3xl opacity-20 bg-gradient-to-r from-orange-400/40 via-blue-400/20 to-emerald-400/30" />
-                <div className="relative rounded-2xl border border-stone-800/60 bg-stone-900/50 backdrop-blur-sm p-6 sm:p-8">
+                <div className="relative rounded-2xl border border-surface-border bg-surface/70 backdrop-blur-sm p-6 sm:p-8">
                   <FretboardGraphic />
-                  <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-stone-400">
+                  <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-muted-foreground">
                     <span className="flex items-center gap-1.5">
                       <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
                       Root
@@ -263,15 +265,15 @@ export function LandingPage() {
             {FEATURES.map((f) => (
               <div
                 key={f.label}
-                className="group rounded-2xl border border-stone-800/50 bg-stone-900/30 backdrop-blur-sm p-5 transition-colors hover:border-orange-700/30"
+                className="group rounded-2xl border border-surface-border bg-surface/50 backdrop-blur-sm p-5 transition-colors hover:border-orange-700/30"
               >
-                <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-stone-800 text-stone-300 transition-colors group-hover:bg-orange-900/30 group-hover:text-orange-400">
+                <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-surface-alt text-stone-300 transition-colors group-hover:bg-orange-900/30 group-hover:text-orange-400">
                   <f.icon className="h-4.5 w-4.5" />
                 </div>
                 <h3 className="text-sm font-semibold text-stone-200">
                   {f.label}
                 </h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-stone-400">
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                   {f.detail}
                 </p>
               </div>
@@ -281,7 +283,7 @@ export function LandingPage() {
 
         {/* Footer */}
         <footer className="px-4 sm:px-6 lg:px-8 pb-10 max-w-6xl mx-auto">
-          <div className="border-t border-stone-800/50 pt-6 flex items-center justify-between text-xs text-stone-500">
+          <div className="border-t border-surface-border pt-6 flex items-center justify-between text-xs text-muted-foreground">
             <span>FretPad</span>
             <span>No account needed. Your data stays in your browser.</span>
           </div>

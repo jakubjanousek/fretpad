@@ -92,7 +92,7 @@ export function FeedbackToast({ loopCount, mode, tempo }: FeedbackToastProps) {
       className={cn(
         "fixed bottom-24 left-1/2 -translate-x-1/2 z-50",
         "w-[min(360px,calc(100vw-2rem))]",
-        "rounded-xl border border-stone-700/50 bg-stone-900/95 backdrop-blur-sm",
+        "rounded-xl border border-surface-border bg-surface/95 backdrop-blur-sm",
         "p-4 shadow-xl shadow-black/20",
         "animate-in fade-in slide-in-from-bottom-4 duration-300",
       )}
@@ -142,7 +142,7 @@ export function FeedbackToast({ loopCount, mode, tempo }: FeedbackToastProps) {
               <button
                 type="button"
                 onClick={dismissPermanently}
-                className="ml-auto text-xs text-stone-500 hover:text-stone-400 transition-colors"
+                className="ml-auto text-xs text-muted-foreground hover:text-stone-300 transition-colors"
               >
                 Don&apos;t ask again
               </button>
@@ -157,7 +157,7 @@ export function FeedbackToast({ loopCount, mode, tempo }: FeedbackToastProps) {
                 onChange={(e) => setComment(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 placeholder="What could be better?"
-                className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-stone-200 placeholder:text-stone-500 focus:border-stone-600 focus:outline-none"
+                className="w-full rounded-lg border border-surface-border bg-surface-alt px-3 py-2 text-sm text-stone-200 placeholder:text-muted-foreground focus:border-stone-600 focus:outline-none"
                 maxLength={200}
                 // biome-ignore lint/a11y/noAutofocus: feedback input should capture focus when revealed
                 autoFocus

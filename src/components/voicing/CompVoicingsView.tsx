@@ -134,23 +134,23 @@ export function CompVoicingsView() {
           <span className="text-sm font-semibold font-[var(--font-display)] text-orange-400">
             {activeChord.symbol}
           </span>
-          <span className="text-xs text-stone-500">
+          <span className="text-xs text-muted-foreground">
             {TYPE_LABELS[selectedVoicing.type] ?? selectedVoicing.type}
           </span>
           {fretRange && (
             <>
-              <span className="text-stone-700">·</span>
-              <span className="text-xs text-stone-500">{fretRange}</span>
+              <span className="text-muted-foreground">·</span>
+              <span className="text-xs text-muted-foreground">{fretRange}</span>
             </>
           )}
-          <div className="flex items-center gap-1 rounded-full bg-stone-800/60 p-0.5">
+          <div className="flex items-center gap-1 rounded-full bg-surface-alt/70 p-0.5">
             <button
               type="button"
               onClick={() => setLabelMode("notes")}
               className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
                 labelMode === "notes"
                   ? "bg-stone-700 text-stone-200"
-                  : "text-stone-500 hover:text-stone-300"
+                  : "text-muted-foreground hover:text-stone-300"
               }`}
             >
               Notes
@@ -161,7 +161,7 @@ export function CompVoicingsView() {
               className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
                 labelMode === "intervals"
                   ? "bg-stone-700 text-stone-200"
-                  : "text-stone-500 hover:text-stone-300"
+                  : "text-muted-foreground hover:text-stone-300"
               }`}
             >
               Intervals
@@ -172,7 +172,7 @@ export function CompVoicingsView() {
 
       {/* Alternative voicings strip with type filter */}
       {!isPlaying && activeChord && (
-        <div className="rounded-xl border border-stone-800/50 bg-stone-900/20 p-3 sm:p-4">
+        <div className="rounded-xl border border-surface-border bg-surface/40 p-3 sm:p-4">
           <VoicingStrip
             voicings={activeVoicings}
             chordSymbol={activeChord.symbol}

@@ -68,10 +68,10 @@ export function PracticePage({ modeId }: PracticePageProps) {
   };
 
   return (
-    <div className={`${display.variable} relative min-h-screen pb-20`}>
+    <div className={`${display.variable} relative min-h-screen pb-24`}>
       {/* Ambient background */}
       <div className="fixed inset-0 -z-10" aria-hidden="true">
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-stone-950 to-stone-900" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-surface" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[radial-gradient(ellipse,_rgba(251,146,60,0.04)_0%,_transparent_70%)]" />
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -94,12 +94,12 @@ export function PracticePage({ modeId }: PracticePageProps) {
           <div className="flex items-center justify-between py-2">
             <Link
               href="/"
-              className="text-sm font-semibold tracking-[0.2em] uppercase text-stone-400 hover:text-stone-200 transition-colors"
+              className="text-sm font-semibold tracking-[0.2em] uppercase text-muted-foreground hover:text-stone-200 transition-colors"
             >
               FretPad
             </Link>
             {/* Mode toggle */}
-            <div className="flex items-center gap-1 rounded-full bg-stone-800/60 p-0.5">
+            <div className="flex items-center gap-1 rounded-full bg-surface-alt/70 p-0.5">
               {TOGGLE_MODES.map((mode) => (
                 <button
                   key={mode.id}
@@ -109,7 +109,7 @@ export function PracticePage({ modeId }: PracticePageProps) {
                     "text-xs font-medium px-3 py-1 rounded-full transition-colors",
                     modeId === mode.id
                       ? "bg-stone-700 text-stone-200"
-                      : "text-stone-500 hover:text-stone-300",
+                      : "text-muted-foreground hover:text-stone-300",
                   )}
                 >
                   {mode.label}
@@ -127,7 +127,7 @@ export function PracticePage({ modeId }: PracticePageProps) {
               : "max-h-[500px] opacity-100",
           )}
         >
-          <div className="rounded-2xl border border-stone-800/50 bg-stone-900/30 backdrop-blur-sm p-4 sm:p-5">
+          <div className="rounded-2xl border border-surface-border bg-surface/50 backdrop-blur-sm p-4 sm:p-5">
             <ProgressionEditor />
           </div>
         </div>
@@ -154,7 +154,7 @@ export function PracticePage({ modeId }: PracticePageProps) {
         {/* Main visualization — Fretboard or Voicings depending on mode */}
         <div
           className={cn(
-            "rounded-2xl border border-stone-800/50 bg-stone-900/30 backdrop-blur-sm transition-all duration-300",
+            "rounded-2xl border border-surface-border bg-surface/50 backdrop-blur-sm transition-all duration-300",
             isPlaying ? "p-3 sm:p-4" : "p-4 sm:p-5 lg:p-6",
           )}
         >

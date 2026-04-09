@@ -49,10 +49,10 @@ export function VoicingCard({
       onClick={onClick}
       className={cn(
         "flex flex-col items-center rounded-xl border-2 p-2.5 sm:p-3 transition-all shrink-0",
-        "hover:border-stone-600 hover:bg-stone-800/50",
+        "hover:border-surface-border hover:bg-surface-alt/50",
         isSelected
-          ? "border-orange-500/60 bg-stone-800/60 ring-1 ring-orange-500/20"
-          : "border-stone-800/40 bg-stone-900/30",
+          ? "border-orange-500/60 bg-surface-alt/60 ring-1 ring-orange-500/20"
+          : "border-surface-border bg-surface/50",
       )}
     >
       <ChordDiagram
@@ -71,7 +71,7 @@ export function VoicingCard({
         >
           {voicing.type}
         </span>
-        <span className="text-[10px] text-stone-500">
+        <span className="text-[10px] text-muted-foreground">
           {getFretRange(voicing)}
         </span>
       </div>

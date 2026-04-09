@@ -56,7 +56,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
 
   if (!chord) {
     return (
-      <div className="text-sm text-stone-400 dark:text-stone-500">
+      <div className="text-sm text-stone-400 dark:text-muted-foreground">
         Select a chord to see its details
       </div>
     );
@@ -119,11 +119,11 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
         <span className="font-[family-name:var(--font-display)] text-2xl tracking-tight text-stone-800 dark:text-stone-100">
           {chord.symbol}
         </span>
-        <span className="text-sm text-stone-500 dark:text-stone-400">
+        <span className="text-sm text-stone-500 dark:text-muted-foreground">
           {formatQuality(chord.quality)}
         </span>
         {chord.bassNote && (
-          <span className="text-xs text-stone-400 dark:text-stone-500">
+          <span className="text-xs text-stone-400 dark:text-muted-foreground">
             Bass: {chord.bassNote}
           </span>
         )}
@@ -134,7 +134,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
             size="sm"
             onClick={handlePlayChord}
             className={cn(
-              "h-7 px-2 text-xs gap-1 rounded-full text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200",
+              "h-7 px-2 text-xs gap-1 rounded-full text-stone-500 hover:text-stone-700 dark:text-muted-foreground dark:hover:text-stone-200",
               playingChord === "chord" &&
                 "text-orange-500 dark:text-orange-400",
             )}
@@ -153,7 +153,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
             size="sm"
             onClick={handlePlayArpeggio}
             className={cn(
-              "h-7 px-2 text-xs gap-1 rounded-full text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200",
+              "h-7 px-2 text-xs gap-1 rounded-full text-stone-500 hover:text-stone-700 dark:text-muted-foreground dark:hover:text-stone-200",
               playingChord === "arpeggio" &&
                 "text-orange-500 dark:text-orange-400",
             )}
@@ -176,7 +176,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
         {detectedKey && (
           <div className="md:col-span-3 -mb-2">
             <div className="flex items-center gap-2 text-xs">
-              <span className="text-stone-400 dark:text-stone-500 uppercase tracking-[0.15em] text-[10px]">
+              <span className="text-stone-400 dark:text-muted-foreground uppercase tracking-[0.15em] text-[10px]">
                 Key
               </span>
               <span className="font-medium text-stone-700 dark:text-stone-200">
@@ -185,7 +185,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
               {currentChordContext &&
                 !currentChordContext.scaleChangesFromKey &&
                 currentChordContext.modeLabel && (
-                  <span className="text-stone-400 dark:text-stone-500">
+                  <span className="text-stone-400 dark:text-muted-foreground">
                     · {currentChordContext.suggestedScale} is{" "}
                     {currentChordContext.modeLabel}
                   </span>
@@ -201,7 +201,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
 
         {/* Chord Tones */}
         <div>
-          <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-stone-500 mb-2">
+          <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-muted-foreground mb-2">
             Chord Tones
           </h4>
           <div className="flex flex-wrap gap-1.5">
@@ -239,7 +239,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
 
         {/* Guide Tones */}
         <div>
-          <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-stone-500 mb-2">
+          <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-muted-foreground mb-2">
             Guide Tones{" "}
             <span className="normal-case tracking-normal">(3rd & 7th)</span>
           </h4>
@@ -257,7 +257,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
               <span className="text-xs text-stone-400">No guide tones</span>
             )}
           </div>
-          <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-1.5">
+          <p className="text-[10px] text-stone-400 dark:text-muted-foreground mt-1.5">
             Define the chord's character
           </p>
         </div>
@@ -265,10 +265,10 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
         {/* Suggested Scales */}
         <div>
           <div className="mb-2">
-            <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-stone-500">
+            <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-muted-foreground">
               Suggested Scales
             </h4>
-            <p className="text-[10px] text-stone-400/70 dark:text-stone-500/70 mt-0.5">
+            <p className="text-[10px] text-stone-400/70 dark:text-muted-foreground/70 mt-0.5">
               Click to preview on fretboard
             </p>
           </div>
@@ -293,7 +293,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
                       "border-y border-l active:scale-95",
                       isActive
                         ? "bg-orange-500/15 border-orange-400/50 text-orange-700 dark:text-orange-400"
-                        : "bg-stone-100/60 dark:bg-stone-800/40 border-stone-200/50 dark:border-stone-700/50 text-stone-600 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-stone-700/40",
+                        : "bg-stone-100/60 dark:bg-surface-alt/40 border-stone-200/50 dark:border-stone-700/50 text-stone-600 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-stone-700/40",
                       isFirst &&
                         !isActive &&
                         "ring-1 ring-stone-300/30 dark:ring-stone-600/30",
@@ -302,7 +302,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
                     {isActive && <Check className="w-3 h-3" />}
                     {scale}
                     {isFirst && !isActive && (
-                      <span className="text-[9px] text-stone-400 dark:text-stone-500 ml-0.5">
+                      <span className="text-[9px] text-stone-400 dark:text-muted-foreground ml-0.5">
                         recommended
                       </span>
                     )}
@@ -314,7 +314,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
                       "p-1 rounded-r-full border-y border-r transition-colors",
                       isPlayingThisScale
                         ? "bg-orange-500/15 border-orange-400/50 text-orange-500"
-                        : "bg-stone-100/60 dark:bg-stone-800/40 border-stone-200/50 dark:border-stone-700/50 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300",
+                        : "bg-stone-100/60 dark:bg-surface-alt/40 border-stone-200/50 dark:border-stone-700/50 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300",
                     )}
                     title={`Play ${scale}`}
                   >
