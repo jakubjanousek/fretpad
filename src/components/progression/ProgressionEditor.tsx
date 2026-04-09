@@ -283,50 +283,18 @@ export function ProgressionEditor() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-1">
-      {/* Progression bars - compact strip */}
-      <div className="relative">
-        <div className="flex flex-wrap items-center gap-1 pb-0.5">
-          <PresetDropdown />
+    <div className="flex flex-col gap-1.5">
+      {/* Row 1: Metadata — preset, name, transpose, time sig */}
+      <div className="flex items-center gap-1.5">
+        <PresetDropdown />
+
+        <div className="flex items-center gap-1 ml-auto">
+          <span className="text-[10px] text-muted-foreground">Name</span>
           <ProgressionName />
-
-          {progression.bars.map((bar, barIndex) => {
-            // Convert bar chords to string for editing
-            const chordString = bar.chords.map((bc) => bc.chord).join(" ");
-
-            return (
-              <BarInput
-                key={bar.id}
-                barIndex={barIndex}
-                chordString={chordString}
-                isSelected={barIndex === currentBarIndex}
-                selectedChordIndex={currentChordIndex}
-                onSelect={handleSelect}
-                onUpdate={updateBar}
-                onRemove={removeBar}
-                canRemove={progression.bars.length > 1}
-                barRef={(node) => {
-                  barRefs.current[barIndex] = node;
-                }}
-                playheadRef={(node) => {
-                  playheadRefs.current[barIndex] = node;
-                }}
-              />
-            );
-          })}
-
-          {/* Add bar button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={addBar}
-            className="h-7 px-2 shrink-0"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </Button>
-
-          {/* Transpose buttons */}
-          <div className="flex items-center gap-0.5 shrink-0">
+          <span className="text-[10px] text-muted-foreground pl-1.5">
+            Transpose
+          </span>
+          <div className="flex items-center gap-0.5">
             <Button
               variant="ghost"
               size="sm"
@@ -348,13 +316,47 @@ export function ProgressionEditor() {
               <ChevronUp className="h-3 w-3" />
             </Button>
           </div>
-
-          {/* Time signature display */}
-          <span className="text-xs text-muted-foreground shrink-0 ml-auto pl-2">
+          <span className="text-xs text-muted-foreground pl-1.5">
             {progression.timeSignature.numerator}/
             {progression.timeSignature.denominator}
           </span>
         </div>
+      </div>
+
+      {/* Row 2: Chord bars */}
+      <div className="flex flex-wrap items-center gap-1">
+        {progression.bars.map((bar, barIndex) => {
+          const chordString = bar.chords.map((bc) => bc.chord).join(" ");
+
+          return (
+            <BarInput
+              key={bar.id}
+              barIndex={barIndex}
+              chordString={chordString}
+              isSelected={barIndex === currentBarIndex}
+              selectedChordIndex={currentChordIndex}
+              onSelect={handleSelect}
+              onUpdate={updateBar}
+              onRemove={removeBar}
+              canRemove={progression.bars.length > 1}
+              barRef={(node) => {
+                barRefs.current[barIndex] = node;
+              }}
+              playheadRef={(node) => {
+                playheadRefs.current[barIndex] = node;
+              }}
+            />
+          );
+        })}
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={addBar}
+          className="h-7 px-2 shrink-0"
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </Button>
       </div>
 
       <p className="text-[10px] text-muted-foreground/70">
