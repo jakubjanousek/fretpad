@@ -3,6 +3,7 @@ import type {
   Chord,
   GuitarFretPosition,
   GuitarVoicing,
+  GuitarVoicingType,
   NoteName,
   VoicingTemplate,
 } from "@/lib/types";
@@ -158,4 +159,14 @@ export function generateVoicingsForChord(
   // Sort by baseFret for predictable ordering
   voicings.sort((a, b) => a.baseFret - b.baseFret);
   return voicings;
+}
+
+/** Filter voicings by type. Returns all voicings if types is undefined. */
+export function filterVoicingsByType(
+  voicings: GuitarVoicing[],
+  types: GuitarVoicingType[] | undefined,
+): GuitarVoicing[] {
+  if (!types) return voicings;
+  const typeSet = new Set(types);
+  return voicings.filter((v) => typeSet.has(v.type));
 }

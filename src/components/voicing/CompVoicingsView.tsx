@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toFlatChordIndex, useVoicingData } from "@/hooks/useVoicingData";
-import type { GuitarVoicing } from "@/lib/types";
+import type { GuitarVoicing, GuitarVoicingType } from "@/lib/types";
 import { useAppStore } from "@/state/useAppStore";
-import { type DiagramLabelMode } from "./ChordDiagram";
+import type { DiagramLabelMode } from "./ChordDiagram";
 import { VoiceLeadingPath } from "./VoiceLeadingPath";
 import { VoicingStrip } from "./VoicingStrip";
 
@@ -14,8 +14,33 @@ const TYPE_LABELS: Record<string, string> = {
   drop3: "Drop 3",
   barre: "Barre chord",
   open: "Open voicing",
+  triadic: "Triad",
   rootless: "Rootless",
 };
+
+type VoicingTypeFilter = "all" | "shell" | "drop2" | "drop3";
+
+const FILTER_OPTIONS: { value: VoicingTypeFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "shell", label: "Shell" },
+  { value: "drop2", label: "Drop 2" },
+  { value: "drop3", label: "Drop 3" },
+];
+
+function filterToTypes(
+  filter: VoicingTypeFilter,
+): GuitarVoicingType[] | undefined {
+  switch (filter) {
+    case "shell":
+      return ["shell"];
+    case "drop2":
+      return ["drop2"];
+    case "drop3":
+      return ["drop3"];
+    default:
+      return undefined;
+  }
+}
 
 export function CompVoicingsView() {
   const progression = useAppStore((s) => s.progression);
@@ -24,7 +49,16 @@ export function CompVoicingsView() {
   const isPlaying = useAppStore((s) => s.isPlaying);
   const setCurrentPosition = useAppStore((s) => s.setCurrentPosition);
 
-  const { chords, voicingsPerChord, path } = useVoicingData(progression);
+  const [voicingFilter, setVoicingFilter] = useState<VoicingTypeFilter>("all");
+  const typeFilter = useMemo(
+    () => filterToTypes(voicingFilter),
+    [voicingFilter],
+  );
+
+  const { chords, voicingsPerChord, path } = useVoicingData(
+    progression,
+    typeFilter,
+  );
 
   const flatIndex = toFlatChordIndex(
     progression,
@@ -109,6 +143,22 @@ export function CompVoicingsView() {
               <span className="text-xs text-stone-500">{fretRange}</span>
             </>
           )}
+          <div className="flex items-center gap-1 rounded-full bg-stone-800/60 p-0.5">
+            {FILTER_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setVoicingFilter(opt.value)}
+                className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
+                  voicingFilter === opt.value
+                    ? "bg-stone-700 text-stone-200"
+                    : "text-stone-500 hover:text-stone-300"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
           <div className="flex items-center gap-1 rounded-full bg-stone-800/60 p-0.5">
             <button
               type="button"
