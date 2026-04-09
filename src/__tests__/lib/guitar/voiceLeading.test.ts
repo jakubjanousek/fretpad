@@ -152,4 +152,25 @@ describe("computeVoiceLeadingPath", () => {
     expect(path[0]?.id).toBe(path[1]?.id);
     expect(path[1]?.id).toBe(path[2]?.id);
   });
+
+  it("preserves path length when some groups are empty", () => {
+    const chords = [chord("Cmaj7"), chord("C"), chord("Dm7")];
+    // Simulate a filter that removes all voicings for the middle chord
+    const voicingsPerChord = [
+      generateVoicingsForChord(chords[0]!),
+      [], // empty group
+      generateVoicingsForChord(chords[2]!),
+    ];
+    const path = computeVoiceLeadingPath(chords, voicingsPerChord);
+    expect(path).toHaveLength(3);
+    expect(path[0]).toBeDefined();
+    expect(path[1]).toBeUndefined();
+    expect(path[2]).toBeDefined();
+  });
+
+  it("returns correct length when all groups are empty", () => {
+    const chords = [chord("Cmaj7"), chord("Dm7")];
+    const path = computeVoiceLeadingPath(chords, [[], []]);
+    expect(path).toHaveLength(2);
+  });
 });
