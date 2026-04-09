@@ -218,7 +218,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
                     "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-150 border",
                     isActive
                       ? "bg-orange-500/15 border-orange-400/50 text-orange-700 dark:text-orange-400"
-                      : "bg-surface-alt/40 border-stone-700/50 text-stone-300 hover:bg-stone-700/40",
+                      : "bg-stone-100/60 dark:bg-surface-alt/40 border-stone-200/50 dark:border-stone-700/50 text-stone-600 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-stone-700/40",
                   )}
                 >
                   <button
