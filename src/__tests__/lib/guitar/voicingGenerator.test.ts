@@ -268,4 +268,44 @@ describe("generateVoicingsForChord", () => {
       expect(drop2.length).toBeGreaterThan(5);
     });
   });
+
+  describe("triad voicings", () => {
+    it("generates voicings for C major triad", () => {
+      const voicings = generateVoicingsForChord(chord("C"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("generates voicings for Am minor triad", () => {
+      const voicings = generateVoicingsForChord(chord("Am"));
+      expect(voicings.length).toBeGreaterThan(0);
+    });
+
+    it("all notes in C major triad voicings belong to the chord", () => {
+      const c = chord("C");
+      const voicings = generateVoicingsForChord(c);
+      for (const v of voicings) {
+        expect(allNotesInChord(v, c.notes)).toBe(true);
+      }
+    });
+
+    it("all notes in Am voicings belong to the chord", () => {
+      const c = chord("Am");
+      const voicings = generateVoicingsForChord(c);
+      for (const v of voicings) {
+        expect(allNotesInChord(v, c.notes)).toBe(true);
+      }
+    });
+
+    it("includes barre chord voicings for major triads", () => {
+      const voicings = generateVoicingsForChord(chord("C"));
+      const barreVoicings = voicings.filter((v) => v.isBarreChord);
+      expect(barreVoicings.length).toBeGreaterThan(0);
+    });
+
+    it("includes barre chord voicings for minor triads", () => {
+      const voicings = generateVoicingsForChord(chord("Am"));
+      const barreVoicings = voicings.filter((v) => v.isBarreChord);
+      expect(barreVoicings.length).toBeGreaterThan(0);
+    });
+  });
 });
