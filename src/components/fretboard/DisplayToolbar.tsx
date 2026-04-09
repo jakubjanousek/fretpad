@@ -3,11 +3,13 @@
 import { PRACTICE_MODES } from "@/lib/modes";
 import type {
   FretboardOverlay,
+  MaxFrets,
   NoteLabelMode,
   TargetNoteMode,
 } from "@/lib/types";
 import { useAppStore } from "@/state/useAppStore";
 
+import { FretCountSelector } from "./DisplayToolbar/FretCountSelector";
 import { LabelSegmentedControl } from "./DisplayToolbar/LabelSegmentedControl";
 import { LayersDropdown } from "./DisplayToolbar/LayersDropdown";
 import { OverlayDropdown } from "./DisplayToolbar/OverlayDropdown";
@@ -33,6 +35,10 @@ export interface DisplayToolbarProps {
   onToggleChromaticApproach?: () => void;
   showDiatonicApproach: boolean;
   onToggleDiatonicApproach?: () => void;
+
+  // Fret count
+  maxFrets?: MaxFrets;
+  onMaxFretsChange?: (frets: MaxFrets) => void;
 }
 
 export function DisplayToolbar({
@@ -55,6 +61,9 @@ export function DisplayToolbar({
   onToggleChromaticApproach,
   showDiatonicApproach,
   onToggleDiatonicApproach,
+
+  maxFrets,
+  onMaxFretsChange,
 }: DisplayToolbarProps) {
   const activeMode = useAppStore((state) => state.activeMode);
   const modeConfig = activeMode ? PRACTICE_MODES[activeMode] : null;
@@ -66,6 +75,13 @@ export function DisplayToolbar({
 
   return (
     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+      {maxFrets !== undefined && (
+        <FretCountSelector
+          maxFrets={maxFrets}
+          onMaxFretsChange={onMaxFretsChange}
+        />
+      )}
+
       {showOverlay && (
         <OverlayDropdown
           fretboardOverlay={fretboardOverlay}

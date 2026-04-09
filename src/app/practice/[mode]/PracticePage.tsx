@@ -81,7 +81,7 @@ export function PracticePage({ modeId }: PracticePageProps) {
         />
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 space-y-4">
+      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 pt-4 space-y-4">
         {/* Top bar — collapses during play */}
         <div
           className={cn(
