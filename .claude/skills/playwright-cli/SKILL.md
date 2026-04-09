@@ -6,6 +6,16 @@ allowed-tools: Bash(playwright-cli:*) Bash(npx:*) Bash(npm:*)
 
 # Browser Automation with playwright-cli
 
+## Screenshot storage rule
+
+**All screenshots MUST be saved to the `.playwright-screenshots/` directory** (gitignored). Always use `--filename=.playwright-screenshots/<name>.png` when taking screenshots. Create the directory first if it doesn't exist.
+
+```bash
+mkdir -p .playwright-screenshots
+playwright-cli screenshot --filename=.playwright-screenshots/page.png
+playwright-cli screenshot e5 --filename=.playwright-screenshots/element.png
+```
+
 ## Quick start
 
 ```bash
