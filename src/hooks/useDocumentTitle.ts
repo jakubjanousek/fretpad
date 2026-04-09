@@ -19,11 +19,13 @@ export {
  */
 export function useDocumentTitle(): void {
   const progression = useAppStore((s) => s.progression);
-  const [hydrated, setHydrated] = useState(useAppStore.persist.hasHydrated());
+  const [hydrated, setHydrated] = useState(
+    () => useAppStore.persist?.hasHydrated?.() ?? false,
+  );
 
   useEffect(() => {
     if (hydrated) return;
-    const unsub = useAppStore.persist.onFinishHydration(() => {
+    const unsub = useAppStore.persist?.onFinishHydration?.(() => {
       setHydrated(true);
     });
     return unsub;

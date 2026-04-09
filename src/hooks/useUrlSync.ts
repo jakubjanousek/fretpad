@@ -146,12 +146,12 @@ export function useUrlSync(): boolean {
       }
     };
 
-    if (useAppStore.persist.hasHydrated()) {
+    if (useAppStore.persist?.hasHydrated?.()) {
       apply();
     } else {
-      const unsub = useAppStore.persist.onFinishHydration(() => {
+      const unsub = useAppStore.persist?.onFinishHydration?.(() => {
         apply();
-        unsub();
+        unsub?.();
       });
       return unsub;
     }
