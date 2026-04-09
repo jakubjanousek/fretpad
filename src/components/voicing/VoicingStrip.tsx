@@ -49,7 +49,7 @@ export function VoicingStrip({
           </span>
         </div>
         {filterOptions && onFilterChange && (
-          <div className="flex items-center gap-0.5 rounded-full bg-surface-alt/80 p-0.5">
+          <div className="flex items-center gap-0.5 rounded-full bg-stone-800 p-0.5">
             {filterOptions.map((opt) => (
               <button
                 key={opt.value}
@@ -58,7 +58,7 @@ export function VoicingStrip({
                 className={`text-[10px] font-medium px-2 py-0.5 rounded-full transition-colors ${
                   activeFilter === opt.value
                     ? "bg-stone-600 text-stone-100"
-                    : "text-muted-foreground hover:text-stone-200"
+                    : "text-stone-400 hover:text-stone-200"
                 }`}
               >
                 {opt.label}

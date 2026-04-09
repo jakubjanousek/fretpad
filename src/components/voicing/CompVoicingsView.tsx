@@ -143,14 +143,14 @@ export function CompVoicingsView() {
               <span className="text-xs text-muted-foreground">{fretRange}</span>
             </>
           )}
-          <div className="flex items-center gap-1 rounded-full bg-surface-alt/70 p-0.5">
+          <div className="flex items-center gap-0.5 rounded-full bg-stone-800 p-0.5">
             <button
               type="button"
               onClick={() => setLabelMode("notes")}
               className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
                 labelMode === "notes"
-                  ? "bg-stone-700 text-stone-200"
-                  : "text-muted-foreground hover:text-stone-300"
+                  ? "bg-stone-600 text-stone-100"
+                  : "text-stone-400 hover:text-stone-200"
               }`}
             >
               Notes
@@ -160,8 +160,8 @@ export function CompVoicingsView() {
               onClick={() => setLabelMode("intervals")}
               className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
                 labelMode === "intervals"
-                  ? "bg-stone-700 text-stone-200"
-                  : "text-muted-foreground hover:text-stone-300"
+                  ? "bg-stone-600 text-stone-100"
+                  : "text-stone-400 hover:text-stone-200"
               }`}
             >
               Intervals
