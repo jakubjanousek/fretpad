@@ -223,9 +223,9 @@ export function Fretboard({
                   >
                     {FRET_MARKERS.includes(fret) && (
                       <div className="flex flex-col gap-8">
-                        <div className="w-2 h-2 rounded-full bg-slate-400/40" />
+                        <div className="w-3 h-3 rounded-full bg-slate-400/60 dark:bg-slate-500/50" />
                         {DOUBLE_MARKER_FRETS.includes(fret) && (
-                          <div className="w-2 h-2 rounded-full bg-slate-400/40" />
+                          <div className="w-3 h-3 rounded-full bg-slate-400/60 dark:bg-slate-500/50" />
                         )}
                       </div>
                     )}
