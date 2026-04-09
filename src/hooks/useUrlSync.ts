@@ -30,6 +30,10 @@ export function buildUrlParams(
     .join("|");
   params.set("chords", chordsStr);
 
+  if (progression.name) {
+    params.set("name", progression.name);
+  }
+
   if (tempo !== DEFAULT_TEMPO) {
     params.set("tempo", String(tempo));
   }
@@ -45,10 +49,10 @@ export function parseUrlParams(params: URLSearchParams): UrlState | null {
   const chordsStr = params.get("chords");
   if (!chordsStr) return null;
 
+  const name = params.get("name") ?? "";
+
   // parseProgression handles pipe-separated format natively
-  const progression = parseProgression(chordsStr, {
-    name: "Shared Progression",
-  });
+  const progression = parseProgression(chordsStr, { name });
   if (!progression) return null;
 
   const tempoStr = params.get("tempo");
@@ -77,6 +81,11 @@ export function buildQueryString(
   const parts = [
     `chords=${encodeURIComponent(chordsStr).replace(/%7C/gi, "|")}`,
   ];
+  if (progression.name) {
+    parts.push(
+      `name=${encodeURIComponent(progression.name).replace(/%20/g, "+")}`,
+    );
+  }
   if (tempo !== DEFAULT_TEMPO) {
     parts.push(`tempo=${tempo}`);
   }
@@ -93,8 +102,26 @@ export function syncStateToUrl(progression: Progression, tempo: number): void {
 }
 
 /**
+ * Parse URL state eagerly from the initial page URL.
+ * Called once at module scope to capture params before anything can overwrite them.
+ */
+function captureInitialUrlState(): UrlState | null {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  return (
+    parseUrlParams(params) ??
+    (params.has("p") ? decodeStateFromUrl(params.get("p") ?? "") : null)
+  );
+}
+
+const initialUrlState = captureInitialUrlState();
+
+/** Whether the initial page load had URL state (chords or p param). */
+export const hadInitialUrlState = initialUrlState !== null;
+
+/**
  * Two-way sync between Zustand store and URL.
- * - On mount: reads ?chords= and applies to store
+ * - After Zustand persist rehydration: applies URL state (URL wins over localStorage)
  * - On progression/tempo change: writes back to URL
  * Returns whether URL state was found on mount.
  */
@@ -106,25 +133,33 @@ export function useUrlSync(): boolean {
   const progression = useAppStore((s) => s.progression);
   const tempo = useAppStore((s) => s.tempo);
 
-  // Read from URL on mount (once)
+  // Apply URL state after Zustand persist rehydration completes
   useEffect(() => {
     if (hasLoadedRef.current) return;
-    hasLoadedRef.current = true;
 
-    const params = new URLSearchParams(window.location.search);
-    // Try new readable format first, fall back to legacy base64
-    const urlState =
-      parseUrlParams(params) ??
-      (params.has("p") ? decodeStateFromUrl(params.get("p") ?? "") : null);
-    if (urlState) {
-      hadUrlState.current = true;
-      setProgression(urlState.progression);
-      setTempo(urlState.tempo);
+    const apply = () => {
+      hasLoadedRef.current = true;
+      if (initialUrlState) {
+        hadUrlState.current = true;
+        setProgression(initialUrlState.progression);
+        setTempo(initialUrlState.tempo);
+      }
+    };
+
+    if (useAppStore.persist.hasHydrated()) {
+      apply();
+    } else {
+      const unsub = useAppStore.persist.onFinishHydration(() => {
+        apply();
+        unsub();
+      });
+      return unsub;
     }
   }, [setProgression, setTempo]);
 
-  // Write to URL on every state change
+  // Write to URL on every state change (only after initial load)
   useEffect(() => {
+    if (!hasLoadedRef.current) return;
     syncStateToUrl(progression, tempo);
   }, [progression, tempo]);
 

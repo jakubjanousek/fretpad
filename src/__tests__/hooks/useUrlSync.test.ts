@@ -46,6 +46,18 @@ describe("useUrlSync helpers", () => {
       const params = buildUrlParams(iiVI, 120);
       expect(params.has("tempo")).toBe(false);
     });
+
+    it("includes name param when progression has a non-empty name", () => {
+      const named = { ...iiVI, name: "My Jazz Turnaround" };
+      const params = buildUrlParams(named, 120);
+      expect(params.get("name")).toBe("My Jazz Turnaround");
+    });
+
+    it("omits name param when name is empty", () => {
+      const unnamed = { ...iiVI, name: "" };
+      const params = buildUrlParams(unnamed, 120);
+      expect(params.has("name")).toBe(false);
+    });
   });
 
   describe("parseUrlParams", () => {
@@ -115,6 +127,41 @@ describe("useUrlSync helpers", () => {
       const params = new URLSearchParams("chords=XYZ123");
       const result = parseUrlParams(params);
       expect(result).toBeNull();
+    });
+
+    it("reads name from URL params into progression.name", () => {
+      const params = new URLSearchParams("chords=Dm7|G7|Cmaj7&name=My+Blues");
+      const result = parseUrlParams(params);
+      expect(result?.progression.name).toBe("My Blues");
+    });
+
+    it("sets empty name when name param is missing", () => {
+      const params = new URLSearchParams("chords=Dm7|G7|Cmaj7");
+      const result = parseUrlParams(params);
+      expect(result?.progression.name).toBe("");
+    });
+
+    it("roundtrips name through buildUrlParams/parseUrlParams", () => {
+      const named = { ...iiVI, name: "Cool Progression" };
+      const params = buildUrlParams(named, 120);
+      const result = parseUrlParams(params);
+      expect(result?.progression.name).toBe("Cool Progression");
+    });
+  });
+
+  describe("buildQueryString", () => {
+    it("includes name when non-empty", async () => {
+      const { buildQueryString } = await import("@/hooks/useUrlSync");
+      const named = { ...iiVI, name: "My Turnaround" };
+      const qs = buildQueryString(named, 120);
+      expect(qs).toContain("name=My+Turnaround");
+    });
+
+    it("omits name when empty", async () => {
+      const { buildQueryString } = await import("@/hooks/useUrlSync");
+      const unnamed = { ...iiVI, name: "" };
+      const qs = buildQueryString(unnamed, 120);
+      expect(qs).not.toContain("name=");
     });
   });
 

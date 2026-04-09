@@ -63,10 +63,8 @@ export function parseProgression(
     timeSignature?: { numerator: number; denominator: number };
   } = {},
 ): Progression | null {
-  const {
-    name = "Custom Progression",
-    timeSignature = { numerator: 4, denominator: 4 },
-  } = options;
+  const { name = "", timeSignature = { numerator: 4, denominator: 4 } } =
+    options;
 
   const totalBeats = timeSignature.numerator;
   const bars: ProgressionBar[] = [];
@@ -130,10 +128,8 @@ export function createProgression(
     timeSignature?: { numerator: number; denominator: number };
   } = {},
 ): Progression | null {
-  const {
-    name = "Custom Progression",
-    timeSignature = { numerator: 4, denominator: 4 },
-  } = options;
+  const { name = "", timeSignature = { numerator: 4, denominator: 4 } } =
+    options;
 
   const bars: ProgressionBar[] = [];
 

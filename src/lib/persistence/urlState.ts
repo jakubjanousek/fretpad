@@ -57,19 +57,37 @@ export function decodeStateFromUrl(encoded: string): ShareableState | null {
   }
 }
 
+const DEFAULT_TEMPO = 120;
+
 /**
- * Generate a shareable URL with encoded progression
+ * Generate a shareable URL with readable query params.
+ * Format: /practice/mode?chords=Dm7|G7|Cmaj7&name=My+Tune&tempo=140
  */
 export function generateShareUrl(
   state: ShareableState,
   mode: PracticeModeId | null,
   origin?: string,
 ): string {
-  const encoded = encodeStateToUrl(state);
-  const url = new URL(origin ?? window.location.origin);
-  url.pathname = `/practice/${mode ?? DEFAULT_SHARE_MODE}`;
-  url.searchParams.set(URL_PARAM, encoded);
-  return url.toString();
+  const { progression, tempo } = state;
+  const base = new URL(origin ?? window.location.origin);
+  base.pathname = `/practice/${mode ?? DEFAULT_SHARE_MODE}`;
+
+  const chordsStr = progression.bars
+    .map((bar) => bar.chords.map((c) => c.chord).join(" "))
+    .join("|");
+  const parts = [
+    `chords=${encodeURIComponent(chordsStr).replace(/%7C/gi, "|")}`,
+  ];
+  if (progression.name) {
+    parts.push(
+      `name=${encodeURIComponent(progression.name).replace(/%20/g, "+")}`,
+    );
+  }
+  if (tempo !== DEFAULT_TEMPO) {
+    parts.push(`tempo=${tempo}`);
+  }
+
+  return `${base.origin}${base.pathname}?${parts.join("&")}`;
 }
 
 /**

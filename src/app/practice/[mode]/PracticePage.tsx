@@ -14,6 +14,7 @@ import { ProgressBar } from "@/components/transport/ProgressBar";
 import { TransportBar } from "@/components/transport/TransportBar";
 import { TransportDrawer } from "@/components/transport/TransportDrawer";
 import { CompVoicingsView } from "@/components/voicing/CompVoicingsView";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useFretboardData } from "@/hooks/useFretboardData";
 import { usePracticeModeSetup } from "@/hooks/usePracticeModeSetup";
 import { buildQueryString } from "@/hooks/useUrlSync";
@@ -34,6 +35,7 @@ interface PracticePageProps {
 
 export function PracticePage({ modeId }: PracticePageProps) {
   usePracticeModeSetup(modeId);
+  useDocumentTitle();
 
   const isPlaying = useAppStore((s) => s.isPlaying);
   const progression = useAppStore((s) => s.progression);

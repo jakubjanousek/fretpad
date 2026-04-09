@@ -72,15 +72,16 @@ describe("urlState", () => {
   });
 
   describe("generateShareUrl", () => {
-    it("builds URL with explicit mode in path", () => {
+    it("builds readable URL with explicit mode in path", () => {
       const url = generateShareUrl(
         sampleState,
         "learn-the-neck",
         "https://fretpad.app",
       );
       expect(url).toMatch(
-        /^https:\/\/fretpad\.app\/practice\/learn-the-neck\?p=/,
+        /^https:\/\/fretpad\.app\/practice\/learn-the-neck\?chords=/,
       );
+      expect(url).toContain("Dm7|G7|Cmaj7|Cmaj7");
     });
 
     it("falls back to default mode when mode is null", () => {
@@ -88,18 +89,31 @@ describe("urlState", () => {
       expect(url).toContain("/practice/outline-chord-changes");
     });
 
-    it("preserves encoded state in query param", () => {
+    it("includes chords in readable format", () => {
       const url = generateShareUrl(
         sampleState,
         "comp-with-voicings",
         "https://fretpad.app",
       );
-      const parsed = new URL(url);
-      const encoded = parsed.searchParams.get("p");
-      expect(encoded).toBeTruthy();
-      // biome-ignore lint/style/noNonNullAssertion: asserted truthy above
-      const decoded = decodeStateFromUrl(encoded!);
-      expect(decoded?.tempo).toBe(sampleState.tempo);
+      expect(url).toContain("chords=Dm7|G7|Cmaj7|Cmaj7");
+    });
+
+    it("includes name when progression has one", () => {
+      const named = {
+        ...sampleState,
+        progression: { ...sampleState.progression, name: "My Blues" },
+      };
+      const url = generateShareUrl(named, null, "https://fretpad.app");
+      expect(url).toContain("name=My+Blues");
+    });
+
+    it("omits name when progression name is empty", () => {
+      const unnamed = {
+        ...sampleState,
+        progression: { ...sampleState.progression, name: "" },
+      };
+      const url = generateShareUrl(unnamed, null, "https://fretpad.app");
+      expect(url).not.toContain("name=");
     });
   });
 

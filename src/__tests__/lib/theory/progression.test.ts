@@ -124,9 +124,9 @@ describe("parseProgression", () => {
       expect(prog?.bars[0]?.totalBeats).toBe(3);
     });
 
-    it("uses default name", () => {
+    it("uses empty string as default name", () => {
       const prog = parseProgression("| C |");
-      expect(prog?.name).toBe("Custom Progression");
+      expect(prog?.name).toBe("");
     });
 
     it("uses default time signature 4/4", () => {

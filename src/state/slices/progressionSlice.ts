@@ -28,6 +28,7 @@ export interface ProgressionSlice {
   addBar: () => void;
   removeBar: (barIndex: number) => void;
   advanceToNextChord: () => void;
+  setProgressionName: (name: string) => void;
   transposeProgression: (semitones: number) => void;
   undo: () => void;
   redo: () => void;
@@ -259,6 +260,12 @@ export const createProgressionSlice: StateCreator<
       currentChordIndex: 0,
       currentChord: chord,
     });
+  },
+
+  setProgressionName: (name) => {
+    pushHistory(get, set);
+    const { progression } = get();
+    set({ progression: { ...progression, name } });
   },
 
   transposeProgression: (semitones) => {

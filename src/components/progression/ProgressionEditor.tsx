@@ -3,6 +3,7 @@
 import { ChevronDown, ChevronUp, Pencil, Plus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { PresetDropdown } from "@/components/progression/PresetDropdown";
+import { ProgressionName } from "@/components/progression/ProgressionName";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -287,6 +288,7 @@ export function ProgressionEditor() {
       <div className="relative">
         <div className="flex flex-wrap items-center gap-1 pb-0.5">
           <PresetDropdown />
+          <ProgressionName />
 
           {progression.bars.map((bar, barIndex) => {
             // Convert bar chords to string for editing
