@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { getNoteAtFret } from "@/lib/fretboard";
-import { generateVoicingsForChord } from "@/lib/guitar/voicingGenerator";
+import {
+  filterVoicingsByType,
+  generateVoicingsForChord,
+} from "@/lib/guitar/voicingGenerator";
 import { parseChordSymbol } from "@/lib/theory/chords";
 import type { Chord, GuitarVoicing } from "@/lib/types";
 import { STANDARD_TUNING } from "@/lib/types";
@@ -404,5 +407,40 @@ describe("generateVoicingsForChord", () => {
         }
       }
     });
+  });
+});
+
+describe("filterVoicingsByType", () => {
+  it("returns only shell voicings when filtered to shell", () => {
+    const c = chord("Cmaj7");
+    const voicings = generateVoicingsForChord(c);
+    const filtered = filterVoicingsByType(voicings, ["shell"]);
+    expect(filtered.length).toBeGreaterThan(0);
+    expect(filtered.every((v) => v.type === "shell")).toBe(true);
+  });
+
+  it("returns only drop2 voicings when filtered to drop2", () => {
+    const c = chord("Cmaj7");
+    const voicings = generateVoicingsForChord(c);
+    const filtered = filterVoicingsByType(voicings, ["drop2"]);
+    expect(filtered.length).toBeGreaterThan(0);
+    expect(filtered.every((v) => v.type === "drop2")).toBe(true);
+  });
+
+  it("returns all voicings when no filter applied", () => {
+    const c = chord("Cmaj7");
+    const voicings = generateVoicingsForChord(c);
+    const filtered = filterVoicingsByType(voicings, undefined);
+    expect(filtered).toEqual(voicings);
+  });
+
+  it("can combine multiple types", () => {
+    const c = chord("Cmaj7");
+    const voicings = generateVoicingsForChord(c);
+    const filtered = filterVoicingsByType(voicings, ["shell", "drop2"]);
+    expect(filtered.length).toBeGreaterThan(0);
+    expect(
+      filtered.every((v) => v.type === "shell" || v.type === "drop2"),
+    ).toBe(true);
   });
 });

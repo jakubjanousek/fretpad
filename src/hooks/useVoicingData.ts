@@ -1,20 +1,31 @@
 import { useMemo } from "react";
 import { computeVoiceLeadingPath } from "@/lib/guitar/voiceLeading";
-import { generateVoicingsForChord } from "@/lib/guitar/voicingGenerator";
+import {
+  filterVoicingsByType,
+  generateVoicingsForChord,
+} from "@/lib/guitar/voicingGenerator";
 import { parseChordSymbol } from "@/lib/theory/chords";
 import { getAllChordsFromProgression } from "@/lib/theory/progression";
-import type { Chord, GuitarVoicing, Progression } from "@/lib/types";
+import type {
+  Chord,
+  GuitarVoicing,
+  GuitarVoicingType,
+  Progression,
+} from "@/lib/types";
 
 export interface VoicingData {
   /** Parsed chord objects in progression order */
   chords: Chord[];
-  /** All candidate voicings per chord position */
+  /** All candidate voicings per chord position (filtered by type if specified) */
   voicingsPerChord: GuitarVoicing[][];
   /** Optimized voice-leading path (one voicing per chord) */
   path: GuitarVoicing[];
 }
 
-export function useVoicingData(progression: Progression): VoicingData {
+export function useVoicingData(
+  progression: Progression,
+  typeFilter?: GuitarVoicingType[],
+): VoicingData {
   return useMemo(() => {
     const symbols = getAllChordsFromProgression(progression);
 
@@ -24,11 +35,13 @@ export function useVoicingData(progression: Progression): VoicingData {
       if (parsed) chords.push(parsed);
     }
 
-    const voicingsPerChord = chords.map((c) => generateVoicingsForChord(c));
+    const voicingsPerChord = chords.map((c) =>
+      filterVoicingsByType(generateVoicingsForChord(c), typeFilter),
+    );
     const path = computeVoiceLeadingPath(chords, voicingsPerChord);
 
     return { chords, voicingsPerChord, path };
-  }, [progression]);
+  }, [progression, typeFilter]);
 }
 
 /**
