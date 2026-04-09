@@ -38,6 +38,13 @@ export {
   parseBar,
   parseProgression,
 } from "./progression";
+// Scale Context
+export type { ChordScaleContext, ParentScale } from "./scaleContext";
+export {
+  areModesOfSameParent,
+  getParentScale,
+  getProgressionScaleContext,
+} from "./scaleContext";
 // Scales
 export {
   getPrimaryScale,

@@ -11,7 +11,7 @@ const SCALE_SUGGESTIONS: Record<ChordQuality, string[]> = {
   min7: ["Dorian", "Aeolian"],
   "7": ["Mixolydian", "Lydian Dominant"],
   min7b5: ["Locrian", "Locrian 6"],
-  dim: ["Diminished", "Whole Tone"],
+  dim: ["Diminished"],
   dim7: ["Diminished"],
   aug: ["Whole Tone", "Lydian Augmented"],
   sus2: ["Major", "Mixolydian"],

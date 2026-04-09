@@ -3,6 +3,7 @@
 import { Check, Play, Volume2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useScaleContext } from "@/hooks/useScaleContext";
 import {
   playChordArpeggio,
   playChordPreview,
@@ -51,6 +52,7 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
     null,
   );
   const [playingScale, setPlayingScale] = useState<string | null>(null);
+  const { detectedKey, currentChordContext } = useScaleContext();
 
   if (!chord) {
     return (
@@ -170,6 +172,33 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
 
       {/* Content grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+        {/* Key Context */}
+        {detectedKey && (
+          <div className="md:col-span-3 -mb-2">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-stone-400 dark:text-stone-500 uppercase tracking-[0.15em] text-[10px]">
+                Key
+              </span>
+              <span className="font-medium text-stone-700 dark:text-stone-200">
+                {detectedKey.label}
+              </span>
+              {currentChordContext &&
+                !currentChordContext.scaleChangesFromKey &&
+                currentChordContext.modeLabel && (
+                  <span className="text-stone-400 dark:text-stone-500">
+                    · {currentChordContext.suggestedScale} is{" "}
+                    {currentChordContext.modeLabel}
+                  </span>
+                )}
+              {currentChordContext?.scaleChangesFromKey && (
+                <span className="text-amber-600 dark:text-amber-400">
+                  · Scale changes here
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Chord Tones */}
         <div>
           <h4 className="text-[10px] uppercase tracking-[0.15em] text-stone-400 dark:text-stone-500 mb-2">
