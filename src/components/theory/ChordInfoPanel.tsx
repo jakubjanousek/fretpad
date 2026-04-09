@@ -91,10 +91,10 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
   return (
     <div className="space-y-5">
       {/* Content grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
         {/* Key Context */}
         {detectedKey && (
-          <div className="md:col-span-3 -mb-2">
+          <div className="md:col-span-2 -mb-2">
             <div className="flex items-center gap-2 text-xs">
               <span className="text-stone-400 dark:text-muted-foreground uppercase tracking-[0.15em] text-[10px]">
                 Key
@@ -214,28 +214,24 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
               return (
                 <div
                   key={`scale-${scale}-${index}`}
-                  className="flex items-center"
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-150 border",
+                    isActive
+                      ? "bg-orange-500/15 border-orange-400/50 text-orange-700 dark:text-orange-400"
+                      : "bg-surface-alt/40 border-stone-700/50 text-stone-300 hover:bg-stone-700/40",
+                  )}
                 >
                   <button
                     type="button"
                     onClick={() => handleScaleClick(scale)}
                     onMouseEnter={() => handleScaleHover(scale)}
                     onMouseLeave={() => handleScaleHover(null)}
-                    className={cn(
-                      "inline-flex items-center gap-1 px-2.5 py-1 rounded-l-full text-xs font-medium transition-all duration-150",
-                      "border-y border-l active:scale-95",
-                      isActive
-                        ? "bg-orange-500/15 border-orange-400/50 text-orange-700 dark:text-orange-400"
-                        : "bg-stone-100/60 dark:bg-surface-alt/40 border-stone-200/50 dark:border-stone-700/50 text-stone-600 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-stone-700/40",
-                      isFirst &&
-                        !isActive &&
-                        "ring-1 ring-stone-300/30 dark:ring-stone-600/30",
-                    )}
+                    className="inline-flex items-center gap-1 active:scale-95"
                   >
                     {isActive && <Check className="w-3 h-3" />}
                     {scale}
                     {isFirst && !isActive && (
-                      <span className="text-[9px] text-stone-400 dark:text-muted-foreground ml-0.5">
+                      <span className="text-[9px] text-muted-foreground ml-0.5">
                         recommended
                       </span>
                     )}
@@ -244,10 +240,10 @@ export function ChordInfoPanel({ chord }: ChordInfoPanelProps) {
                     type="button"
                     onClick={() => handlePlayScale(scale)}
                     className={cn(
-                      "p-1 rounded-r-full border-y border-r transition-colors",
+                      "transition-colors",
                       isPlayingThisScale
-                        ? "bg-orange-500/15 border-orange-400/50 text-orange-500"
-                        : "bg-stone-100/60 dark:bg-surface-alt/40 border-stone-200/50 dark:border-stone-700/50 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300",
+                        ? "text-orange-500"
+                        : "text-muted-foreground hover:text-stone-200",
                     )}
                     title={`Play ${scale}`}
                   >
