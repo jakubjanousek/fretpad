@@ -4,6 +4,7 @@ import { track } from "@vercel/analytics";
 import { ArrowRight, Guitar, Mic, Music, Waves } from "lucide-react";
 import { DM_Serif_Display } from "next/font/google";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const display = DM_Serif_Display({
   subsets: ["latin"],
@@ -38,33 +39,71 @@ const FEATURES = [
   },
 ] as const;
 
-function FretboardGraphic() {
+type NoteType = "root" | "guide" | "chord";
+
+const CHORD_FRAMES: ReadonlyArray<{
+  name: string;
+  notes: ReadonlyArray<{ s: number; f: number; type: NoteType }>;
+}> = [
+  {
+    name: "Dm7",
+    notes: [
+      { s: 4, f: 0, type: "root" }, // D
+      { s: 2, f: 3, type: "root" }, // D
+      { s: 5, f: 3, type: "guide" }, // C (b7)
+      { s: 3, f: 5, type: "guide" }, // C
+      { s: 4, f: 3, type: "guide" }, // F (b3)
+      { s: 1, f: 1, type: "guide" }, // F
+      { s: 3, f: 2, type: "chord" }, // A
+      { s: 5, f: 0, type: "chord" }, // A
+    ],
+  },
+  {
+    name: "G7",
+    notes: [
+      { s: 6, f: 3, type: "root" }, // G
+      { s: 1, f: 3, type: "root" }, // G
+      { s: 5, f: 2, type: "guide" }, // B (3)
+      { s: 2, f: 0, type: "guide" }, // B
+      { s: 4, f: 3, type: "guide" }, // F (b7)
+      { s: 1, f: 1, type: "guide" }, // F
+      { s: 4, f: 0, type: "chord" }, // D (5)
+      { s: 5, f: 5, type: "chord" }, // D
+    ],
+  },
+  {
+    name: "Cmaj7",
+    notes: [
+      { s: 5, f: 3, type: "root" }, // C
+      { s: 2, f: 1, type: "root" }, // C
+      { s: 5, f: 2, type: "guide" }, // B (maj7)
+      { s: 2, f: 0, type: "guide" }, // B
+      { s: 4, f: 2, type: "guide" }, // E (3)
+      { s: 1, f: 0, type: "guide" }, // E
+      { s: 3, f: 0, type: "chord" }, // G (5)
+      { s: 6, f: 3, type: "chord" }, // G
+    ],
+  },
+];
+
+const FRAME_DURATION_MS = 2200;
+
+function FretboardGraphic({ frameIndex }: { frameIndex: number }) {
   const strings = 6;
   const frets = 5;
-  const notes = [
-    { s: 1, f: 1, type: "guide" },
-    { s: 2, f: 0, type: "root" },
-    { s: 3, f: 2, type: "chord" },
-    { s: 4, f: 0, type: "guide" },
-    { s: 5, f: 3, type: "root" },
-    { s: 6, f: 3, type: "chord" },
-    { s: 1, f: 3, type: "scale" },
-    { s: 3, f: 4, type: "scale" },
-    { s: 5, f: 1, type: "guide" },
-  ];
+  const frame = CHORD_FRAMES[frameIndex] ?? CHORD_FRAMES[0];
+  if (!frame) return null;
 
-  const colors: Record<string, string> = {
+  const colors: Record<NoteType, string> = {
     root: "fill-orange-500",
     guide: "fill-blue-500",
     chord: "fill-emerald-500",
-    scale: "fill-slate-400",
   };
 
-  const glows: Record<string, string> = {
+  const glows: Record<NoteType, string> = {
     root: "drop-shadow(0 0 6px rgba(249,115,22,0.6))",
     guide: "drop-shadow(0 0 5px rgba(59,130,246,0.5))",
     chord: "drop-shadow(0 0 4px rgba(16,185,129,0.4))",
-    scale: "none",
   };
 
   const sw = 260;
@@ -130,9 +169,10 @@ function FretboardGraphic() {
             />
           ),
       )}
-      {notes.map((n) => (
+      {frame.notes.map((n, i) => (
         <circle
-          key={`${n.s}-${n.f}`}
+          // biome-ignore lint/suspicious/noArrayIndexKey: frame remount is intentional for re-animation
+          key={`${frameIndex}-${i}`}
           cx={px + (n.f === 0 ? -10 : fretW * (n.f - 0.5))}
           cy={py + stringH * (n.s - 1)}
           r="7"
@@ -142,8 +182,8 @@ function FretboardGraphic() {
           <animate
             attributeName="opacity"
             values="0;1"
-            dur="0.4s"
-            begin={`${0.8 + (n.s + n.f) * 0.08}s`}
+            dur="0.35s"
+            begin={`${(n.s + n.f) * 0.04}s`}
             fill="freeze"
             calcMode="spline"
             keySplines="0.4 0 0.2 1"
@@ -151,6 +191,46 @@ function FretboardGraphic() {
         </circle>
       ))}
     </svg>
+  );
+}
+
+function ChordProgressionDemo() {
+  const [frameIndex, setFrameIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setFrameIndex((i) => (i + 1) % CHORD_FRAMES.length);
+    }, FRAME_DURATION_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5">
+          {CHORD_FRAMES.map((c, i) => (
+            <span
+              key={c.name}
+              className={`rounded-md px-2 py-1 text-xs font-medium tracking-wide transition-colors duration-300 ${
+                i === frameIndex
+                  ? "bg-orange-500/15 text-orange-300 ring-1 ring-orange-500/30"
+                  : "text-muted-foreground"
+              }`}
+            >
+              {c.name}
+            </span>
+          ))}
+        </div>
+        <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-orange-500" />
+          </span>
+          Live
+        </span>
+      </div>
+      <FretboardGraphic frameIndex={frameIndex} />
+    </div>
   );
 }
 
@@ -185,21 +265,21 @@ export function LandingPage() {
               <div className="flex items-center gap-3">
                 <span className="h-px w-8 bg-orange-500/60" />
                 <span className="text-xs font-medium tracking-[0.25em] uppercase text-orange-400">
-                  Guitar practice tool
+                  For guitarists learning to improvise
                 </span>
               </div>
 
               <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.4rem,5vw,3.8rem)] leading-[1.05] tracking-[-0.02em] text-stone-50">
-                Play over changes.{" "}
+                See what to play.{" "}
                 <span className="text-muted-foreground">
-                  Nail the voicings.
+                  As the chord changes.
                 </span>
               </h1>
 
               <p className="text-lg leading-relaxed text-muted-foreground max-w-xl">
-                FretPad plays a backing track and shows you what to play — chord
-                tones for improvising, voice-led voicings for comping. No
-                install, no account — just open and play.
+                A backing track plays. Chord tones light up on the fretboard in
+                time with the changes. Your mic listens and scores how you're
+                doing. No install, no account — open and play.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -234,7 +314,7 @@ export function LandingPage() {
               <div className="relative w-full">
                 <div className="absolute inset-0 blur-3xl opacity-20 bg-gradient-to-r from-orange-400/40 via-blue-400/20 to-emerald-400/30" />
                 <div className="relative rounded-2xl border border-surface-border bg-surface/70 backdrop-blur-sm p-6 sm:p-8">
-                  <FretboardGraphic />
+                  <ChordProgressionDemo />
                   <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-muted-foreground">
                     <span className="flex items-center gap-1.5">
                       <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
@@ -247,10 +327,6 @@ export function LandingPage() {
                     <span className="flex items-center gap-1.5">
                       <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
                       Chord tone
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-2.5 w-2.5 rounded-full bg-slate-400" />
-                      Scale tone
                     </span>
                   </div>
                 </div>
