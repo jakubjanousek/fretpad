@@ -7,6 +7,7 @@ import { useState } from "react";
 import { FeedbackToast } from "@/components/feedback/FeedbackToast";
 import { Fretboard } from "@/components/fretboard/Fretboard";
 import { PracticeNowPlaying } from "@/components/practice/PracticeNowPlaying";
+import { TipsToast } from "@/components/practice/TipsToast";
 import { ProgressionEditor } from "@/components/progression/ProgressionEditor";
 import { TheoryPanel } from "@/components/theory/TheoryPanel";
 import { AudioInputScorecard } from "@/components/transport/AudioInputScorecard";
@@ -199,6 +200,7 @@ export function PracticePage({ modeId }: PracticePageProps) {
       />
       <TransportDrawer open={settingsOpen} onOpenChange={setSettingsOpen} />
       <FeedbackToast loopCount={loopCount} mode={modeId} tempo={tempo} />
+      <TipsToast loopCount={loopCount} />
     </div>
   );
 }
