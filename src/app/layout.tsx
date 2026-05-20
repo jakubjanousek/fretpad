@@ -21,11 +21,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "FretPad — Guitar Practice Tool for Improvisation",
+    default: "FretPad — Practice Jazz Improvisation on Guitar",
     template: "%s | FretPad",
   },
   description:
-    "Practice guitar improvisation over chord progressions with a visual fretboard, backing tracks, and on-demand music theory.",
+    "Practice jazz improvisation over chord changes. Guide tones light up on a visual fretboard, jazz swing backing tracks groove, and your mic scores your solos.",
   openGraph: {
     type: "website",
     siteName: "FretPad",

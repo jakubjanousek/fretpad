@@ -265,7 +265,7 @@ export function LandingPage() {
               <div className="flex items-center gap-3">
                 <span className="h-px w-8 bg-orange-500/60" />
                 <span className="text-xs font-medium tracking-[0.25em] uppercase text-orange-400">
-                  For guitarists learning to improvise
+                  For guitarists learning jazz improvisation
                 </span>
               </div>
 
@@ -277,9 +277,9 @@ export function LandingPage() {
               </h1>
 
               <p className="text-lg leading-relaxed text-muted-foreground max-w-xl">
-                A backing track plays. Chord tones light up on the fretboard in
-                time with the changes. Your mic listens and scores how you're
-                doing. No install, no account — open and play.
+                A jazz backing track grooves under you. Chord tones light up on
+                the fretboard in time with the changes. Your mic listens and
+                scores your solo. No install, no account — open and play.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
