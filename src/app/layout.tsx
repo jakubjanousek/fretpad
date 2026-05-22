@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/react";
+import { BotIdClient } from "botid/client";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { InstallPromptBanner } from "@/components/InstallPromptBanner";
@@ -54,6 +55,9 @@ export const viewport: Viewport = {
   ],
 };
 
+// Routes guarded by Vercel BotID — keep in sync with the API route handlers.
+const protectedRoutes = [{ path: "/api/feedback", method: "POST" }];
+
 const themeScript = `
 (function() {
   document.documentElement.classList.add('dark');
@@ -68,6 +72,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
+        <BotIdClient protect={protectedRoutes} />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Required for theme flash prevention */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

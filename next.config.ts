@@ -1,4 +1,5 @@
 import withSerwistInit from "@serwist/next";
+import { withBotId } from "botid/next/config";
 import type { NextConfig } from "next";
 
 const withSerwist = withSerwistInit({
@@ -16,4 +17,8 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSerwist(nextConfig);
+// botid is typed against an older Next.js release; the config shape is
+// compatible at runtime, so cast to the parameter type withBotId expects.
+export default withBotId(
+  withSerwist(nextConfig) as Parameters<typeof withBotId>[0],
+);
