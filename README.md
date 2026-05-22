@@ -2,6 +2,12 @@
 
 A browser-based practice tool for jazz guitar improvisation. Pick a chord progression, get a backing loop, and see the fretboard light up with chord tones, guide tones, and scales — so you can spend practice time playing instead of working out theory.
 
+**▶ Try it live: [fretpad.com](https://fretpad.com)**
+
+<!-- TODO: add a screenshot — drop an image at docs/screenshot.png and uncomment:
+![FretPad fretboard view](docs/screenshot.png)
+-->
+
 > **Heads up — this is a hobby project, built in the open.**
 > I'm not trying to ship a product here. FretPad is where I learn by building: experimenting with audio in the browser, music theory in code, and modern React/Next.js. Things are half-finished, the roadmap shifts, and I leave my mistakes in the commit history on purpose. If that's useful or interesting to you, great. If you spot something I got wrong, even better — tell me.
 
