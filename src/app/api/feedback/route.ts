@@ -2,6 +2,7 @@ import { put } from "@vercel/blob";
 import { checkBotId } from "botid/server";
 import { NextResponse } from "next/server";
 import { SITE_URL } from "@/lib/config";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 const MAX_COMMENT_LENGTH = 1000;
 const MAX_MODE_LENGTH = 100;
@@ -129,6 +130,20 @@ export async function POST(request: Request) {
     access: "private",
     contentType: "application/json",
   });
+
+  const posthog = getPostHogClient();
+  posthog.capture({
+    distinctId: "anonymous",
+    event: "feedback_submitted",
+    properties: {
+      rating: entry.rating,
+      has_comment: Boolean(entry.comment),
+      mode: entry.mode,
+      tempo: entry.tempo,
+      loop_count: entry.loopCount,
+    },
+  });
+  await posthog.flush();
 
   return NextResponse.json({ ok: true });
 }

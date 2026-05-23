@@ -1,6 +1,7 @@
 "use client";
 
 import { Share, X } from "lucide-react";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -41,6 +42,7 @@ export function InstallPromptBanner() {
   }, []);
 
   const dismiss = () => {
+    posthog.capture("install_prompt_dismissed");
     localStorage.setItem(INSTALL_DISMISSED_KEY, "true");
     setVisible(false);
   };

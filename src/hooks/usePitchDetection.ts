@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useCallback, useEffect, useRef } from "react";
 import { Note } from "tonal";
 import * as Tone from "tone";
@@ -355,6 +356,7 @@ export function usePitchDetection({
       micStateRef.current = "active";
       setMicActive(true);
       resetScore();
+      posthog.capture("mic_enabled");
 
       startDetectionLoop(analyser, audioContext.sampleRate);
     } catch (err) {

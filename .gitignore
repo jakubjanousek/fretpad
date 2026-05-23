@@ -63,3 +63,4 @@ public/workbox-*.js
 public/workbox-*.js.map
 
 .claude/worktrees
+.pnpm-store/

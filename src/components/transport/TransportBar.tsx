@@ -1,6 +1,7 @@
 "use client";
 
 import { Minus, Play, Plus, Settings, Square } from "lucide-react";
+import posthog from "posthog-js";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -93,7 +94,10 @@ export function TransportBar({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={handleStopClick}
+                      onClick={() => {
+                        posthog.capture("practice_session_stopped", { tempo });
+                        handleStopClick();
+                      }}
                       aria-label="Stop"
                       className="hero-button h-12 w-12 rounded-full bg-stone-700/40 hover:bg-stone-700/60 active:scale-95 transition-all duration-150"
                     >
@@ -103,7 +107,10 @@ export function TransportBar({
                     <Button
                       variant="default"
                       size="icon"
-                      onClick={handlePlay}
+                      onClick={() => {
+                        posthog.capture("practice_session_started", { tempo });
+                        handlePlay();
+                      }}
                       aria-label="Play"
                       className="hero-button h-12 w-12 rounded-full bg-orange-500 hover:bg-orange-400 border-orange-500 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-400/35 active:scale-95 transition-all duration-150"
                     >

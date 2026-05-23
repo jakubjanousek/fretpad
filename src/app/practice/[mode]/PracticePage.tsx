@@ -3,6 +3,7 @@
 import { DM_Serif_Display } from "next/font/google";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useState } from "react";
 import { FeedbackToast } from "@/components/feedback/FeedbackToast";
 import { Fretboard } from "@/components/fretboard/Fretboard";
@@ -69,6 +70,10 @@ export function PracticePage({ modeId }: PracticePageProps) {
 
   const handleModeSwitch = (targetMode: PracticeModeId) => {
     if (targetMode === modeId) return;
+    posthog.capture("mode_switched", {
+      from_mode: modeId,
+      to_mode: targetMode,
+    });
     const qs = buildQueryString(progression, tempo);
     router.push(`/practice/${targetMode}?${qs}`);
   };

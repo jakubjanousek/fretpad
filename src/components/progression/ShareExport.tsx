@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Link, Share2, Type } from "lucide-react";
+import posthog from "posthog-js";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +24,11 @@ export function ShareExport() {
     try {
       await navigator.clipboard.writeText(url);
       setCopied("url");
+      posthog.capture("share_url_copied", {
+        format: "url",
+        mode: activeMode,
+        tempo,
+      });
       setTimeout(() => setCopied(null), 2000);
     } catch (error) {
       console.error("Failed to copy URL:", error);

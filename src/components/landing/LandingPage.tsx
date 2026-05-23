@@ -4,6 +4,7 @@ import { track } from "@vercel/analytics";
 import { ArrowRight, Guitar, Mic, Music, Waves } from "lucide-react";
 import { DM_Serif_Display } from "next/font/google";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 
 const display = DM_Serif_Display({
@@ -285,9 +286,12 @@ export function LandingPage() {
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Link
                   href="/practice/outline-chord-changes"
-                  onClick={() =>
-                    track("cta_click", { mode: "outline-chord-changes" })
-                  }
+                  onClick={() => {
+                    track("cta_click", { mode: "outline-chord-changes" });
+                    posthog.capture("landing_cta_clicked", {
+                      mode: "outline-chord-changes",
+                    });
+                  }}
                   className="group inline-flex items-center gap-2.5 rounded-full bg-stone-50 px-7 py-3.5 text-sm font-medium text-stone-900 transition-all hover:gap-3.5 hover:shadow-lg hover:shadow-orange-400/10 active:scale-[0.98]"
                 >
                   Start improvising
@@ -295,9 +299,12 @@ export function LandingPage() {
                 </Link>
                 <Link
                   href="/practice/comp-with-voicings"
-                  onClick={() =>
-                    track("cta_click", { mode: "comp-with-voicings" })
-                  }
+                  onClick={() => {
+                    track("cta_click", { mode: "comp-with-voicings" });
+                    posthog.capture("landing_cta_clicked", {
+                      mode: "comp-with-voicings",
+                    });
+                  }}
                   className="group inline-flex items-center gap-2.5 rounded-full border border-stone-700 px-7 py-3.5 text-sm font-medium text-stone-300 transition-all hover:border-orange-600/40 hover:text-stone-100 active:scale-[0.98]"
                 >
                   Practice voicings

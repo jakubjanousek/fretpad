@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, Clock, Plus, Search, Trash2, X } from "lucide-react";
+import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -155,6 +156,10 @@ export function PresetDropdown() {
     loadPreset(key as keyof typeof PRESET_PROGRESSIONS);
     addRecentPreset(key, "builtin");
     setRecentPresets(loadRecentPresets());
+    posthog.capture("preset_loaded", {
+      preset_key: key,
+      preset_type: "builtin",
+    });
     setOpen(false);
     setSearch("");
   };
@@ -163,6 +168,11 @@ export function PresetDropdown() {
     setProgression(preset.progression);
     addRecentPreset(preset.id, "custom");
     setRecentPresets(loadRecentPresets());
+    posthog.capture("preset_loaded", {
+      preset_key: preset.id,
+      preset_name: preset.name,
+      preset_type: "custom",
+    });
     setOpen(false);
     setSearch("");
   };
@@ -170,6 +180,7 @@ export function PresetDropdown() {
   const handleSavePreset = (name: string) => {
     const success = savePreset(name, currentProgression);
     if (success) {
+      posthog.capture("custom_preset_saved", { preset_name: name });
       setShowSaveForm(false);
     }
   };
@@ -311,6 +322,10 @@ export function PresetDropdown() {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
+                          posthog.capture("custom_preset_deleted", {
+                            preset_id: preset.id,
+                            preset_name: preset.name,
+                          });
                           deletePreset(preset.id);
                         }}
                         className="opacity-0 group-hover/item:opacity-100 hover:text-destructive transition-opacity"

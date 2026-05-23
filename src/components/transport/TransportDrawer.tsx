@@ -1,6 +1,7 @@
 "use client";
 
 import { Keyboard, Music, Timer, TrendingUp } from "lucide-react";
+import posthog from "posthog-js";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -82,7 +83,12 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
               <Button
                 variant={metronome.enabled ? "default" : "outline"}
                 size="sm"
-                onClick={() => setMetronomeEnabled(!metronome.enabled)}
+                onClick={() => {
+                  posthog.capture("metronome_toggled", {
+                    enabled: !metronome.enabled,
+                  });
+                  setMetronomeEnabled(!metronome.enabled);
+                }}
                 aria-label={
                   metronome.enabled ? "Disable metronome" : "Enable metronome"
                 }
@@ -163,7 +169,12 @@ export function TransportDrawer({ open, onOpenChange }: TransportDrawerProps) {
               <Button
                 variant={tempoRamp.enabled ? "default" : "outline"}
                 size="sm"
-                onClick={() => setTempoRampEnabled(!tempoRamp.enabled)}
+                onClick={() => {
+                  posthog.capture("tempo_ramp_toggled", {
+                    enabled: !tempoRamp.enabled,
+                  });
+                  setTempoRampEnabled(!tempoRamp.enabled);
+                }}
                 aria-label={
                   tempoRamp.enabled ? "Disable tempo ramp" : "Enable tempo ramp"
                 }
