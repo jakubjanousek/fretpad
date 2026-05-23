@@ -2,6 +2,7 @@
 
 import { track } from "@vercel/analytics";
 import { ThumbsDown, ThumbsUp, X } from "lucide-react";
+import posthog from "posthog-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -77,6 +78,13 @@ export function FeedbackToast({ loopCount, mode, tempo }: FeedbackToastProps) {
         }),
       });
       track("feedback_submitted", { rating });
+      posthog.capture("feedback_submitted", {
+        rating,
+        has_comment: Boolean(comment.trim()),
+        mode,
+        tempo,
+        loop_count: loopCount,
+      });
     } catch {
       // Silently fail — feedback is best-effort
     }
